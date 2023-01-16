@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="user-scalable=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">
+	</script>
+<script type="text/javascript">
+	function getUrlVars() {
+		var vars = {};
+		var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+		vars[key] = value;
+		});
+		return vars;
+	}
+	function getUrlParam(parameter, defaultvalue){
+		var urlparameter = defaultvalue;
+		if(window.location.href.indexOf(parameter) > -1){
+        	urlparameter = getUrlVars()[parameter];
+	        }
+		return urlparameter;
+	}
+	var xRes = parseInt(getUrlParam('xRes','30'));
+	var yRes = parseInt(getUrlParam('yRes','30'));
+
+if ((xRes > yRes)) {
+    xRes = (xRes * 0.8);
+    yRes = (yRes * 0.04);
+} else {
+    if ((xRes < yRes)) {
+        xRes = (xRes * 3.4);
+        yRes = (yRes * 0.06);
+    } else {
+        xRes = (screen.width * 0.9);
+        yRes = (screen.height * 0.03);
+    }
+}
+
+if ((parseInt(screen.width) < parseInt(screen.height))) {
+	xRes = (screen.width * 3);
+	yRes = (screen.height * 0.09);
+	}
+else {
+	xRes=(screen.width * 0.75);
+	yRes=(screen.height * 0.03);
+	}
+</script>
+<style type="text/css">
+
+	.style1 {font-size: var(--yRes)px}
+	.style2 {text-align: left}
+	.style3 {background-color: #999999;
+	}
+
+  input[type=checkbox] {
+		width: 35px;
+		height: 35px;
+	}
+
+  input[type=radio] {
+        	width: 35px;
+		height: 35px;
+	}
+
+  .button {
+		background-color: #667C26;
+		border: none;
+		color: white;
+		padding: 20px;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		font-size: var(--yRes)px;
+		margin: 4px 2px;
+		border-radius: 12px;
+	}
+
+  table {
+		margin-left:auto;
+    margin-right:auto;
+	}
+
+  tr.spaceUnder>td {
+  padding-bottom: 3em;
+  }
+
+</style>
+</head>
+
+
+
+<body id="bodyForm">
+	<script>
+		document.getElementById('bodyForm').style = "width: " + xRes + "px; font-family: Arial, Helvetica, sans-serif; justify-content: left; overflow-x: hidden; overflow-y: hidden; background-color: white; color: #413839; font-size: "+ yRes / 2 +"px";
+	</script>
+
+	<form name="form1" method="post" action="">
+		<table border="0" cellpadding="10" width="90%">
+      <tr>
+        <td colspan="2">
+          <h2 class="style2">Proband*innen-Information und Einverständniserklärung</h2>
+            <p class="style2">Vielen Dank für Ihr Interesse an unserer Studie! <br> <br>
+                Das hier ist ein Platzhalter für eine VP-Info. <br>
+              </p>
+        </td>
+      </tr>
+
+      <!-- consent -->
+      <tr class = spaceUnder>
+          <td valign="top">
+            <br>
+            <hr>
+            Indem Sie fortfahren erklären Sie sich mit den hier genannten Bedingungen zur Teilnahme einverstanden.
+            <br><br>
+            <div style="color:green">
+              <input name="consent" type="radio" id="consent" value="True" size=20 required> Ja, ich bin einverstanden.<br><br>
+            </div>
+            <div style="color:red">
+              <input name="consent" type="radio" id="consent" value="False" size=20> Nein, ich bin nicht einverstanden.<br>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Submit Button -->
+			 <tr>
+			      <td>&nbsp;</td><td style="text-align:center"><input type="submit" name="Weiter" value="Weiter"  class="button"></td>
+			 </tr>
+
+
+		</table>
+	</form>
+
+</body>
+</html>
