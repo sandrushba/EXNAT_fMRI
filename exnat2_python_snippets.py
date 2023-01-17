@@ -618,6 +618,8 @@ exp_block_counter = 0
 curr_colour = all_colour_lists[exp_block_counter][exp_trial_counter]
 curr_block_kind = all_block_kinds[exp_block_counter][exp_trial_counter]
 curr_target = all_targets[exp_block_counter][exp_trial_counter]
+curr_text_nr = all_texts_nrs_list[exp_block_counter]
+curr_word = all_texts_list[exp_block_counter][exp_trial_counter]
 
 
 """ IMPORTANT: """
