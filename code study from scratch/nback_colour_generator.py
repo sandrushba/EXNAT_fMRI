@@ -11,7 +11,7 @@
 
 
 
-''' ---- 1. Settings ----------------------------------------'''
+''' ---- Settings ----------------------------------------'''
 
 import numpy as np
 import random
@@ -483,6 +483,11 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
       else:
         target_colours.append(target_colour)
         target_colours_counter.append(1)
+
+
+
+
+
 
 
 
