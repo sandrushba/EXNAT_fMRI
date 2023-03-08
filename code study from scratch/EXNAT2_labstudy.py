@@ -22,7 +22,7 @@ import os
 import sys
 
 # psychopy for creating study components
-from psychopy import visual, core, event
+from psychopy import visual, core, event, gui
 
 # numpy for being able to calculate
 import numpy as np
@@ -31,10 +31,10 @@ import numpy as np
 import random
 
 # pylsl for pushing triggers to lsl stream
-#from pylsl import StreamInlet, resolve_stream, StreamOutlet, StreamInfo, local_clock, StreamInlet
+# from pylsl import StreamInlet, resolve_stream, StreamOutlet, StreamInfo, local_clock, StreamInlet
 
-#import socket
-#import serial
+# import socket
+# import serial # I guess that's for serial ports?
 
 
 # Set working directory
@@ -61,33 +61,39 @@ def main_experiment():
         ## ################    Demographics         ####################
 
         # get user input
-        ID = input("Wie lautet Ihr Versuchspersonen-Code?") # ID
-        age = input("Wie alt sind Sie?") # age
-        gender = input("Welches Geschlecht steht \nin Ihrem Ausweis (m / w / d)?") # gender
+        # what do we want to know?
+        exp_info = {'Geschlecht': 'w', 'Alter': '', 'Versuchspersonen-Code': '', 'Händigkeit': 'r'}
+        # create dialogue box with text fields
+        dlg = gui.DlgFromDict(exp_info) # show small window for user input
 
-        # push as triggers to LSL
+        # Check whether user clicked okay or cancel in the dialogue box.
+        # If they clicked cancel, print message and abort experiment
+        if not dlg.OK:
+            print("User pressed 'Cancel'!")
+            core.quit()
+            
+        # If everything's fine though, proceed:
+        # push information as triggers to LSL
         #out_marker.push_sample(["START EXPERIMENT"]) 
-        #out_marker.push_sample(["ID: " + ID + ", age: " + age + ", gender: " + gender]) 
+        #out_marker.push_sample([ "ID: " + exp_info['Versuchspersonen-Code'] + ", age: " + exp_info['Alter'] + ", gender: " + exp_info['Geschlecht'] + ", handedness: " + exp_info['Händigkeit'] ]) 
 
         
-        ## ################    Setup Psychopy     ####################
+        ## ################    Experiment Settings     ####################
 
-        # Set window and remove mouse during experiment:
+        """ set up window for experiment """
         global win
         win = visual.Window(size     = (800,600), # set window size
                             fullscr  = False, # make window full screen for better timing and less distractions
                             allowGUI = True, # False = draw window w/o frame or closing buttons
                             monitor  = 'testMonitor', 
                             units    = 'norm',
-                            color    = [1,1,1])
+                            color    = [1,1,1]) # make the background white for a start
+                
         
+        """ set response keys """
         # make sure there are no key events defined so we start with a clean slate
         event.globalKeys.clear()
         
-        
-        ## ################    Experiment Settings     ####################
-
-        """ set response keys """
         # to go from word to word, I use the Space bar
         # to indicate that an n-back target was detected & 
         # the key C for right-handed people 
@@ -101,7 +107,6 @@ def main_experiment():
 
         continue_key = "Space"
         event.globalKeys.add(key = continue_key, func = next_word)
-
 
 
         """ set colours """        
@@ -124,6 +129,28 @@ def main_experiment():
         # People with a "true" colour blindness 
         # (i.e. protanopia, deuteranopia, tritanopia)
         # shouldn't participate in this study.
+
+
+        """ create n-back colour lists for all blocks """
+        # There are 9 dual-task main blocks à 300 stimuli each (50 targets)
+        # reading bl * 3
+        # 1-back * 3
+        # 2-back * 3
+        
+        # We also have 2 dual-task main blocks, 
+        # one for 1-back and 1 for 2-back à 60 trials each (10 targets):
+        # 2 * single main
+        
+        # Then we also have 4 short training blocks à 20 trials each (5 targets)
+        # 4 * single training
+        
+        # Lastly, there's also the reading bl training text à 159 trials
+        
+        # So for every block, build a list with colour codes containing the right amount of targets.
+        # The function is defined in another script bc it's super long, 
+        # I import it at the beginning of this script.
+        
+
 
 
         """ set texts """
@@ -207,9 +234,9 @@ def main_experiment():
         main_blocks1 = [elem for sublist in main_blocks1 for elem in sublist]
         
         # now shuffle order of the last 6 main blocks:
-        main_blocks2 = ["Reading_Baseline_main", "Reading_Baseline_main", "2back_dual_main", 
-                       "1back_dual_main", "1back_dual_main", 
-                       "2back_dual_main"]
+        main_blocks2 = ["Reading_Baseline_main", "Reading_Baseline_main",  
+                        "1back_dual_main", "1back_dual_main", 
+                        "2back_dual_main", "2back_dual_main"]
         random.shuffle(main_blocks2)
         
         # put them all together:
@@ -217,44 +244,19 @@ def main_experiment():
         all_blocks = Reading_BL + main_blocks1 + main_blocks2
         
 
-
-
-
-
-
-
-        ## ################    Stimuli Psychopy    #################
-
-        ## intro
-        global exp_text
-        exp_text = visual.TextStim(win,
-                                     pos=[0,0],
-                                     color = (1,1,1)
-                                     )
-
-        ## main trial components
-        global fixation
-        fixation =  visual.TextStim(win,
-                                    pos=[0,0],
-                                    text = '+',
-                                    height = 0.7,
-                                    color = (1,1,1)
-                                    )
-
-
+        ####################  START EXPERIMENT  ###################################
+        
         # Set timer
         global timer
         timer = core.Clock()
+
         
-        ####################  START EXPERIMENT  ###################################
 
-
-
-
-
-
-
-
+        # Show instructions for first block
+        
+        global instr
+        instr = "Im folgenden Experiment geht es darum, kurze Texte zu lesen. \nJeder Text wird Ihnen dabei Wort für Wort angezeigt. \n\nBitte drücken Sie die Leertaste um zum nächsten Wort zu gehen."
+        displ_instr(instr)
 
 
         ####################  TRAINING BLOCK ###################################
@@ -292,16 +294,14 @@ def main_experiment():
 ''' function for showing instructions '''
 def displ_instr(text):
     
-    # set text:
-    global show_instr                    # init global variable show_instr
-    show_instr.text  = text              # set text
-    show_instr.font  = "Times New Roman" # set font
-    show_instr.color = "black"           # font colour should be black
-    
-    # draw text:
+    # create text stimulus object
+    global show_instr  
+    show_instr = visual.TextStim(win, text = text, font = "Times New Roman", color = "black", pos=[0,0])
+    # show object in window
     show_instr.draw()                    # draw image
-    win.flip()                           # show image on screen
+    win.flip()                          # show image on screen
     
+
 
     
     
@@ -316,7 +316,7 @@ def displ_word(word, colour, target, nback_cond = None):
     
     # create text stimulus object
     global text_stim  
-    text_stim = visual.TextStim(win, text = word, font = "Times New Roman", color = colour)
+    text_stim = visual.TextStim(win, text = word, font = "Times New Roman", color = colour, pos=[0,0])
     # show object in window
     text_stim.draw()                    # draw image
     win.flip()                          # show image on screen
