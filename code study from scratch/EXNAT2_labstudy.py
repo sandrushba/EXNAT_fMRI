@@ -41,12 +41,18 @@ import random
 dir_path = os.path.dirname(os.path.realpath(__file__))
 # set working directory to location of current file
 
+# I defined a function for generating colour lists in another script, so import that one, too:
+from nback_colour_generator import create_nback_stimlist
+
+
+
+
 ''' ---- 2. Prep functions ----------------------------------------'''
 
 
 
 def main_experiment():
-    
+            
 
 
         ## ################    Setup LSL Stream     ####################
