@@ -13,13 +13,6 @@
 
 ''' ---- 1. Settings ----------------------------------------'''
 
-# reset the namespace, which means all variables, functions, 
-# and imported modules will be removed from memory.
-# This will not clear any files or data saved on your computer, 
-# it will only clear the memory of the current Spyder console session.
-from IPython import get_ipython
-get_ipython().magic('reset -sf')
-
 
 # Import packages 
 # --> you might have to pip install some of the packages first
@@ -30,6 +23,8 @@ import os
 
 # for getting current date & time
 import datetime
+
+import pyglet 
 
 # psychopy for creating study components
 from psychopy import visual, core, event, gui
@@ -198,7 +193,7 @@ def main_experiment():
         """ set up window for experiment """
         
         global win
-        out_marker.push_sample(["start"])
+        #out_marker.push_sample(["start"])
         win = visual.Window(size     = (800,600), # set window size
                             fullscr  = False, # make window full screen for better timing and less distractions
                             allowGUI = True, # False = draw window w/o frame or closing buttons
@@ -221,11 +216,11 @@ def main_experiment():
         # add new global event keys "c" and "Space"
         # "c" calls the function target_response and Space calls the 
         # function next_word (both defined at the end of the script)
-        target_key = "c"
-        event.globalKeys.add(key = target_key, func = target_response)
+        #target_key = "c"
+        #event.globalKeys.add(key = target_key, func = target_response)
 
-        continue_key = "Space"
-        event.globalKeys.add(key = continue_key, func = next_word)
+        #continue_key = "Space"
+        #event.globalKeys.add(key = continue_key, func = next_word)
 
 
         """ set colours """        
@@ -423,9 +418,11 @@ def main_experiment():
 
         # Show instructions for first block        
         global instr
-        instr = "Im folgenden Experiment geht es darum, kurze Texte zu lesen. \nJeder Text wird Ihnen dabei Wort für Wort angezeigt. \n\nBitte drücken Sie die Leertaste um zum nächsten Wort zu gehen."
+        instr = "Im folgenden Experiment geht es darum, kurze Texte zu lesen. \nJeder Text wird Ihnen dabei Wort für Wort angezeigt. \nIm Anschluss an den Text werden Ihnen 3 Multiple-Choice-Fragen zum Inhalt des Textes gestellt.\n\n Bitte drücken Sie die Leertaste um zum nächsten Wort zu gehen. "
         displ_instr(instr)
 
+        
+        
 
         ####################  TRAINING BLOCK ###################################
 
@@ -480,7 +477,7 @@ def displ_instr(text):
 # input arguments: text to display
 # optional: font size & font colour
 
-def text_trial(word, colour, target, nback_cond = None):
+def text_trial(word, colour, target, trial_counter, nback_cond = None):
     
     """ trial settings """
     curr_nback_RT = 0
@@ -568,7 +565,7 @@ def record_space_c():
     curr_duration = 0
     
     while True:
-        keys = psychopy.event.getKeys(keyList = ['space', 'c'], timeStamped = True)
+        keys = event.getKeys(keyList = ['space', 'c'], timeStamped = True)
         if keys:
             # Record the first key pressed and its response time
             key, response_time = keys[0]
@@ -586,18 +583,105 @@ def record_space_c():
     return curr_nback_RT, curr_duration
        
  
- """ Function to record button press "Space" """
+""" Function to record button press "Space" """
 # --> for single task   
 def record_space():
     # wait for key press:    
-    keys = psychopy.event.getKeys(keyList = ['space'], timeStamped = True)
+    keys = event.getKeys(keyList = ['space'], timeStamped = True)
     # get current duration    
     key, curr_duration = keys[0]
     # return value
     return curr_duration
 
     
-    
-    
-    
+""" Function to display MC questions and record answer """
 
+def multiple_choice(win, question, options):
+    
+    """
+    This function presents a multiple choice question 
+    and allows the the participant to use the up/down arrow keys 
+    # to select an option. 
+    # Once an option is selected, it will be highlighted in green. 
+    # The participant can change their selection by using the arrow keys again. 
+    # They can confirm their selection by pressing the return key, 
+    # which will return the selected option as a string. 
+    # If the participant doesn't make a selection before pressing return, 
+    # nothing will happen, which means they have to choose if they want to proceed.  
+    
+    Parameters:
+    question (str): the question text(e.g. question = "Which bird is the fastest?")
+    options (list): a list of three answer options (e.g. options = ["racing pigeon","peregrine falcon", "great philippine eagle"])
+    win (visual.window.Window): window to present the question in
+    
+    """
+    
+    # Create a list of text objects for each answer option
+    option_texts = [visual.TextStim(win, text = opt,  height=20, pos = (0, -50*(i-1))) for i, opt in enumerate(options, start = 1)]
+    # Create a text object for the question
+    question_text = visual.TextStim(win, text = question, color = "black", pos = (0, 100), height = 30)
+    
+    # Set initial option selection to None
+    selected_option = "NO_ANS"
+    
+    # Create a loop to handle input
+    while True:
+        
+        # Draw the question and options to the screen
+        question_text.draw()
+        
+        for text_obj in option_texts:
+            # Highlight the selected option in green
+            if text_obj.text == selected_option:
+                text_obj.color = "green"
+            else:
+                text_obj.color = "black"
+            text_obj.draw()
+        win.flip()
+        
+        # Wait for user input
+        keys = event.waitKeys(keyList=["up", "down", "return"])
+        print(keys)
+        if keys == ['up']:
+            # Select the previous option
+            if selected_option != "NO_ANS":
+                index = options.index(selected_option)
+                if index > 0:
+                    selected_option = options[index-1]
+        
+        elif keys == ['down']:
+            print("detected down")
+            # Select the next option
+            if selected_option != "NO_ANS":
+                index = options.index(selected_option)
+                if index < len(options)-1:
+                    selected_option = options[index+1]
+        
+        # force participant to answer
+        elif keys == ['return'] and selected_option != "NO_ANS":
+            print("detected return")
+            # End the loop and return the selected option
+            return selected_option
+    
+    
+# Set up the window
+win = visual.Window(size=(800, 600), color="#ffffff", monitor = "testmonitor", units="pix", fullscr=False)
+
+# Call the function with your desired question and options
+question = "Which bird is the fastest?"
+options = ["racing pigeon","peregrine falcon", "great philippine eagle"]
+selected_option = multiple_choice(win, question, options)
+
+# Close the window when you're done
+win.close()
+core.quit()
+print("closed window")
+
+
+
+import sys
+print(sys.executable)
+
+
+
+    
