@@ -13,13 +13,23 @@
 
 ''' ---- 1. Settings ----------------------------------------'''
 
-# import packages 
+# reset the namespace, which means all variables, functions, 
+# and imported modules will be removed from memory.
+# This will not clear any files or data saved on your computer, 
+# it will only clear the memory of the current Spyder console session.
+from IPython import get_ipython
+get_ipython().magic('reset -sf')
+
+
+# Import packages 
 # --> you might have to pip install some of the packages first
+
 
 # os for getting/setting working directory
 import os
 
-import sys
+# for getting current date & time
+import datetime
 
 # psychopy for creating study components
 from psychopy import visual, core, event, gui
@@ -30,26 +40,37 @@ import numpy as np
 # for random number generator
 import random
 
+# for saving data in csv
+import pandas as pd
+
 # pylsl for pushing triggers to lsl stream
-# from pylsl import StreamInlet, resolve_stream, StreamOutlet, StreamInfo, local_clock, StreamInlet
+# from pylsl import StreamInlet, resolve_stream, StreamOutlet, StreamInfo
 
-# import socket
-# import serial # I guess that's for serial ports?
-
-
-# Set working directory
-dir_path = os.path.dirname(os.path.realpath(__file__))
-# set working directory to location of current file
-
-# I defined a function for generating colour lists in another script, so import that one, too:
-from nback_colour_generator import create_nback_stimlist
+# I guess that's for serial ports?
+# import serial 
 
 
+# Set working directory:
+
+# get the absolute path of the current file
+#current_file = os.path.abspath(os.getcwd())
+
+# get the directory containing the current file
+#current_dir = os.path.dirname(current_file)
+
+# set the working directory to the directory containing the current file
+#os.chdir(current_dir)
 
 
-''' ---- 2. Prep functions ----------------------------------------'''
+os.chdir("/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/code study from scratch")
 
 
+# I defined a function for generating colour lists in another script, so import that one, too.
+# Also import function for counting n-back targets in stimulus list
+from nback_colour_generator import create_nback_stimlist, get_targets
+
+
+''' ---- 2. Main Experiment function ----------------------------------------'''
 
 def main_experiment():
             
@@ -62,6 +83,85 @@ def main_experiment():
         global out_marker
         #info_marker_stream = StreamInfo('PsychoPyMarkers', 'Marker', 1, 0, 'string')
         #out_marker = StreamOutlet(info_marker_stream)
+        out_marker.push_sample(["TEST MARKER"])
+
+
+
+        ## ################    Setup CSV           ####################
+
+        # Create columns for all information we'd like to save
+        
+        # col 0: ID
+        ID = []
+        
+        # col 1: age
+        age = []
+        
+        # col 3: gender
+        gender = []
+        
+        # col 4: handedness
+        handedness = []
+        
+        # col 5: sender
+        sender = []
+        
+        # col 6: block_kind
+        block_kind = []
+        
+        # col 7: text_nr
+        text_nr = []
+            
+        # col 8: duration
+        duration = []
+        
+        # col 9: word
+        word = []
+        
+        # col 10: colour
+        colour = []
+        
+        # col 11: target
+        target = []
+        # col 12: nback_response
+        nback_response = []
+        
+        # col 13: nback_RT
+        nback_RT = []
+        
+        # col 14: trial_nr
+        trial_nr = []
+        
+        # col 15: block_nr
+        block_nr = []
+        
+        # col 16: Q1
+        Q1 = []
+
+        # col 17: Q2
+        Q2 = []
+        
+        # col 18: Q3
+        Q3 = []
+        
+        # col 19: subj_reading_effort1
+        subj_reading_effort1 = []
+        
+        # col 20: subj_reading_effort2
+        subj_reading_effort2 = []
+        
+        # col 21: subj_text_difficulty
+        subj_text_difficulty = []
+        
+        # col 22: subj_text_incomprehensibility1
+        subj_text_incomprehensibility1 = []
+        
+        # col 23: subj_text_incomprehensibility2
+        subj_text_incomprehensibility2 = []
+        
+        # col 24: subj_interest_in_text
+        subj_interest_in_text = []
+
 
 
         ## ################    Demographics         ####################
@@ -78,16 +178,27 @@ def main_experiment():
             print("User pressed 'Cancel'!")
             core.quit()
             
-        # If everything's fine though, proceed:
-        # push information as triggers to LSL
-        #out_marker.push_sample(["START EXPERIMENT"]) 
-        #out_marker.push_sample([ "ID: " + exp_info['Versuchspersonen-Code'] + ", age: " + exp_info['Alter'] + ", gender: " + exp_info['Geschlecht'] + ", handedness: " + exp_info['Händigkeit'] ]) 
+        # If everything's fine though, proceed: Push information to LSL.
+        # In this new LSL stream called "Demographics", we have 7 channels, each channel containing a string (
+        # = our demographical data and a few additional information on the dataset)
+        demogr_info = pylsl.StreamInfo('Demographics', 'DemographicsData', 7, 0, pylsl.cf_string)
+        demogr_outlet = pylsl.StreamOutlet(demogr_info)
+        demogr_data = ['Participant ID: ' + exp_info['Versuchspersonen-Code'] , 
+                       'Age: ' + exp_info['Alter'], 
+                       'Gender: ' + exp_info['Geschlecht'], 
+                       'Handedness: ' + exp_info['Handedness'], 
+                       'Native Language: German',
+                       'Vision: corrected or corrected to normal',
+                       'Date & time of recording' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")]
+        demogr_outlet.push_sample(demogr_data)
 
         
         ## ################    Experiment Settings     ####################
 
         """ set up window for experiment """
+        
         global win
+        out_marker.push_sample(["start"])
         win = visual.Window(size     = (800,600), # set window size
                             fullscr  = False, # make window full screen for better timing and less distractions
                             allowGUI = True, # False = draw window w/o frame or closing buttons
@@ -95,6 +206,8 @@ def main_experiment():
                             units    = 'norm',
                             color    = [1,1,1]) # make the background white for a start
                 
+        
+        
         
         """ set response keys """
         # make sure there are no key events defined so we start with a clean slate
@@ -135,28 +248,6 @@ def main_experiment():
         # People with a "true" colour blindness 
         # (i.e. protanopia, deuteranopia, tritanopia)
         # shouldn't participate in this study.
-
-
-        """ create n-back colour lists for all blocks """
-        # There are 9 dual-task main blocks à 300 stimuli each (50 targets)
-        # reading bl * 3
-        # 1-back * 3
-        # 2-back * 3
-        
-        # We also have 2 dual-task main blocks, 
-        # one for 1-back and 1 for 2-back à 60 trials each (10 targets):
-        # 2 * single main
-        
-        # Then we also have 4 short training blocks à 20 trials each (5 targets)
-        # 4 * single training
-        
-        # Lastly, there's also the reading bl training text à 159 trials
-        
-        # So for every block, build a list with colour codes containing the right amount of targets.
-        # The function is defined in another script bc it's super long, 
-        # I import it at the beginning of this script.
-        
-
 
 
         """ set texts """
@@ -224,18 +315,20 @@ def main_experiment():
         # The first blocks should be:
         #    - reading baseline + training
         #    - click training
-        #    - in random order: 1-back (single task training & main & dual task main) & 2-back (single task training & main & dual task main)
+        #    - in random order: 1-back (2x single task training & 1x main & 1x dual task main) & 2-back (2x single task training & 1x main & 1x dual task main)
         #    - in random order: 2x reading BL main, 2x 1-back main, 2x 2-back main
         
         # this always comes first in the experiment
         Reading_BL = ["Reading_Baseline_training", "Reading_Baseline_main", "click_training"]
         
         # then you get both n-back conditions with trainings (which of them is first is randomized)
-        oneback = ["1back_single_training", "1back_single_main", "1back_dual_main"]
-        twoback = ["2back_single_training", "2back_single_main", "2back_dual_main"]
+        oneback = ["1back_single_training1", "1back_single_training2", "1back_single_main", "1back_dual_main"]
+        twoback = ["2back_single_training1", "2back_single_training2", "2back_single_main", "2back_dual_main"]
+        
         # shuffle the order of the 2 lists
         main_blocks1 = [oneback, twoback]
         random.shuffle(main_blocks1)
+        
         # flatten nested list
         main_blocks1 = [elem for sublist in main_blocks1 for elem in sublist]
         
@@ -249,17 +342,86 @@ def main_experiment():
         global all_blocks 
         all_blocks = Reading_BL + main_blocks1 + main_blocks2
         
+        
+        
+        
+        """ create n-back colour lists for all blocks """
+                
+        # The reading bl training text has 159 trials.
+        
+        # The click training has 6 trials. 
+        
+        # Then we also have 4 short training blocks à 20 trials each (5 targets)
+        # 4 * single training
+                
+        # We have 2 single-task main blocks, 
+        # one for 1-back and 1 for 2-back à 60 trials each (10 targets):
+        # 2 * single main
+        
+        # There are 9 dual-task main blocks à 300 stimuli each (50 targets)
+        # reading bl * 3
+        # 1-back * 3
+        # 2-back * 3
+        
+        # --> all in all, 15 blocks
+        
+        # So for every block, build a list with colour codes containing the right amount of targets.
+        # The function is defined in another script bc it's super long, 
+        # I import it at the beginning of this script.
+
+        # First, create list with length of all texts. The length of the blocks is 
+        # always in the same order, only the conditions change.
+        blocks_textlen = [159, 300, 6, # reading bl blocks + click training
+                          20, 60, 60, 300, 20, 60, 60, 300, # main blocks 1 + trainings & single tasks
+                          300, 300, 300, 300, 300, 300] # main blocks 2        
+        blocks_target_counts = [25, 50, 1, # reading bl blocks + click training
+                                5, 10, 10, 50, 5, 10, 10, 50, # main blocks 1 + trainings & single tasks
+                                50, 50, 50, 50, 50, 50]
+        # Now loop this list. Check which condition we have there and the create colour list for each text.
+        all_colour_lists = []
+        all_target_lists = []
+        for block_idx, block_length in enumerate(blocks_textlen):
+            
+            # get 1st letter of block name - that tells us the condition
+            block_cond = all_blocks[block_idx][0]
+            
+            # for each condition, decide which n-back level we want to assign
+            # For all no-n-back blocks, we use 1 (just for the colour list generation)
+            global curr_nback_level
+            if block_cond == "R":
+                curr_nback_level = 1
+            elif block_cond == "c":
+                curr_nback_level = 1
+            elif block_cond == "1":
+                curr_nback_level = 1
+            else: curr_nback_level = 2
+                  
+            # generate colour list for current block  
+            global curr_colours
+            curr_colours = create_nback_stimlist(nback_level = curr_nback_level, 
+                                                 colour_codes = colours, 
+                                                 story = ["x"] * block_length, 
+                                                 target_abs_min = blocks_target_counts[block_idx], 
+                                                 target_abs_max = blocks_target_counts[block_idx], 
+                                                 zeroback_target = None)
+        
+            
+            # get list of targets / non-targets
+            curr_targets = get_targets(stim_list = curr_colours, 
+                                       nback_level = curr_nback_level)
+
+            # add to bigger lists
+            all_colour_lists.append(curr_colours)
+            all_target_lists.append(curr_targets)
+
+
+        print("------ finished preparing stimuli! ------")
+
 
         ####################  START EXPERIMENT  ###################################
         
-        # Set timer
-        global timer
-        timer = core.Clock()
 
-        
-
-        # Show instructions for first block
-        
+        # Show instructions for first block        
         global instr
         instr = "Im folgenden Experiment geht es darum, kurze Texte zu lesen. \nJeder Text wird Ihnen dabei Wort für Wort angezeigt. \n\nBitte drücken Sie die Leertaste um zum nächsten Wort zu gehen."
         displ_instr(instr)
@@ -318,70 +480,124 @@ def displ_instr(text):
 # input arguments: text to display
 # optional: font size & font colour
 
-def displ_word(word, colour, target, nback_cond = None):
+def text_trial(word, colour, target, nback_cond = None):
     
-    # create text stimulus object
+    """ trial settings """
+    curr_nback_RT = 0
+    
+    
+    """ create text stimulus object & show on screen """
     global text_stim  
     text_stim = visual.TextStim(win, text = word, font = "Times New Roman", color = colour, pos=[0,0])
     # show object in window
     text_stim.draw()                    # draw image
     win.flip()                          # show image on screen
     
-    # send word onset trigger to lsl stream
-    marker_text = "dual_main_" + nback_cond + "_" + word + "_" + colour + "_" + str(target)
-    #out_marker.push_sample(["WORD_ONSET_" + marker_text]) # send scaling factor
     
+    """ send word onset trigger to LSL stream """
+    marker_text = "dual_main_" + nback_cond + "_" + word + "_" + colour + "_" + str(target)
+    #out_marker.push_sample(["WORD_ONSET_" + marker_text])
+    
+    
+    """ record trial onset time """
+    onset_time = core.getTime()
+    
+    """ fixed word display: 50 ms = 3 frames """
     # wait for about 50 ms before participant is allowed to react 
     # (50 ms should be about 3 frames with a frame rate of 60 Hz aka 16.667 ms / cycle)
-
-
-
-""" function for n-back task response (key: c)""" 
-def target_response(win, nback_cond, word, colour, target, target_button):
-    pass
-
-
-""" function for going to the next stimulus (key: Space)""" 
-def next_word(nback_cond, word, colour, target, target_detected):
-    pass
+    num_frames = 3
+    # get expected duration of next screen flip in seconds and add the number of 
+    # frames you want to wait for by dividing the number of frames by the frame rate
+    wait_time = win.getFutureFlipTime() + (num_frames / win.getActualFrameRate())
+    # while the time we set as wait_time is not over, do nothing. After it, we can proceed.
+    while core.getTime() < wait_time:
+        pass  # do nothing
     
+    """ record responses """
 
+    if nback_cond == None:
+        # In single-task reading blocks, participants can press the 
+        # Space button to go to the next word.
+        # Record response time if space was pressed.
+        curr_duration = record_space()
 
-
-def dual_task_trial(nback_cond, word, colour, target, target_button):
-
-    # nback_con = which n-back condition we have in this block, can be either 1-back or 2-back 
-    # word = which word to display
-    # colour = which font colour the current word should have
-    # target = is the current trial an n-back target trial?
-    # target_button = which button should the participant press to indicate they saw an n-back target?
-    
-    
-    """ Send marker to indicate the onset of the trial (aka word onset) """
-    # create a marker that tells us which condition, colour, & word we have in this trial
-    # and whether the trial was a target trial
-    marker_text = "dual_main_" + nback_cond + "_" + word + "_" + colour + "_" + str(target)
-    #out_marker.push_sample(["WORD_ONSET_" + marker_text]) 
-    
-    # show word
-    # end if Space button was pressed & record duration
-    #presTextPsychoPy(word)
+    else:
+        # In dual-task blocks & single-task n-back blocks, 
+        # participants can either press the 
+        # Space button to go to the next word or the C button 
+        # to indicate they saw a target. 
+        # Only end the component if Space was pressed, but record 
+        # response times for both kinds of responses.
+        curr_nback_RT, curr_duration = record_space_c
     
     
-    # reset trial timer
-    #timer.reset()
-    #countdownTimer = core.CountdownTimer(dur_trial)
+    """ send word offset trigger to LSL stream """
+    # this time, also include nback RT & reading time
+    marker_text = marker_text + "nback_RT:" + curr_nback_RT + "_RT:" + curr_duration 
+    #out_marker.push_sample(["WORD_OFFSET_" + marker_text])
+    
+    
+    """ get kind of n-back response (hit, miss, false alarm, correct rejection) """
+    
     
 
-    # reset input buffer from serial port
-    #ser.reset_input_buffer()
-    #c = 0 # init buffer for serial port reset
     
-    # send trial onset marker to lsl
-    #out_marker.push_sample(['trial_start_sf_{}'.format(scl_fctr_fdbck)]) # send scaling factor
+
+    """ save data """
+
+    """ increase trial counter """
+    trial_counter += 1
+    
+
+    """ End current trial slide """
+    word.setAutoDraw(False)
+    colour.setAutoDraw(False)
     
     
-    """ Send marker to indicate the offset of the trial (aka word offset) """
-    #out_marker.push_sample(['end_trial']) # send 1 for start of fixation cross
+    
+    
+    
+    
+
+    
+""" Function to record button presses "C" and "Space" """
+# --> for dual task
+def record_space_c():
+    # placeholder variables for our RTs
+    curr_nback_RT = 0
+    curr_duration = 0
+    
+    while True:
+        keys = psychopy.event.getKeys(keyList = ['space', 'c'], timeStamped = True)
+        if keys:
+            # Record the first key pressed and its response time
+            key, response_time = keys[0]
+            # if the key way Space, save response time in 
+            # curr_duration and break the loop
+            if key == 'space':
+                curr_duration = response_time
+                break
+            # if the key was C, record response time but don't 
+            # break the loop - we want to wait for Space to be pressed!
+            elif key == 'c':
+                curr_nback_RT = response_time
+    
+    # return both RTs
+    return curr_nback_RT, curr_duration
+       
+ 
+ """ Function to record button press "Space" """
+# --> for single task   
+def record_space():
+    # wait for key press:    
+    keys = psychopy.event.getKeys(keyList = ['space'], timeStamped = True)
+    # get current duration    
+    key, curr_duration = keys[0]
+    # return value
+    return curr_duration
+
+    
+    
+    
     
 

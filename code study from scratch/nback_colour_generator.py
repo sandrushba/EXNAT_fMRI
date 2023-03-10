@@ -19,11 +19,8 @@ import math as Math
 
 
 
-''' ---- 1. Function: draw w/o replacement with sample size > sampling list ----------'''
-# --> Idea: draw w/o replacement, start over again if you run out of
-#           values, then shuffle your sample
-#           draw without replacement from list with sample size > list
-#           start over again if no values left for drawing, shuffle everything in the end
+''' ---- 1st Function: draw w/o replacement with sample size > sampling list ----------'''
+
 def draw_without_replacement(sampling_list, sample_size):
     
     """
@@ -60,16 +57,8 @@ def draw_without_replacement(sampling_list, sample_size):
 
 
 
-''' ---- 2. Function: generate n-back colour list with given target number ----------'''
+''' ---- 2nd Function: generate n-back colour list with given target number ----------'''
 
-# Function for generating n-back stimulus list
-# for given...
-# ... n-back level (= nback_level) - should be a numeric
-# ... stimulus list (= colour_codes) - an array of colour codes
-# ... words (= story) - an array of strings (words)
-# ... min. abs. number of targets (= target_abs_min) - a numeric
-# ... max. abs. number of targets (= target_abs_max) - a numeric
-# ... zeroback target stimulus (zeroback_target = None) - a string with a colour code
 
 def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, target_abs_max, zeroback_target = None):
   
@@ -178,7 +167,6 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
     # if we don't have enough targets or too many targets...
     if target_count < target_abs_min or target_count > target_abs_max:
         #print("target count is not correct. There are", target_count, "targets currently." )
-        found_target_nr = False
 
         # randomly draw a target number to use for adding/taking away targets
         target_nr = round(random.uniform(target_abs_min, target_abs_max))
@@ -200,7 +188,7 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
             for t in range(len(target)):
                 if target[t] == False:
                     indices_targets.extend([t])
-        
+
             # Now it gets a little complicated: We want to add targets by replacing non-targets, but
             # we don't want to turn other targets into non-targets by taking away their match.
             # Here's a 1-back example (imagine we're replacing the one in the brackets with "green"):
@@ -229,7 +217,7 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
             
             # loop list of indices with non-targets
             for nontarget_idx in indices_targets:
-    
+
               # Explanation of the following if-conditions:
                   
     		  # 1. We can only put targets into the array where we have enough predecessor values.
@@ -256,7 +244,7 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
                 # reason: We don't want to remove targets, so don't change this
                 # if it's the target colour for another trial
                 colours_match1 = random_colour_list[nontarget_idx] == random_colour_list[nontarget_idx + nback_level]
-                
+
                 # we also need to check if the colour n trials before is the same as the one n trials after the current trial
                 # reason:
                 # if we have this situation (1-back): red yellow red
@@ -272,16 +260,23 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
                   # for the current trial:
                   replacement_col = random_colour_list[nontarget_idx - nback_level]
 
-    
                   # save index and replacement colour in array for later use:
                   idx_replacements.append(nontarget_idx)
                   replacement_colours.append(replacement_col)
                   #print(replacement_col, nontarget_idx)
-    
+                  
 
             # now we need to draw from this list of possible replacements as many indices/colours
             # as we need to make up for the missing targets.
     
+            # if for some reason there are less replacement colours than we need, use recursion
+            if (len(replacement_colours) < target_nr - target_count):
+                print("did not find enough replacement colours")
+                print("-------------- recursion -------------")
+                return create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, target_abs_max, zeroback_target = None)
+
+            # if everything's fine, go on: 
+                
             # shuffle arrays with indices and colours
     
             # use a seed, but it's okay if it's always the same seed
@@ -301,14 +296,15 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
             # loop the replacements
             for repl_idx in range(target_nr - target_count):
 
-                # Replace the values in the original colour and target lists
+                # Replace the values in the original colour and target lists             
                 random_colour_list[idx_replacements[repl_idx]] = replacement_colours[repl_idx]
-                target[idx_replacements[repl_idx]] = True
+ 
 
         # TOO MANY TARGETS:
 
         # too many targets, get rid of some
         else:
+
             if target_count - target_nr > 0:
                 nr_replacements = abs(target_count - target_nr)
                 print("Too many targets, replacing ", nr_replacements, "targets by non-targets")
@@ -318,7 +314,6 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
 
                 # get random indices of some of those targets (as many as we need to replace)
                 idx_replacements = random.sample(indices_targets, k = nr_replacements)
-
 
                 # replace target by non-target colour (aka colour that doesn't match
                 # target colour from n trials before or current colour
@@ -331,20 +326,16 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
 
                       # select colour you DON'T want to use:
                       not_this_colour = random_colour_list[replace_this_colour + nback_level]
-                      print("not this colour:", not_this_colour)
                       
                       # and we also don't want to replace the current colour with itself, so
                       # keep current colour in mind, too:
                       curr_colour = random_colour_list[replace_this_colour]
-                      print("current colour:", curr_colour)
         
                       colour_codes_replacements = colour_codes.copy()
-        
         
                       # filter out the colours we don't want:
                       colour_codes_replacements = list(filter(lambda e: e != not_this_colour, colour_codes_replacements))
                       colour_codes_replacements = list(filter(lambda e: e != curr_colour, colour_codes_replacements))
-                      print("possible replacements:", colour_codes_replacements)
            
                       # get random colour from suitable replacement colours
                       replacement_colour = random.sample(colour_codes_replacements, k = 1)[0]
@@ -353,19 +344,13 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
 
                     # if it's the end of the array anyway and we can't mess anything up, just
                     # use random replacement colour that isn't current colour:
-                    else:
-                        print("END")
-
+                    else:                        
                         colour_codes_replacements = colour_codes.copy()
                         curr_colour = random_colour_list[replace_this_colour]
-                        print("current colour:", curr_colour)
                         colour_codes_replacements = [e for e in colour_codes_replacements if e != curr_colour]
-                        print("possible replacements:", colour_codes_replacements)
                         replacement_colour = random.sample(colour_codes_replacements, k = 1)[0]
 
-                    # actually replace colours
-                    #print("replacing", random_colour_list[replace_this_colour], "with", replacement_colour)
-                    print("idx:", replace_this_colour, "target:", target[replace_this_colour])
+                    # actually replace colours               
                     random_colour_list[replace_this_colour] = replacement_colour
                     target[replace_this_colour] = False
 
@@ -388,6 +373,7 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
             if col_idx < nback_number:
                 # save target as false
                 curr_target = False
+
             # if it's one of the following trials, check if we have a match
             else:
                 # get colour from n trials back
@@ -411,6 +397,7 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
         for i in range(len(target)):
             if target[i] == True:
                 target_count = target_count + 1
+
   
         print("nr of targets after replacements:", target_count)
 
@@ -427,79 +414,119 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
             print("-------------- recursion -------------")
             # recursion: generate new colour list
             return create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, target_abs_max, zeroback_target = None)
-        
-        else:
-            # If everything is looking good, we can run some checks on the distribution of the
-            # colours and then return the colour list if everything's fine
-            
-            # check if colour transition probabilities are more or less evenly distributed
-
-            pairs = []
-            pairs_counter = []
-            
-            for idx in range(len(random_colour_list) - 1):
-                curr_colour = random_colour_list[idx] + " -> " + random_colour_list[idx + 1]
-            
-                if curr_colour in pairs:
-                    idx_pair = pairs.index(curr_colour)
-                    pairs_counter[idx_pair] += 1
-                else:
-                    pairs.append(curr_colour)
-                    pairs_counter.append(1)
-
-
-            change_prob_cutoff_lower = np.mean(pairs_counter) - 2 * np.std(pairs_counter)
-            change_prob_cutoff_upper = np.mean(pairs_counter) + 2 * np.std(pairs_counter)
-            min_change_prob          = np.min(pairs_counter)
-            max_change_prob          = np.max(pairs_counter)
-
-            if min_change_prob < change_prob_cutoff_lower or max_change_prob > change_prob_cutoff_upper:
-                change_prob_equal = False
-            else:
-                change_prob_equal = True
-
-
-        	# now also check if some colours are more often targets than others:
-            target_colours = []
-            target_colours_counter = []
-        
-            for t in range(len(target)):
-              if target[t] == True:
-                  target_colour = random_colour_list[t]
-        
-                  if target_colour in target_colours:
-                    idx_target_colour = target_colours.index(target_colour)
-                    target_colours_counter[idx_target_colour] += 1
-                  else:
-                    target_colours.append(target_colour)
-                    target_colours_counter.append(1)
 
         
-            target_prob_cutoff_lower = np.mean(target_colours_counter) - 2 * np.std(target_colours_counter)
-            target_prob_cutoff_upper = np.mean(target_colours_counter) + 2 * np.std(target_colours_counter)
-            min_target_prob          = np.min(target_colours_counter)
-            max_target_prob          = np.max(target_colours_counter)
-    
-            if min_target_prob < target_prob_cutoff_lower or max_target_prob > target_prob_cutoff_upper:
-                target_colours_equal = False
-            else:
-                target_colours_equal = True
-    
-    
-            # if everything's fine...
-            if target_colours_equal and change_prob_equal:
-                # return colour list:
-                print("current target number is", target_count, "and should be", target_nr, "- all fine!")
-                print("returning colour list")
-                return random_colour_list
-    
-            # if change probabilities or distribution of target colours is not balanced...
-            else:
-                # recursion: generate new colour list
-                print("distribution of target colours & change probabilities were a little off")
-                print("-------------- recursion -------------")
-                return create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, target_abs_max, zeroback_target = None)
+  # If everything is looking good, we can run some checks on the distribution of the
+  # colours and then return the colour list if everything's fine
+   
+  # check if colour transition probabilities are more or less evenly distributed
+
+  pairs = []
+  pairs_counter = []
+   
+  for idx in range(len(random_colour_list) - 1):
+       curr_colour = random_colour_list[idx] + " -> " + random_colour_list[idx + 1]
+   
+       if curr_colour in pairs:
+           idx_pair = pairs.index(curr_colour)
+           pairs_counter[idx_pair] += 1
+
+       else:
+           pairs.append(curr_colour)
+           pairs_counter.append(1)
+
+
+  change_prob_cutoff_lower = np.mean(pairs_counter) - 2 * np.std(pairs_counter)
+  change_prob_cutoff_upper = np.mean(pairs_counter) + 2 * np.std(pairs_counter)
+  min_change_prob          = np.min(pairs_counter)
+  max_change_prob          = np.max(pairs_counter)
+
+  if min_change_prob < change_prob_cutoff_lower or max_change_prob > change_prob_cutoff_upper:
+       change_prob_equal = False
+  else:
+       change_prob_equal = True
+
+
+  # now also check if some colours are more often targets than others:
+  target_colours = []
+  target_colours_counter = []
+
+  for t in range(len(target)):
+     if target[t] == True:
+         target_colour = random_colour_list[t]
+   
+         if target_colour in target_colours:
+           idx_target_colour = target_colours.index(target_colour)
+           target_colours_counter[idx_target_colour] += 1
+         else:
+           target_colours.append(target_colour)
+           target_colours_counter.append(1)
+
+   
+  target_prob_cutoff_lower = np.mean(target_colours_counter) - 2 * np.std(target_colours_counter)
+  target_prob_cutoff_upper = np.mean(target_colours_counter) + 2 * np.std(target_colours_counter)
+  min_target_prob          = np.min(target_colours_counter)
+  max_target_prob          = np.max(target_colours_counter)
+   
+  if min_target_prob < target_prob_cutoff_lower or max_target_prob > target_prob_cutoff_upper:
+       target_colours_equal = False
+  else:
+       target_colours_equal = True
+   
+   
+  # if everything's fine...
+  if target_colours_equal and change_prob_equal:
+       # return colour list:
+       print("current target number is", target_count, "and should be", target_nr, "- all fine!")
+       print("returning colour list")
+       return random_colour_list
+   
+  # if change probabilities or distribution of target colours is not balanced...
+  else:
+       # recursion: generate new colour list
+       print("distribution of target colours & change probabilities were a little off")
+       print("-------------- recursion -------------")
+       return create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, target_abs_max, zeroback_target = None)
 
 
 
+
+
+
+
+''' ---- 3rd Function: Get n-back targets ----------'''
+
+
+def get_targets(stim_list, nback_level):
+    """
+    For each index in the list, state if stimulus is target or not (given the n-back level).
+
+    Parameters:
+    stim_list (list): The stimulus list
+    nback_level (int): Which n-back level to use (e.g. 1 or 2)
+  
+    Returns:
+    List with booleans where True = target and False = no target
+    
+    """    
+    
+    # create target list
+    target_list = []
+
+    # loop colours, get colour and index of colour
+    for col_idx, colour in enumerate(stim_list):
+        # if the trial is >= our n-back level and colour matches 
+        # the one n trials before, we found a target
+        if col_idx >= nback_level: 
+            # also get previous colour from idx - n-back level
+            previous_colour = stim_list[col_idx - nback_level]
+            if colour == previous_colour:
+                # add 1 to target counter
+                target_list.append(True)
+            else: 
+                target_list.append(False)
+        else: target_list.append(False)
+    return target_list
+
+    print("---------------------")
 
