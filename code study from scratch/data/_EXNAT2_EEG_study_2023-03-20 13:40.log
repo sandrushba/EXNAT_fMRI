@@ -1,0 +1,11 @@
+7.9787 	EXP 	Created window1 = Window(allowGUI=True, allowStencil=False, autoLog=True, backendConf=UNKNOWN, bitsMode=UNKNOWN, blendMode='avg', bpc=(8, 8, 8), color=array([1, 1, 1]), colorSpace='rgb', depthBits=8, fullscr=<method-wrapper '__getattribute__' of attributeSetter object at 0x7fd6b93e4cc0>, gamma=None, gammaErrorPolicy='raise', lms=UNKNOWN, monitor=<psychopy.monitors.calibTools.Monitor object at 0x7fd68a026be0>, multiSample=False, name='window1', numSamples=2, pos=[905.0, 470.0], screen=0, size=array([3000, 2000]), stencilBits=0, stereo=False, units='deg', useFBO=True, useRetina=True, viewOri=0.0, viewPos=None, viewScale=None, waitBlanking=True, winType='pyglet')
+7.9789 	EXP 	window1: mouseVisible = True
+7.9789 	EXP 	window1: recordFrameIntervals = False
+8.1450 	EXP 	window1: recordFrameIntervals = True
+8.3282 	EXP 	window1: recordFrameIntervals = False
+8.9357 	WARNING 	Monitor specification not found. Creating a temporary one...
+9.4421 	EXP 	Created window1 = Window(allowGUI=True, allowStencil=False, autoLog=True, backendConf=UNKNOWN, bitsMode=UNKNOWN, blendMode='avg', bpc=(8, 8, 8), color=array([0, 0, 0]), colorSpace='rgb', depthBits=8, fullscr=<method-wrapper '__getattribute__' of attributeSetter object at 0x7fd6b93e4cc0>, gamma=None, gammaErrorPolicy='raise', lms=UNKNOWN, monitor=<psychopy.monitors.calibTools.Monitor object at 0x7fd68986a4e0>, multiSample=False, name='window1', numSamples=2, pos=[1080.0, 570.0], screen=0, size=array([1600, 1200]), stencilBits=0, stereo=False, units='pix', useFBO=False, useRetina=True, viewOri=0.0, viewPos=None, viewScale=None, waitBlanking=True, winType='pyglet')
+9.4423 	EXP 	window1: mouseVisible = True
+9.5873 	EXP 	Created unnamed TextStim = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color=array([1., 1., 1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, font='', fontFiles=[], height=30, italic=False, languageStyle='LTR', name='unnamed TextStim', opacity=1.0, ori=0.0, pos=array([  0., 150.]), rgb=UNKNOWN, text='What is the capital of France?', units='pix', win=Window(...), wrapWidth=500)
+9.5917 	EXP 	window1: mouseVisible = True
+9.5951 	EXP 	window1: mouseVisible = True
