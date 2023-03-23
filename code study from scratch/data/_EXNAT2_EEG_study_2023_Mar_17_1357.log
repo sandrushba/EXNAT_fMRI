@@ -1,9 +1,0 @@
-20.1072 	EXP 	Created window1 = Window(allowGUI=False, allowStencil=False, autoLog=True, backendConf=UNKNOWN, bitsMode=UNKNOWN, blendMode='avg', bpc=(8, 8, 8), color=array([0, 0, 0]), colorSpace='rgb', depthBits=8, fullscr=<method-wrapper '__getattribute__' of attributeSetter object at 0x7f87c3a21a90>, gamma=None, gammaErrorPolicy='raise', lms=UNKNOWN, monitor=<psychopy.monitors.calibTools.Monitor object at 0x7f87c3a34860>, multiSample=False, name='window1', numSamples=2, pos=[640.0, 360.0], screen=0, size=array([5120, 2880]), stencilBits=0, stereo=False, units='deg', useFBO=True, useRetina=True, viewOri=0.0, viewPos=None, viewScale=None, waitBlanking=True, winType='pyglet')
-20.1074 	EXP 	window1: mouseVisible = True
-20.1075 	EXP 	window1: recordFrameIntervals = False
-20.2733 	EXP 	window1: recordFrameIntervals = True
-20.4571 	EXP 	window1: recordFrameIntervals = False
-20.8299 	EXP 	Created unnamed TextStim = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoLog=True, bold=False, color=array([-1., -1., -1.]), colorSpace='rgb', contrast=1.0, depth=0, flipHoriz=False, flipVert=False, font='', fontFiles=[], height=1, italic=False, languageStyle='LTR', name='unnamed TextStim', opacity=1.0, ori=0.0, pos=array([0., 0.]), rgb=UNKNOWN, text='', units='deg', win=Window(...), wrapWidth=15.0)
-20.8950 	EXP 	unnamed TextStim: text = 'Hi, this is the instruction for the reading BL training.\n\nPlease press space to go to the next word.\n\nThere will be 3 MC questions after the block, so make sure to read the text carefully.\n\nPlease press Space to start the block!\n\n'
-22.5883 	DATA 	Keypress: space
-23.1138 	EXP 	window1: mouseVisible = True
