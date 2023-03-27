@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2022.2.5),
-    on Thu Mar 23 16:31:50 2023
+    on Fri Mar 24 10:52:24 2023
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -42,7 +42,10 @@ psychopyVersion = '2022.2.5'
 expName = 'EXNAT-2'  # from the Builder filename that created this script
 expInfo = {
     'participant': '',
-    'session': '001',
+    'age': '',
+    'handedness': 'r',
+    'gender': 'w',
+    'testing_mode': 'yes',
 }
 # --- Show participant info dialog --
 dlg = gui.DlgFromDict(dictionary=expInfo, sortKeys=False, title=expName)
@@ -58,7 +61,7 @@ filename = _thisDir + os.sep + u'data/%s_%s_%s' % (expInfo['participant'], expNa
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath='/Users/merle/Desktop/EXNAT2/selfpaced_reading_nback_lastrun.py',
+    originPath='/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/selfpaced_reading_nback_lastrun.py',
     savePickle=True, saveWideText=True,
     dataFileName=filename)
 logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a file
@@ -143,10 +146,11 @@ print("create trigger stream")
 # Run 'Begin Experiment' code from set_stimuli
 ### Stimulus settings
 
-# set colours you want to use here:
-# important: I set the colours "manually" in the trainings, 
-# so change them there, too, if you change them here.
+# set colours you want to use for background:
+light_bg_col = (240, 223, 204) # ivory instructions background
+dark_bg_col  = (10, 10, 10)    # dark grey trials background
 
+# set colours you want to use for the stimuli:
 colours = ["#D292F3", "#F989A2", "#2AB7EF", "#88BA3F"]
 print("Preparing experiment with n-back colours:", colours)
 
@@ -321,13 +325,14 @@ empty_placeholder = visual.TextStim(win=win, name='empty_placeholder',
 # --- Initialize components for Routine "Q3" ---
 
 # --- Initialize components for Routine "text_rating" ---
-text_2 = visual.TextStim(win=win, name='text_2',
-    text='Difficulty rating',
-    font='Open Sans',
-    units='deg', pos=(0, 0), height=1.0, wrapWidth=None, ori=0.0, 
-    color='black', colorSpace='rgb', opacity=None, 
-    languageStyle='LTR',
-    depth=-1.0);
+slider = visual.Slider(win=win, name='slider',
+    startValue=0, size=(1, 1), pos=(0, -4), units='deg',
+    labels=("sehr leicht", "sehr schwierig"), ticks=(0,100), granularity=1.0,
+    style='slider', styleTweaks=(), opacity=None,
+    labelColor='black', markerColor=[0.1216, 0.4745, 0.1216], lineColor='black', colorSpace='rgb',
+    font='Open Sans', labelHeight=0.05,
+    flip=False, ori=0.0, depth=-1, readOnly=False)
+end_rating = keyboard.Keyboard()
 
 # Create some handy timers
 globalClock = core.Clock()  # to track the time since experiment started
@@ -443,7 +448,7 @@ for thisBlock in blocks:
     # until we have to display a main text block (in this case we exit the routine).
     while True:
         # keep background ivory
-        win.Color = (240, 223, 204)
+        win.Color = light_bg_col
         win.flip()
         
         # clear buffer of all previously recorded key events:
@@ -469,7 +474,7 @@ for thisBlock in blocks:
             print(curr_block + " is not a text block - preparing rect as stim now")
             
             # keep background ivory
-            win.Color = (240, 223, 204)
+            win.Color = light_bg_col
             win.flip()
             
             ### Show instructions
@@ -514,13 +519,13 @@ for thisBlock in blocks:
                 # transition from white (RGB: 255, 255, 255)
                 # to medium grey (RGB: 10, 10, 10)
                 change_bg_colour(window = win, 
-                                 start_rgb = (240, 223, 204), 
-                                 end_rgb = (10, 10, 10), 
+                                 start_rgb = light_bg_col, 
+                                 end_rgb = dark_bg_col, 
                                  seconds = 2)
                 # Wait for a brief period of time so bg is set
                 core.wait(0.8)
                 # keep background grey
-                win.Color = (10, 10, 10)
+                win.Color = dark_bg_col
                 win.flip()
             
                 # don't show questions
@@ -571,16 +576,18 @@ for thisBlock in blocks:
                     
                     # get trial number (start counting from 1, so add 1)
                     curr_trial_nr = trial_idx + 1
-    
-                    # set current colour as colour of rectangle
-                    stim.fillColor = curr_col
                     
                     ### ISI: wait for 100 ms
                     while core.getTime() < onset_time + 0.1:
-                        # draw the stimulus during the waiting period
+                        # draw the stimulus during the waiting period, 
+                        # but use grey as a fill colour
+                        stim.Colour = dark_bg_col
                         stim.draw()
                         win.flip()
                         
+                    # set current colour as colour of rectangle
+                    stim.fillColor = curr_col
+                    
                     # show stimulus on screen
                     stim.draw() # draw stimulus on screen
                     win.flip() # update the window to clear the screen and display the stimulus
@@ -670,9 +677,10 @@ for thisBlock in blocks:
                     # start a new row in the csv
                     thisExp.nextEntry()
                     
-                    ### TESTING MODE: end loop after 4 trials
-                    if trial_idx == 3:
-                        break
+                    ### IF TESTING MODE ENABLED: end loop after 4 trials
+                    if expInfo['testing_mode'] == "yes":
+                        if trial_idx == 3:
+                            break
                     
                     ### send stimulus offset trigger to LSL stream
                     marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + str(curr_nback_response)
@@ -683,13 +691,13 @@ for thisBlock in blocks:
                 # change background colour from grey (RGB: 10, 10, 10)
                 # to ivory (RGB: 240, 223, 204)
                 change_bg_colour(window = win, 
-                                 start_rgb = (10, 10, 10), 
-                                 end_rgb = (240, 223, 204), 
+                                 start_rgb = dark_bg_col, 
+                                 end_rgb = light_bg_col, 
                                  seconds = 2)
                 # Wait for a brief period of time so bg is set
                 core.wait(0.8)
                 # keep background ivory
-                win.Color = (240, 223, 204)
+                win.Color = light_bg_col
                 win.flip()
             
             ### End currrent block
@@ -757,7 +765,7 @@ for thisBlock in blocks:
     # this routine is for all blocks with texts
     
     # keep background ivory
-    win.Color = (240, 223, 204)
+    win.Color = light_bg_col
     win.flip()
     
     # clear buffer of all previously recorded key events:
@@ -785,7 +793,7 @@ for thisBlock in blocks:
     # if it's the reading bl training block, prepare training stimuli:
     elif curr_block == "Reading_Baseline_training":
         # keep background ivory
-        win.Color = (240, 223, 204)
+        win.Color = light_bg_col
         win.flip()
         
         ### Show instructions
@@ -801,7 +809,7 @@ for thisBlock in blocks:
         # display the text on screen
         while True:
             # keep background ivory
-            win.Color = (240, 223, 204)
+            win.Color = light_bg_col
             instr_text_stim.draw()
             win.flip()
             # end showing screen if participant presses space
@@ -821,20 +829,20 @@ for thisBlock in blocks:
         # transition from ivory (RGB: 240, 223, 204)
         # to medium grey (RGB: 10, 10, 10)
         change_bg_colour(window = win, 
-                         start_rgb = (240, 223, 204),
-                         end_rgb = (10, 10, 10), 
+                         start_rgb = light_bg_col,
+                         end_rgb = dark_bg_col, 
                          seconds = 2)
         # Wait for a brief period of time so bg is set
         core.wait(0.8)
         # keep background grey
-        win.Color = (10, 10, 10)
+        win.Color = dark_bg_col
         win.flip()
         
     # if it's one of the "normal" main blocks, prepare main block stimuli:
     elif curr_block in ["Reading_Baseline_main", "1back_dual_main", "2back_dual_main"]:
     
         # keep background ivory
-        win.Color = (240, 223, 204)
+        win.Color = light_bg_col
         win.flip()
         ### Show instructions
         # set instruction text
@@ -858,13 +866,13 @@ for thisBlock in blocks:
         # transition from ivory (RGB: 240, 223, 204)
         # to medium grey (RGB: 10, 10, 10)
         change_bg_colour(window = win, 
-                         start_rgb = (240, 223, 204),
-                         end_rgb = (10, 10, 10), 
+                         start_rgb = light_bg_col,
+                         end_rgb = dark_bg_col, 
                          seconds = 2)
         # Wait for a brief period of time so bg is set
         core.wait(0.8)
         # keep background grey
-        win.Color = (10, 10, 10)
+        win.Color = dark_bg_col
         win.flip()
     
         # show main block questions
@@ -1023,9 +1031,10 @@ for thisBlock in blocks:
         # start a new row in the csv
         thisExp.nextEntry()
     
-        ### TESTING MODE: end loop after 4 trials
-        if trial_idx == 3:
-            break
+        ### IF TESTING MODE ENABLED: end loop after 4 trials
+        if expInfo['testing_mode'] == "yes":
+            if trial_idx == 3:
+                break
         
         ### send word offset trigger to LSL stream
         marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + str(curr_nback_response)
@@ -1038,14 +1047,14 @@ for thisBlock in blocks:
     # change background colour from grey (RGB: 10, 10, 10)
     # to ivory (RGB: 240, 223, 204)
     change_bg_colour(window = win, 
-                     start_rgb = (10, 10, 10), 
-                     end_rgb = (240, 223, 204), 
+                     start_rgb = dark_bg_col, 
+                     end_rgb = light_bg_col, 
                      seconds = 2)
     # Wait for a brief period of time so bg is set
     core.wait(0.5)
     
     # keep background ivory
-    win.Color = (240, 223, 204)
+    win.Color = light_bg_col
     win.flip()
             
     # end current routine
@@ -1109,7 +1118,7 @@ for thisBlock in blocks:
     
     ### Settings:
     # keep background ivory
-    win.Color = (240, 223, 204)
+    win.Color = light_bg_col
     win.flip()
     
     # clear buffer of all previously recorded key events:
@@ -1154,7 +1163,7 @@ for thisBlock in blocks:
                                color = "black", # set all to black as a default
                                height = 0.5, 
                                font = "Bookman Old Style",
-                               wrapWidth = 7,
+                               wrapWidth = 15,
                                anchorHoriz = 'left', 
                                alignText = 'center') for i in range(len(Q1_answers))]
     
@@ -1302,7 +1311,7 @@ for thisBlock in blocks:
     
     ### Settings:
     # keep background ivory
-    win.Color = (240, 223, 204)
+    win.Color = light_bg_col
     win.flip()
     
     # clear buffer of all previously recorded key events:
@@ -1347,7 +1356,7 @@ for thisBlock in blocks:
                                color = "black", # set all to black as a default
                                height = 0.5, 
                                font = "Bookman Old Style",
-                               wrapWidth = 7,
+                               wrapWidth = 15,
                                anchorHoriz = 'left', 
                                alignText = 'center') for i in range(len(Q1_answers))]
     
@@ -1495,7 +1504,7 @@ for thisBlock in blocks:
     
     ### Settings:
     # keep background ivory
-    win.Color = (240, 223, 204)
+    win.Color = light_bg_col
     win.flip()
     
     # clear buffer of all previously recorded key events:
@@ -1540,7 +1549,7 @@ for thisBlock in blocks:
                                color = "black", # set all to black as a default
                                height = 0.5, 
                                font = "Bookman Old Style",
-                               wrapWidth = 7,
+                               wrapWidth = 15,
                                anchorHoriz = 'left', 
                                alignText = 'center') for i in range(len(Q1_answers))]
     
@@ -1686,15 +1695,21 @@ for thisBlock in blocks:
     exp_block_counter = exp_block_counter + 1
     
     # keep background ivory
-    win.Color = (240, 223, 204)
+    win.Color = light_bg_col
     win.flip()
             
     # if it's a reading bl block, get text 
     # difficulty rating, if not, skip this routine
     if curr_block[0] != "Reading_Baseline_main":
         continueRoutine = False
+    else:
+        
+    slider.reset()
+    end_rating.keys = []
+    end_rating.rt = []
+    _end_rating_allKeys = []
     # keep track of which components have finished
-    text_ratingComponents = [text_2]
+    text_ratingComponents = [slider, end_rating]
     for thisComponent in text_ratingComponents:
         thisComponent.tStart = None
         thisComponent.tStop = None
@@ -1708,7 +1723,7 @@ for thisBlock in blocks:
     frameN = -1
     
     # --- Run Routine "text_rating" ---
-    while continueRoutine and routineTimer.getTime() < 1.0:
+    while continueRoutine:
         # get current time
         t = routineTimer.getTime()
         tThisFlip = win.getFutureFlipTime(clock=routineTimer)
@@ -1716,21 +1731,40 @@ for thisBlock in blocks:
         frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
         # update/draw components on each frame
         
-        # *text_2* updates
-        if text_2.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+        # *slider* updates
+        if slider.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
             # keep track of start time/frame for later
-            text_2.frameNStart = frameN  # exact frame index
-            text_2.tStart = t  # local t and not account for scr refresh
-            text_2.tStartRefresh = tThisFlipGlobal  # on global time
-            win.timeOnFlip(text_2, 'tStartRefresh')  # time at next scr refresh
-            text_2.setAutoDraw(True)
-        if text_2.status == STARTED:
-            # is it time to stop? (based on global clock, using actual start)
-            if tThisFlipGlobal > text_2.tStartRefresh + 1.0-frameTolerance:
-                # keep track of stop time/frame for later
-                text_2.tStop = t  # not accounting for scr refresh
-                text_2.frameNStop = frameN  # exact frame index
-                text_2.setAutoDraw(False)
+            slider.frameNStart = frameN  # exact frame index
+            slider.tStart = t  # local t and not account for scr refresh
+            slider.tStartRefresh = tThisFlipGlobal  # on global time
+            win.timeOnFlip(slider, 'tStartRefresh')  # time at next scr refresh
+            # add timestamp to datafile
+            thisExp.timestampOnFlip(win, 'slider.started')
+            slider.setAutoDraw(True)
+        
+        # *end_rating* updates
+        waitOnFlip = False
+        if end_rating.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
+            # keep track of start time/frame for later
+            end_rating.frameNStart = frameN  # exact frame index
+            end_rating.tStart = t  # local t and not account for scr refresh
+            end_rating.tStartRefresh = tThisFlipGlobal  # on global time
+            win.timeOnFlip(end_rating, 'tStartRefresh')  # time at next scr refresh
+            # add timestamp to datafile
+            thisExp.timestampOnFlip(win, 'end_rating.started')
+            end_rating.status = STARTED
+            # keyboard checking is just starting
+            waitOnFlip = True
+            win.callOnFlip(end_rating.clock.reset)  # t=0 on next screen flip
+            win.callOnFlip(end_rating.clearEvents, eventType='keyboard')  # clear events on next screen flip
+        if end_rating.status == STARTED and not waitOnFlip:
+            theseKeys = end_rating.getKeys(keyList=['space'], waitRelease=False)
+            _end_rating_allKeys.extend(theseKeys)
+            if len(_end_rating_allKeys):
+                end_rating.keys = _end_rating_allKeys[-1].name  # just the last key pressed
+                end_rating.rt = _end_rating_allKeys[-1].rt
+                # a response ends the routine
+                continueRoutine = False
         
         # check for quit (typically the Esc key)
         if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
@@ -1754,11 +1788,16 @@ for thisBlock in blocks:
     for thisComponent in text_ratingComponents:
         if hasattr(thisComponent, "setAutoDraw"):
             thisComponent.setAutoDraw(False)
-    # using non-slip timing so subtract the expected duration of this Routine (unless ended on request)
-    if routineForceEnded:
-        routineTimer.reset()
-    else:
-        routineTimer.addTime(-1.000000)
+    blocks.addData('slider.response', slider.getRating())
+    blocks.addData('slider.rt', slider.getRT())
+    # check responses
+    if end_rating.keys in ['', [], None]:  # No response was made
+        end_rating.keys = None
+    blocks.addData('end_rating.keys',end_rating.keys)
+    if end_rating.keys != None:  # we had a response
+        blocks.addData('end_rating.rt', end_rating.rt)
+    # the Routine "text_rating" was not non-slip safe, so reset the non-slip timer
+    routineTimer.reset()
     thisExp.nextEntry()
     
 # completed 17.0 repeats of 'blocks'

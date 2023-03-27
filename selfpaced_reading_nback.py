@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2022.2.5),
-    on Wed Mar 22 16:47:20 2023
+    on Fri Mar 24 10:22:07 2023
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -32,250 +32,6 @@ import sys  # to get file system encoding
 
 from psychopy.hardware import keyboard
 
-# Run 'Before Experiment' code from code_Q2
-##########################################################
-#            Text Comprehension Questions - Q2           #
-##########################################################
-
-### Settings:
-# keep background white
-win.color = (1,1,1)
-
-# load first question for current text & their respective answers
-Q2 = locals()[curr_text_nr + "_Q2"]
-Q2_answers = locals()[curr_text_nr + "_Q2_ans"]
-Q2_corr = locals()[curr_text_nr + "_Q2_corr"]
-
-
-# Define text positions and formatting
-question_pos = (0, 3)
-answer_xpos = -3 # move questions a bit to the left 
-answer_ypos = [ 0, -2, -4, -6] # set the y axis positions of all 4 answers
-
-# Create text stim for the question:
-question = visual.TextStim(win, 
-                           text = Q2, 
-                           pos = question_pos,
-                           color = "black",
-                           height = 0.6,
-                           anchorHoriz = 'center',
-                           alignText = 'center', 
-                           wrapWidth = 10)
-# create 1 text stim for each answer option:
-answers = [visual.TextStim(win, 
-                           text = Q2_answers[i], 
-                           pos = (answer_xpos, answer_ypos[i]), 
-                           color = "black", # set all to black as a default
-                           height = 0.6, 
-                           wrapWidth = 7,
-                           anchorHoriz = 'left', 
-                           alignText = 'center') for i in range(len(Q1_answers))]
-
-### Show all on screen until I set .autoDraw = False
-question.autoDraw = True
-for answer in answers:
-    answer.autoDraw = True
-win.flip()
-
-
-### Record key responses:
-Q2_chosen_ans = None
-
-while True:        
-    # if 1 was pressed...
-    if event.getKeys(['1']):
-        print('a')
-        # save Q1 answer as a 
-        Q2_chosen_ans = "a"
-        # set font colour of the first answer (answer a) to 
-        # green and the rest to black:
-        answers[0].setColor("green")
-        for answer in answers[1:]:
-            answer.setColor("black")
-            # draw updated stimulus:
-            win.flip()
-    # same procedure for all other answer options:
-    if event.getKeys(['2']):
-        print('b')
-        Q2_chosen_ans = "b"
-        # set font colour of the second answer (answer b) to 
-        # green and the rest to black:
-        answers[1].setColor("green")
-        for answer in [answers[0]] + answers[2:]:
-            answer.setColor("black")
-            # draw updated stimulus:
-            win.flip()
-    if event.getKeys(['3']):
-        print('c')
-        Q2_chosen_ans = "c"
-        # set font colour of the third answer (answer c) to 
-        # green and the rest to black:
-        answers[2].setColor("green")
-        for answer in answers[:2] + answers[3:]:
-            answer.setColor("black")
-        # draw updated stimulus:
-        win.flip()
-    if event.getKeys(['4']):
-        print('d')
-        Q2_chosen_ans = "d"
-        # set font colour of the fourth answer (answer d) to 
-        # green and the rest to black:
-        answers[3].setColor("green")
-        for answer in answers[:-1]:
-            answer.setColor("black")
-        # draw updated stimulus 
-        win.flip()
-    # if participant pressed "space", check whether they chose an answer.
-    # if yes, end this routine and go to next question, if not, wait for valid answer.
-    elif event.getKeys(['space']) and Q2_chosen_ans != None:
-        break
-
-# print chosen answers for Q1, Q2 and Q3
-print("answer for Q2:" + str(Q2_chosen_ans))
-
-# check if answer was correct:
-if Q2_chosen_ans == Q2_corr: 
-    print("answer correct!")
-else: 
-    print("answer incorrect!")
-    
-# save data:
-thisExp.addData('question', 'Q2')
-thisExp.addData('chosen_ans', Q2_chosen_ans)
-thisExp.addData('ans_correct', Q2_chosen_ans == Q2_corr)
-thisExp.addData('block_kind', curr_nback_cond)
-thisExp.addData('text_nr', curr_text_nr)
-thisExp.addData('block_nr', curr_block)
-
-### End Q1: Set .autoDraw = False to stop showing question & answers
-question.autoDraw = False
-for answer in answers:
-    answer.autoDraw = False
-
-# end current routine
-continueRoutine = False
-# Run 'Before Experiment' code from code_Q3
-##########################################################
-#            Text Comprehension Questions - Q3           #
-##########################################################
-
-### Settings:
-# keep background white
-win.color = (1,1,1)
-
-# load first question for current text & their respective answers
-Q3 = locals()[curr_text_nr + "_Q3"]
-Q3_answers = locals()[curr_text_nr + "_Q3_ans"]
-Q3_corr = locals()[curr_text_nr + "_Q3_corr"]
-
-
-# Define text positions and formatting
-question_pos = (0, 3)
-answer_xpos = -3 # move questions a bit to the left 
-answer_ypos = [ 0, -2, -4, -6] # set the y axis positions of all 4 answers
-
-# Create text stim for the question:
-question = visual.TextStim(win, 
-                           text = Q3, 
-                           pos = question_pos,
-                           color = "black",
-                           height = 0.6,
-                           anchorHoriz = 'center',
-                           alignText = 'center', 
-                           wrapWidth = 10)
-# create 1 text stim for each answer option:
-answers = [visual.TextStim(win, 
-                           text = Q3_answers[i], 
-                           pos = (answer_xpos, answer_ypos[i]), 
-                           color = "black", # set all to black as a default
-                           height = 0.6, 
-                           wrapWidth = 7,
-                           anchorHoriz = 'left', 
-                           alignText = 'center') for i in range(len(Q1_answers))]
-
-### Show all on screen until I set .autoDraw = False
-question.autoDraw = True
-for answer in answers:
-    answer.autoDraw = True
-win.flip()
-
-
-### Record key responses:
-Q3_chosen_ans = None
-
-while True:        
-    # if 1 was pressed...
-    if event.getKeys(['1']):
-        print('a')
-        # save Q1 answer as a 
-        Q3_chosen_ans = "a"
-        # set font colour of the first answer (answer a) to 
-        # green and the rest to black:
-        answers[0].setColor("green")
-        for answer in answers[1:]:
-            answer.setColor("black")
-            # draw updated stimulus:
-            win.flip()
-    # same procedure for all other answer options:
-    if event.getKeys(['2']):
-        print('b')
-        Q3_chosen_ans = "b"
-        # set font colour of the second answer (answer b) to 
-        # green and the rest to black:
-        answers[1].setColor("green")
-        for answer in [answers[0]] + answers[2:]:
-            answer.setColor("black")
-            # draw updated stimulus:
-            win.flip()
-    if event.getKeys(['3']):
-        print('c')
-        Q3_chosen_ans = "c"
-        # set font colour of the third answer (answer c) to 
-        # green and the rest to black:
-        answers[2].setColor("green")
-        for answer in answers[:2] + answers[3:]:
-            answer.setColor("black")
-        # draw updated stimulus:
-        win.flip()
-    if event.getKeys(['4']):
-        print('d')
-        Q3_chosen_ans = "d"
-        # set font colour of the fourth answer (answer d) to 
-        # green and the rest to black:
-        answers[3].setColor("green")
-        for answer in answers[:-1]:
-            answer.setColor("black")
-        # draw updated stimulus 
-        win.flip()
-    # if participant pressed "space", check whether they chose an answer.
-    # if yes, end this routine and go to next question, if not, wait for valid answer.
-    elif event.getKeys(['space']) and Q3_chosen_ans != None:
-        break
-
-# print chosen answers for Q1, Q2 and Q3
-print("answer for Q3:" + str(Q3_chosen_ans))
-
-# check if answer was correct:
-if Q3_chosen_ans == Q3_corr: 
-    print("answer correct!")
-else: 
-    print("answer incorrect!")
-    
-# save data:
-thisExp.addData('question', 'Q3')
-thisExp.addData('chosen_ans', Q3_chosen_ans)
-thisExp.addData('ans_correct', Q3_chosen_ans == Q3_corr)
-thisExp.addData('block_kind', curr_nback_cond)
-thisExp.addData('text_nr', curr_text_nr)
-thisExp.addData('block_nr', curr_block)
-
-### End Q1: Set .autoDraw = False to stop showing question & answers
-question.autoDraw = False
-for answer in answers:
-    answer.autoDraw = False
-
-# end current routine
-continueRoutine = False
 
 
 # Ensure that relative paths start from the same directory as this script
@@ -286,7 +42,10 @@ psychopyVersion = '2022.2.5'
 expName = 'EXNAT-2'  # from the Builder filename that created this script
 expInfo = {
     'participant': '',
-    'session': '001',
+    'age': '',
+    'handedness': 'r',
+    'gender': 'w',
+    'testing_mode': 'yes',
 }
 # --- Show participant info dialog --
 dlg = gui.DlgFromDict(dictionary=expInfo, sortKeys=False, title=expName)
@@ -302,8 +61,8 @@ filename = _thisDir + os.sep + u'data/%s_%s_%s' % (expInfo['participant'], expNa
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath='/Users/merle/Desktop/EXNAT2/selfpaced_reading_nback.py',
-    savePickle=True, saveWideText=False,
+    originPath='/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/selfpaced_reading_nback.py',
+    savePickle=True, saveWideText=True,
     dataFileName=filename)
 logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a file
 
@@ -316,7 +75,7 @@ frameTolerance = 0.001  # how close to onset before 'same' frame
 win = visual.Window(
     size=[700, 500], fullscr=False, screen=0, 
     winType='pyglet', allowStencil=False,
-    monitor='testMonitor', color=[0,0,0], colorSpace='rgb',
+    monitor='testMonitor', color=[0.8824, 0.7490, 0.6000], colorSpace='rgb',
     blendMode='avg', useFBO=True, 
     units='deg')
 win.mouseVisible = True
@@ -417,10 +176,26 @@ print("Preparing experiment with n-back colours:", colours)
 ### Shuffle order of texts
 print("shuffle texts") 
 # collect the text IDs in lists so I know which text was shown 
-all_texts_nrs_list = ["text_01", "text_02", "text_03", "text_04", "text_05", "text_06", "text_07", "text_08", "text_09"]
+all_main_texts_nrs_list = ["text_01", "text_02", "text_03", "text_04", "text_05", "text_06", "text_07", "text_08", "text_09"]
 # shuffle text numbers
-random.shuffle(all_texts_nrs_list)
-
+random.shuffle(all_main_texts_nrs_list)
+# append "empty" text numbers to the list where we have blocks that are not main blocks.
+all_texts_nrs_list = []
+for t_idx, t in enumerate(all_main_texts_nrs_list):
+    # if it's the first text, it's the reading BL main block.
+    # Append 1 empty text number before text (for the reading BL training) 
+    # and 4 after text (for click training, 2x single task training & 1x single task main)
+    if t_idx == 0: 
+        all_texts_nrs_list = all_texts_nrs_list + ["", t, "", "", "", ""]
+    # the second text is the first n-back block. 
+    # There are 3 "empty" blocks after it (2x single task training & 1x single task main)
+    elif t_idx == 1: 
+        all_texts_nrs_list = all_texts_nrs_list + [t, "", "", ""]
+    # all following texts are main blocks and can be appended to all_texts_nrs_list
+    elif t_idx > 1:
+        all_texts_nrs_list.append(t)
+        
+print(all_texts_nrs_list)
 
 ### Set order of blocks 
 print("set block order") 
@@ -526,31 +301,8 @@ print("------ finished preparing stimuli! ------")
 
 # ------------------------------------------
 
-# init trial counter for the whole experiment
-exp_trial_counter = 0
-
 # init block counter for the whole experiment
 exp_block_counter = 0
-
-
-################################################
-
-### Prepare information for first trial
-
-#curr_colour = all_colour_lists[exp_block_counter][exp_trial_counter]
-#print(curr_colour)
-#curr_block_kind = all_block_kinds[exp_block_counter][exp_trial_counter]
-#print(curr_block_kind)
-#curr_target = all_targets[exp_block_counter][exp_trial_counter]
-#print(curr_target)
-#curr_text_nr = all_texts_nrs_list[exp_block_counter]
-#print(curr_text_nr)
-#curr_word = all_texts_list[exp_block_counter][exp_trial_counter]
-#print(curr_word)
-
-""" IMPORTANT: """
-# Don't forget to set trial counter back to 0 after each main block!
-# Don't forget to add 1 to trial_counter after each trial and to block_counter after each block!
 
 print("starting experiment now!")
 empty_placeholder = visual.TextStim(win=win, name='empty_placeholder',
@@ -561,24 +313,9 @@ empty_placeholder = visual.TextStim(win=win, name='empty_placeholder',
     languageStyle='LTR',
     depth=-2.0);
 
-# --- Initialize components for Routine "instr" ---
-instr_1_1 = visual.TextStim(win=win, name='instr_1_1',
-    text='Cheerio cowboy, this is the beginning of a block!',
-    font='Open Sans',
-    pos=(0, 0), height=1.0, wrapWidth=None, ori=0.0, 
-    color='white', colorSpace='rgb', opacity=None, 
-    languageStyle='LTR',
-    depth=-1.0);
-instr_1_2 = visual.TextStim(win=win, name='instr_1_2',
-    text='Please press „Space“ to start the block!',
-    font='Open Sans',
-    pos=(0, -2), height=1.0, wrapWidth=None, ori=0.0, 
-    color='white', colorSpace='rgb', opacity=None, 
-    languageStyle='LTR',
-    depth=-2.0);
-resp_1 = keyboard.Keyboard()
+# --- Initialize components for Routine "no_text_blocks" ---
 
-# --- Initialize components for Routine "main_blocks" ---
+# --- Initialize components for Routine "text_blocks" ---
 
 # --- Initialize components for Routine "Q1" ---
 
@@ -590,7 +327,7 @@ resp_1 = keyboard.Keyboard()
 text_2 = visual.TextStim(win=win, name='text_2',
     text='Difficulty rating',
     font='Open Sans',
-    pos=(0, 0), height=1.0, wrapWidth=None, ori=0.0, 
+    units='deg', pos=(0, 0), height=1.0, wrapWidth=None, ori=0.0, 
     color='black', colorSpace='rgb', opacity=None, 
     languageStyle='LTR',
     depth=-1.0);
@@ -693,18 +430,281 @@ for thisBlock in blocks:
         for paramName in thisBlock:
             exec('{} = thisBlock[paramName]'.format(paramName))
     
-    # --- Prepare to start Routine "instr" ---
+    # --- Prepare to start Routine "no_text_blocks" ---
     continueRoutine = True
     routineForceEnded = False
     # update component parameters for each repeat
-    # Run 'Begin Routine' code from set_instructions
-    # set instructions for current block
-    resp_1.keys = []
-    resp_1.rt = []
-    _resp_1_allKeys = []
+    # Run 'Begin Routine' code from code_rectangles
+    #################################################
+    #                Blocks w/o text                #
+    #################################################
+    # this routine is for all blocks where there are 
+    # coloured rectangles instead of words
+    
+    # the non-text blocks all come in succession, there's just 1 main block in between them.
+    # So use loop here that runs the non-text blocks 
+    # until we have to display a main text block (in this case we exit the routine).
+    while True:
+        # keep background ivory
+        win.Color = (240, 223, 204)
+        win.flip()
+        
+        # clear buffer of all previously recorded key events:
+        event.clearEvents()
+        
+        ### specify settings for the current block
+    
+        ### Prepare stimuli:
+    
+        # get block kind
+        curr_block = all_blocks[exp_block_counter]
+        print("start preparing block " + curr_block)
+    
+        # Check whether it's one of the non-text tasks.
+        # If current block is a text block, skip this routine and go to the next.
+        if curr_block not in ["click_training", "1back_single_training1", "1back_single_training2", 
+                          "1back_single_main", "2back_single_training1", "2back_single_training2", "2back_single_main"]:
+            print("skipping current routine")
+            break
+    
+        # if it's one of the non-text blocks, though, prepare stimuli:
+        else:
+            print(curr_block + " is not a text block - preparing rect as stim now")
+            
+            # keep background ivory
+            win.Color = (240, 223, 204)
+            win.flip()
+            
+            ### Show instructions
+            # set instruction text
+            instr_text = locals()["instr_" + curr_block]
+            # create text box
+            instr_text_stim = visual.TextStim(win, 
+                                             text = instr_text, 
+                                             height = 0.5, 
+                                             pos = (0, 0),
+                                             font = "Bookman Old Style",
+                                             color = 'black')
+            # display the text on screen
+            if curr_block in ["1back_single_training2", "2back_single_training2"]:
+                while True:
+                    instr_text_stim.draw()
+                    win.flip()
+                    # skip current block (aka the second training block))
+                    if event.getKeys(['space']):
+                        print("start next block - skip second training block")
+                        skip_curr_block = True
+                        break
+                    # repeat training (aka run current block, which is the second training block)
+                    elif event.getKeys(['w']):
+                        print("repeat training block")
+                        skip_curr_block = False
+                        break
+            # for regular blocks that can't be repeated:
+            else: 
+                while True:
+                    instr_text_stim.draw()
+                    win.flip()
+                    # start current block
+                    if event.getKeys(['space']):
+                        print("start current block")
+                        skip_curr_block = False
+                        break
+                        
+            # only run this if the current block shall not be skipped:
+            if skip_curr_block == False:
+                ### change background colour 
+                # transition from white (RGB: 255, 255, 255)
+                # to medium grey (RGB: 10, 10, 10)
+                change_bg_colour(window = win, 
+                                 start_rgb = (240, 223, 204), 
+                                 end_rgb = (10, 10, 10), 
+                                 seconds = 2)
+                # Wait for a brief period of time so bg is set
+                core.wait(0.8)
+                # keep background grey
+                win.Color = (10, 10, 10)
+                win.flip()
+            
+                # don't show questions
+                skip_questions = True
+                training_Qs = False
+    
+                # get n-back condition:
+                curr_nback_cond = curr_block[0] # get first character of block name
+    
+                # if it is a 1 or a 2, set that as current n-back level:
+                if curr_nback_cond in [1, 2]:
+                    curr_nback_cond == int(curr_nback_cond)
+                # if it's neither 1 nor 2, it has to be a block without n-back,
+                # so set curr_nback_cond to None
+                else:
+                    curr_nback_cond = None
+    
+                # get list with targets & list with colours
+                curr_targets = all_target_lists[exp_block_counter]
+                curr_colours = all_colour_lists[exp_block_counter]
+                # for current text nr, get text whose name = current text nr
+                curr_text = locals()[curr_text_nr]
+    
+                # start block loop
+    
+                # create empty text stimulus 
+                stim = visual.Rect(win = win,
+                                   width = 3, # width = 3 * 1° visual angle (to make it look rectangle-ish)
+                                   height = 1, # height = 1° visual angle (just like words)
+                                   pos = (0,0), # center stimulus 
+                                   fillColor = 'green')
+                stim.draw()
+                win.flip()
+    
+                # clear buffer of all previously recorded key events:
+                event.clearEvents()
+    
+                # loop colours in current text
+                for trial_idx, curr_col in enumerate(curr_colours):
+                    print("current idx: " + str(trial_idx) + ", curr colour:" + curr_col)
+                    
+                    ### prepare & show current word:
+                    
+                    # if it's a block with an n-back task, prepare target list
+                    if curr_nback_cond != None:
+                        curr_target = curr_targets[trial_idx]
+                        saw_target = False
+                    
+                    # get trial number (start counting from 1, so add 1)
+                    curr_trial_nr = trial_idx + 1
+    
+                    # set current colour as colour of rectangle
+                    stim.fillColor = curr_col
+                    
+                    ### ISI: wait for 100 ms
+                    while core.getTime() < onset_time + 0.1:
+                        # draw the stimulus during the waiting period
+                        stim.draw()
+                        win.flip()
+                        
+                    # show stimulus on screen
+                    stim.draw() # draw stimulus on screen
+                    win.flip() # update the window to clear the screen and display the stimulus
+    
+                    # send word onset trigger to LSL stream
+                    marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_col
+                    #out_marker.push_sample(["STIM_ONSET_" + marker_text])
+                    
+                    # record trial onset time
+                    onset_time = core.getTime()
+                    print(onset_time)
+                                        
+                    ### wait for key response: 
+                    # In blocks with n-back task, participants can press "c" to indicate they saw a target colour and "space" to go to the next word/stimulus.
+                    # In blocks without n-back task, participants can only press "space" to go to the next stimulus.
+                    print("start tracking key responses")
+                        
+                    ### start recording responses
+                    # start "endless" while loop that looks for responses
+                    while True:        
+                        # in each iteration, draw word on screen
+                        stim.draw()
+                        win.flip()
+                        
+                        # if participant presses space bar on their keyboard...
+                        if event.getKeys(['space']):
+                            # get reaction time
+                            curr_duration = core.getTime() - onset_time
+                            ### send trigger to LSL stream to indicate participant wants to go to next word
+                            marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_col
+                            #out_marker.push_sample(["REACTION_NEXT_STIM_" + marker_text])
+                            print("detected space key press -- RT: " + str(curr_duration))
+                            # break while loop
+                            break
+    
+                        # if participant pressed button "c" for the first time and it's an n-back condition 
+                        # where they're actually supposed to do that (aka not a reading baseline condition)...
+                        elif event.getKeys(['c']) and curr_nback_cond != None and saw_target == False:
+                            # get reaction time
+                            curr_nback_RT = onset_time - core.getTime()    
+                            ### send trigger to LSL stream to indicate n-back response
+                            marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_col
+                            #out_marker.push_sample(["NBACK_REACTION_" + marker_text])
+                            # only get first target response, we don't care if they press the button more than once:
+                            saw_target = True
+                            print("detected C key press -- n-back RT: " + str(curr_nback_RT))
+                        # If esc is pressed, end the experiment:
+                        elif event.getKeys(['escape']):
+                            core.quit()
+                    
+                    ### end trial
+                    print("end trial")
+                    # stop display of current word
+                    win.flip()
+                    
+                    # check whether response was hit, miss, false alarm or correct rejection
+                    # they saw a target and there was one: hit
+                    if curr_nback_cond != None: 
+                        if saw_target and curr_target:
+                            curr_nback_response = "hit"
+                        # they didn't see a target but there was one: miss
+                        elif saw_target == False and curr_target:
+                            curr_nback_response = "miss"
+                            curr_nback_RT = None
+                        # they didn't see a target and there was none: correct rejection
+                        elif saw_target == False and curr_target == False:
+                            curr_nback_response = "correct rejection"
+                            curr_nback_RT = None
+                        # they saw a target but there was none: false alarm
+                        elif saw_target and curr_target == False:
+                            curr_nback_response = "false alarm"
+                    # if it wasn't an n-back task block:
+                    else: 
+                        curr_target = None
+                        curr_nback_response = None
+                        curr_nback_RT = None
+                    
+                    ### save everything in output csv
+                    thisExp.addData('colour', curr_colour)
+                    thisExp.addData('target', curr_target)
+                    thisExp.addData('nback_response', curr_nback_response)
+                    thisExp.addData('nback_RT', curr_nback_RT)
+                    thisExp.addData('block_kind', curr_nback_cond)
+                    thisExp.addData('duration', curr_duration)
+                    thisExp.addData('block_nr', curr_block)
+                    thisExp.addData('trial_nr', curr_trial_nr)
+                    # start a new row in the csv
+                    thisExp.nextEntry()
+                    
+                    ### IF TESTING MODE ENABLED: end loop after 4 trials
+                    if expInfo['testing_mode'] == "yes":
+                        if trial_idx == 3:
+                            break
+                    
+                    ### send stimulus offset trigger to LSL stream
+                    marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + str(curr_nback_response)
+                    #out_marker.push_sample(["STIM_OFFSET_" + marker_text])
+                    
+                print("finished presenting trials")
+                
+                # change background colour from grey (RGB: 10, 10, 10)
+                # to ivory (RGB: 240, 223, 204)
+                change_bg_colour(window = win, 
+                                 start_rgb = (10, 10, 10), 
+                                 end_rgb = (240, 223, 204), 
+                                 seconds = 2)
+                # Wait for a brief period of time so bg is set
+                core.wait(0.8)
+                # keep background ivory
+                win.Color = (240, 223, 204)
+                win.flip()
+            
+            ### End currrent block
+            # add 1 to the block counter to go load the next block
+            exp_block_counter = exp_block_counter + 1
+    
+    # go to next routine
+    continueRoutine = False
     # keep track of which components have finished
-    instrComponents = [instr_1_1, instr_1_2, resp_1]
-    for thisComponent in instrComponents:
+    no_text_blocksComponents = []
+    for thisComponent in no_text_blocksComponents:
         thisComponent.tStart = None
         thisComponent.tStop = None
         thisComponent.tStartRefresh = None
@@ -716,7 +716,7 @@ for thisBlock in blocks:
     _timeToFirstFrame = win.getFutureFlipTime(clock="now")
     frameN = -1
     
-    # --- Run Routine "instr" ---
+    # --- Run Routine "no_text_blocks" ---
     while continueRoutine:
         # get current time
         t = routineTimer.getTime()
@@ -724,52 +724,6 @@ for thisBlock in blocks:
         tThisFlipGlobal = win.getFutureFlipTime(clock=None)
         frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
         # update/draw components on each frame
-        
-        # *instr_1_1* updates
-        if instr_1_1.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
-            # keep track of start time/frame for later
-            instr_1_1.frameNStart = frameN  # exact frame index
-            instr_1_1.tStart = t  # local t and not account for scr refresh
-            instr_1_1.tStartRefresh = tThisFlipGlobal  # on global time
-            win.timeOnFlip(instr_1_1, 'tStartRefresh')  # time at next scr refresh
-            # add timestamp to datafile
-            thisExp.timestampOnFlip(win, 'instr_1_1.started')
-            instr_1_1.setAutoDraw(True)
-        
-        # *instr_1_2* updates
-        if instr_1_2.status == NOT_STARTED and tThisFlip >= 2.0-frameTolerance:
-            # keep track of start time/frame for later
-            instr_1_2.frameNStart = frameN  # exact frame index
-            instr_1_2.tStart = t  # local t and not account for scr refresh
-            instr_1_2.tStartRefresh = tThisFlipGlobal  # on global time
-            win.timeOnFlip(instr_1_2, 'tStartRefresh')  # time at next scr refresh
-            # add timestamp to datafile
-            thisExp.timestampOnFlip(win, 'instr_1_2.started')
-            instr_1_2.setAutoDraw(True)
-        
-        # *resp_1* updates
-        waitOnFlip = False
-        if resp_1.status == NOT_STARTED and tThisFlip >= 2.0-frameTolerance:
-            # keep track of start time/frame for later
-            resp_1.frameNStart = frameN  # exact frame index
-            resp_1.tStart = t  # local t and not account for scr refresh
-            resp_1.tStartRefresh = tThisFlipGlobal  # on global time
-            win.timeOnFlip(resp_1, 'tStartRefresh')  # time at next scr refresh
-            # add timestamp to datafile
-            thisExp.timestampOnFlip(win, 'resp_1.started')
-            resp_1.status = STARTED
-            # keyboard checking is just starting
-            waitOnFlip = True
-            win.callOnFlip(resp_1.clock.reset)  # t=0 on next screen flip
-            win.callOnFlip(resp_1.clearEvents, eventType='keyboard')  # clear events on next screen flip
-        if resp_1.status == STARTED and not waitOnFlip:
-            theseKeys = resp_1.getKeys(keyList=['space'], waitRelease=False)
-            _resp_1_allKeys.extend(theseKeys)
-            if len(_resp_1_allKeys):
-                resp_1.keys = _resp_1_allKeys[-1].name  # just the last key pressed
-                resp_1.rt = _resp_1_allKeys[-1].rt
-                # a response ends the routine
-                continueRoutine = False
         
         # check for quit (typically the Esc key)
         if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
@@ -780,7 +734,7 @@ for thisBlock in blocks:
             routineForceEnded = True
             break
         continueRoutine = False  # will revert to True if at least one component still running
-        for thisComponent in instrComponents:
+        for thisComponent in no_text_blocksComponents:
             if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
                 continueRoutine = True
                 break  # at least one component has not yet finished
@@ -789,46 +743,37 @@ for thisBlock in blocks:
         if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
             win.flip()
     
-    # --- Ending Routine "instr" ---
-    for thisComponent in instrComponents:
+    # --- Ending Routine "no_text_blocks" ---
+    for thisComponent in no_text_blocksComponents:
         if hasattr(thisComponent, "setAutoDraw"):
             thisComponent.setAutoDraw(False)
-    # check responses
-    if resp_1.keys in ['', [], None]:  # No response was made
-        resp_1.keys = None
-    blocks.addData('resp_1.keys',resp_1.keys)
-    if resp_1.keys != None:  # we had a response
-        blocks.addData('resp_1.rt', resp_1.rt)
-    # the Routine "instr" was not non-slip safe, so reset the non-slip timer
+    # the Routine "no_text_blocks" was not non-slip safe, so reset the non-slip timer
     routineTimer.reset()
     
-    # --- Prepare to start Routine "main_blocks" ---
+    # --- Prepare to start Routine "text_blocks" ---
     continueRoutine = True
     routineForceEnded = False
     # update component parameters for each repeat
-    # Run 'Begin Routine' code from stim_settings_1
+    # Run 'Begin Routine' code from code_text
+    #################################################
+    #                Blocks with text               #
+    #################################################
+    # this routine is for all blocks with texts
     
-    #################################################
-    #                 Start Block                   #
-    #################################################
+    # keep background ivory
+    win.Color = (240, 223, 204)
+    win.flip()
+    
+    # clear buffer of all previously recorded key events:
+    event.clearEvents()
     
     ### specify settings for the current block
-    
-    
-    ### change background colour 
-    # transition from white (RGB: 255, 255, 255)
-    # to medium grey (RGB: 128, 128, 128)
-    change_bg_colour(window = win, 
-                     start_rgb = (255, 255, 255), 
-                     end_rgb = (10, 10, 10), 
-                     seconds = 2)
-    # Wait for a brief period of time so bg is set
-    core.wait(0.5)
     
     ### Prepare stimuli:
     
     # get block kind
-    curr_block = all_blocks[exp_block_counter][exp_trial_counter]
+    curr_block = all_blocks[exp_block_counter]
+    print("start preparing block " + curr_block)
     
     # Check whether it's some of the non-text tasks, 
     # the reading bl training or one of the dual-task main blocks.
@@ -836,19 +781,100 @@ for thisBlock in blocks:
     # If current block it's a non-text block, skip this routine.
     if curr_block in ["click_training", "1back_single_training1", "1back_single_training2", 
                       "1back_single_main", "2back_single_training1", "2back_single_training2", "2back_single_main"]:
-        # end current routine
+        print("skipping current routine")
+        # skip questions & end current routine
+        skip_questions = True
         continueRoutine = False
-    
+        
     # if it's the reading bl training block, prepare training stimuli:
     elif curr_block == "Reading_Baseline_training":
-        # get training text
-        curr_text = reading_bl_training_text
+        # keep background ivory
+        win.Color = (240, 223, 204)
+        win.flip()
+        
+        ### Show instructions
+        # set instruction text
+        instr_text = locals()["instr_" + curr_block]
+        # create text box
+        instr_text_stim = visual.TextStim(win, 
+                                          text = instr_text, 
+                                          height = 0.5, # font height: 5° visual angle
+                                          font = "Bookman Old Style",
+                                          pos = (0, 0),
+                                          color = 'black')
+        # display the text on screen
+        while True:
+            # keep background ivory
+            win.Color = (240, 223, 204)
+            instr_text_stim.draw()
+            win.flip()
+            # end showing screen if participant presses space
+            if 'space' in event.getKeys():
+                break 
+                
+        ### get training text
+        curr_text = reading_bl_tr_text
         curr_text_nr = "reading_bl_training_text"
         curr_nback_cond = None
         curr_colours = all_colour_lists[0]
+        # show training questions
+        skip_questions = False
+        training_Qs = True
+        
+        ### change background colour 
+        # transition from ivory (RGB: 240, 223, 204)
+        # to medium grey (RGB: 10, 10, 10)
+        change_bg_colour(window = win, 
+                         start_rgb = (240, 223, 204),
+                         end_rgb = (10, 10, 10), 
+                         seconds = 2)
+        # Wait for a brief period of time so bg is set
+        core.wait(0.8)
+        # keep background grey
+        win.Color = (10, 10, 10)
+        win.flip()
         
     # if it's one of the "normal" main blocks, prepare main block stimuli:
     elif curr_block in ["Reading_Baseline_main", "1back_dual_main", "2back_dual_main"]:
+    
+        # keep background ivory
+        win.Color = (240, 223, 204)
+        win.flip()
+        ### Show instructions
+        # set instruction text
+        instr_text = locals()["instr_" + curr_block]
+        # create text box
+        instr_text_stim = visual.TextStim(win, 
+                                          text = instr_text, 
+                                          height = 0.5, # font height: 5° visual angle
+                                          font = "Bookman Old Style",
+                                          pos = (0, 0),
+                                          color = 'black')
+        # Display the text on screen
+        while True:
+            instr_text_stim.draw()
+            win.flip()
+            # end showing screen if participant presses space
+            if 'space' in event.getKeys():
+                break 
+        
+        ### change background colour 
+        # transition from ivory (RGB: 240, 223, 204)
+        # to medium grey (RGB: 10, 10, 10)
+        change_bg_colour(window = win, 
+                         start_rgb = (240, 223, 204),
+                         end_rgb = (10, 10, 10), 
+                         seconds = 2)
+        # Wait for a brief period of time so bg is set
+        core.wait(0.8)
+        # keep background grey
+        win.Color = (10, 10, 10)
+        win.flip()
+    
+        # show main block questions
+        skip_questions = False
+        training_Qs = False
+        
         # get text nr:
         curr_text_nr = all_texts_nrs_list[exp_block_counter]
         
@@ -869,25 +895,25 @@ for thisBlock in blocks:
         # for current text nr, get text whose name = current text nr
         curr_text = locals()[curr_text_nr]
     
-    # start block loop
-    print("starting block")
+    ### Start block loop
     
     # create empty text stimulus 
     stim = visual.TextStim(win = win, 
                            text = ' ', 
                            pos = (0,0), # center stimulus 
-                           height = 2) # font height = 2° visual angle
+                           font = "Times New Roman",
+                           height = 1) # font height = 1° visual angle
     stim.draw()
     win.flip()
-    
-    # loop words in current text
-    print("1st word in text: " + curr_text[0])
     
     # clear buffer of all previously recorded key events:
     event.clearEvents()
     
+    # loop words in current text
     for trial_idx, curr_word in enumerate(curr_text):
         print("current idx: " + str(trial_idx) + ", curr word:" + curr_word)
+        
+        ### prepare & show current word:
         
         # get current colour
         curr_colour = curr_colours[trial_idx]
@@ -900,19 +926,19 @@ for thisBlock in blocks:
         # get trial number (start counting from 1, so add 1)
         curr_trial_nr = trial_idx + 1
     
-        ### set current word & colour as content of text stimulus
+        # set current word & colour as content of text stimulus
         stim.color = curr_colour
         stim.text = curr_word
         
-        ### show word on screen
+        # show word on screen
         stim.draw() # draw word on screen
         win.flip() # update the window to clear the screen and display the word
     
         # send word onset trigger to LSL stream
         marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_word
-        #out_marker.push_sample(["WORD_ONSET_" + marker_text])
+        #out_marker.push_sample(["STIM_ONSET_" + marker_text])
         
-        ### record trial onset time
+        # record trial onset time
         onset_time = core.getTime()
         print(onset_time)
         
@@ -939,8 +965,8 @@ for thisBlock in blocks:
                 # get reaction time
                 curr_duration = core.getTime() - onset_time
                 ### send trigger to LSL stream to indicate participant wants to go to next word
-                marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + str(curr_target)
-                #out_marker.push_sample(["REACTION_NEXT_WORD_" + marker_text])
+                marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_word
+                #out_marker.push_sample(["REACTION_NEXT_STIM_" + marker_text])
                 print("detected space key press -- RT: " + str(curr_duration))
                 # break while loop
                 break
@@ -951,7 +977,7 @@ for thisBlock in blocks:
                 # get reaction time
                 curr_nback_RT = onset_time - core.getTime()    
                 ### send trigger to LSL stream to indicate n-back response
-                marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + str(curr_target)
+                marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_word
                 #out_marker.push_sample(["NBACK_REACTION_" + marker_text])
                 # only get first target response, we don't care if they press the button more than once:
                 saw_target = True
@@ -983,10 +1009,11 @@ for thisBlock in blocks:
                 curr_nback_response = "false alarm"
         # if it wasn't an n-back task block:
         else: 
-            curr_nback_response = None
             curr_target = None
+            curr_nback_response = None
+            curr_nback_RT = None
         
-        # save everything in output csv
+        ### save everything in output csv
         thisExp.addData('word', curr_word)
         thisExp.addData('colour', curr_colour)
         thisExp.addData('target', curr_target)
@@ -997,33 +1024,39 @@ for thisBlock in blocks:
         thisExp.addData('text_nr', curr_text_nr)
         thisExp.addData('block_nr', curr_block)
         thisExp.addData('trial_nr', curr_trial_nr)
-        
-        # break loop after a few trials (for testing)
+        # start a new row in the csv
+        thisExp.nextEntry()
+    
+        ### TESTING MODE: end loop after 4 trials
         if trial_idx == 3:
             break
         
         ### send word offset trigger to LSL stream
-        marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + curr_nback_response
-        #out_marker.push_sample(["WORD_OFFSET_" + marker_text])
+        marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + str(curr_nback_response)
+        #out_marker.push_sample(["STIM_OFFSET_" + marker_text])
         
     print("finished presenting trials")
     
     ### Prepare questions
     
     # change background colour from grey (RGB: 10, 10, 10)
-    # to white (RGB: 255, 255, 255)
+    # to ivory (RGB: 240, 223, 204)
     change_bg_colour(window = win, 
                      start_rgb = (10, 10, 10), 
-                     end_rgb = (255, 255, 255), 
+                     end_rgb = (240, 223, 204), 
                      seconds = 2)
     # Wait for a brief period of time so bg is set
     core.wait(0.5)
     
+    # keep background ivory
+    win.Color = (240, 223, 204)
+    win.flip()
+            
     # end current routine
     continueRoutine = False
     # keep track of which components have finished
-    main_blocksComponents = []
-    for thisComponent in main_blocksComponents:
+    text_blocksComponents = []
+    for thisComponent in text_blocksComponents:
         thisComponent.tStart = None
         thisComponent.tStop = None
         thisComponent.tStartRefresh = None
@@ -1035,7 +1068,7 @@ for thisBlock in blocks:
     _timeToFirstFrame = win.getFutureFlipTime(clock="now")
     frameN = -1
     
-    # --- Run Routine "main_blocks" ---
+    # --- Run Routine "text_blocks" ---
     while continueRoutine:
         # get current time
         t = routineTimer.getTime()
@@ -1053,7 +1086,7 @@ for thisBlock in blocks:
             routineForceEnded = True
             break
         continueRoutine = False  # will revert to True if at least one component still running
-        for thisComponent in main_blocksComponents:
+        for thisComponent in text_blocksComponents:
             if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
                 continueRoutine = True
                 break  # at least one component has not yet finished
@@ -1062,11 +1095,11 @@ for thisBlock in blocks:
         if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
             win.flip()
     
-    # --- Ending Routine "main_blocks" ---
-    for thisComponent in main_blocksComponents:
+    # --- Ending Routine "text_blocks" ---
+    for thisComponent in text_blocksComponents:
         if hasattr(thisComponent, "setAutoDraw"):
             thisComponent.setAutoDraw(False)
-    # the Routine "main_blocks" was not non-slip safe, so reset the non-slip timer
+    # the Routine "text_blocks" was not non-slip safe, so reset the non-slip timer
     routineTimer.reset()
     
     # --- Prepare to start Routine "Q1" ---
@@ -1079,14 +1112,29 @@ for thisBlock in blocks:
     ##########################################################
     
     ### Settings:
-    # keep background white
-    win.Color = (1,1,1)
+    # keep background ivory
+    win.Color = (240, 223, 204)
+    win.flip()
     
-    # load first question for current text & their respective answers
-    Q1 = locals()[curr_text_nr + "_Q1"]
-    Q1_answers = locals()[curr_text_nr + "_Q1_ans"]
-    Q1_corr = locals()[curr_text_nr + "_Q1_corr"]
+    # clear buffer of all previously recorded key events:
+    event.clearEvents()
     
+    # check which kind of block we have
+    # if there was no text before, we can skip the questions
+    if skip_questions:
+        continueRoutine = False
+    # if we have a training text, set training questions
+    elif skip_questions == False and training_Qs:
+        Q1 = reading_bl_tr_Q1
+        Q1_answers = reading_bl_tr_Q1_ans
+        Q1_corr = reading_bl_tr_Q1_corr
+        
+    # if we have a main text, set regular questions
+    elif skip_questions == False and training_Qs == False:
+        # load first question for current text & their respective answers
+        Q1 = locals()[curr_text_nr + "_Q1"]
+        Q1_answers = locals()[curr_text_nr + "_Q1_ans"]
+        Q1_corr = locals()[curr_text_nr + "_Q1_corr"]
     
     # Define text positions and formatting
     question_pos = (0, 3)
@@ -1099,6 +1147,7 @@ for thisBlock in blocks:
                                pos = question_pos,
                                color = "black",
                                height = 0.6,
+                               font = "Bookman Old Style",
                                anchorHoriz = 'center',
                                alignText = 'center', 
                                wrapWidth = 10)
@@ -1107,8 +1156,9 @@ for thisBlock in blocks:
                                text = Q1_answers[i], 
                                pos = (answer_xpos, answer_ypos[i]), 
                                color = "black", # set all to black as a default
-                               height = 0.6, 
-                               wrapWidth = 7,
+                               height = 0.5, 
+                               font = "Bookman Old Style",
+                               wrapWidth = 15,
                                anchorHoriz = 'left', 
                                alignText = 'center') for i in range(len(Q1_answers))]
     
@@ -1171,7 +1221,7 @@ for thisBlock in blocks:
         elif event.getKeys(['space']) and Q1_chosen_ans != None:
             break
     
-    # print chosen answers for Q1, Q2 and Q3
+    # print chosen answer for Q1
     print("answer for Q1:" + str(Q1_chosen_ans))
     
     # check if answer was correct:
@@ -1187,6 +1237,8 @@ for thisBlock in blocks:
     thisExp.addData('block_kind', curr_nback_cond)
     thisExp.addData('text_nr', curr_text_nr)
     thisExp.addData('block_nr', curr_block)
+    # start a new row in the csv
+    thisExp.nextEntry()
     
     ### End Q1: Set .autoDraw = False to stop showing question & answers
     question.autoDraw = False
@@ -1247,6 +1299,147 @@ for thisBlock in blocks:
     continueRoutine = True
     routineForceEnded = False
     # update component parameters for each repeat
+    # Run 'Begin Routine' code from code_Q2
+    ##########################################################
+    #            Text Comprehension Questions - Q2           #
+    ##########################################################
+    
+    ### Settings:
+    # keep background ivory
+    win.Color = (240, 223, 204)
+    win.flip()
+    
+    # clear buffer of all previously recorded key events:
+    event.clearEvents()
+    
+    # check which kind of block we have
+    # if there was no text before, we can skip the questions
+    if skip_questions:
+        continueRoutine = False
+    # if we have a training text, set training questions
+    elif skip_questions == False and training_Qs:
+        Q2 = reading_bl_tr_Q2
+        Q2_answers = reading_bl_tr_Q2_ans
+        Q2_corr = reading_bl_tr_Q2_corr
+        
+    # if we have a main text, set regular questions
+    elif skip_questions == False and training_Qs == False:
+        # load first question for current text & their respective answers
+        Q2 = locals()[curr_text_nr + "_Q2"]
+        Q2_answers = locals()[curr_text_nr + "_Q2_ans"]
+        Q2_corr = locals()[curr_text_nr + "_Q2_corr"]
+    
+    # Define text positions and formatting
+    question_pos = (0, 3)
+    answer_xpos = -3 # move questions a bit to the left 
+    answer_ypos = [ 0, -2, -4, -6] # set the y axis positions of all 4 answers
+    
+    # Create text stim for the question:
+    question = visual.TextStim(win, 
+                               text = Q2, 
+                               pos = question_pos,
+                               color = "black",
+                               height = 0.6,
+                               font = "Bookman Old Style",
+                               anchorHoriz = 'center',
+                               alignText = 'center', 
+                               wrapWidth = 10)
+    # create 1 text stim for each answer option:
+    answers = [visual.TextStim(win, 
+                               text = Q2_answers[i], 
+                               pos = (answer_xpos, answer_ypos[i]), 
+                               color = "black", # set all to black as a default
+                               height = 0.5, 
+                               font = "Bookman Old Style",
+                               wrapWidth = 15,
+                               anchorHoriz = 'left', 
+                               alignText = 'center') for i in range(len(Q1_answers))]
+    
+    ### Show all on screen until I set .autoDraw = False
+    question.autoDraw = True
+    for answer in answers:
+        answer.autoDraw = True
+    win.flip()
+    
+    
+    ### Record key responses:
+    Q2_chosen_ans = None
+    
+    while True:        
+        # if 1 was pressed...
+        if event.getKeys(['1']):
+            print('a')
+            # save Q1 answer as a 
+            Q1_chosen_ans = "a"
+            # set font colour of the first answer (answer a) to 
+            # green and the rest to black:
+            answers[0].setColor("green")
+            for answer in answers[1:]:
+                answer.setColor("black")
+                # draw updated stimulus:
+                win.flip()
+        # same procedure for all other answer options:
+        if event.getKeys(['2']):
+            print('b')
+            Q1_chosen_ans = "b"
+            # set font colour of the second answer (answer b) to 
+            # green and the rest to black:
+            answers[1].setColor("green")
+            for answer in [answers[0]] + answers[2:]:
+                answer.setColor("black")
+                # draw updated stimulus:
+                win.flip()
+        if event.getKeys(['3']):
+            print('c')
+            Q1_chosen_ans = "c"
+            # set font colour of the third answer (answer c) to 
+            # green and the rest to black:
+            answers[2].setColor("green")
+            for answer in answers[:2] + answers[3:]:
+                answer.setColor("black")
+            # draw updated stimulus:
+            win.flip()
+        if event.getKeys(['4']):
+            print('d')
+            Q1_chosen_ans = "d"
+            # set font colour of the fourth answer (answer d) to 
+            # green and the rest to black:
+            answers[3].setColor("green")
+            for answer in answers[:-1]:
+                answer.setColor("black")
+            # draw updated stimulus 
+            win.flip()
+        # if participant pressed "space", check whether they chose an answer.
+        # if yes, end this routine and go to next question, if not, wait for valid answer.
+        elif event.getKeys(['space']) and Q1_chosen_ans != None:
+            break
+    
+    # print chosen answer for Q2
+    print("answer for Q2:" + str(Q2_chosen_ans))
+    
+    # check if answer was correct:
+    if Q2_chosen_ans == Q2_corr: 
+        print("answer correct!")
+    else: 
+        print("answer incorrect!")
+        
+    # save data:
+    thisExp.addData('question', 'Q2')
+    thisExp.addData('chosen_ans', Q2_chosen_ans)
+    thisExp.addData('ans_correct', Q2_chosen_ans == Q2_corr)
+    thisExp.addData('block_kind', curr_nback_cond)
+    thisExp.addData('text_nr', curr_text_nr)
+    thisExp.addData('block_nr', curr_block)
+    # start a new row in the csv
+    thisExp.nextEntry()
+    
+    ### End Q2: Set .autoDraw = False to stop showing question & answers
+    question.autoDraw = False
+    for answer in answers:
+        answer.autoDraw = False
+    
+    # end current routine
+    continueRoutine = False
     # keep track of which components have finished
     Q2Components = []
     for thisComponent in Q2Components:
@@ -1299,6 +1492,147 @@ for thisBlock in blocks:
     continueRoutine = True
     routineForceEnded = False
     # update component parameters for each repeat
+    # Run 'Begin Routine' code from code_Q3
+    ##########################################################
+    #            Text Comprehension Questions - Q3           #
+    ##########################################################
+    
+    ### Settings:
+    # keep background ivory
+    win.Color = (240, 223, 204)
+    win.flip()
+    
+    # clear buffer of all previously recorded key events:
+    event.clearEvents()
+    
+    # check which kind of block we have
+    # if there was no text before, we can skip the questions
+    if skip_questions:
+        continueRoutine = False
+    # if we have a training text, set training questions
+    elif skip_questions == False and training_Qs:
+        Q3 = reading_bl_tr_Q3
+        Q3_answers = reading_bl_tr_Q3_ans
+        Q3_corr = reading_bl_tr_Q3_corr
+        
+    # if we have a main text, set regular questions
+    elif skip_questions == False and training_Qs == False:
+        # load first question for current text & their respective answers
+        Q3 = locals()[curr_text_nr + "_Q3"]
+        Q3_answers = locals()[curr_text_nr + "_Q3_ans"]
+        Q3_corr = locals()[curr_text_nr + "_Q3_corr"]
+    
+    # Define text positions and formatting
+    question_pos = (0, 3)
+    answer_xpos = -3 # move questions a bit to the left 
+    answer_ypos = [ 0, -2, -4, -6] # set the y axis positions of all 4 answers
+    
+    # Create text stim for the question:
+    question = visual.TextStim(win, 
+                               text = Q3, 
+                               pos = question_pos,
+                               color = "black",
+                               height = 0.6,
+                               font = "Bookman Old Style",
+                               anchorHoriz = 'center',
+                               alignText = 'center', 
+                               wrapWidth = 10)
+    # create 1 text stim for each answer option:
+    answers = [visual.TextStim(win, 
+                               text = Q3_answers[i], 
+                               pos = (answer_xpos, answer_ypos[i]), 
+                               color = "black", # set all to black as a default
+                               height = 0.5, 
+                               font = "Bookman Old Style",
+                               wrapWidth = 15,
+                               anchorHoriz = 'left', 
+                               alignText = 'center') for i in range(len(Q1_answers))]
+    
+    ### Show all on screen until I set .autoDraw = False
+    question.autoDraw = True
+    for answer in answers:
+        answer.autoDraw = True
+    win.flip()
+    
+    
+    ### Record key responses:
+    Q3_chosen_ans = None
+    
+    while True:        
+        # if 1 was pressed...
+        if event.getKeys(['1']):
+            print('a')
+            # save Q3 answer as a 
+            Q1_chosen_ans = "a"
+            # set font colour of the first answer (answer a) to 
+            # green and the rest to black:
+            answers[0].setColor("green")
+            for answer in answers[1:]:
+                answer.setColor("black")
+                # draw updated stimulus:
+                win.flip()
+        # same procedure for all other answer options:
+        if event.getKeys(['2']):
+            print('b')
+            Q1_chosen_ans = "b"
+            # set font colour of the second answer (answer b) to 
+            # green and the rest to black:
+            answers[1].setColor("green")
+            for answer in [answers[0]] + answers[2:]:
+                answer.setColor("black")
+                # draw updated stimulus:
+                win.flip()
+        if event.getKeys(['3']):
+            print('c')
+            Q1_chosen_ans = "c"
+            # set font colour of the third answer (answer c) to 
+            # green and the rest to black:
+            answers[2].setColor("green")
+            for answer in answers[:2] + answers[3:]:
+                answer.setColor("black")
+            # draw updated stimulus:
+            win.flip()
+        if event.getKeys(['4']):
+            print('d')
+            Q1_chosen_ans = "d"
+            # set font colour of the fourth answer (answer d) to 
+            # green and the rest to black:
+            answers[3].setColor("green")
+            for answer in answers[:-1]:
+                answer.setColor("black")
+            # draw updated stimulus 
+            win.flip()
+        # if participant pressed "space", check whether they chose an answer.
+        # if yes, end this routine and go to next question, if not, wait for valid answer.
+        elif event.getKeys(['space']) and Q1_chosen_ans != None:
+            break
+    
+    # print chosen answer for Q3
+    print("answer for Q3:" + str(Q3_chosen_ans))
+    
+    # check if answer was correct:
+    if Q3_chosen_ans == Q3_corr: 
+        print("answer correct!")
+    else: 
+        print("answer incorrect!")
+        
+    # save data:
+    thisExp.addData('question', 'Q3')
+    thisExp.addData('chosen_ans', Q3_chosen_ans)
+    thisExp.addData('ans_correct', Q3_chosen_ans == Q3_corr)
+    thisExp.addData('block_kind', curr_nback_cond)
+    thisExp.addData('text_nr', curr_text_nr)
+    thisExp.addData('block_nr', curr_block)
+    # start a new row in the csv
+    thisExp.nextEntry()
+    
+    ### End Q3: Set .autoDraw = False to stop showing question & answers
+    question.autoDraw = False
+    for answer in answers:
+        answer.autoDraw = False
+    
+    # end current routine
+    continueRoutine = False
     # keep track of which components have finished
     Q3Components = []
     for thisComponent in Q3Components:
@@ -1352,12 +1686,17 @@ for thisBlock in blocks:
     routineForceEnded = False
     # update component parameters for each repeat
     # Run 'Begin Routine' code from difficulty_rating
-    # if it's a reading bl block, get text difficulty rating
-    if curr_block[0] == "Reading_Baseline_main":
-        pass
-    
     # end of the block, so we have to add 1 to the block counter
     exp_block_counter = exp_block_counter + 1
+    
+    # keep background ivory
+    win.Color = (240, 223, 204)
+    win.flip()
+            
+    # if it's a reading bl block, get text 
+    # difficulty rating, if not, skip this routine
+    if curr_block[0] != "Reading_Baseline_main":
+        continueRoutine = False
     # keep track of which components have finished
     text_ratingComponents = [text_2]
     for thisComponent in text_ratingComponents:
@@ -1388,8 +1727,6 @@ for thisBlock in blocks:
             text_2.tStart = t  # local t and not account for scr refresh
             text_2.tStartRefresh = tThisFlipGlobal  # on global time
             win.timeOnFlip(text_2, 'tStartRefresh')  # time at next scr refresh
-            # add timestamp to datafile
-            thisExp.timestampOnFlip(win, 'text_2.started')
             text_2.setAutoDraw(True)
         if text_2.status == STARTED:
             # is it time to stop? (based on global clock, using actual start)
@@ -1397,8 +1734,6 @@ for thisBlock in blocks:
                 # keep track of stop time/frame for later
                 text_2.tStop = t  # not accounting for scr refresh
                 text_2.frameNStop = frameN  # exact frame index
-                # add timestamp to datafile
-                thisExp.timestampOnFlip(win, 'text_2.stopped')
                 text_2.setAutoDraw(False)
         
         # check for quit (typically the Esc key)
@@ -1432,6 +1767,15 @@ for thisBlock in blocks:
     
 # completed 17.0 repeats of 'blocks'
 
+# get names of stimulus parameters
+if blocks.trialList in ([], [None], None):
+    params = []
+else:
+    params = blocks.trialList[0].keys()
+# save data for this loop
+blocks.saveAsText(filename + 'blocks.csv', delim=',',
+    stimOut=params,
+    dataOut=['n','all_mean','all_std', 'all_raw'])
 
 # --- End experiment ---
 # Flip one final time so any remaining win.callOnFlip() 
@@ -1439,6 +1783,7 @@ for thisBlock in blocks:
 win.flip()
 
 # these shouldn't be strictly necessary (should auto-save)
+thisExp.saveAsWideText(filename+'.csv', delim='auto')
 thisExp.saveAsPickle(filename)
 # make sure everything is closed down
 if eyetracker:
