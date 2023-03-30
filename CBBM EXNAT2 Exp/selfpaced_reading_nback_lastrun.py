@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Tue Mar 28 16:06:30 2023
+    on Thu Mar 30 14:24:58 2023
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -70,7 +70,7 @@ frameTolerance = 0.001  # how close to onset before 'same' frame
 win = visual.Window(
     size=[1500, 1000], fullscr=False, screen=0, 
     winType='pyglet', allowGUI=True, allowStencil=False,
-    monitor='testMonitor', color='[240, 223, 204]', colorSpace='rgb',
+    monitor='testMonitor', color='', colorSpace='rgb',
     blendMode='avg', useFBO=True, 
     units='deg')
 # store frame rate of monitor if we can measure it
@@ -139,15 +139,21 @@ print("create trigger stream")
 ### Stimulus settings
 
 # set flicker frequency (in Hz)
+#flicker_freq = 17.3
 flicker_freq = 17.3
 # set frame rate (in Hz)
 frame_rate = 60
 
 # set colours you want to use for background:
-light_bg_col = (240, 223, 204) # ivory instructions background
-dark_bg_col  = (10, 10, 10)    # dark grey trials background
+# (divide by 255 to get RGB with range 0-1)
+light_bg_col = [253/255, 251/255, 240/255] # ivory instructions background
+dark_bg_col  = [80/255, 80/255, 80/255]    # dark grey background for stimuli
+#light_bg_col = (253, 251, 240) # ivory instructions background
+#dark_bg_col  = (80, 80, 80)    # dark grey background for stimuli
 
-# make background light for a start
+# make background light for a start - use RGB colour codes
+#win.colorSpace = "rgb255"
+win.colorSpace = "rgb"
 win.color = light_bg_col
 
 # set colours you want to use for the stimuli:
@@ -541,15 +547,21 @@ for thisBlock in blocks:
     
                 # start block loop
     
-                # create empty text stimulus 
+                # prepare flicker
+                # hint: flicker_freq and frame_rate are set in the settings 
+                # code component at the beginning of the experiment.
+                
+                # create flicker phase variable - start at phase = 0
+                flicker_phase = 0
+                # we also need the start time (let's set it as current time 
+                # at this point in the script):
+                start_time = core.getTime()
+        
+                # create empty stimulus 
                 stim = visual.Rect(win = win,
                                    width = 3, # width = 3 * 1° visual angle (to make it look rectangle-ish)
                                    height = 1, # height = 1° visual angle (just like words)
-                                   pos = (0,0), # center stimulus 
-                                   fillColor = 'green')
-                
-                # set the flicker rate to 10 Hz
-                #stim.flicker(frequency = 10)
+                                   pos = (0,0)) # center stimulus 
                 
                 stim.draw()
                 win.flip()
@@ -582,6 +594,28 @@ for thisBlock in blocks:
                     # set current colour as colour of rectangle
                     stim.fillColor = curr_col
                     
+                    # Flicker option 1: use sine-wave (gradient) flicker
+                    #frame_time = core.getTime() # get current time point (in sec)
+                    #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
+                    #opacity = (flicker_intensity + 1) / 2
+        
+                    # Flicker option 2: use square-wave (on-off) flicker
+                    frame_time = core.getTime() 
+                    time_passed = frame_time - start_time 
+                    cycle_duration = 1 / flicker_freq
+                    cycle_passed = time_passed % cycle_duration
+                    
+                    if cycle_passed < cycle_duration / 2:
+                        opacity = 1
+                    else: 
+                        opacity = 0
+                    
+                    # set opacity
+                    stim.opacity = opacity  
+                    # draw stimulus on screen
+                    stim.draw()
+                    win.flip()
+            
                     # show stimulus on screen
                     stim.draw() # draw stimulus on screen
                     win.flip() # update the window to clear the screen and display the stimulus
@@ -603,8 +637,34 @@ for thisBlock in blocks:
                     # start "endless" while loop that looks for responses
                     while True:        
                         # in each iteration, draw word on screen
+                        
+                                        
+                        # Flicker option 1: use sine-wave (gradient) flicker
+                        #frame_time = core.getTime() # get current time point (in sec)
+                        #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
+                        #opacity = (flicker_intensity + 1) / 2
+                    
+                        # Flicker option 2: use square-wave (on-off) flicker
+                        frame_time = core.getTime() 
+                        time_passed = frame_time - start_time 
+                        cycle_duration = 1 / flicker_freq
+                        cycle_passed = time_passed % cycle_duration
+                        
+                        if cycle_passed < cycle_duration / 2:
+                            opacity = 1
+                        else: 
+                            opacity = 0
+                        
+                        # set opacity
+                        stim.opacity = opacity  
+                        # draw stimulus on screen
                         stim.draw()
                         win.flip()
+                
+                        # show stimulus on screen
+                        stim.draw() # draw stimulus on screen
+                        win.flip() # update the window to clear the screen and display the stimulus
+    
                         
                         # if participant presses space bar on their keyboard...
                         if event.getKeys(['space']):
@@ -634,7 +694,7 @@ for thisBlock in blocks:
                     
                     ### end trial
                     print("end trial")
-                    # stop display of current word
+                    # stop display of current stimulus
                     win.flip()
                     
                     # check whether response was hit, miss, false alarm or correct rejection
@@ -798,8 +858,8 @@ for thisBlock in blocks:
                                           height = 0.5, # font height: 5° visual angle
                                           font = "Bookman Old Style",
                                           pos = (0, 0),
-                                          color = 'black')
-        
+                                          color = "black")
+            
         # display the text on screen
         while True:
             # keep background ivory
@@ -831,8 +891,8 @@ for thisBlock in blocks:
         
         
         ### change background colour 
-        # transition from ivory (RGB: 240, 223, 204)
-        # to medium grey (RGB: 10, 10, 10)
+        # transition from ivory 
+        # to medium grey 
         change_bg_colour(window = win, 
                          start_rgb = light_bg_col,
                          end_rgb = dark_bg_col, 
@@ -840,9 +900,11 @@ for thisBlock in blocks:
         # Wait for a brief period of time so bg is set
         core.wait(0.8)
         # keep background grey
-        win.Color = dark_bg_col
-        win.flip()
-        
+        #win.Color = dark_bg_col
+        #win.flip()
+        print("window colour: ", win.Color)
+    
+    
     # if it's one of the "normal" main blocks, prepare main block stimuli:
     elif curr_block in ["Reading_Baseline_main", "1back_dual_main", "2back_dual_main"]:
     
@@ -859,7 +921,7 @@ for thisBlock in blocks:
                                           height = 0.5, # font height: 5° visual angle
                                           font = "Bookman Old Style",
                                           pos = (0, 0),
-                                          color = 'black')
+                                          color = "black")
         # Display the text on screen
         while True:
             instr_text_stim.draw()
@@ -869,8 +931,7 @@ for thisBlock in blocks:
                 break 
         
         ### change background colour 
-        # transition from ivory (RGB: 240, 223, 204)
-        # to medium grey (RGB: 10, 10, 10)
+        # transition from ivory to medium grey
         change_bg_colour(window = win, 
                          start_rgb = light_bg_col,
                          end_rgb = dark_bg_col, 
@@ -878,8 +939,9 @@ for thisBlock in blocks:
         # Wait for a brief period of time so bg is set
         core.wait(0.8)
         # keep background grey
-        win.Color = dark_bg_col
-        win.flip()
+        #win.Color = dark_bg_col
+        #win.flip()
+        print("window colour: ", win.Color)
     
         # show main block questions
         skip_questions = False
@@ -919,13 +981,24 @@ for thisBlock in blocks:
     
     # create empty text stimulus 
     stim = visual.TextStim(win = win, 
-                           text = ' ', 
+                           text = " ", 
                            pos = (0,0), # center stimulus
-                           opacity = 1, # we'll modify the opacity later to make the words flicker
                            font = "Times New Roman",
                            height = 1) # font height = 1° visual angle
     
+    # create grey rectangle that masks the text if I set opacity to 1
+    # --> changing the text opacity directly isn't working: https://discourse.psychopy.org/t/opacity-of-text-stimuli-is-not-updating/11152/7    
+    stim_mask = visual.Rect(win = win,
+                            width = 20, # width = 20° visual angle
+                            height = 3, # height = 3° visual angle 
+                            pos = (0,0), # center stimulus 
+                            opacity = 0, # set opacity to 0 for a start
+                            #colorSpace = "rgb255", # interpret colour code as rgb255 values
+                            colorSpace = "rgb", # interpret colour code as rgb values
+                            fillColor = dark_bg_col)
+    
     stim.draw()
+    stim_mask.draw()
     win.flip()
     
     # clear buffer of all previously recorded key events:
@@ -952,15 +1025,28 @@ for thisBlock in blocks:
         stim.color = curr_colour
         stim.text = curr_word
         
-        # flicker: 
-        # create sine wave with freq 17.3 Hz (= flicker_freq; the values will be our flicker intensity) 
-        # and get value at current time point (frame_time). This will result in a value between 1 and -1
+        # Flicker option 1: use sine-wave (gradient) flicker
+        # --> doesn't seem to work, I don't see the words flicker when I play this
+        # create current opacity value to continue flickering the word
+        #frame_time = core.getTime() # get current time point (in sec)
+        #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
+        #opacity = (flicker_intensity + 1) / 2
+    
+        # use square-wave (on-off) flicker
         frame_time = core.getTime() # get current time point (in sec)
-        flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
-        stim.opacity = (flicker_intensity + 1) / 2
+        time_passed = frame_time - start_time # calculate time passed since start
+        cycle_duration = 1 / flicker_freq # calculate duration of one flicker cycle
+        cycle_passed = time_passed % cycle_duration # calculate time passed in current flicker cycle
+        if cycle_passed < cycle_duration / 2: # if in the first half of the cycle
+            opacity = 1 # set opacity to 1
+        else: # if in the second half of the cycle
+            opacity = 0 # set opacity to 0
+            
+        stim_mask.opacity = opacity
         
         # show word on screen
         stim.draw() # draw word on screen
+        stim_mask.draw() # draw mask on screen
         win.flip() # update the window to clear the screen and display the word
     
         # send word onset trigger to LSL stream
@@ -974,11 +1060,26 @@ for thisBlock in blocks:
         ### wait for 50 ms
         while core.getTime() < onset_time + 0.05:
             # draw the stimulus during the waiting period
-            # create current opacity value to continue flickering the word
-            frame_time = core.getTime() # get current time point (in sec)
-            flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
-            stim.opacity = (flicker_intensity + 1) / 2
-            stim.draw()
+    
+            # Flicker option 1: use sine-wave (gradient) flicker
+            #frame_time = core.getTime() 
+            #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
+            #opacity = (flicker_intensity + 1) / 2
+    
+            # Flicker option 2: use square-wave (on-off) flicker
+            frame_time = core.getTime() 
+            time_passed = frame_time - start_time 
+            cycle_duration = 1 / flicker_freq
+            cycle_passed = time_passed % cycle_duration
+            if cycle_passed < cycle_duration / 2:
+                opacity = 1
+            else: 
+                opacity = 0
+            
+            stim_mask.opacity = opacity
+        
+            stim.draw() # draw text
+            stim_mask.draw() # draw mask
             win.flip()
                 
         ### wait for key response: 
@@ -991,10 +1092,26 @@ for thisBlock in blocks:
         while True:        
             # in each iteration, draw word on screen
             # --> flicker again
-            frame_time = core.getTime() # get current time point (in sec)
-            flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
-            stim.opacity = (flicker_intensity + 1) / 2
+    
+            # Flicker option 1: use sine-wave (gradient) flicker
+            #frame_time = core.getTime() 
+            #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
+            #opacity = (flicker_intensity + 1) / 2
+    
+            # Flicker option 2: use square-wave (on-off) flicker
+            frame_time = core.getTime() 
+            time_passed = frame_time - start_time 
+            cycle_duration = 1 / flicker_freq
+            cycle_passed = time_passed % cycle_duration
+            if cycle_passed < cycle_duration / 2:
+                opacity = 1
+            else: 
+                opacity = 0
+                
+            stim_mask.opacity = opacity
+            
             stim.draw()
+            stim_mask.draw()
             win.flip()
             
             # if participant presses space bar on their keyboard...
