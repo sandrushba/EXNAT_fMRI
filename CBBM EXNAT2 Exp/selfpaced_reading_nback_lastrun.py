@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Thu Mar 30 14:24:58 2023
+    on Fri Mar 31 17:19:31 2023
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -139,22 +139,18 @@ print("create trigger stream")
 ### Stimulus settings
 
 # set flicker frequency (in Hz)
-#flicker_freq = 17.3
-flicker_freq = 17.3
+flicker_freq = 10
 # set frame rate (in Hz)
 frame_rate = 60
 
 # set colours you want to use for background:
-# (divide by 255 to get RGB with range 0-1)
-light_bg_col = [253/255, 251/255, 240/255] # ivory instructions background
-dark_bg_col  = [80/255, 80/255, 80/255]    # dark grey background for stimuli
-#light_bg_col = (253, 251, 240) # ivory instructions background
-#dark_bg_col  = (80, 80, 80)    # dark grey background for stimuli
+#light_bg_col_hex = "#FDFBF0" # ivory instructions background
+#dark_bg_col_hex  = "#505050" # dark grey background for stimuli
+light_bg_col = [(x / 127.5) - 1 for x in (253, 251, 240)] # ivory instructions background (use RGB -1:1)
+dark_bg_col  = [(x / 127.5) - 1 for x in (80, 80, 80)] # dark grey background for stimuli (use RGB -1:1)
 
-# make background light for a start - use RGB colour codes
-#win.colorSpace = "rgb255"
-win.colorSpace = "rgb"
-win.color = light_bg_col
+# make background light for a start - use rgb -1:1 colour codes
+win.setColor(light_bg_col, colorSpace='rgb')
 
 # set colours you want to use for the stimuli:
 colours = ["#D292F3", "#F989A2", "#2AB7EF", "#88BA3F"]
@@ -444,7 +440,7 @@ for thisBlock in blocks:
     # until we have to display a main text block (in this case we exit the routine).
     while True:
         # keep background ivory
-        win.Color = light_bg_col
+        win.setColor(light_bg_col, colorSpace='rgb')
         win.flip()
         
         # clear buffer of all previously recorded key events:
@@ -470,7 +466,7 @@ for thisBlock in blocks:
             print(curr_block + " is not a text block - preparing rect as stim now")
             
             # keep background ivory
-            win.Color = light_bg_col
+            win.setColor(light_bg_col, colorSpace='rgb')
             win.flip()
             
             ### Show instructions
@@ -521,7 +517,7 @@ for thisBlock in blocks:
                 # Wait for a brief period of time so bg is set
                 core.wait(0.8)
                 # keep background grey
-                win.Color = dark_bg_col
+                win.setColor(dark_bg_col, colorSpace='rgb')
                 win.flip()
             
                 # don't show questions
@@ -561,6 +557,7 @@ for thisBlock in blocks:
                 stim = visual.Rect(win = win,
                                    width = 3, # width = 3 * 1° visual angle (to make it look rectangle-ish)
                                    height = 1, # height = 1° visual angle (just like words)
+                                  # colorSpace = "hex",
                                    pos = (0,0)) # center stimulus 
                 
                 stim.draw()
@@ -751,7 +748,7 @@ for thisBlock in blocks:
                 # Wait for a brief period of time so bg is set
                 core.wait(0.8)
                 # keep background ivory
-                win.Color = light_bg_col
+                win.setColor(light_bg_col, colorSpace='rgb')
                 win.flip()
             
             ### End currrent block
@@ -818,7 +815,7 @@ for thisBlock in blocks:
     # this routine is for all blocks with texts
     
     # keep background ivory
-    win.Color = light_bg_col
+    win.setColor(light_bg_col, colorSpace='rgb')
     win.flip()
     
     # clear buffer of all previously recorded key events:
@@ -846,7 +843,7 @@ for thisBlock in blocks:
     # if it's the reading bl training block, prepare training stimuli:
     elif curr_block == "Reading_Baseline_training":
         # keep background ivory
-        win.Color = light_bg_col
+        win.setColor(light_bg_col, colorSpace='rgb')
         win.flip()
         
         ### Show instructions
@@ -863,7 +860,7 @@ for thisBlock in blocks:
         # display the text on screen
         while True:
             # keep background ivory
-            win.Color = light_bg_col
+            win.setColor(light_bg_col, colorSpace='rgb')
             instr_text_stim.draw()
             win.flip()
             # end showing screen if participant presses space
@@ -900,16 +897,14 @@ for thisBlock in blocks:
         # Wait for a brief period of time so bg is set
         core.wait(0.8)
         # keep background grey
-        #win.Color = dark_bg_col
-        #win.flip()
-        print("window colour: ", win.Color)
-    
+        win.setColor(dark_bg_col, colorSpace='rgb')
+        win.flip()
     
     # if it's one of the "normal" main blocks, prepare main block stimuli:
     elif curr_block in ["Reading_Baseline_main", "1back_dual_main", "2back_dual_main"]:
     
         # keep background ivory
-        win.Color = light_bg_col
+        win.setColor(light_bg_col, colorSpace='rgb')
         win.flip()
         
         ### Show instructions
@@ -939,8 +934,8 @@ for thisBlock in blocks:
         # Wait for a brief period of time so bg is set
         core.wait(0.8)
         # keep background grey
-        #win.Color = dark_bg_col
-        #win.flip()
+        win.setColor(dark_bg_col, colorSpace='rgb')
+        win.flip()
         print("window colour: ", win.Color)
     
         # show main block questions
@@ -993,9 +988,8 @@ for thisBlock in blocks:
                             height = 3, # height = 3° visual angle 
                             pos = (0,0), # center stimulus 
                             opacity = 0, # set opacity to 0 for a start
-                            #colorSpace = "rgb255", # interpret colour code as rgb255 values
-                            colorSpace = "rgb", # interpret colour code as rgb values
-                            fillColor = dark_bg_col)
+                            fillColor = dark_bg_col,
+                            colorSpace = "rgb")
     
     stim.draw()
     stim_mask.draw()
@@ -1028,19 +1022,19 @@ for thisBlock in blocks:
         # Flicker option 1: use sine-wave (gradient) flicker
         # --> doesn't seem to work, I don't see the words flicker when I play this
         # create current opacity value to continue flickering the word
-        #frame_time = core.getTime() # get current time point (in sec)
-        #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
-        #opacity = (flicker_intensity + 1) / 2
+        frame_time = core.getTime() # get current time point (in sec)
+        flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
+        opacity = (flicker_intensity + 1) / 2
     
         # use square-wave (on-off) flicker
-        frame_time = core.getTime() # get current time point (in sec)
-        time_passed = frame_time - start_time # calculate time passed since start
-        cycle_duration = 1 / flicker_freq # calculate duration of one flicker cycle
-        cycle_passed = time_passed % cycle_duration # calculate time passed in current flicker cycle
-        if cycle_passed < cycle_duration / 2: # if in the first half of the cycle
-            opacity = 1 # set opacity to 1
-        else: # if in the second half of the cycle
-            opacity = 0 # set opacity to 0
+        #frame_time = core.getTime() # get current time point (in sec)
+        #time_passed = frame_time - start_time # calculate time passed since start
+        #cycle_duration = 1 / flicker_freq # calculate duration of one flicker cycle
+        #cycle_passed = time_passed % cycle_duration # calculate time passed in current flicker cycle
+        #if cycle_passed < cycle_duration / 2: # if in the first half of the cycle
+        #    opacity = 1 # set opacity to 1
+        #else: # if in the second half of the cycle
+        #    opacity = 0 # set opacity to 0
             
         stim_mask.opacity = opacity
         
@@ -1062,19 +1056,19 @@ for thisBlock in blocks:
             # draw the stimulus during the waiting period
     
             # Flicker option 1: use sine-wave (gradient) flicker
-            #frame_time = core.getTime() 
-            #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
-            #opacity = (flicker_intensity + 1) / 2
+            frame_time = core.getTime() 
+            flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
+            opacity = (flicker_intensity + 1) / 2
     
             # Flicker option 2: use square-wave (on-off) flicker
-            frame_time = core.getTime() 
-            time_passed = frame_time - start_time 
-            cycle_duration = 1 / flicker_freq
-            cycle_passed = time_passed % cycle_duration
-            if cycle_passed < cycle_duration / 2:
-                opacity = 1
-            else: 
-                opacity = 0
+            #frame_time = core.getTime() 
+            #time_passed = frame_time - start_time 
+            #cycle_duration = 1 / flicker_freq
+            #cycle_passed = time_passed % cycle_duration
+            #if cycle_passed < cycle_duration / 2:
+            #    opacity = 1
+            #else: 
+            #    opacity = 0
             
             stim_mask.opacity = opacity
         
@@ -1094,19 +1088,19 @@ for thisBlock in blocks:
             # --> flicker again
     
             # Flicker option 1: use sine-wave (gradient) flicker
-            #frame_time = core.getTime() 
-            #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
-            #opacity = (flicker_intensity + 1) / 2
+            frame_time = core.getTime() 
+            flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
+            opacity = (flicker_intensity + 1) / 2
     
             # Flicker option 2: use square-wave (on-off) flicker
-            frame_time = core.getTime() 
-            time_passed = frame_time - start_time 
-            cycle_duration = 1 / flicker_freq
-            cycle_passed = time_passed % cycle_duration
-            if cycle_passed < cycle_duration / 2:
-                opacity = 1
-            else: 
-                opacity = 0
+            #frame_time = core.getTime() 
+            #time_passed = frame_time - start_time 
+            #cycle_duration = 1 / flicker_freq
+            #cycle_passed = time_passed % cycle_duration
+            #if cycle_passed < cycle_duration / 2:
+            #    opacity = 1
+            #else: 
+            #    opacity = 0
                 
             stim_mask.opacity = opacity
             
@@ -1194,8 +1188,7 @@ for thisBlock in blocks:
     
     ### Prepare questions
     
-    # change background colour from grey (RGB: 10, 10, 10)
-    # to ivory (RGB: 240, 223, 204)
+    # change background colour from grey to ivory
     change_bg_colour(window = win, 
                      start_rgb = dark_bg_col, 
                      end_rgb = light_bg_col, 
@@ -1204,7 +1197,7 @@ for thisBlock in blocks:
     core.wait(0.5)
     
     # keep background ivory
-    win.Color = light_bg_col
+    win.setColor(light_bg_col, colorSpace='rgb')
     win.flip()
             
     # end current routine
@@ -1266,7 +1259,7 @@ for thisBlock in blocks:
     
     ### Settings:
     # keep background ivory
-    win.Color = light_bg_col
+    win.setColor(light_bg_col, colorSpace='rgb')
     win.flip()
     
     # clear buffer of all previously recorded key events:
@@ -1467,7 +1460,7 @@ for thisBlock in blocks:
     
     ### Settings:
     # keep background ivory
-    win.Color = light_bg_col
+    win.setColor(light_bg_col, colorSpace='rgb')
     win.flip()
     
     # clear buffer of all previously recorded key events:
@@ -1667,7 +1660,7 @@ for thisBlock in blocks:
     
     ### Settings:
     # keep background ivory
-    win.Color = light_bg_col
+    win.setColor(light_bg_col, colorSpace='rgb')
     win.flip()
     
     # clear buffer of all previously recorded key events:
@@ -1868,7 +1861,7 @@ for thisBlock in blocks:
     
     ### Settings:
     # keep background ivory
-    win.Color = light_bg_col
+    win.setColor(light_bg_col, colorSpace='rgb')
     win.flip()
     
     # check which kind of block we have

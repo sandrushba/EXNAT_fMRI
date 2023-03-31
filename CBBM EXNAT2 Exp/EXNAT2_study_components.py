@@ -12,12 +12,9 @@ Version: March 2023
 from psychopy import visual, event, core
 
 
-""" 1) Function to turn background from colour 1 to colour 2 (both defined in HEX) over the course of x seconds """
+""" 1) Function to turn background from colour 1 to colour 2 (both defined in RGB -1:1 as list) over the course of x seconds """
 def change_bg_colour(window, start_rgb, end_rgb, seconds = 2):
-    # convert normal RGB255 values to 0-1 scale
-    start_rgb = [c/255 for c in start_rgb]
-    end_rgb = [c/255 for c in end_rgb]
-
+    
     # create a rectangle with the same size as the window
     rect = visual.Rect(window, width = window.size[0], height = window.size[1])
 
@@ -40,8 +37,14 @@ def change_bg_colour(window, start_rgb, end_rgb, seconds = 2):
         core.wait(1/60)
 
     # set end color
-    window.Color = end_rgb
+    window.setColor(end_rgb, colorSpace = 'rgb')
     window.flip()
 
     # wait a few ms to ensure the final bg colour is fully set
     core.wait(0.5)
+    print("finished changing bg")
+
+
+
+
+
