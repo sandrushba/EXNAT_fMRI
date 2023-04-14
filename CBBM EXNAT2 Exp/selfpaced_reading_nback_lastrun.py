@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Fri Apr 14 14:44:34 2023
+    on Fri Apr 14 14:51:48 2023
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -2447,9 +2447,9 @@ win.flip()
 
 # create "empty" square stimulus:
 stim = visual.Rect(win = win,
-                   width = 2, # width = 2° visual angle
-                   height = 2, # height = 2° visual angle 
-                   pos = (0,0), # center stimulus 
+                   width = 1, # width = 1° visual angle
+                   height = 1, # height = 1° visual angle 
+                   pos = (0, 0), # center stimulus 
                    opacity = 0, # set opacity to 0 for a start
                    fillColor = dark_bg_col,
                    colorSpace = "rgb")
@@ -2518,7 +2518,7 @@ for cue_idx in range(0,20):
                 thisExp.addData('block_cond', 'None')
                 thisExp.addData('block_nr', exp_block_counter)
                 thisExp.addData('block_name', 'motor_task')
-                thisExp.addData('reaction_timestamp', reaction_onset)
+                thisExp.addData('reaction_timestamp', reaction_timestamp)
                 thisExp.addData('last_cue_onset_timestamp', last_cue_onset_timestamp)
                 
                 print("participant pressed space!")  
@@ -2546,7 +2546,7 @@ while core.getTime() < onset_time + 3:
         thisExp.addData('block_cond', 'None')
         thisExp.addData('block_nr', exp_block_counter)
         thisExp.addData('block_name', 'motor_task')
-        thisExp.addData('reaction_timestamp', reaction_onset)
+        thisExp.addData('reaction_timestamp', reaction_timestamp)
         thisExp.addData('last_cue_onset_timestamp', last_cue_onset_timestamp)
         
     # start a new row in the csv
