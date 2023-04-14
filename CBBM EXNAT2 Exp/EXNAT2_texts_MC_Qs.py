@@ -15,7 +15,7 @@ Version: March 2023
 
 instr_Reading_Baseline_training =  "Instruktionen\n\n\nWillkommen zum Experiment!\nIm folgenden Block werden Ihnen einzelne Wörter angezeigt, die einen zusammenhängenden Text bilden.\n\nBitte lesen Sie den Text, indem Sie mithilfe der Leertaste von Wort zu Wort weiterklicken. Die Schriftfarbe der Worte variiert, Sie können das jedoch einfach ignorieren.\n\nAuf den Text folgen drei Fragen zum Textinhalt. \n\nSie können die Aufgabe nun in einem kurzen Übungsblock testen. Bitte drücken Sie die Leertaste um den Übungsblock zu starten."
 
-instr_Reading_Baseline_main = "Instruktionen\n\n\nNun folgt ein etwas längerer Text - diesmal aus einer Zeitung.\n\nBitte lesen Sie den Text, indem Sie mithilfe der Leertaste von Wort zu Wort weiterklicken. Bitte ignorieren Sie wie eben auch die sich verändernde Schriftfarbe.\n\nAm Ende des Texts werden Ihnen wieder Fragen zum Inhalt gestellt.\n\nBitte drücken Sie die Leertaste um den Block zu starten."
+instr_Reading_Baseline_main = "Instruktionen\n\n\nIm nun folgenden Block wird Ihnen ein Text angezeigt.\n\nBitte lesen Sie den Text, indem Sie mithilfe der Leertaste von Wort zu Wort weiterklicken. Bitte ignorieren Sie wie eben auch die sich verändernde Schriftfarbe.\n\nAm Ende des Texts werden Ihnen wieder Fragen zum Inhalt gestellt.\n\nBitte drücken Sie die Leertaste um den Block zu starten."
 
 instr_click_training = "Instruktionen\n\n\nNun kommt eine neue Aufgabe:\nIhnen werden gleich nacheinander verschiedenfarbige Rechtecke gezeigt. Wie auch eben bei der Leseaufgabe können Sie mit der Leertaste weiter klicken.\n\nBitte drücken Sie die Leertaste um den Übungsblock zu starten."
 
@@ -35,6 +35,9 @@ instr_2back_single_main = "Instruktionen\n\n\nNun folgt ein etwas längerer Bloc
 
 instr_2back_dual_main = "Instruktionen\n\n\nIm folgenden Block werden Ihnen einzelne Worte angezeigt, die einen Text bilden.\n\nBitte drücken Sie die Taste C, wenn die Farbe des aktuellen Worts mit der des vorletzten Worts (2 zurück) übereinstimmt.\n\nWie auch zuvor können Sie mithilfe der Leertaste zum nächsten Wort weiterklicken.\n\nAm Ende des Blocks werden Ihnen 3 Verständnisfragen zum Inhalt des Texts gestellt.\n\nBitte drücken Sie die Leertaste um den Block zu starten."
 
+instr_visual_task = "Instruktionen\n\n\nIm folgenden Block wird Ihnen ein Text Wort für Wort angezeigt.\n\nDiesmal müssen Sie gar keine Tasten drücken - die Worte wechseln von allein und es gibt keine Zusatzaufgabe.\n\nBitte lesen Sie einfach nur den Text.\n\nBitte drücken Sie die Leertaste um den Block zu starten."
+
+instr_motor_task = "Instruktionen\n\n\nIm folgenden Block werden Ihnen zuerst einige Vierecke angezeigt.\n\nBitte drücken Sie immer dann die Leertaste, wenn ein Viereck angezeigt wird. Sie werden merken, dass Sie anfangen werden, in einem bestimmten Rhythmus zu drücken.\n\nBitte drücken Sie die Leertaste immer weiter in diesem Rhythmus. Versuchen Sie nicht schneller oder langsamer zu drücken.\n\nDie Vierecke verschwinden irgendwann, lassen Sie sich davon bitte nicht beirren. Drücken Sie bitte trotzdem immer weiter die Leertaste.\n\n\nBitte drücken Sie auf die Leertaste, um den Block zu starten."
 
 
 """ Reading Baseline Training: """

@@ -15,7 +15,7 @@ Version: March 2023
 
 instr_Reading_Baseline_training =  "Instruktionen\n\n\nWillkommen zum Experiment!\nIm folgenden Block werden Ihnen einzelne Wörter angezeigt, die einen zusammenhängenden Text bilden.\n\nBitte lesen Sie den Text, indem Sie mithilfe der Leertaste von Wort zu Wort weiterklicken. Die Schriftfarbe der Worte variiert, Sie können das jedoch einfach ignorieren.\n\nAuf den Text folgen drei Fragen zum Textinhalt. \n\nSie können die Aufgabe nun in einem kurzen Übungsblock testen. Bitte drücken Sie die Leertaste um den Übungsblock zu starten."
 
-instr_Reading_Baseline_main = "Instruktionen\n\n\nNun folgt ein etwas längerer Text - diesmal aus einer Zeitung.\n\nBitte lesen Sie den Text, indem Sie mithilfe der Leertaste von Wort zu Wort weiterklicken. Bitte ignorieren Sie wie eben auch die sich verändernde Schriftfarbe.\n\nAm Ende des Texts werden Ihnen wieder Fragen zum Inhalt gestellt.\n\nBitte drücken Sie die Leertaste um den Block zu starten."
+instr_Reading_Baseline_main = "Instruktionen\n\n\nIn diesem Block wird Ihnen ein Text angezeigt.\n\nBitte lesen Sie den Text, indem Sie mithilfe der Leertaste von Wort zu Wort weiterklicken. Bitte ignorieren Sie wie eben auch die sich verändernde Schriftfarbe.\n\nAm Ende des Texts werden Ihnen wieder Fragen zum Inhalt gestellt.\n\nBitte drücken Sie die Leertaste um den Block zu starten."
 
 instr_click_training = "Instruktionen\n\n\nNun kommt eine neue Aufgabe:\nIhnen werden gleich nacheinander verschiedenfarbige Rechtecke gezeigt. Wie auch eben bei der Leseaufgabe können Sie mit der Leertaste weiter klicken.\n\nBitte drücken Sie die Leertaste um den Übungsblock zu starten."
 
