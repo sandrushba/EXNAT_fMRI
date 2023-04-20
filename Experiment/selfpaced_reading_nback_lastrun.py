@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Mon Apr 17 12:43:22 2023
+    on Mon Apr 17 13:12:35 2023
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -139,7 +139,7 @@ print("create trigger stream")
 ### Stimulus settings
 
 # set flicker frequency (in Hz)
-flicker_freq = 1
+flicker_freq = 17.3
 # set frame rate (in Hz)
 frame_rate = 60
 

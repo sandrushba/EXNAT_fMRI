@@ -37,8 +37,7 @@ def change_bg_colour(window, start_rgb, end_rgb, seconds = 2):
         core.wait(1/60)
 
     # set end color
-    #window.setColor(end_rgb, colorSpace = 'rgb')
-    window.color = end_rgb
+    window.setColor(end_rgb, colorSpace = 'rgb')
     window.flip()
 
     # wait a few ms to ensure the final bg colour is fully set
