@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Mon Apr 17 13:12:35 2023
+    on Wed Jun 28 13:28:47 2023
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -94,6 +94,30 @@ settingsClock = core.Clock()
 import sys
 # --> if you don't do this, German "Umlaute" can't be displayed correctly:
 sys.stdout = open(sys.stdout.fileno(), mode = 'w', encoding = 'utf8', buffering = 1)
+
+# for playing sounds:
+import psychtoolbox as ptb
+from psychopy import prefs
+prefs.hardware['audioLib'] = ['ptb'] # set 'ptb', 'pyo' or'pygame' as sound library here
+
+# I use ptb here as a sound library because PTB is built to bring a number of advantages in 
+# terms of latency.
+# PsychoPy docs on PTB's advantages: "With the most aggressive low-latency settings you 
+# can get a sound to play in “immediate” mode with typically in the region of 5ms lag and 
+# maybe 1ms precision. That’s pretty good compared to the other options that have a lag of 
+# 20ms upwards and several ms variability. BUT, on top of that, PTB allows you to preschedule 
+# your sound to occur at a particular point in time (e.g. when the trigger is due to be 
+# sent or when the screen is due to flip) and the PTB engine will then prepare all the buffers 
+# ready to go and will also account for the known latencies in the card. With this method the 
+# PTB engine is capable of sub-ms precision and even sub-ms lag!" 
+# --> sounds good to me
+# Psychopy uses "aggressive exclusive mode" as a default for the Latency Mode in PTB. 
+# This means your study will take control of the audio device you’re using and prioritise our use 
+# of the sound card over all others (e.g. other sound-playing apps like Spotify). 
+# This makes the latencies as low as possible.
+from psychopy import sound
+from psychopy.sound import Sound
+print(Sound) # should look roughly like this: <class 'psychopy.sound.SoundPtb'>
 
 # for getting current date & time:
 import datetime
@@ -316,6 +340,9 @@ empty_placeholder = visual.TextStim(win=win, name='empty_placeholder',
     languageStyle='LTR',
     depth=-2.0);
 
+# Initialize components for Routine "soundcheck"
+soundcheckClock = core.Clock()
+
 # Initialize components for Routine "no_text_blocks"
 no_text_blocksClock = core.Clock()
 
@@ -336,9 +363,6 @@ difficultyClock = core.Clock()
 
 # Initialize components for Routine "vis_task"
 vis_taskClock = core.Clock()
-
-# Initialize components for Routine "motor_task"
-motor_taskClock = core.Clock()
 
 # Initialize components for Routine "end"
 endClock = core.Clock()
@@ -415,6 +439,72 @@ for thisComponent in settingsComponents:
         thisComponent.setAutoDraw(False)
 thisExp.addData('empty_placeholder.started', empty_placeholder.tStartRefresh)
 thisExp.addData('empty_placeholder.stopped', empty_placeholder.tStopRefresh)
+
+# ------Prepare to start Routine "soundcheck"-------
+continueRoutine = True
+# update component parameters for each repeat
+frequency = 200 # frequency of sound in Hz
+duration = 1.0 # duration of sound in seconds
+sRate = 44100 # sampling rate
+
+test_sound = Sound(value = frequency, 
+                   secs = duration, 
+                   sampleRate = sRate,
+                   name = "test_sound", # just for logging
+                   hamming = True, # filter sound
+                   volume = 1, # play on full volume
+                   loops = 0) # play sound only once
+                   
+now = ptb.GetSecs()
+test_sound.play(when = now + 0.5)  # play in EXACTLY 0.5s
+core.wait(1.5) # wait until sound is finished
+# keep track of which components have finished
+soundcheckComponents = []
+for thisComponent in soundcheckComponents:
+    thisComponent.tStart = None
+    thisComponent.tStop = None
+    thisComponent.tStartRefresh = None
+    thisComponent.tStopRefresh = None
+    if hasattr(thisComponent, 'status'):
+        thisComponent.status = NOT_STARTED
+# reset timers
+t = 0
+_timeToFirstFrame = win.getFutureFlipTime(clock="now")
+soundcheckClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
+frameN = -1
+
+# -------Run Routine "soundcheck"-------
+while continueRoutine:
+    # get current time
+    t = soundcheckClock.getTime()
+    tThisFlip = win.getFutureFlipTime(clock=soundcheckClock)
+    tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+    frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+    # update/draw components on each frame
+    
+    # check for quit (typically the Esc key)
+    if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
+        core.quit()
+    
+    # check if all components have finished
+    if not continueRoutine:  # a component has requested a forced-end of Routine
+        break
+    continueRoutine = False  # will revert to True if at least one component still running
+    for thisComponent in soundcheckComponents:
+        if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+            continueRoutine = True
+            break  # at least one component has not yet finished
+    
+    # refresh the screen
+    if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+        win.flip()
+
+# -------Ending Routine "soundcheck"-------
+for thisComponent in soundcheckComponents:
+    if hasattr(thisComponent, "setAutoDraw"):
+        thisComponent.setAutoDraw(False)
+# the Routine "soundcheck" was not non-slip safe, so reset the non-slip timer
+routineTimer.reset()
 
 # set up handler to look after randomisation of conditions etc
 blocks = data.TrialHandler(nReps=30.0, method='sequential', 
@@ -2120,15 +2210,21 @@ continueRoutine = True
 
 # In this task, the first reading baseline 
 # text is presented again, but this time the text proceeds 
-# automatically without the participant having to press a button.
+# automatically without the participant having to press the Space bar.
 # To make sure the words are not presented too fast, 
 # we take the exact time each word was presented on screen 
 # from the block where the participant could control the speed.
 
+# In this block, there's no 1-back or 2-back, but we use a 0-back 
+# task as a motoric "tapping task", so basically the participants always 
+# have to press a certain button if the current word has a certain target colour.
+
 # Put differently: We take both the text from the first reading BL 
 # block AND the measured reading times for each word from this 
 # block and show the text again, but this time with the previously 
-# recorded duration for each word.
+# recorded duration for each word. Every time the word is shown in a 
+# certain colour (e.g. blue), the participant has to press a button, 
+# but there's no real n-back in this block.
 
 
 ### INSTRUCTIONS:
@@ -2385,248 +2481,6 @@ for thisComponent in vis_taskComponents:
     if hasattr(thisComponent, "setAutoDraw"):
         thisComponent.setAutoDraw(False)
 # the Routine "vis_task" was not non-slip safe, so reset the non-slip timer
-routineTimer.reset()
-
-# ------Prepare to start Routine "motor_task"-------
-continueRoutine = True
-# update component parameters for each repeat
-# Purely motoric task (-> more or less no visual stimuli) 
-
-# In this task, the participant is presented with a number of 
-# squares that are separated by ISIs of a fixed duration. 
-# Each square is shown for 100 ms, during the ISI nothing is shown on screen.
-# The duration of the ISI is the median duration of the reading times 
-# recorded in the first reading baseline block.
-
-# compute median RT from previously recorded durations:
-ISI_duration = np.median(vis_task_durations)
-print("RT median:", ISI_duration)
-
-
-### INSTRUCTIONS:
-# keep background ivory
-win.setColor(light_bg_col, colorSpace='rgb')
-win.flip()
-
-### Show instructions
-# set instruction text
-instr_text = locals()["instr_motor_task"]
-# create text box
-instr_text_stim = visual.TextStim(win, 
-                                  text = instr_text, 
-                                  height = 0.5, # font height: 5° visual angle
-                                  font = "Bookman Old Style",
-                                  pos = (0, 0),
-                                  color = "black")
-
-# display the instructions on screen
-while True:
-    # keep background ivory
-    win.setColor(light_bg_col, colorSpace='rgb')
-    instr_text_stim.draw()
-    win.flip()
-    # end screen if participant presses space
-    if 'space' in event.getKeys():
-        break 
-
-  
-### START MOTOR TASK BLOCK:
-
-### change background colour 
-# transition from ivory 
-# to medium grey 
-change_bg_colour(window = win, 
-                 start_rgb = light_bg_col,
-                 end_rgb = dark_bg_col, 
-                 seconds = 2)
-# Wait for a brief period of time so bg is set
-core.wait(0.8)
-# keep background grey
-win.setColor(dark_bg_col, colorSpace='rgb')
-win.flip()
-
-
-### start block loop
-
-# create "empty" square stimulus:
-stim = visual.Rect(win = win,
-                   width = 1, # width = 1° visual angle
-                   height = 1, # height = 1° visual angle 
-                   pos = (0, 0), # center stimulus 
-                   opacity = 0, # set opacity to 0 for a start
-                   fillColor = dark_bg_col,
-                   colorSpace = "rgb")
-# show it on screen
-stim.draw()
-stim_mask.draw()
-win.flip()
-
-block_onset_time = core.getTime()
-# start showing 20 cues for motor response
-for cue_idx in range(0,20):
-    
-    # show cue (white square)
-    stim.color = [(x / 127.5) - 1 for x in (255, 255, 255)] # white
-    stim.draw()
-    win.flip()
-    last_cue_onset_timestamp = core.getTime()
-    # send cue onset trigger to LSL stream
-    #out_marker.push_sample(["STIM_ONSET_motor_task"])
-    
-    # wait until 100 ms are over
-    while core.getTime() < last_cue_onset_timestamp + 0.1:
-        # draw the stimulus during the waiting period
-        stim.draw()
-        win.flip()
-        
-        # Check if participant pressed space - if yes, send trigger + record data:
-        if event.getKeys(['space']):
-            # send reaction trigger to LSL stream
-            #out_marker.push_sample(["REACTION_motor_task"])
-            
-            # record timestamp of reaction and save in output csv
-            reaction_timestamp = core.getTime()
-   
-            # save data in output csv:
-            thisExp.addData('block_cond', 'None')
-            thisExp.addData('block_nr', exp_block_counter)
-            thisExp.addData('block_name', 'motor_task')
-            thisExp.addData('reaction_timestamp', reaction_onset)
-            thisExp.addData('last_cue_onset_timestamp', last_cue_onset_timestamp)
-            
-            print("participant pressed space!")
-        
-        # make cue disappear by making colour match the bg colour again
-        stim.color = dark_bg_col
-        stim.draw()
-        win.flip()
-    
-        # send cue offset trigger to LSL stream
-        #out_marker.push_sample(["STIM_OFFSET_motor_task"])
-    
-        # start recording motor response (space bar press)
-        onset_time = core.getTime()
-        
-        #while core.getTime() < onset_time + ISI_duration:
-        while core.getTime() < onset_time + 1: # make ISI 1 second long
-            # if space bar was pressed, record RT, send trigger & save data
-            if event.getKeys(['space']):
-                # send reaction trigger to LSL stream
-                #out_marker.push_sample(["REACTION_motor_task"])
-                
-                # record timestamp of reaction and save in output csv
-                reaction_timestamp = core.getTime()
-       
-                # save data in output csv:
-                thisExp.addData('block_cond', 'None')
-                thisExp.addData('block_nr', exp_block_counter)
-                thisExp.addData('block_name', 'motor_task')
-                thisExp.addData('reaction_timestamp', reaction_timestamp)
-                thisExp.addData('last_cue_onset_timestamp', last_cue_onset_timestamp)
-                
-                print("participant pressed space!")  
-                
-            # --> don't save anything if participant didn't react, just show the next cue!
-
-
-
-# If all cues were shown, start recording all motor 
-# responses for a duration of 3 min:
-
-onset_time = core.getTime()
-while core.getTime() < onset_time + (3 * 60 * 1000): # 3 min * 60 s / min * 1000 ms / s = 180000 ms
-    
-    # if there was a key response, send trigger & save data:
-    if event.getKeys(['space']):
-        
-        # send reaction trigger to LSL stream
-        #out_marker.push_sample(["REACTION_motor_task"])
-        
-        # record timestamp of reaction and save in output csv
-        reaction_timestamp = core.getTime()
-       
-        # save data in output csv:
-        thisExp.addData('block_cond', 'None')
-        thisExp.addData('block_nr', exp_block_counter)
-        thisExp.addData('block_name', 'motor_task')
-        thisExp.addData('reaction_timestamp', reaction_timestamp)
-        thisExp.addData('last_cue_onset_timestamp', last_cue_onset_timestamp)
-        
-    # start a new row in the csv
-    thisExp.nextEntry()
-
-    ### IF TESTING MODE ENABLED: end loop after 20 trials
-    if expInfo['testing_mode'] == "yes":
-        if trial_idx == 20:
-            break
-    
-print("finished motor task block!")
-
-# change background colour from grey to ivory
-change_bg_colour(window = win, 
-                 start_rgb = dark_bg_col, 
-                 end_rgb = light_bg_col, 
-                 seconds = 2)
-# Wait for a brief period of time so bg is set
-core.wait(0.5)
-
-# keep background ivory
-win.setColor(light_bg_col, colorSpace='rgb')
-win.flip()
-        
-# go to next block (if there is one left)
-exp_block_counter += 1
-continueRoutine = False
-
-
-
-
-# keep track of which components have finished
-motor_taskComponents = []
-for thisComponent in motor_taskComponents:
-    thisComponent.tStart = None
-    thisComponent.tStop = None
-    thisComponent.tStartRefresh = None
-    thisComponent.tStopRefresh = None
-    if hasattr(thisComponent, 'status'):
-        thisComponent.status = NOT_STARTED
-# reset timers
-t = 0
-_timeToFirstFrame = win.getFutureFlipTime(clock="now")
-motor_taskClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
-frameN = -1
-
-# -------Run Routine "motor_task"-------
-while continueRoutine:
-    # get current time
-    t = motor_taskClock.getTime()
-    tThisFlip = win.getFutureFlipTime(clock=motor_taskClock)
-    tThisFlipGlobal = win.getFutureFlipTime(clock=None)
-    frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
-    # update/draw components on each frame
-    
-    # check for quit (typically the Esc key)
-    if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
-        core.quit()
-    
-    # check if all components have finished
-    if not continueRoutine:  # a component has requested a forced-end of Routine
-        break
-    continueRoutine = False  # will revert to True if at least one component still running
-    for thisComponent in motor_taskComponents:
-        if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
-            continueRoutine = True
-            break  # at least one component has not yet finished
-    
-    # refresh the screen
-    if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
-        win.flip()
-
-# -------Ending Routine "motor_task"-------
-for thisComponent in motor_taskComponents:
-    if hasattr(thisComponent, "setAutoDraw"):
-        thisComponent.setAutoDraw(False)
-# the Routine "motor_task" was not non-slip safe, so reset the non-slip timer
 routineTimer.reset()
 
 # ------Prepare to start Routine "end"-------
