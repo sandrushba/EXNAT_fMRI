@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Wed Jun 28 13:28:47 2023
+    on Wed Jun 28 17:21:41 2023
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -119,6 +119,12 @@ from psychopy import sound
 from psychopy.sound import Sound
 print(Sound) # should look roughly like this: <class 'psychopy.sound.SoundPtb'>
 
+# for hidden markov models 
+# (used in the prediction tendency task 
+# part of the script):
+# --> make sure to pip install hmmlearn this on the lab PC
+from hmmlearn import hmm
+
 # for getting current date & time:
 import datetime
 # numpy for being able to calculate
@@ -138,7 +144,7 @@ import time
 # import all texts
 from EXNAT2_texts_MC_Qs import *
 # import some additional functions I wrote for the experiment:
-from EXNAT2_study_components import change_bg_colour
+from EXNAT2_study_components import change_bg_colour, generate_trial_sequence # the second one is for the prediction tendency task
 from nback_colour_generator import create_nback_stimlist, draw_without_replacement, get_targets
 
 # build little function to flatten nested lists:
@@ -340,8 +346,8 @@ empty_placeholder = visual.TextStim(win=win, name='empty_placeholder',
     languageStyle='LTR',
     depth=-2.0);
 
-# Initialize components for Routine "soundcheck"
-soundcheckClock = core.Clock()
+# Initialize components for Routine "pred_tendency"
+pred_tendencyClock = core.Clock()
 
 # Initialize components for Routine "no_text_blocks"
 no_text_blocksClock = core.Clock()
@@ -440,27 +446,173 @@ for thisComponent in settingsComponents:
 thisExp.addData('empty_placeholder.started', empty_placeholder.tStartRefresh)
 thisExp.addData('empty_placeholder.stopped', empty_placeholder.tStopRefresh)
 
-# ------Prepare to start Routine "soundcheck"-------
+# ------Prepare to start Routine "pred_tendency"-------
 continueRoutine = True
 # update component parameters for each repeat
-frequency = 200 # frequency of sound in Hz
-duration = 1.0 # duration of sound in seconds
-sRate = 44100 # sampling rate
+# Settings for Prediction Tendency Task:
 
-test_sound = Sound(value = frequency, 
-                   secs = duration, 
-                   sampleRate = sRate,
-                   name = "test_sound", # just for logging
-                   hamming = True, # filter sound
-                   volume = 1, # play on full volume
-                   loops = 0) # play sound only once
-                   
+# for the sounds:
+tones = [440, 587, 782, 1043]  # Pure tone frequencies in Hz
+tone_duration = 0.1  # Duration of each pure tone in seconds (each lasted 100 ms)
+tone_rate = 3  # Rate of pure tone presentation in Hz
+tone_volume = 1 # use full volume, but you can adjust this later if you determined a hearing threshold
+audio_sample_freq = 44100 # 44100 Hz --> audio sampling rate at the lab (according to Frauke)
+tones_iti = 1/3
+tone_fade = 5e-3
+
+# for the paradigm:
+block_trials = 1500  # Number of trials per entropy condition
+trigger_ordered = 1
+trigger_random = 2
+
+
+# -------------------------------------------
+
+# Prediction Tendency Task:
+
+# Generate the trial sequences for both entropy conditions 
+# (both for 1500 tones aka trials)
+ordered_sequence = generate_trial_sequence("ordered")
+random_sequence = generate_trial_sequence("random")
+
+
+''' PREPARE SOUNDS FOR RANDOM SEQUENCE: '''
+# create an empty dict to store the prepared sounds
+tones_random = {}
+
+# loop over list random_sequence with all frequencies
+for tone_idx, curr_freq in enumerate(random_sequence):
+
+    print("current frequency:", curr_freq, "tone index:", tone_idx)
+
+    # build a time array: you need the sound duration and the right sampling frequency for your device
+    # 1 divided by the sampling rate = duration of a single sample in sec
+    tone_sample_len = 1/audio_sample_freq
+    t = np.arange(0, tone_duration, tone_sample_len)
+
+    # generate sine wave:
+    sine_wave = np.sin(2*np.pi*curr_freq*t)
+
+    # plot the sine wave
+    plt.plot(t, sine_wave)
+    plt.xlabel('Time (s)')
+    plt.ylabel('Amplitude')
+    plt.show()
+
+    # Apply cosine ramp to "smoothen" the edges of the sound a bit (I'm not an audio expert as you can tell)
+    # We basically gradually turn up the sound, play it for a while,
+    # and then decrease the volume again so it doesn't make annoying clicky noises when it's played.
+
+    # apply cosine ramp:
+    # check how many samples we have to use for the fade in/out:
+    fade_samples = int(tone_fade * audio_sample_freq)
+
+    # if there are enough, but not too many fade samples,
+    # apply cosine ramp to signal
+    if fade_samples > 0 and fade_samples < len(sine_wave):
+      ramp = np.cos(np.linspace(0, np.pi / 2, fade_samples))
+      sine_wave[:fade_samples] *= ramp[::-1]
+      sine_wave[-fade_samples:] *= ramp
+
+    # plot the modified sine wave again
+    plt.plot(t, sine_wave)
+    plt.xlabel('Time (s)')
+    plt.ylabel('Amplitude')
+    plt.show()
+
+    print("----------------------")
+
+
+    # generate sound object for the sound file we built
+    sound = Sound(value = sine_wave,
+                  secs = tone_duration, # duration of sound in seconds
+                  sampleRate = sRate,
+                  name = f"tone{tone_idx + 1}", # create a name for the sound for logging
+                  hamming = False, # don't apply filter, we did this before
+                  volume = tone_volume,
+                  loops = 0) # don't repeat sound, play only once
+    
+    # add the sound to the dict
+    tones_random[f"tone{tone_idx + 1}_random"] = sound
+
+
+''' PREPARE SOUNDS FOR ORDERED SEQUENCE: '''
+
+# create an empty dict to store the prepared sounds
+tones_ordered = {}
+
+# loop over list ordered_sequence with all frequencies
+for tone_idx, curr_freq in enumerate(ordered_sequence):
+
+    print("current frequency:", curr_freq, "tone index:", tone_idx)
+
+    # build a time array: you need the sound duration and the right sampling frequency for your device
+    # 1 divided by the sampling rate = duration of a single sample in sec
+    tone_sample_len = 1/audio_sample_freq
+    t = np.arange(0, tone_duration, tone_sample_len)
+
+    # generate sine wave:
+    sine_wave = np.sin(2*np.pi*curr_freq*t)
+
+    # plot the sine wave
+    plt.plot(t, sine_wave)
+    plt.xlabel('Time (s)')
+    plt.ylabel('Amplitude')
+    plt.show()
+
+    # Apply cosine ramp to "smoothen" the edges of the sound a bit (I'm not an audio expert as you can tell)
+    # We basically gradually turn up the sound, play it for a while,
+    # and then decrease the volume again so it doesn't make annoying clicky noises when it's played.
+
+    # apply cosine ramp:
+    # check how many samples we have to use for the fade in/out:
+    fade_samples = int(tone_fade * audio_sample_freq)
+
+    # if there are enough, but not too many fade samples,
+    # apply cosine ramp to signal
+    if fade_samples > 0 and fade_samples < len(sine_wave):
+      ramp = np.cos(np.linspace(0, np.pi / 2, fade_samples))
+      sine_wave[:fade_samples] *= ramp[::-1]
+      sine_wave[-fade_samples:] *= ramp
+
+    # plot the modified sine wave again
+    plt.plot(t, sine_wave)
+    plt.xlabel('Time (s)')
+    plt.ylabel('Amplitude')
+    plt.show()
+
+    print("----------------------")
+
+
+    # generate sound object for the sound file we built
+    sound = Sound(value = sine_wave,
+                  secs = tone_duration, # duration of sound in seconds
+                  sampleRate = sRate,
+                  name = f"tone{tone_idx + 1}", # create a name for the sound for logging
+                  hamming = False, # don't apply filter, we did this before
+                  volume = tone_volume,
+                  loops = 0) # don't repeat sound, play only once
+    
+    # add the sound to the dict
+    tones_ordered[f"tone{tone_idx + 1}_ordered"] = sound
+
+print("finished preparing prediction tendency task!")
+
+# now you can access & play each sound by its name, like this:
 now = ptb.GetSecs()
-test_sound.play(when = now + 0.5)  # play in EXACTLY 0.5s
+tones_ordered["tone1_ordered"].play(when = now)  # Play the first sound immediately
 core.wait(1.5) # wait until sound is finished
+
+
+
+
+
+
+
+
 # keep track of which components have finished
-soundcheckComponents = []
-for thisComponent in soundcheckComponents:
+pred_tendencyComponents = []
+for thisComponent in pred_tendencyComponents:
     thisComponent.tStart = None
     thisComponent.tStop = None
     thisComponent.tStartRefresh = None
@@ -470,14 +622,14 @@ for thisComponent in soundcheckComponents:
 # reset timers
 t = 0
 _timeToFirstFrame = win.getFutureFlipTime(clock="now")
-soundcheckClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
+pred_tendencyClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
 frameN = -1
 
-# -------Run Routine "soundcheck"-------
+# -------Run Routine "pred_tendency"-------
 while continueRoutine:
     # get current time
-    t = soundcheckClock.getTime()
-    tThisFlip = win.getFutureFlipTime(clock=soundcheckClock)
+    t = pred_tendencyClock.getTime()
+    tThisFlip = win.getFutureFlipTime(clock=pred_tendencyClock)
     tThisFlipGlobal = win.getFutureFlipTime(clock=None)
     frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
     # update/draw components on each frame
@@ -490,7 +642,7 @@ while continueRoutine:
     if not continueRoutine:  # a component has requested a forced-end of Routine
         break
     continueRoutine = False  # will revert to True if at least one component still running
-    for thisComponent in soundcheckComponents:
+    for thisComponent in pred_tendencyComponents:
         if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
             continueRoutine = True
             break  # at least one component has not yet finished
@@ -499,11 +651,11 @@ while continueRoutine:
     if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
         win.flip()
 
-# -------Ending Routine "soundcheck"-------
-for thisComponent in soundcheckComponents:
+# -------Ending Routine "pred_tendency"-------
+for thisComponent in pred_tendencyComponents:
     if hasattr(thisComponent, "setAutoDraw"):
         thisComponent.setAutoDraw(False)
-# the Routine "soundcheck" was not non-slip safe, so reset the non-slip timer
+# the Routine "pred_tendency" was not non-slip safe, so reset the non-slip timer
 routineTimer.reset()
 
 # set up handler to look after randomisation of conditions etc
