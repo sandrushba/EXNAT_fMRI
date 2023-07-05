@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Wed Jun 28 17:21:41 2023
+    on Fri Jun 30 10:18:05 2023
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -94,6 +94,8 @@ settingsClock = core.Clock()
 import sys
 # --> if you don't do this, German "Umlaute" can't be displayed correctly:
 sys.stdout = open(sys.stdout.fileno(), mode = 'w', encoding = 'utf8', buffering = 1)
+# print Python environment psychopy is currently using
+print(sys.executable)
 
 # for playing sounds:
 import psychtoolbox as ptb
@@ -119,12 +121,6 @@ from psychopy import sound
 from psychopy.sound import Sound
 print(Sound) # should look roughly like this: <class 'psychopy.sound.SoundPtb'>
 
-# for hidden markov models 
-# (used in the prediction tendency task 
-# part of the script):
-# --> make sure to pip install hmmlearn this on the lab PC
-from hmmlearn import hmm
-
 # for getting current date & time:
 import datetime
 # numpy for being able to calculate
@@ -135,10 +131,64 @@ import random
 import pandas as pd
 # additional timing package (I know we have core.wait, but I also want this one)
 import time
+
+# for hidden markov models 
+# (used in the prediction tendency task 
+# part of the script):
+# --> make sure to pip install scipy, scikit-learn (aka sklearn) 
+# and hmmlearn first on the lab PC.
+# scipy is already included in the Psychopy library, so you can import it as usual:
+import scipy
+print("imported scipy")
+
+# Importing the others are a bit more tricky: 
+
+# I think you can either by pip install them or 
+# you download the package you want to import (the tar.gz source file) 
+# & put it in Psychopy/Contents/Resources/lib/python3.6
+
+# You can also try downloading a .whl file for each package, putting 
+# those into the custom Python Packages folder in the Experiment folder 
+# and setting paths to the modules in preferences > general > path
+# (But this doesn't work for scikit-learn, hence the other options)
+
+# This is where you can download the files. Make sure you use a version that's 
+# compatible with the Python Version we're using here 
+# (Python 3.6.9 as used in Psychopy 2021.2.3)
+# https://pypi.org/project/scikit-learn/0.24.2/#files 
+# https://pypi.org/project/hmmlearn/0.2.5/#files
+
+# import scikit-learn:
+import importlib
+print("imported importlib")
+# Specify the name of the package 
+# --> I changed the package name from scikit-learn-0.24.2 to scikit_learn 
+# because it didn't recognize the package name for some reason
+package_name = 'scikit_learn'
+# Import the package using import_module
+sklearn = importlib.import_module(package_name)
+print("imported sklearn (aka scikit-learn)")
+
+# Perform a basic operation using sklearn
+from sklearn.datasets import load_iris
+data = load_iris()
+print("Number of samples:", len(data.data))
+
+
+
+# Importing hmmlearn is even worse, I could only import hmmlearn, but not the 
+# submodule hmm for some reason. After hours of shouting at the terminal and 
+# editing the package's setup.py file (yes, you shouldn't do that, I know), 
+# I decided to just copy the hmm submodule and 
+# import it like I do with my custom scripts later on:
+from hmmlearn import hmm
+print("imported hmm from hmmlearn")
+
 # pylsl for pushing triggers to lsl stream:
-# from pylsl import StreamInlet, resolve_stream, StreamOutlet, StreamInfo
+from pylsl import StreamInlet, resolve_stream, StreamOutlet, StreamInfo
 # for connecting to serial ports:
-# import serial
+import serial
+
 
 # from my custom scripts...
 # import all texts
@@ -459,6 +509,7 @@ tone_volume = 1 # use full volume, but you can adjust this later if you determin
 audio_sample_freq = 44100 # 44100 Hz --> audio sampling rate at the lab (according to Frauke)
 tones_iti = 1/3
 tone_fade = 5e-3
+
 
 # for the paradigm:
 block_trials = 1500  # Number of trials per entropy condition
