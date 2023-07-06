@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Wed Jun 28 18:01:01 2023
+    on Thu Jul  6 12:56:09 2023
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -127,29 +127,30 @@ import datetime
 import numpy as np
 # for random number generator:
 import random
-# for saving data in csv:
+# for saving data in csv / working with pd data frames:
 import pandas as pd
 # additional timing package (I know we have core.wait, but I also want this one)
 import time
 
-# for hidden markov models 
-# (used in the prediction tendency task 
-# part of the script):
-# --> make sure to pip install scipy, 
-# scikit-learn and hmmlearn this on the lab PC
-from hmmlearn import hmm
 # pylsl for pushing triggers to lsl stream:
-# from pylsl import StreamInlet, resolve_stream, StreamOutlet, StreamInfo
+from pylsl import StreamInlet, resolve_stream, StreamOutlet, StreamInfo
 # for connecting to serial ports:
-# import serial
+import serial
 
 
 # from my custom scripts...
 # import all texts
 from EXNAT2_texts_MC_Qs import *
 # import some additional functions I wrote for the experiment:
-from EXNAT2_study_components import change_bg_colour, generate_trial_sequence # the second one is for the prediction tendency task
+from EXNAT2_study_components import change_bg_colour
 from nback_colour_generator import create_nback_stimlist, draw_without_replacement, get_targets
+
+# load CSVs with tone sequences for prediction tendency task:
+ordered_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/Experiment/Prediction Tendency Task/df_ordered_seqs.csv"
+random_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/Experiment/Prediction Tendency Task/df_random_seqs.csv"
+df_ordered_tone_seqs = pd.read_csv(ordered_path)
+df_random_tone_seqs = pd.read_csv(random_path)
+print("loaded CSVs with stimulus lists for prediction tendency task")
 
 # build little function to flatten nested lists:
 def flatten_list(nested_list):
@@ -455,6 +456,10 @@ continueRoutine = True
 # update component parameters for each repeat
 # Settings for Prediction Tendency Task:
 
+# These settings were used to generate 
+# the tones in the csvs I import at the beginning of the experiment, 
+# we don't really need them here:
+
 # for the sounds:
 tones = [440, 587, 782, 1043]  # Pure tone frequencies in Hz
 tone_duration = 0.1  # Duration of each pure tone in seconds (each lasted 100 ms)
@@ -463,7 +468,6 @@ tone_volume = 1 # use full volume, but you can adjust this later if you determin
 audio_sample_freq = 44100 # 44100 Hz --> audio sampling rate at the lab (according to Frauke)
 tones_iti = 1/3
 tone_fade = 5e-3
-
 
 # for the paradigm:
 block_trials = 1500  # Number of trials per entropy condition
@@ -477,9 +481,13 @@ trigger_random = 2
 
 # Generate the trial sequences for both entropy conditions 
 # (both for 1500 tones aka trials)
-ordered_sequence = generate_trial_sequence("ordered")
-random_sequence = generate_trial_sequence("random")
 
+# randomly choose 2 sequences, 1 ordered & 1 random sequence: 
+ordered_row = df_ordered_tone_seqs.sample(n = 1)
+random_row = df_random_tone_seqs.sample(n = 1)
+# access the values in the random rows: 
+ordered_sequence = ordered_row.values[0]
+random_sequence = random_row.values[0]
 
 ''' PREPARE SOUNDS FOR RANDOM SEQUENCE: '''
 # create an empty dict to store the prepared sounds
@@ -499,10 +507,10 @@ for tone_idx, curr_freq in enumerate(random_sequence):
     sine_wave = np.sin(2*np.pi*curr_freq*t)
 
     # plot the sine wave
-    plt.plot(t, sine_wave)
-    plt.xlabel('Time (s)')
-    plt.ylabel('Amplitude')
-    plt.show()
+    #plt.plot(t, sine_wave)
+    #plt.xlabel('Time (s)')
+    #plt.ylabel('Amplitude')
+    #plt.show()
 
     # Apply cosine ramp to "smoothen" the edges of the sound a bit (I'm not an audio expert as you can tell)
     # We basically gradually turn up the sound, play it for a while,
@@ -520,10 +528,10 @@ for tone_idx, curr_freq in enumerate(random_sequence):
       sine_wave[-fade_samples:] *= ramp
 
     # plot the modified sine wave again
-    plt.plot(t, sine_wave)
-    plt.xlabel('Time (s)')
-    plt.ylabel('Amplitude')
-    plt.show()
+    #plt.plot(t, sine_wave)
+    #plt.xlabel('Time (s)')
+    #plt.ylabel('Amplitude')
+    #plt.show()
 
     print("----------------------")
 
@@ -531,7 +539,7 @@ for tone_idx, curr_freq in enumerate(random_sequence):
     # generate sound object for the sound file we built
     sound = Sound(value = sine_wave,
                   secs = tone_duration, # duration of sound in seconds
-                  sampleRate = sRate,
+                  sampleRate = audio_sample_freq,
                   name = f"tone{tone_idx + 1}", # create a name for the sound for logging
                   hamming = False, # don't apply filter, we did this before
                   volume = tone_volume,
@@ -560,10 +568,10 @@ for tone_idx, curr_freq in enumerate(ordered_sequence):
     sine_wave = np.sin(2*np.pi*curr_freq*t)
 
     # plot the sine wave
-    plt.plot(t, sine_wave)
-    plt.xlabel('Time (s)')
-    plt.ylabel('Amplitude')
-    plt.show()
+    #plt.plot(t, sine_wave)
+    #plt.xlabel('Time (s)')
+    #plt.ylabel('Amplitude')
+    #plt.show()
 
     # Apply cosine ramp to "smoothen" the edges of the sound a bit (I'm not an audio expert as you can tell)
     # We basically gradually turn up the sound, play it for a while,
@@ -581,18 +589,17 @@ for tone_idx, curr_freq in enumerate(ordered_sequence):
       sine_wave[-fade_samples:] *= ramp
 
     # plot the modified sine wave again
-    plt.plot(t, sine_wave)
-    plt.xlabel('Time (s)')
-    plt.ylabel('Amplitude')
-    plt.show()
+    #plt.plot(t, sine_wave)
+    #plt.xlabel('Time (s)')
+    #plt.ylabel('Amplitude')
+    #plt.show()
 
     print("----------------------")
-
 
     # generate sound object for the sound file we built
     sound = Sound(value = sine_wave,
                   secs = tone_duration, # duration of sound in seconds
-                  sampleRate = sRate,
+                  sampleRate = audio_sample_freq,
                   name = f"tone{tone_idx + 1}", # create a name for the sound for logging
                   hamming = False, # don't apply filter, we did this before
                   volume = tone_volume,

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Fri Jun 30 10:18:05 2023
+    on Thu Jul  6 16:53:00 2023
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -127,62 +127,10 @@ import datetime
 import numpy as np
 # for random number generator:
 import random
-# for saving data in csv:
+# for saving data in csv / working with pd data frames:
 import pandas as pd
 # additional timing package (I know we have core.wait, but I also want this one)
 import time
-
-# for hidden markov models 
-# (used in the prediction tendency task 
-# part of the script):
-# --> make sure to pip install scipy, scikit-learn (aka sklearn) 
-# and hmmlearn first on the lab PC.
-# scipy is already included in the Psychopy library, so you can import it as usual:
-import scipy
-print("imported scipy")
-
-# Importing the others are a bit more tricky: 
-
-# I think you can either by pip install them or 
-# you download the package you want to import (the tar.gz source file) 
-# & put it in Psychopy/Contents/Resources/lib/python3.6
-
-# You can also try downloading a .whl file for each package, putting 
-# those into the custom Python Packages folder in the Experiment folder 
-# and setting paths to the modules in preferences > general > path
-# (But this doesn't work for scikit-learn, hence the other options)
-
-# This is where you can download the files. Make sure you use a version that's 
-# compatible with the Python Version we're using here 
-# (Python 3.6.9 as used in Psychopy 2021.2.3)
-# https://pypi.org/project/scikit-learn/0.24.2/#files 
-# https://pypi.org/project/hmmlearn/0.2.5/#files
-
-# import scikit-learn:
-import importlib
-print("imported importlib")
-# Specify the name of the package 
-# --> I changed the package name from scikit-learn-0.24.2 to scikit_learn 
-# because it didn't recognize the package name for some reason
-package_name = 'scikit_learn'
-# Import the package using import_module
-sklearn = importlib.import_module(package_name)
-print("imported sklearn (aka scikit-learn)")
-
-# Perform a basic operation using sklearn
-from sklearn.datasets import load_iris
-data = load_iris()
-print("Number of samples:", len(data.data))
-
-
-
-# Importing hmmlearn is even worse, I could only import hmmlearn, but not the 
-# submodule hmm for some reason. After hours of shouting at the terminal and 
-# editing the package's setup.py file (yes, you shouldn't do that, I know), 
-# I decided to just copy the hmm submodule and 
-# import it like I do with my custom scripts later on:
-from hmmlearn import hmm
-print("imported hmm from hmmlearn")
 
 # pylsl for pushing triggers to lsl stream:
 from pylsl import StreamInlet, resolve_stream, StreamOutlet, StreamInfo
@@ -194,8 +142,15 @@ import serial
 # import all texts
 from EXNAT2_texts_MC_Qs import *
 # import some additional functions I wrote for the experiment:
-from EXNAT2_study_components import change_bg_colour, generate_trial_sequence # the second one is for the prediction tendency task
+from EXNAT2_study_components import change_bg_colour
 from nback_colour_generator import create_nback_stimlist, draw_without_replacement, get_targets
+
+# load CSVs with tone sequences for prediction tendency task:
+ordered_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/Experiment/Prediction Tendency Task/df_ordered_seqs.csv"
+random_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/Experiment/Prediction Tendency Task/df_random_seqs.csv"
+df_ordered_tone_seqs = pd.read_csv(ordered_path)
+df_random_tone_seqs = pd.read_csv(random_path)
+print("loaded CSVs with stimulus lists for prediction tendency task")
 
 # build little function to flatten nested lists:
 def flatten_list(nested_list):
@@ -501,6 +456,10 @@ continueRoutine = True
 # update component parameters for each repeat
 # Settings for Prediction Tendency Task:
 
+# These settings were used to generate 
+# the tones in the csvs I import at the beginning of the experiment, 
+# we don't really need them here:
+
 # for the sounds:
 tones = [440, 587, 782, 1043]  # Pure tone frequencies in Hz
 tone_duration = 0.1  # Duration of each pure tone in seconds (each lasted 100 ms)
@@ -509,7 +468,6 @@ tone_volume = 1 # use full volume, but you can adjust this later if you determin
 audio_sample_freq = 44100 # 44100 Hz --> audio sampling rate at the lab (according to Frauke)
 tones_iti = 1/3
 tone_fade = 5e-3
-
 
 # for the paradigm:
 block_trials = 1500  # Number of trials per entropy condition
@@ -521,21 +479,11 @@ trigger_random = 2
 
 # Prediction Tendency Task:
 
-# Generate the trial sequences for both entropy conditions 
-# (both for 1500 tones aka trials)
-ordered_sequence = generate_trial_sequence("ordered")
-random_sequence = generate_trial_sequence("random")
-
-
-''' PREPARE SOUNDS FOR RANDOM SEQUENCE: '''
-# create an empty dict to store the prepared sounds
-tones_random = {}
-
-# loop over list random_sequence with all frequencies
-for tone_idx, curr_freq in enumerate(random_sequence):
-
-    print("current frequency:", curr_freq, "tone index:", tone_idx)
-
+# Prepare sound objects for all 4 tones:
+tones_objects = {}
+for tone_idx, curr_freq in enumerate(tones):
+    print("preparing sound object for tone", curr_freq, "- tone index:", tone_idx)
+    
     # build a time array: you need the sound duration and the right sampling frequency for your device
     # 1 divided by the sampling rate = duration of a single sample in sec
     tone_sample_len = 1/audio_sample_freq
@@ -545,14 +493,16 @@ for tone_idx, curr_freq in enumerate(random_sequence):
     sine_wave = np.sin(2*np.pi*curr_freq*t)
 
     # plot the sine wave
-    plt.plot(t, sine_wave)
-    plt.xlabel('Time (s)')
-    plt.ylabel('Amplitude')
-    plt.show()
+    #plt.plot(t, sine_wave)
+    #plt.xlabel('Time (s)')
+    #plt.ylabel('Amplitude')
+    #plt.show()
 
-    # Apply cosine ramp to "smoothen" the edges of the sound a bit (I'm not an audio expert as you can tell)
+    # Apply cosine ramp to "smoothen" the edges of the sound a bit 
+    # (I'm not an audio expert as you can tell)
     # We basically gradually turn up the sound, play it for a while,
-    # and then decrease the volume again so it doesn't make annoying clicky noises when it's played.
+    # and then decrease the volume again so it doesn't make annoying 
+    # clicking noises when it's played.
 
     # apply cosine ramp:
     # check how many samples we have to use for the fade in/out:
@@ -566,99 +516,160 @@ for tone_idx, curr_freq in enumerate(random_sequence):
       sine_wave[-fade_samples:] *= ramp
 
     # plot the modified sine wave again
-    plt.plot(t, sine_wave)
-    plt.xlabel('Time (s)')
-    plt.ylabel('Amplitude')
-    plt.show()
+    #plt.plot(t, sine_wave)
+    #plt.xlabel('Time (s)')
+    #plt.ylabel('Amplitude')
+    #plt.show()
 
     print("----------------------")
-
 
     # generate sound object for the sound file we built
     sound = Sound(value = sine_wave,
                   secs = tone_duration, # duration of sound in seconds
-                  sampleRate = sRate,
+                  sampleRate = audio_sample_freq,
                   name = f"tone{tone_idx + 1}", # create a name for the sound for logging
                   hamming = False, # don't apply filter, we did this before
                   volume = tone_volume,
                   loops = 0) # don't repeat sound, play only once
     
     # add the sound to the dict
-    tones_random[f"tone{tone_idx + 1}_random"] = sound
+    tones_objects[f"tone_{curr_freq}"] = sound
 
-
-''' PREPARE SOUNDS FOR ORDERED SEQUENCE: '''
-
-# create an empty dict to store the prepared sounds
-tones_ordered = {}
-
-# loop over list ordered_sequence with all frequencies
-for tone_idx, curr_freq in enumerate(ordered_sequence):
-
-    print("current frequency:", curr_freq, "tone index:", tone_idx)
-
-    # build a time array: you need the sound duration and the right sampling frequency for your device
-    # 1 divided by the sampling rate = duration of a single sample in sec
-    tone_sample_len = 1/audio_sample_freq
-    t = np.arange(0, tone_duration, tone_sample_len)
-
-    # generate sine wave:
-    sine_wave = np.sin(2*np.pi*curr_freq*t)
-
-    # plot the sine wave
-    plt.plot(t, sine_wave)
-    plt.xlabel('Time (s)')
-    plt.ylabel('Amplitude')
-    plt.show()
-
-    # Apply cosine ramp to "smoothen" the edges of the sound a bit (I'm not an audio expert as you can tell)
-    # We basically gradually turn up the sound, play it for a while,
-    # and then decrease the volume again so it doesn't make annoying clicky noises when it's played.
-
-    # apply cosine ramp:
-    # check how many samples we have to use for the fade in/out:
-    fade_samples = int(tone_fade * audio_sample_freq)
-
-    # if there are enough, but not too many fade samples,
-    # apply cosine ramp to signal
-    if fade_samples > 0 and fade_samples < len(sine_wave):
-      ramp = np.cos(np.linspace(0, np.pi / 2, fade_samples))
-      sine_wave[:fade_samples] *= ramp[::-1]
-      sine_wave[-fade_samples:] *= ramp
-
-    # plot the modified sine wave again
-    plt.plot(t, sine_wave)
-    plt.xlabel('Time (s)')
-    plt.ylabel('Amplitude')
-    plt.show()
-
-    print("----------------------")
-
-
-    # generate sound object for the sound file we built
-    sound = Sound(value = sine_wave,
-                  secs = tone_duration, # duration of sound in seconds
-                  sampleRate = sRate,
-                  name = f"tone{tone_idx + 1}", # create a name for the sound for logging
-                  hamming = False, # don't apply filter, we did this before
-                  volume = tone_volume,
-                  loops = 0) # don't repeat sound, play only once
-    
-    # add the sound to the dict
-    tones_ordered[f"tone{tone_idx + 1}_ordered"] = sound
-
-print("finished preparing prediction tendency task!")
+print("finished preparing sound objects for prediction tendency task")
 
 # now you can access & play each sound by its name, like this:
-now = ptb.GetSecs()
-tones_ordered["tone1_ordered"].play(when = now)  # Play the first sound immediately
-core.wait(1.5) # wait until sound is finished
+#now = ptb.GetSecs()
+#curr_tone = tones_objects["tone_440"]
+#curr_tone.play(when = now)  # play the sound immediately
+# send a trigger
+#core.wait(0.1) # wait 100 ms until the audio has finished
+#curr_tone.stop() # close the sound
+
+# Get the trial sequences for both entropy conditions 
+# (both for 1500 tones aka trials)
+
+# randomly choose 2 sequences, 1 ordered & 1 random sequence: 
+ordered_row = df_ordered_tone_seqs.sample(n = 1)
+random_row = df_random_tone_seqs.sample(n = 1)
+# access the values in the random rows, exclude the first value (it's the index of the row): 
+ordered_sequence = ordered_row.values[0][1:]
+random_sequence = random_row.values[0][1:]
 
 
+# choose which of the conditions to play first:
+choice = random.choice(["ordered", "random"])
 
+if choice == "ordered":
+    print("starting with ordered sequence as first block!")
+    first_sequence = ordered_sequence
+    second_sequence = random_sequence
+    seq1_name = "ordered"
+    seq2_name = "random"
+else: 
+    print("starting with random sequence as first block!")
+    first_sequence = random_sequence
+    second_sequence = ordered_sequence
+    seq1_name = "random"
+    seq2_name = "ordered"
 
+# PLAY FIRST BLOCK:
 
+# loop over list first_sequence with all frequencies:
+for tone_idx, curr_freq in enumerate(first_sequence):
 
+    print("current frequency:", curr_freq, "tone index:", tone_idx)
+    now = ptb.GetSecs() # get current time stamp
+    print("tone onset:", now)
+    # get sound object for current frequency tone
+    curr_tone = tones_objects[f"tone_{curr_freq}"]
+    curr_tone.play(when = now)  # play the sound immediately
+    # send tone onset trigger to LSL stream
+    marker_text = "pred_tendency_"+ seq1_name + "_" + str(curr_freq) + "_trial_" + str(tone_idx)
+    print(marker_text)
+    #out_marker.push_sample(["STIM_ONSET_" + marker_text])
+
+    ptb.WaitSecs(0.1) # wait 100 ms until the audio has finished
+    curr_tone.stop() # close the sound
+    # send tone offset trigger to LSL stream
+    #out_marker.push_sample(["STIM_OFFSET_" + marker_text])
+    
+    # 1 3Hz cycle = 333.33 ms, so continue waiting until 333.33 ms have 
+    # passed since starting the tone before playing the next tone
+    time_passed = ptb.GetSecs() - now
+    print("time passed since start of tone:", time_passed)
+    core.wait(0.33333 - time_passed)
+    
+    # end this loop after 10 tones if testing mode is activated
+    if expInfo['testing_mode'] == "yes":
+        if tone_idx == 10:
+            break
+    print("------ next tone ------ ")
+
+print(" --- FINISHED BLOCK 1 OF PREDICTION TENDENCY TASK --- ")
+
+# short break:
+
+# set instruction text
+instr_text = "Sie können nun eine kurze Pause machen. Drücken Sie die Leertaste, wenn Sie den nächsten Block starten möchten. Bitte hören Sie auch im nächsten Block wieder nur zu."
+
+# create text box
+instr_text_stim = visual.TextStim(win, 
+                                  text = instr_text, 
+                                  height = 0.5, 
+                                  pos = (0, 0),
+                                  font = "Bookman Old Style",
+                                  color = 'black')
+                                  
+# display the text on screen & wait for keypress:
+while True:
+    instr_text_stim.draw()
+    win.flip()
+    
+    # if space bar is pressed, start second block:
+    if event.getKeys(['space']):
+        # remove words from screen
+        win.flip()
+        break # break while loop
+        
+print("starting second prediction tendency task block")
+
+# PLAY SECOND BLOCK:
+
+# loop over list first_sequence with all frequencies:
+for tone_idx, curr_freq in enumerate(second_sequence):
+
+    print("current frequency:", curr_freq, "tone index:", tone_idx)
+    now = ptb.GetSecs() # get current time stamp
+    print("tone onset:", now)
+    # get sound object for current frequency tone
+    curr_tone = tones_objects[f"tone_{curr_freq}"]
+    curr_tone.play(when = now)  # play the sound immediately
+    # send tone onset trigger to LSL stream
+    marker_text = "pred_tendency_"+ seq2_name + "_" + str(curr_freq) + "_trial_" + str(tone_idx)
+    print(marker_text)
+    #out_marker.push_sample(["STIM_ONSET_" + marker_text])
+
+    ptb.WaitSecs(0.1) # wait 100 ms until the audio has finished
+    curr_tone.stop() # close the sound
+    # send tone offset trigger to LSL stream
+    #out_marker.push_sample(["STIM_OFFSET_" + marker_text])
+    
+    # 1 3Hz cycle = 333.33 ms, so continue waiting until 333.33 ms have 
+    # passed since starting the tone before playing the next tone
+    time_passed = ptb.GetSecs() - now
+    print("time passed since start of tone:", time_passed)
+    core.wait(0.33333 - time_passed)
+    
+    # end this loop after 10 tones if testing mode is activated
+    if expInfo['testing_mode'] == "yes":
+        if tone_idx == 10:
+            break
+    print("------ next tone ------ ")
+
+# If everything's finished, go to next routine
+print(" --- FINISHED BLOCK 2 OF PREDICTION TENDENCY TASK --- ")
+print(" --- ENDING PREDICTION TENDENCY TASK NOW --- ")
+continueRoutine = False
 
 
 # keep track of which components have finished
