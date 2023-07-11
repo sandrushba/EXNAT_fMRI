@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Tue Jul 11 15:37:43 2023
+    on Tue Jul 11 15:40:10 2023
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -484,7 +484,7 @@ trigger_random = 2
 # create text box
 fixation_cross = visual.TextStim(win, 
                                  text = "+", 
-                                 height = 5, 
+                                 height = 3, 
                                  pos = (0, 0),
                                  font = "Bookman Old Style",
                                  color = 'black')
