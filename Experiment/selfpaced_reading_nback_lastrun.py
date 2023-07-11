@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Tue Jul 11 13:56:07 2023
+    on Tue Jul 11 15:37:43 2023
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -351,9 +351,6 @@ empty_placeholder = visual.TextStim(win=win, name='empty_placeholder',
     languageStyle='LTR',
     depth=-2.0);
 
-# Initialize components for Routine "test"
-testClock = core.Clock()
-
 # Initialize components for Routine "pred_tendency"
 pred_tendencyClock = core.Clock()
 
@@ -454,349 +451,6 @@ for thisComponent in settingsComponents:
 thisExp.addData('empty_placeholder.started', empty_placeholder.tStartRefresh)
 thisExp.addData('empty_placeholder.stopped', empty_placeholder.tStopRefresh)
 
-# ------Prepare to start Routine "test"-------
-continueRoutine = True
-# update component parameters for each repeat
-### VISUAL TASK TRAINING & MAIN BLOCK
-
-# choose 1 target colour & generate 0-back colour list
-target_colour = random.choice(colours)
-
-# keep background ivory
-win.setColor(light_bg_col, colorSpace='rgb')
-win.flip()
-
-### Show instructions
-
-# set texts
-instr_text1 = "Im folgenden Block werden die Worte von allein abgespielt. \n\nSie müssen also diesmal nicht die Leertaste drücken, lesen Sie aber bitte trotzdem den Text mit. \n\nBitte drücken Sie immer die Taste 'C', wenn Sie ein Wort in der folgenden Farbe sehen:" 
-instr_text2 = "Sie können die Aufgabe kurz üben, bevor der Hauptblock startet.\n\n\nDrücken Sie die Leertaste, wenn Sie bereit sind, den Übungsblock zu starten!"
-
-# create text boxes
-instr_text_stim1 = visual.TextStim(win, 
-                                  text = instr_text1, 
-                                  height = 0.5, # font height: 5° visual angle
-                                  font = "Bookman Old Style",
-                                  pos = (0, 4), # move instructions a bit up
-                                  color = "black")
-instr_text_stim2 = visual.TextStim(win, 
-                                  text = instr_text2, 
-                                  height = 0.5, # font height: 5° visual angle
-                                  font = "Bookman Old Style",
-                                  pos = (0, -5), # move instructions a bit up
-                                  color = "black")
-# create "empty" circle as stimulus
-instr_colour_circle_stim = visual.Circle(win = win,
-                                         radius = 1, # radius = 1° visual angle
-                                         # colorSpace = "hex",
-                                         pos = (0,0)) # move circle slightly down
-
-# set current target colour as colour of circle:
-instr_colour_circle_stim.fillColor = target_colour
-
-# display the text & the circle on screen until Space is pressed
-while True:
-    # keep background ivory
-    win.setColor(light_bg_col, colorSpace='rgb')
-    instr_text_stim1.draw()
-    instr_text_stim2.draw()
-    instr_colour_circle_stim.draw()
-    win.flip()
-    # end screen if participant presses space
-    if 'space' in event.getKeys():
-        break 
-
-
-### START VISUAL TASK TRAINING
-
-# change background colour: 
-# transition from ivory 
-# to medium grey 
-change_bg_colour(window = win, 
-                 start_rgb = light_bg_col,
-                 end_rgb = dark_bg_col, 
-                 seconds = 2)
-# Wait for a brief period of time so bg is set
-core.wait(0.8)
-# keep background grey
-win.setColor(dark_bg_col, colorSpace='rgb')
-win.flip()
-
-# clear buffer of all previously recorded key events:
-event.clearEvents()
-
-
-# prepare stimuli:
-curr_text_training = ['Einen', 'Augenblick', 'herrschte', 'totale', 'Stille.', 'Man', 'hörte', 'plötzlich', 'die', 'Wellen', 'rauschen', 'und', 'das', 'Radio', 'aus', 'dem', 'Salon', 'herüberjazzen,', 'man', 'vernahm', 'jeden', 'Schritt', 'vom', 'Promenadendeck', 'und', 'das', 'leise,', 'feine', 'Sausen', 'des', 'Winds,', 'der', 'durch', 'die', 'Fugen', 'der', 'Fenster', 'fuhr.', 'Keiner', 'von', 'uns', 'atmete,', 'es', 'war', 'zu', 'plötzlich', 'gekommen', 'und', 'wir', 'alle', 'noch', 'geradezu', 'erschrocken', 'über', 'das', 'Unwahrscheinliche,', 'daß', 'dieser', 'Unbekannte', 'dem', 'Weltmeister', 'in', 'einer', 'schon', 'halb', 'verlorenen', 'Partie', 'seinen', 'Willen', 'aufgezwungen', 'haben', 'sollte.', 'McConnor', 'lehnte', 'sich', 'mit', 'einem', 'Ruck', 'zurück,', 'der', 'zurückgehaltene', 'Atem', 'fuhr', 'ihm', 'hörbar', 'in', 'einem', 'beglückten', "\"Ah!\"", 'von', 'den', 'Lippen.', 'Ich', 'wiederum', 'beobachtete', 'Czentovic.', 'Schon', 'bei', 'den', 'letzten', 'Zügen', 'hatte', 'mir', 'geschienen,', 'als', 'ob', 'er', 'blässer', 'geworden', 'sei.', 'Aber', 'er','verstand', 'sich', 'gut', 'zusammenzuhalten.', 'Er', 'verharrte', 'in', 'seiner', 'scheinbar', 'gleichmütigen', 'Starre', 'und', 'fragte', 'nur', 'in', 'lässigster', 'Weise,', 'während', 'er', 'die', 'Figuren', 'mit', 'ruhiger', 'Hand', 'vom', 'Brette', 'schob:', "\"Wünschen", 'die', 'Herren', 'noch', 'eine', 'dritte', 'Partie?\"']
-
-# compute average reading speed by dividing the 
-# let's say we use 40 ms / letter, that would be 200 ms for a short word like "Einen", so still quite a lot:
-curr_durations_training = [len(word) * 40 / 1000 for word in curr_text_training] # in ms
-# print(curr_durations_training)
-
-# generate random colour list:
-curr_colours_training = create_0back_stimlist(target_colour = target_colour, nr_targets = 25, colour_codes = colours, nr_words = len(curr_text_training))
-
-# save position of targets as True/False list:
-curr_targets_training = [colour == target_colour for colour in curr_colours_training]
-
-
-### prepare flicker
-# hint: flicker_freq and frame_rate are set in the settings 
-# code component at the beginning of the experiment.
-
-# create flicker phase variable - start at phase = 0
-flicker_phase = 0
-# we also need the start time (let's set it as current time 
-# at this point in the script):
-start_time = core.getTime()
-
-### start block loop
-
-# create empty text stimulus 
-stim = visual.TextStim(win = win, 
-                       text = " ", 
-                       pos = (0,0), # center stimulus
-                       font = "Times New Roman",
-                       height = 1) # font height = 1° visual angle
-
-# create grey rectangle that masks the text if I set opacity to 1
-# --> changing the text opacity directly isn't working: https://discourse.psychopy.org/t/opacity-of-text-stimuli-is-not-updating/11152/7    
-stim_mask = visual.Rect(win = win,
-                        width = 20, # width = 20° visual angle
-                        height = 3, # height = 3° visual angle 
-                        pos = (0,0), # center stimulus 
-                        opacity = 0, # set opacity to 0 for a start
-                        fillColor = dark_bg_col,
-                        colorSpace = "rgb")
-
-stim.draw()
-stim_mask.draw()
-win.flip()
-
-
-# loop words in current text
-for trial_idx, curr_word in enumerate(curr_text_training):
-    print("current idx: " + str(trial_idx) + ", curr word:" + curr_word)
-    
-    ### prepare & show current word:
-    
-    # get current colour
-    curr_colour = curr_colours_training[trial_idx]
-    # check if it's a target
-    curr_target = curr_targets_training[trial_idx]
-    
-    # get duration for current word
-    curr_duration = curr_durations_training[trial_idx]
-    
-    # get trial number (start counting from 1, so add 1)
-    curr_trial_nr = trial_idx + 1
-
-    # set current word & colour as content of text stimulus
-    stim.color = curr_colour
-    stim.text = curr_word
-    
-    # Flicker option 1: use sine-wave (gradient) flicker
-    # create current opacity value to continue flickering the word
-    #frame_time = core.getTime() # get current time point (in sec)
-    #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
-    #opacity = (flicker_intensity + 1) / 2
-
-    # use square-wave (on-off) flicker
-    frame_time = core.getTime() # get current time point (in sec)
-    time_passed = frame_time - start_time # calculate time passed since start
-    cycle_duration = 1 / flicker_freq # calculate duration of one flicker cycle
-    cycle_passed = time_passed % cycle_duration # calculate time passed in current flicker cycle
-    if cycle_passed < cycle_duration / 2: # if in the first half of the cycle
-        opacity = 1 # set opacity to 1
-    else: # if in the second half of the cycle
-        opacity = 0 # set opacity to 0
-        
-    stim_mask.opacity = opacity
-    
-    # show word on screen
-    stim.draw() # draw word on screen
-    stim_mask.draw() # draw mask on screen
-    win.flip() # update the window to clear the screen and display the word
-
-    # send word onset trigger to LSL stream
-    marker_text = "trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + str(curr_target)
-    #out_marker.push_sample(["STIM_ONSET_vistask_training" + marker_text])
-    
-    # record trial onset time
-    onset_time = core.getTime()
-    print("onset_time:", onset_time)
-    print("word duration: " +  str(onset_time + curr_duration) + " ms")
-    
-
-    ### wait for key response until curr_duration is over: 
-
-    # create tracker for 0-back responses for the current trial:
-    previous_response = False
-
-    ### start recording responses
-    # start while loop that looks for responses
-    # --> end while loop only if duration for current word is over
-    while core.getTime() < (onset_time + curr_duration):    
-        print("curr time stamp:", core.getTime())
-        # in each iteration, draw word on screen
-        # --> flicker again
-
-        # Flicker option 1: use sine-wave (gradient) flicker
-        #frame_time = core.getTime() 
-        #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
-        #opacity = (flicker_intensity + 1) / 2
-
-        # Flicker option 2: use square-wave (on-off) flicker
-        frame_time = core.getTime() 
-        time_passed = frame_time - start_time 
-        cycle_duration = 1 / flicker_freq
-        cycle_passed = time_passed % cycle_duration
-        if cycle_passed < cycle_duration / 2:
-            opacity = 1
-        else: 
-            opacity = 0
-            
-        stim_mask.opacity = opacity
-        
-        stim.draw()
-        stim_mask.draw()
-        win.flip()
-        
-        # if participant pressed button "c" and hasn't already responded in the current trial
-        if event.getKeys(['c']) and previous_response == False:
-            # get reaction time
-            # we measure reaction time from the onset of the current word, even if the target 
-            # was the word before (or occurred even earlier). 
-            # In such cases we can infer the actual reaction times from the df later.
-            # Reason why I don't use the last target as an onset: Doesn't take into 
-            # account that there might be false alarm responses.
-            curr_nback_RT = (core.getTime() - onset_time) * 1000 # *1000 to convert s to ms    
-            ### send trigger to LSL stream to indicate n-back response
-            #out_marker.push_sample(["REACTION_visktask__training" + marker_text])
-            # only get first target response, we don't care if they press the button more than once in this trial:
-            previous_response = True
-            print("detected C key press -- 0-back RT: " + str(curr_nback_RT) + " ms") # * 1000 to convert s to ms
-        # If esc is pressed, end the experiment:
-        elif event.getKeys(['escape']):
-            core.quit()
-    
-    ### end trial
-    print("end trial")
-    # stop display of current word
-    win.flip()
-    
-    # check whether response was hit, miss, false alarm or correct rejection
-    # they saw a target and there was one: hit
-    if previous_response and curr_target:
-        curr_nback_response = "hit"
-    # they didn't see a target but there was one: miss
-    elif previous_response == False and curr_target:
-        curr_nback_response = "miss"
-        curr_nback_RT = None
-    # they didn't see a target and there was none: correct rejection
-    elif previous_response == False and curr_target == False:
-        curr_nback_response = "correct rejection"
-        curr_nback_RT = None
-    # they saw a target but there was none: false alarm
-    elif previous_response and curr_target == False:
-        curr_nback_response = "false alarm"
-
-    ### End of trial / current word display:
-    
-    ### save everything in output csv
-    thisExp.addData('word', curr_word)
-    thisExp.addData('colour', curr_colour)
-    thisExp.addData('target', curr_target)
-    thisExp.addData('nback_response', curr_nback_response)
-    thisExp.addData('nback_RT', curr_nback_RT) # in ms
-    thisExp.addData('duration', curr_duration * 1000) # *1000 to convert s to ms
-    thisExp.addData('text_nr', None)
-    thisExp.addData('trial_nr', curr_trial_nr)
-    thisExp.addData('block_cond', 'None')
-    thisExp.addData('block_nr', exp_block_counter)
-    thisExp.addData('block_name', 'visual_task_training')
-
-    # start a new row in the csv
-    thisExp.nextEntry()
-
-    ### IF TESTING MODE ENABLED: end loop after 4 trials
-    if expInfo['testing_mode'] == "yes":
-        if trial_idx == 3:
-            break
-    
-    ### send word offset trigger to LSL stream   
-    #out_marker.push_sample(["STIM_OFFSET_vistask_training" + marker_text])
-    
-print("finished visual task block")
-
-# change background colour from grey to ivory
-change_bg_colour(window = win, 
-                 start_rgb = dark_bg_col, 
-                 end_rgb = light_bg_col, 
-                 seconds = 2)
-# Wait for a brief period of time so bg is set
-core.wait(0.5)
-
-# keep background ivory
-win.setColor(light_bg_col, colorSpace='rgb')
-win.flip()
-        
-# go to next block  
-exp_block_counter += 1
-
-
-
-### START VISUAL TASK BLOCK
-
-# keep track of which components have finished
-testComponents = []
-for thisComponent in testComponents:
-    thisComponent.tStart = None
-    thisComponent.tStop = None
-    thisComponent.tStartRefresh = None
-    thisComponent.tStopRefresh = None
-    if hasattr(thisComponent, 'status'):
-        thisComponent.status = NOT_STARTED
-# reset timers
-t = 0
-_timeToFirstFrame = win.getFutureFlipTime(clock="now")
-testClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
-frameN = -1
-
-# -------Run Routine "test"-------
-while continueRoutine:
-    # get current time
-    t = testClock.getTime()
-    tThisFlip = win.getFutureFlipTime(clock=testClock)
-    tThisFlipGlobal = win.getFutureFlipTime(clock=None)
-    frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
-    # update/draw components on each frame
-    
-    # check for quit (typically the Esc key)
-    if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
-        core.quit()
-    
-    # check if all components have finished
-    if not continueRoutine:  # a component has requested a forced-end of Routine
-        break
-    continueRoutine = False  # will revert to True if at least one component still running
-    for thisComponent in testComponents:
-        if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
-            continueRoutine = True
-            break  # at least one component has not yet finished
-    
-    # refresh the screen
-    if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
-        win.flip()
-
-# -------Ending Routine "test"-------
-for thisComponent in testComponents:
-    if hasattr(thisComponent, "setAutoDraw"):
-        thisComponent.setAutoDraw(False)
-# the Routine "test" was not non-slip safe, so reset the non-slip timer
-routineTimer.reset()
-
 # ------Prepare to start Routine "pred_tendency"-------
 continueRoutine = True
 # update component parameters for each repeat
@@ -824,6 +478,16 @@ trigger_random = 2
 # -------------------------------------------
 
 # Prediction Tendency Task:
+
+# create fixation cross:
+
+# create text box
+fixation_cross = visual.TextStim(win, 
+                                 text = "+", 
+                                 height = 5, 
+                                 pos = (0, 0),
+                                 font = "Bookman Old Style",
+                                 color = 'black')
 
 # Prepare sound objects for all 4 tones:
 tones_objects = {}
@@ -942,11 +606,15 @@ while True:
         # remove words from screen
         win.flip()
         break # break while loop
-        
+
+# draw fixation cross on screen:
+fixation_cross.draw()
+win.flip()
+fixation_cross.setAutoDraw(True) # continue drawing this
+    
 # loop over list first_sequence with all frequencies:
 for tone_idx, curr_freq in enumerate(first_sequence):
-
-    print("current frequency:", curr_freq, "tone index:", tone_idx)
+    print("current frequency:", curr_freq, "tone index:", tone_idx) 
     now = ptb.GetSecs() # get current time stamp
     print("tone onset:", now)
     # get sound object for current frequency tone
@@ -973,6 +641,9 @@ for tone_idx, curr_freq in enumerate(first_sequence):
         if tone_idx == 10:
             break
     print("------ next tone ------ ")
+
+fixation_cross.setAutoDraw(False) # stop drawing fixation cross on screen
+win.flip()
 
 print(" --- FINISHED BLOCK 1 OF PREDICTION TENDENCY TASK --- ")
 
@@ -1004,10 +675,16 @@ print("starting second prediction tendency task block")
 
 # PLAY SECOND BLOCK:
 
+# draw fixation cross on screen:
+fixation_cross.draw()
+win.flip()
+fixation_cross.setAutoDraw(True) # continue drawing this
+
 # loop over list first_sequence with all frequencies:
 for tone_idx, curr_freq in enumerate(second_sequence):
 
     print("current frequency:", curr_freq, "tone index:", tone_idx)
+    
     now = ptb.GetSecs() # get current time stamp
     print("tone onset:", now)
     # get sound object for current frequency tone
@@ -1034,6 +711,8 @@ for tone_idx, curr_freq in enumerate(second_sequence):
         if tone_idx == 10:
             break
     print("------ next tone ------ ")
+
+fixation_cross.setAutoDraw(False) # stop drawing fixation cross on screen
 
 # If everything's finished, go to next routine
 print(" --- FINISHED BLOCK 2 OF PREDICTION TENDENCY TASK --- ")
@@ -1749,19 +1428,19 @@ for thisBlock in blocks:
             # draw the stimulus during the waiting period
     
             # Flicker option 1: use sine-wave (gradient) flicker
-            frame_time = core.getTime() 
-            flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
-            opacity = (flicker_intensity + 1) / 2
+            #frame_time = core.getTime() 
+            #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
+            #opacity = (flicker_intensity + 1) / 2
     
             # Flicker option 2: use square-wave (on-off) flicker
-            #frame_time = core.getTime() 
-            #time_passed = frame_time - start_time 
-            #cycle_duration = 1 / flicker_freq
-            #cycle_passed = time_passed % cycle_duration
-            #if cycle_passed < cycle_duration / 2:
-            #    opacity = 1
-            #else: 
-            #    opacity = 0
+            frame_time = core.getTime() 
+            time_passed = frame_time - start_time 
+            cycle_duration = 1 / flicker_freq
+            cycle_passed = time_passed % cycle_duration
+            if cycle_passed < cycle_duration / 2:
+                opacity = 1
+            else: 
+                opacity = 0
             
             stim_mask.opacity = opacity
         
@@ -1781,19 +1460,19 @@ for thisBlock in blocks:
             # --> flicker again
     
             # Flicker option 1: use sine-wave (gradient) flicker
-            frame_time = core.getTime() 
-            flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
-            opacity = (flicker_intensity + 1) / 2
+            #frame_time = core.getTime() 
+            #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
+            #opacity = (flicker_intensity + 1) / 2
     
             # Flicker option 2: use square-wave (on-off) flicker
-            #frame_time = core.getTime() 
-            #time_passed = frame_time - start_time 
-            #cycle_duration = 1 / flicker_freq
-            #cycle_passed = time_passed % cycle_duration
-            #if cycle_passed < cycle_duration / 2:
-            #    opacity = 1
-            #else: 
-            #    opacity = 0
+            frame_time = core.getTime() 
+            time_passed = frame_time - start_time 
+            cycle_duration = 1 / flicker_freq
+            cycle_passed = time_passed % cycle_duration
+            if cycle_passed < cycle_duration / 2:
+                opacity = 1
+            else: 
+                opacity = 0
                 
             stim_mask.opacity = opacity
             
@@ -2789,7 +2468,7 @@ blocks.saveAsText(filename + 'blocks.csv', delim=',',
 # ------Prepare to start Routine "vis_task"-------
 continueRoutine = True
 # update component parameters for each repeat
-# Purely visual task (-> more or less no motor responses) 
+### VISUAL TASK TRAINING & MAIN BLOCK
 
 # In this task, the first reading baseline 
 # text is presented again, but this time the text proceeds 
@@ -2815,14 +2494,309 @@ continueRoutine = True
 # the participant has to press a button, but there's no real n-back in this block.
 # Obviously, the participant will be told which colour 
 # is the target colour before the block.
+ 
+# choose 1 target colour & generate 0-back colour list
+target_colour = random.choice(colours)
 
-### INSTRUCTIONS:
 # keep background ivory
 win.setColor(light_bg_col, colorSpace='rgb')
 win.flip()
 
+# ----------------------------------
+ 
+### VISUAL TASK TRAINING
+
+# Show instructions
+
 # clear buffer of all previously recorded key events:
 event.clearEvents()
+
+# set texts
+instr_text1 = "Im folgenden Block werden die Worte von allein abgespielt. \n\nSie müssen also diesmal nicht die Leertaste drücken, lesen Sie aber bitte trotzdem den Text mit. \n\nBitte drücken Sie immer die Taste 'C', wenn Sie ein Wort in der folgenden Farbe sehen:" 
+instr_text2 = "Sie können die Aufgabe kurz üben, bevor der Hauptblock startet.\n\n\nDrücken Sie die Leertaste, wenn Sie bereit sind, den Übungsblock zu starten!"
+
+# create text boxes
+instr_text_stim1 = visual.TextStim(win, 
+                                  text = instr_text1, 
+                                  height = 0.5, # font height: 5° visual angle
+                                  font = "Bookman Old Style",
+                                  pos = (0, 4), # move instructions a bit up
+                                  color = "black")
+instr_text_stim2 = visual.TextStim(win, 
+                                  text = instr_text2, 
+                                  height = 0.5, # font height: 5° visual angle
+                                  font = "Bookman Old Style",
+                                  pos = (0, -5), # move instructions a bit up
+                                  color = "black")
+# create "empty" circle as stimulus
+instr_colour_circle_stim = visual.Circle(win = win,
+                                         radius = 1, # radius = 1° visual angle
+                                         # colorSpace = "hex",
+                                         pos = (0,0)) # move circle slightly down
+
+# set current target colour as colour of circle:
+instr_colour_circle_stim.fillColor = target_colour
+
+# display the text & the circle on screen until Space is pressed
+while True:
+    # keep background ivory
+    win.setColor(light_bg_col, colorSpace='rgb')
+    instr_text_stim1.draw()
+    instr_text_stim2.draw()
+    instr_colour_circle_stim.draw()
+    win.flip()
+    # end screen if participant presses space
+    if 'space' in event.getKeys():
+        break 
+
+
+### START VISUAL TASK TRAINING
+
+# change background colour: 
+# transition from ivory 
+# to medium grey 
+change_bg_colour(window = win, 
+                 start_rgb = light_bg_col,
+                 end_rgb = dark_bg_col, 
+                 seconds = 2)
+# Wait for a brief period of time so bg is set
+core.wait(0.8)
+# keep background grey
+win.setColor(dark_bg_col, colorSpace='rgb')
+win.flip()
+
+# clear buffer of all previously recorded key events:
+event.clearEvents()
+
+
+# prepare stimuli:
+curr_text_training = ['Einen', 'Augenblick', 'herrschte', 'totale', 'Stille.', 'Man', 'hörte', 'plötzlich', 'die', 'Wellen', 'rauschen', 'und', 'das', 'Radio', 'aus', 'dem', 'Salon', 'herüberjazzen,', 'man', 'vernahm', 'jeden', 'Schritt', 'vom', 'Promenadendeck', 'und', 'das', 'leise,', 'feine', 'Sausen', 'des', 'Winds,', 'der', 'durch', 'die', 'Fugen', 'der', 'Fenster', 'fuhr.', 'Keiner', 'von', 'uns', 'atmete,', 'es', 'war', 'zu', 'plötzlich', 'gekommen', 'und', 'wir', 'alle', 'noch', 'geradezu', 'erschrocken', 'über', 'das', 'Unwahrscheinliche,', 'daß', 'dieser', 'Unbekannte', 'dem', 'Weltmeister', 'in', 'einer', 'schon', 'halb', 'verlorenen', 'Partie', 'seinen', 'Willen', 'aufgezwungen', 'haben', 'sollte.', 'McConnor', 'lehnte', 'sich', 'mit', 'einem', 'Ruck', 'zurück,', 'der', 'zurückgehaltene', 'Atem', 'fuhr', 'ihm', 'hörbar', 'in', 'einem', 'beglückten', "\"Ah!\"", 'von', 'den', 'Lippen.', 'Ich', 'wiederum', 'beobachtete', 'Czentovic.', 'Schon', 'bei', 'den', 'letzten', 'Zügen', 'hatte', 'mir', 'geschienen,', 'als', 'ob', 'er', 'blässer', 'geworden', 'sei.', 'Aber', 'er','verstand', 'sich', 'gut', 'zusammenzuhalten.', 'Er', 'verharrte', 'in', 'seiner', 'scheinbar', 'gleichmütigen', 'Starre', 'und', 'fragte', 'nur', 'in', 'lässigster', 'Weise,', 'während', 'er', 'die', 'Figuren', 'mit', 'ruhiger', 'Hand', 'vom', 'Brette', 'schob:', "\"Wünschen", 'die', 'Herren', 'noch', 'eine', 'dritte', 'Partie?\"']
+
+# compute average reading speed by dividing the 
+# let's say we use 40 ms / letter, that would be 200 ms for a short word like "Einen", so still quite a lot:
+curr_durations_training = [len(word) * 40 / 1000 for word in curr_text_training] # in ms
+# print(curr_durations_training)
+
+# generate random colour list:
+curr_colours_training = create_0back_stimlist(target_colour = target_colour, nr_targets = 25, colour_codes = colours, nr_words = len(curr_text_training))
+
+# save position of targets as True/False list:
+curr_targets_training = [colour == target_colour for colour in curr_colours_training]
+
+
+### prepare flicker
+# hint: flicker_freq and frame_rate are set in the settings 
+# code component at the beginning of the experiment.
+
+# create flicker phase variable - start at phase = 0
+flicker_phase = 0
+# we also need the start time (let's set it as current time 
+# at this point in the script):
+start_time = core.getTime()
+
+### start block loop
+
+# create empty text stimulus 
+stim = visual.TextStim(win = win, 
+                       text = " ", 
+                       pos = (0,0), # center stimulus
+                       font = "Times New Roman",
+                       height = 1) # font height = 1° visual angle
+
+# create grey rectangle that masks the text if I set opacity to 1
+# --> changing the text opacity directly isn't working: https://discourse.psychopy.org/t/opacity-of-text-stimuli-is-not-updating/11152/7    
+stim_mask = visual.Rect(win = win,
+                        width = 20, # width = 20° visual angle
+                        height = 3, # height = 3° visual angle 
+                        pos = (0,0), # center stimulus 
+                        opacity = 0, # set opacity to 0 for a start
+                        fillColor = dark_bg_col,
+                        colorSpace = "rgb")
+
+stim.draw()
+stim_mask.draw()
+win.flip()
+
+
+# loop words in current text
+for trial_idx, curr_word in enumerate(curr_text_training):
+    print("current idx: " + str(trial_idx) + ", curr word:" + curr_word)
+    
+    ### prepare & show current word:
+    
+    # get current colour
+    curr_colour = curr_colours_training[trial_idx]
+    # check if it's a target
+    curr_target = curr_targets_training[trial_idx]
+    
+    # get duration for current word
+    curr_duration = curr_durations_training[trial_idx]
+    
+    # get trial number (start counting from 1, so add 1)
+    curr_trial_nr = trial_idx + 1
+
+    # set current word & colour as content of text stimulus
+    stim.color = curr_colour
+    stim.text = curr_word
+    
+    # Flicker option 1: use sine-wave (gradient) flicker
+    # create current opacity value to continue flickering the word
+    #frame_time = core.getTime() # get current time point (in sec)
+    #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
+    #opacity = (flicker_intensity + 1) / 2
+
+    # use square-wave (on-off) flicker
+    frame_time = core.getTime() # get current time point (in sec)
+    time_passed = frame_time - start_time # calculate time passed since start
+    cycle_duration = 1 / flicker_freq # calculate duration of one flicker cycle
+    cycle_passed = time_passed % cycle_duration # calculate time passed in current flicker cycle
+    if cycle_passed < cycle_duration / 2: # if in the first half of the cycle
+        opacity = 1 # set opacity to 1
+    else: # if in the second half of the cycle
+        opacity = 0 # set opacity to 0
+        
+    stim_mask.opacity = opacity
+    
+    # show word on screen
+    stim.draw() # draw word on screen
+    stim_mask.draw() # draw mask on screen
+    win.flip() # update the window to clear the screen and display the word
+
+    # send word onset trigger to LSL stream
+    marker_text = "trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + str(curr_target)
+    #out_marker.push_sample(["STIM_ONSET_vistask_training" + marker_text])
+    
+    # record trial onset time
+    onset_time = core.getTime()
+    print("onset_time:", onset_time)
+    print("word duration: " +  str(onset_time + curr_duration) + " ms")
+    
+
+    ### wait for key response until curr_duration is over: 
+
+    # create tracker for 0-back responses for the current trial:
+    previous_response = False
+
+    ### start recording responses
+    # start while loop that looks for responses
+    # --> end while loop only if duration for current word is over
+    while core.getTime() < (onset_time + curr_duration):    
+        print("curr time stamp:", core.getTime())
+        # in each iteration, draw word on screen
+        # --> flicker again
+
+        # Flicker option 1: use sine-wave (gradient) flicker
+        #frame_time = core.getTime() 
+        #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
+        #opacity = (flicker_intensity + 1) / 2
+
+        # Flicker option 2: use square-wave (on-off) flicker
+        frame_time = core.getTime() 
+        time_passed = frame_time - start_time 
+        cycle_duration = 1 / flicker_freq
+        cycle_passed = time_passed % cycle_duration
+        if cycle_passed < cycle_duration / 2:
+            opacity = 1
+        else: 
+            opacity = 0
+            
+        stim_mask.opacity = opacity
+        
+        stim.draw()
+        stim_mask.draw()
+        win.flip()
+        
+        # if participant pressed button "c" and hasn't already responded in the current trial
+        if event.getKeys(['c']) and previous_response == False:
+            # get reaction time
+            # we measure reaction time from the onset of the current word, even if the target 
+            # was the word before (or occurred even earlier). 
+            # In such cases we can infer the actual reaction times from the df later.
+            # Reason why I don't use the last target as an onset: Doesn't take into 
+            # account that there might be false alarm responses.
+            curr_nback_RT = (core.getTime() - onset_time) * 1000 # *1000 to convert s to ms    
+            ### send trigger to LSL stream to indicate n-back response
+            #out_marker.push_sample(["REACTION_visktask__training" + marker_text])
+            # only get first target response, we don't care if they press the button more than once in this trial:
+            previous_response = True
+            print("detected C key press -- 0-back RT: " + str(curr_nback_RT) + " ms") # * 1000 to convert s to ms
+        # If esc is pressed, end the experiment:
+        elif event.getKeys(['escape']):
+            core.quit()
+    
+    ### end trial
+    print("end trial")
+    # stop display of current word
+    win.flip()
+    
+    # check whether response was hit, miss, false alarm or correct rejection
+    # they saw a target and there was one: hit
+    if previous_response and curr_target:
+        curr_nback_response = "hit"
+    # they didn't see a target but there was one: miss
+    elif previous_response == False and curr_target:
+        curr_nback_response = "miss"
+        curr_nback_RT = None
+    # they didn't see a target and there was none: correct rejection
+    elif previous_response == False and curr_target == False:
+        curr_nback_response = "correct rejection"
+        curr_nback_RT = None
+    # they saw a target but there was none: false alarm
+    elif previous_response and curr_target == False:
+        curr_nback_response = "false alarm"
+
+    ### End of trial / current word display:
+    
+    ### save everything in output csv
+    thisExp.addData('word', curr_word)
+    thisExp.addData('colour', curr_colour)
+    thisExp.addData('target', curr_target)
+    thisExp.addData('nback_response', curr_nback_response)
+    thisExp.addData('nback_RT', curr_nback_RT) # in ms
+    thisExp.addData('duration', curr_duration * 1000) # *1000 to convert s to ms
+    thisExp.addData('text_nr', None)
+    thisExp.addData('trial_nr', curr_trial_nr)
+    thisExp.addData('block_cond', 'None')
+    thisExp.addData('block_nr', exp_block_counter)
+    thisExp.addData('block_name', 'visual_task_training')
+
+    # start a new row in the csv
+    thisExp.nextEntry()
+
+    ### IF TESTING MODE ENABLED: end loop after 4 trials
+    if expInfo['testing_mode'] == "yes":
+        if trial_idx == 3:
+            break
+    
+    ### send word offset trigger to LSL stream   
+    #out_marker.push_sample(["STIM_OFFSET_vistask_training" + marker_text])
+    
+print("finished visual task block")
+
+# change background colour from grey to ivory
+change_bg_colour(window = win, 
+                 start_rgb = dark_bg_col, 
+                 end_rgb = light_bg_col, 
+                 seconds = 2)
+# Wait for a brief period of time so bg is set
+core.wait(0.5)
+
+# keep background ivory
+win.setColor(light_bg_col, colorSpace='rgb')
+win.flip()
+        
+# go to next block  
+exp_block_counter += 1
+
+
+# ----------------------------------
+
+
+### START VISUAL TASK BLOCK
+
+# clear buffer of all previously recorded key events:
+event.clearEvents()
+
 
 ### Show instructions
 # set instruction text
@@ -2845,7 +2819,7 @@ while True:
     if 'space' in event.getKeys():
         break 
 
-  
+ 
 ### START VISUAL TASK BLOCK:
 
 ### change background colour 
@@ -2972,7 +2946,7 @@ for trial_idx, curr_word in enumerate(curr_text):
     #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
     #opacity = (flicker_intensity + 1) / 2
 
-    # use square-wave (on-off) flicker
+    # Flicker option 2: use square-wave (on-off) flicker
     frame_time = core.getTime() # get current time point (in sec)
     time_passed = frame_time - start_time # calculate time passed since start
     cycle_duration = 1 / flicker_freq # calculate duration of one flicker cycle
@@ -3115,6 +3089,9 @@ win.flip()
  # (or end the experiment, this will probably be the last real block)
 exp_block_counter += 1
 continueRoutine = False
+
+
+
 
 # keep track of which components have finished
 vis_taskComponents = []
