@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Tue Jul 11 15:40:10 2023
+    on Wed Jul 19 12:55:36 2023
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -265,7 +265,7 @@ random.shuffle(main_blocks2)
 # put them all together:
 #global all_blocks 
 all_blocks = Reading_BL + main_blocks1 + main_blocks2
-
+print(all_blocks)
 ### Create n-back colour lists for all blocks
 
 print("create n-back colour lists")
@@ -454,20 +454,18 @@ thisExp.addData('empty_placeholder.stopped', empty_placeholder.tStopRefresh)
 # ------Prepare to start Routine "pred_tendency"-------
 continueRoutine = True
 # update component parameters for each repeat
-# Settings for Prediction Tendency Task:
-
-# These settings were used to generate 
-# the tones in the csvs I import at the beginning of the experiment, 
-# we don't really need them here:
+### Settings for Prediction Tendency Task:
 
 # for the sounds:
+tone_volume = 1 # use full volume and make sure the system volume is
+                # set to a value where the tones are played with 40dB
 tones = [440, 587, 782, 1043]  # Pure tone frequencies in Hz
 tone_duration = 0.1  # Duration of each pure tone in seconds (each lasted 100 ms)
 tone_rate = 3  # Rate of pure tone presentation in Hz
-tone_volume = 1 # use full volume, but you can adjust this later if you determined a hearing threshold
 audio_sample_freq = 44100 # 44100 Hz --> audio sampling rate at the lab (according to Frauke)
 tones_iti = 1/3
 tone_fade = 5e-3
+
 
 # for the paradigm:
 block_trials = 1500  # Number of trials per entropy condition
@@ -477,9 +475,9 @@ trigger_random = 2
 
 # -------------------------------------------
 
-# Prediction Tendency Task:
+### Prediction Tendency Task:
 
-# create fixation cross:
+### create fixation cross:
 
 # create text box
 fixation_cross = visual.TextStim(win, 
@@ -489,7 +487,7 @@ fixation_cross = visual.TextStim(win,
                                  font = "Bookman Old Style",
                                  color = 'black')
 
-# Prepare sound objects for all 4 tones:
+### Prepare sound objects for all 4 tones:
 tones_objects = {}
 for tone_idx, curr_freq in enumerate(tones):
     print("preparing sound object for tone", curr_freq, "- tone index:", tone_idx)
@@ -565,25 +563,52 @@ random_row = df_random_tone_seqs.sample(n = 1)
 ordered_sequence = ordered_row.values[0][1:]
 random_sequence = random_row.values[0][1:]
 
+# break them into chunks of about 500 trials 
+# (aka 3 blocks per condition aka 6 blocks in total)
+# We have 1505 trials in each condition, so 2 of the  blocks will have 505 trials.
+ordered_sub1 = ordered_sequence[:500] # 0 - 499
+ordered_sub2 = ordered_sequence[500:1000] # 500 - 999
+ordered_sub3 = ordered_sequence[1000:] # 1000 - end
+
+random_sub1 = random_sequence[:500] # 0 - 499
+random_sub2 = random_sequence[500:1000] # 500 - 999
+random_sub3 = random_sequence[1000:] # 1000 - end
+
+# build trigger names for each condition ("random" and "ordered")
+ordered_trig1 = ["ordered"]*len(ordered_sub1)
+ordered_trig2 = ["ordered"]*len(ordered_sub2)
+ordered_trig3 = ["ordered"]*len(ordered_sub3)
+random_trig1 = ["random"]*len(random_sub1)
+random_trig2 = ["random"]*len(random_sub2)
+random_trig3 = ["random"]*len(random_sub3)
+
+# put the smaller lists into a list & shuffle them
+task_order_stimuli = [ordered_sub1, ordered_sub2, ordered_sub3, random_sub1, random_sub2, random_sub3]
+task_order_trigger = [ordered_trig1, ordered_trig2, ordered_trig3, random_trig1, random_trig2, random_trig3]
+
+# shuffle both in the exact same way using the same seed:
+pred_tend_seed = random.randint(1, 100)
+random.seed(pred_tend_seed)
+
+random.shuffle(task_order_stimuli)
+random.shuffle(task_order_trigger)
+
+# 3010 trials are quite a lot without a break, so include one after the first 3 blocks:
+# find out after how many trials the 3rd block ends:
+break_idx = len(task_order_stimuli[0]) + len(task_order_stimuli[1]) + len(task_order_stimuli[2])
+#print(break_idx) # if we reach this index, include a small break
+
+
+# flatten the lists so they're not nested anymore:
+task_order_stimuli = np.concatenate(task_order_stimuli).ravel().tolist()
+task_order_trigger = flatten_list(task_order_trigger)
+
 
 # choose which of the conditions to play first:
 choice = random.choice(["ordered", "random"])
 
-if choice == "ordered":
-    print("starting with ordered sequence as first block!")
-    first_sequence = ordered_sequence
-    second_sequence = random_sequence
-    seq1_name = "ordered"
-    seq2_name = "random"
-else: 
-    print("starting with random sequence as first block!")
-    first_sequence = random_sequence
-    second_sequence = ordered_sequence
-    seq1_name = "random"
-    seq2_name = "ordered"
 
-
-# PLAY FIRST BLOCK:
+### START PLAYING TASK
 
 # set instruction text
 instr_text = "Im folgenden Block wird Ihnen eine längere Tonsequenz vorgespielt (Dauer ca. 8 min).\n\nBitte schauen Sie auf das Fixationskreuz in der Mitte des Bildschirms und hören Sie einfach nur zu. \n\n\nDrücken Sie die Leertaste, wenn Sie beginnen möchten."
@@ -613,7 +638,41 @@ win.flip()
 fixation_cross.setAutoDraw(True) # continue drawing this
     
 # loop over list first_sequence with all frequencies:
-for tone_idx, curr_freq in enumerate(first_sequence):
+for tone_idx, curr_freq in enumerate(task_order_stimuli):
+    
+    ### BREAK:
+    # if we reached the first trial after the 3rd block, include break:
+    if tone_idx == break_idx:
+        
+        fixation_cross.setAutoDraw(False) # stop drawing fixation cross on screen
+        
+        # set instruction text
+        instr_text = "Sie können nun eine kurze Pause machen. Drücken Sie die Leertaste, wenn Sie den nächsten Block starten möchten. Bitte hören Sie auch im nächsten Block wieder nur zu."
+
+        # create text box
+        instr_text_stim = visual.TextStim(win, 
+                                          text = instr_text, 
+                                          height = 0.5, 
+                                          pos = (0, 0),
+                                          font = "Bookman Old Style",
+                                          color = 'black')
+                                          
+        # display the text on screen & wait for keypress:
+        while True:
+            instr_text_stim.draw()
+            win.flip()
+            
+            # if space bar is pressed, start second block:
+            if event.getKeys(['space']):
+                # remove words from screen
+                win.flip()
+                break # break while loop
+
+        print("starting second prediction tendency task block")
+        fixation_cross.setAutoDraw(True) # start drawing fixation cross on screen again
+        ptb.WaitSecs(0.5) # wait 500 ms before playing the first tone of the next sequence
+
+    ### RUN TRIAL:
     print("current frequency:", curr_freq, "tone index:", tone_idx) 
     now = ptb.GetSecs() # get current time stamp
     print("tone onset:", now)
@@ -621,7 +680,7 @@ for tone_idx, curr_freq in enumerate(first_sequence):
     curr_tone = tones_objects[f"tone_{curr_freq}"]
     curr_tone.play(when = now)  # play the sound immediately
     # send tone onset trigger to LSL stream
-    marker_text = "pred_tendency_"+ seq1_name + "_" + str(curr_freq) + "_trial_" + str(tone_idx)
+    marker_text = "pred_tendency_"+ str(task_order_stimuli[tone_idx]) + "_" + str(curr_freq) + "_trial_" + str(tone_idx)
     print(marker_text)
     #out_marker.push_sample(["STIM_ONSET_" + marker_text])
 
@@ -636,76 +695,17 @@ for tone_idx, curr_freq in enumerate(first_sequence):
     print("time passed since start of tone:", time_passed)
     core.wait(0.33333 - time_passed)
     
-    # end this loop after 10 tones if testing mode is activated
-    if expInfo['testing_mode'] == "yes":
-        if tone_idx == 10:
-            break
-    print("------ next tone ------ ")
+    ### save information on current trial in output csv
+    # (even if we don't record any behavioral data here)
+    thisExp.addData('trial_nr', tone_idx)
+    thisExp.addData('block_nr', exp_block_counter)
+    thisExp.addData('block_name', "prediction_tendency_task")
+    thisExp.addData('block_kind', task_order_stimuli[tone_idx])
+    thisExp.addData('frequency', curr_freq)
 
-fixation_cross.setAutoDraw(False) # stop drawing fixation cross on screen
-win.flip()
-
-print(" --- FINISHED BLOCK 1 OF PREDICTION TENDENCY TASK --- ")
-
-# short break:
-
-# set instruction text
-instr_text = "Sie können nun eine kurze Pause machen. Drücken Sie die Leertaste, wenn Sie den nächsten Block starten möchten. Bitte hören Sie auch im nächsten Block wieder nur zu."
-
-# create text box
-instr_text_stim = visual.TextStim(win, 
-                                  text = instr_text, 
-                                  height = 0.5, 
-                                  pos = (0, 0),
-                                  font = "Bookman Old Style",
-                                  color = 'black')
-                                  
-# display the text on screen & wait for keypress:
-while True:
-    instr_text_stim.draw()
-    win.flip()
-    
-    # if space bar is pressed, start second block:
-    if event.getKeys(['space']):
-        # remove words from screen
-        win.flip()
-        break # break while loop
+    # start a new row in the csv
+    thisExp.nextEntry()
         
-print("starting second prediction tendency task block")
-
-# PLAY SECOND BLOCK:
-
-# draw fixation cross on screen:
-fixation_cross.draw()
-win.flip()
-fixation_cross.setAutoDraw(True) # continue drawing this
-
-# loop over list first_sequence with all frequencies:
-for tone_idx, curr_freq in enumerate(second_sequence):
-
-    print("current frequency:", curr_freq, "tone index:", tone_idx)
-    
-    now = ptb.GetSecs() # get current time stamp
-    print("tone onset:", now)
-    # get sound object for current frequency tone
-    curr_tone = tones_objects[f"tone_{curr_freq}"]
-    curr_tone.play(when = now)  # play the sound immediately
-    # send tone onset trigger to LSL stream
-    marker_text = "pred_tendency_"+ seq2_name + "_" + str(curr_freq) + "_trial_" + str(tone_idx)
-    print(marker_text)
-    #out_marker.push_sample(["STIM_ONSET_" + marker_text])
-
-    ptb.WaitSecs(0.1) # wait 100 ms until the audio has finished
-    curr_tone.stop() # close the sound
-    # send tone offset trigger to LSL stream
-    #out_marker.push_sample(["STIM_OFFSET_" + marker_text])
-    
-    # 1 3Hz cycle = 333.33 ms, so continue waiting until 333.33 ms have 
-    # passed since starting the tone before playing the next tone
-    time_passed = ptb.GetSecs() - now
-    print("time passed since start of tone:", time_passed)
-    core.wait(0.33333 - time_passed)
-    
     # end this loop after 10 tones if testing mode is activated
     if expInfo['testing_mode'] == "yes":
         if tone_idx == 10:
@@ -713,9 +713,9 @@ for tone_idx, curr_freq in enumerate(second_sequence):
     print("------ next tone ------ ")
 
 fixation_cross.setAutoDraw(False) # stop drawing fixation cross on screen
+win.flip()
 
 # If everything's finished, go to next routine
-print(" --- FINISHED BLOCK 2 OF PREDICTION TENDENCY TASK --- ")
 print(" --- ENDING PREDICTION TENDENCY TASK NOW --- ")
 continueRoutine = False
 
@@ -943,8 +943,8 @@ for thisBlock in blocks:
                     # get trial number (start counting from 1, so add 1)
                     curr_trial_nr = trial_idx + 1
                     
-                    ### ISI: wait for 100 ms
-                    while core.getTime() < onset_time + 0.1:
+                    ### ISI: wait for 500 ms
+                    while core.getTime() < onset_time + 0.5:
                         # draw the stimulus during the waiting period, 
                         # but use grey as a fill colour
                         stim.Colour = dark_bg_col
@@ -2400,7 +2400,7 @@ for thisBlock in blocks:
     
     # If there are still blocks left, go to next one.
     # If not, end loop here:
-    if len(all_colour_lists) <= exp_block_counter + 1:
+    if exp_block_counter == 17:
         blocks.finished = True
     
     
