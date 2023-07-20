@@ -374,7 +374,6 @@
   </Routines>
   <Flow>
     <Routine name="settings"/>
-    <Routine name="test_instr"/>
     <LoopInitiator loopType="TrialHandler" name="blocks">
       <Param name="Selected rows" updates="None" val="" valType="str"/>
       <Param name="conditions" updates="None" val="None" valType="str"/>

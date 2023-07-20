@@ -56,7 +56,6 @@ instr_vis_task_1 = "Im folgenden Block werden die Worte von allein abgespielt.\n
 instr_vis_task_2 = "Sie können die Aufgabe kurz üben, bevor der Hauptblock startet.\n\n\nDrücken Sie die Leertaste, wenn Sie bereit sind, den Übungsblock zu starten!"
 instr_pic_vis_task = instr_pic_path + "vis_task.jpeg"
 
-
 # warning sign for change of task:
 warning_sign = instr_pic_path + "warning.jpeg"
 

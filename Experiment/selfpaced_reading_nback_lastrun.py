@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Thu Jul 20 14:14:32 2023
+    on Thu Jul 20 15:01:31 2023
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -361,9 +361,6 @@ empty_placeholder = visual.TextStim(win=win, name='empty_placeholder',
     languageStyle='LTR',
     depth=-2.0);
 
-# Initialize components for Routine "test_instr"
-test_instrClock = core.Clock()
-
 # Initialize components for Routine "no_text_blocks"
 no_text_blocksClock = core.Clock()
 
@@ -472,89 +469,6 @@ for thisComponent in settingsComponents:
         thisComponent.setAutoDraw(False)
 thisExp.addData('empty_placeholder.started', empty_placeholder.tStartRefresh)
 thisExp.addData('empty_placeholder.stopped', empty_placeholder.tStopRefresh)
-
-# ------Prepare to start Routine "test_instr"-------
-continueRoutine = True
-# update component parameters for each repeat
-
-instr_text = locals()["instr_1back_dual_main"]
-curr_block = "1back_dual_main"
-
-# create text box
-instr_text_stim = visual.TextStim(win, 
-                                      text = instr_text, 
-                                      height = 0.5, # font height: 5° visual angle
-                                      font = "Bookman Old Style",
-                                      pos = (0, 7), # move up a bit so there's space left for the picture
-                                      color = "black")
-
-# create ImageStim object
-curr_instr_pic = visual.ImageStim(win, 
-                                  size = (10, 4),
-                                  pos = (0, -2),
-                                  image = locals()["instr_pic_" + curr_block]) # set path to image here
-
-# display the text & picture on screen
-while True:
-    # keep background ivory
-    win.setColor(light_bg_col, colorSpace='rgb')
-    instr_text_stim.draw()
-    curr_instr_pic.draw()
-    win.flip()
-    # end showing screen if participant presses space
-    if 'space' in event.getKeys():
-        break 
-
-# go to next slide
-continueRoutine = False
-
-# keep track of which components have finished
-test_instrComponents = []
-for thisComponent in test_instrComponents:
-    thisComponent.tStart = None
-    thisComponent.tStop = None
-    thisComponent.tStartRefresh = None
-    thisComponent.tStopRefresh = None
-    if hasattr(thisComponent, 'status'):
-        thisComponent.status = NOT_STARTED
-# reset timers
-t = 0
-_timeToFirstFrame = win.getFutureFlipTime(clock="now")
-test_instrClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
-frameN = -1
-
-# -------Run Routine "test_instr"-------
-while continueRoutine:
-    # get current time
-    t = test_instrClock.getTime()
-    tThisFlip = win.getFutureFlipTime(clock=test_instrClock)
-    tThisFlipGlobal = win.getFutureFlipTime(clock=None)
-    frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
-    # update/draw components on each frame
-    
-    # check for quit (typically the Esc key)
-    if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
-        core.quit()
-    
-    # check if all components have finished
-    if not continueRoutine:  # a component has requested a forced-end of Routine
-        break
-    continueRoutine = False  # will revert to True if at least one component still running
-    for thisComponent in test_instrComponents:
-        if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
-            continueRoutine = True
-            break  # at least one component has not yet finished
-    
-    # refresh the screen
-    if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
-        win.flip()
-
-# -------Ending Routine "test_instr"-------
-for thisComponent in test_instrComponents:
-    if hasattr(thisComponent, "setAutoDraw"):
-        thisComponent.setAutoDraw(False)
-# the Routine "test_instr" was not non-slip safe, so reset the non-slip timer
-routineTimer.reset()
 
 # set up handler to look after randomisation of conditions etc
 blocks = data.TrialHandler(nReps=30.0, method='sequential', 
