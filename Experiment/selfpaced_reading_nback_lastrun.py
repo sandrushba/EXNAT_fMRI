@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Wed Jul 19 15:25:38 2023
+    on Thu Jul 20 14:14:32 2023
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -96,6 +96,9 @@ import sys
 sys.stdout = open(sys.stdout.fileno(), mode = 'w', encoding = 'utf8', buffering = 1)
 # print Python environment psychopy is currently using
 print(sys.executable)
+
+# for showing pictures
+from psychopy import visual
 
 # for playing sounds:
 import psychtoolbox as ptb
@@ -358,6 +361,9 @@ empty_placeholder = visual.TextStim(win=win, name='empty_placeholder',
     languageStyle='LTR',
     depth=-2.0);
 
+# Initialize components for Routine "test_instr"
+test_instrClock = core.Clock()
+
 # Initialize components for Routine "no_text_blocks"
 no_text_blocksClock = core.Clock()
 
@@ -376,8 +382,17 @@ Q3Clock = core.Clock()
 # Initialize components for Routine "difficulty"
 difficultyClock = core.Clock()
 
+# Initialize components for Routine "warning"
+warningClock = core.Clock()
+
+# Initialize components for Routine "warning"
+warningClock = core.Clock()
+
 # Initialize components for Routine "vis_task"
 vis_taskClock = core.Clock()
+
+# Initialize components for Routine "warning"
+warningClock = core.Clock()
 
 # Initialize components for Routine "pred_tendency"
 pred_tendencyClock = core.Clock()
@@ -458,6 +473,89 @@ for thisComponent in settingsComponents:
 thisExp.addData('empty_placeholder.started', empty_placeholder.tStartRefresh)
 thisExp.addData('empty_placeholder.stopped', empty_placeholder.tStopRefresh)
 
+# ------Prepare to start Routine "test_instr"-------
+continueRoutine = True
+# update component parameters for each repeat
+
+instr_text = locals()["instr_1back_dual_main"]
+curr_block = "1back_dual_main"
+
+# create text box
+instr_text_stim = visual.TextStim(win, 
+                                      text = instr_text, 
+                                      height = 0.5, # font height: 5° visual angle
+                                      font = "Bookman Old Style",
+                                      pos = (0, 7), # move up a bit so there's space left for the picture
+                                      color = "black")
+
+# create ImageStim object
+curr_instr_pic = visual.ImageStim(win, 
+                                  size = (10, 4),
+                                  pos = (0, -2),
+                                  image = locals()["instr_pic_" + curr_block]) # set path to image here
+
+# display the text & picture on screen
+while True:
+    # keep background ivory
+    win.setColor(light_bg_col, colorSpace='rgb')
+    instr_text_stim.draw()
+    curr_instr_pic.draw()
+    win.flip()
+    # end showing screen if participant presses space
+    if 'space' in event.getKeys():
+        break 
+
+# go to next slide
+continueRoutine = False
+
+# keep track of which components have finished
+test_instrComponents = []
+for thisComponent in test_instrComponents:
+    thisComponent.tStart = None
+    thisComponent.tStop = None
+    thisComponent.tStartRefresh = None
+    thisComponent.tStopRefresh = None
+    if hasattr(thisComponent, 'status'):
+        thisComponent.status = NOT_STARTED
+# reset timers
+t = 0
+_timeToFirstFrame = win.getFutureFlipTime(clock="now")
+test_instrClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
+frameN = -1
+
+# -------Run Routine "test_instr"-------
+while continueRoutine:
+    # get current time
+    t = test_instrClock.getTime()
+    tThisFlip = win.getFutureFlipTime(clock=test_instrClock)
+    tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+    frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+    # update/draw components on each frame
+    
+    # check for quit (typically the Esc key)
+    if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
+        core.quit()
+    
+    # check if all components have finished
+    if not continueRoutine:  # a component has requested a forced-end of Routine
+        break
+    continueRoutine = False  # will revert to True if at least one component still running
+    for thisComponent in test_instrComponents:
+        if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+            continueRoutine = True
+            break  # at least one component has not yet finished
+    
+    # refresh the screen
+    if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+        win.flip()
+
+# -------Ending Routine "test_instr"-------
+for thisComponent in test_instrComponents:
+    if hasattr(thisComponent, "setAutoDraw"):
+        thisComponent.setAutoDraw(False)
+# the Routine "test_instr" was not non-slip safe, so reset the non-slip timer
+routineTimer.reset()
+
 # set up handler to look after randomisation of conditions etc
 blocks = data.TrialHandler(nReps=30.0, method='sequential', 
     extraInfo=expInfo, originPath=-1,
@@ -527,13 +625,20 @@ for thisBlock in blocks:
             instr_text_stim = visual.TextStim(win, 
                                              text = instr_text, 
                                              height = 0.5, 
-                                             pos = (0, 0),
+                                             pos = (0, 7),
                                              font = "Bookman Old Style",
                                              color = 'black')
-            # display the text on screen
+            # create ImageStim object
+            curr_instr_pic = visual.ImageStim(win, 
+                                              size = (10, 4),
+                                              pos = (0, -2),
+                                              image = locals()["instr_pic_" + curr_block]) # set path to image here
+    
+            # display the text & image on screen
             if curr_block in ["1back_single_training2", "2back_single_training2"]:
                 while True:
                     instr_text_stim.draw()
+                    curr_instr_pic.draw()
                     win.flip()
                     # skip current block (aka the second training block))
                     if event.getKeys(['space']):
@@ -549,6 +654,7 @@ for thisBlock in blocks:
             else: 
                 while True:
                     instr_text_stim.draw()
+                    curr_instr_pic.draw()
                     win.flip()
                     # start current block
                     if event.getKeys(['space']):
@@ -633,8 +739,11 @@ for thisBlock in blocks:
                     # get trial number (start counting from 1, so add 1)
                     curr_trial_nr = trial_idx + 1
                     
-                    ### ISI: wait for 500 ms
-                    while core.getTime() < onset_time + 0.5:
+                    ### ISI: wait for 200 ms
+                    # --> I also tried 500, but if the break is too long it 
+                    # messes up the flicker and it starts looking really weird.
+                    # So I guess we have to deal with the not really visible repetitions.
+                    while core.getTime() < onset_time + 0.2:
                         # draw the stimulus during the waiting period, 
                         # but use grey as a fill colour
                         stim.Colour = dark_bg_col
@@ -910,14 +1019,20 @@ for thisBlock in blocks:
                                           text = instr_text, 
                                           height = 0.5, # font height: 5° visual angle
                                           font = "Bookman Old Style",
-                                          pos = (0, 0),
+                                          pos = (0, 7), # move up a bit
                                           color = "black")
-            
+        # create ImageStim object
+        curr_instr_pic = visual.ImageStim(win, 
+                                          size = (10, 4),
+                                          pos = (0, -2),
+                                          image = locals()["instr_pic_" + curr_block]) # set path to image here
+    
         # display the text on screen
         while True:
             # keep background ivory
             win.setColor(light_bg_col, colorSpace='rgb')
             instr_text_stim.draw()
+            curr_instr_pic.draw()
             win.flip()
             # end showing screen if participant presses space
             if 'space' in event.getKeys():
@@ -971,11 +1086,19 @@ for thisBlock in blocks:
                                           text = instr_text, 
                                           height = 0.5, # font height: 5° visual angle
                                           font = "Bookman Old Style",
-                                          pos = (0, 0),
+                                          pos = (0, 7),
                                           color = "black")
+        
+        # create ImageStim object
+        curr_instr_pic = visual.ImageStim(win, 
+                                          size = (10, 4),
+                                          pos = (0, -2),
+                                          image = locals()["instr_pic_" + curr_block]) # set path to image here
+    
         # Display the text on screen
         while True:
             instr_text_stim.draw()
+            curr_instr_pic.draw()
             win.flip()
             # end showing screen if participant presses space
             if 'space' in event.getKeys():
@@ -2143,6 +2266,88 @@ for thisBlock in blocks:
             thisComponent.setAutoDraw(False)
     # the Routine "difficulty" was not non-slip safe, so reset the non-slip timer
     routineTimer.reset()
+    
+    # ------Prepare to start Routine "warning"-------
+    continueRoutine = True
+    # update component parameters for each repeat
+    ### Show warning sign if task changes
+    
+    # If task in last block (curr_block) is not the same as the next one, show warning.
+    
+    # To check this, we compare the first letter in the block name.
+    # I won't show a warning if it switches from rectangles to words, 
+    # I think people will notice it's different. 
+    
+    if exp_block_counter < 17: # if there are still blocks left
+        
+        # if the current block and the next one don't with the same letter
+        if curr_block[0] != all_blocks[exp_block_counter][0]: 
+    
+            # create ImageStim object
+            curr_instr_pic = visual.ImageStim(win, 
+                                             size = (10, 10),
+                                             pos = (0, 0),
+                                             image = warning_sign) # set path to image here
+    
+            # draw image on screen
+            curr_instr_pic.draw()
+            win.flip()
+    
+            # Wait for 4 seconds
+            core.wait(4)
+            win.flip()
+    else: 
+        print("task in", curr_block, "is the same as in next block", all_blocks[exp_block_counter + 1], "- skipping warning sign!")
+    
+    # go to next slide
+    continueRoutine = False
+    # keep track of which components have finished
+    warningComponents = []
+    for thisComponent in warningComponents:
+        thisComponent.tStart = None
+        thisComponent.tStop = None
+        thisComponent.tStartRefresh = None
+        thisComponent.tStopRefresh = None
+        if hasattr(thisComponent, 'status'):
+            thisComponent.status = NOT_STARTED
+    # reset timers
+    t = 0
+    _timeToFirstFrame = win.getFutureFlipTime(clock="now")
+    warningClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
+    frameN = -1
+    
+    # -------Run Routine "warning"-------
+    while continueRoutine:
+        # get current time
+        t = warningClock.getTime()
+        tThisFlip = win.getFutureFlipTime(clock=warningClock)
+        tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+        frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+        # update/draw components on each frame
+        
+        # check for quit (typically the Esc key)
+        if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
+            core.quit()
+        
+        # check if all components have finished
+        if not continueRoutine:  # a component has requested a forced-end of Routine
+            break
+        continueRoutine = False  # will revert to True if at least one component still running
+        for thisComponent in warningComponents:
+            if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+                continueRoutine = True
+                break  # at least one component has not yet finished
+        
+        # refresh the screen
+        if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+            win.flip()
+    
+    # -------Ending Routine "warning"-------
+    for thisComponent in warningComponents:
+        if hasattr(thisComponent, "setAutoDraw"):
+            thisComponent.setAutoDraw(False)
+    # the Routine "warning" was not non-slip safe, so reset the non-slip timer
+    routineTimer.reset()
     thisExp.nextEntry()
     
 # completed 30.0 repeats of 'blocks'
@@ -2156,6 +2361,88 @@ else:
 blocks.saveAsText(filename + 'blocks.csv', delim=',',
     stimOut=params,
     dataOut=['n','all_mean','all_std', 'all_raw'])
+
+# ------Prepare to start Routine "warning"-------
+continueRoutine = True
+# update component parameters for each repeat
+### Show warning sign if task changes
+
+# If task in last block (curr_block) is not the same as the next one, show warning.
+
+# To check this, we compare the first letter in the block name.
+# I won't show a warning if it switches from rectangles to words, 
+# I think people will notice it's different. 
+
+if exp_block_counter < 17: # if there are still blocks left
+    
+    # if the current block and the next one don't with the same letter
+    if curr_block[0] != all_blocks[exp_block_counter][0]: 
+
+        # create ImageStim object
+        curr_instr_pic = visual.ImageStim(win, 
+                                         size = (10, 10),
+                                         pos = (0, 0),
+                                         image = warning_sign) # set path to image here
+
+        # draw image on screen
+        curr_instr_pic.draw()
+        win.flip()
+
+        # Wait for 4 seconds
+        core.wait(4)
+        win.flip()
+else: 
+    print("task in", curr_block, "is the same as in next block", all_blocks[exp_block_counter + 1], "- skipping warning sign!")
+
+# go to next slide
+continueRoutine = False
+# keep track of which components have finished
+warningComponents = []
+for thisComponent in warningComponents:
+    thisComponent.tStart = None
+    thisComponent.tStop = None
+    thisComponent.tStartRefresh = None
+    thisComponent.tStopRefresh = None
+    if hasattr(thisComponent, 'status'):
+        thisComponent.status = NOT_STARTED
+# reset timers
+t = 0
+_timeToFirstFrame = win.getFutureFlipTime(clock="now")
+warningClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
+frameN = -1
+
+# -------Run Routine "warning"-------
+while continueRoutine:
+    # get current time
+    t = warningClock.getTime()
+    tThisFlip = win.getFutureFlipTime(clock=warningClock)
+    tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+    frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+    # update/draw components on each frame
+    
+    # check for quit (typically the Esc key)
+    if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
+        core.quit()
+    
+    # check if all components have finished
+    if not continueRoutine:  # a component has requested a forced-end of Routine
+        break
+    continueRoutine = False  # will revert to True if at least one component still running
+    for thisComponent in warningComponents:
+        if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+            continueRoutine = True
+            break  # at least one component has not yet finished
+    
+    # refresh the screen
+    if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+        win.flip()
+
+# -------Ending Routine "warning"-------
+for thisComponent in warningComponents:
+    if hasattr(thisComponent, "setAutoDraw"):
+        thisComponent.setAutoDraw(False)
+# the Routine "warning" was not non-slip safe, so reset the non-slip timer
+routineTimer.reset()
 
 # ------Prepare to start Routine "vis_task"-------
 continueRoutine = True
@@ -2203,22 +2490,18 @@ win.flip()
 # clear buffer of all previously recorded key events:
 event.clearEvents()
 
-# set texts
-instr_text1 = "Im folgenden Block werden die Worte von allein abgespielt. \n\nSie müssen also diesmal nicht die Leertaste drücken, lesen Sie aber bitte trotzdem den Text mit. \n\nBitte drücken Sie immer die Taste 'C', wenn Sie ein Wort in der folgenden Farbe sehen:" 
-instr_text2 = "Sie können die Aufgabe kurz üben, bevor der Hauptblock startet.\n\n\nDrücken Sie die Leertaste, wenn Sie bereit sind, den Übungsblock zu starten!"
-
 # create text boxes
 instr_text_stim1 = visual.TextStim(win, 
-                                  text = instr_text1, 
+                                  text = locals()["instr_vis_task_1"], 
                                   height = 0.5, # font height: 5° visual angle
                                   font = "Bookman Old Style",
-                                  pos = (0, 4), # move instructions a bit up
+                                  pos = (0, 4), # move instructions up a bit
                                   color = "black")
 instr_text_stim2 = visual.TextStim(win, 
-                                  text = instr_text2, 
+                                  text = locals()["instr_vis_task_2"], 
                                   height = 0.5, # font height: 5° visual angle
                                   font = "Bookman Old Style",
-                                  pos = (0, -5), # move instructions a bit up
+                                  pos = (0, -5), # move instructions down a bit
                                   color = "black")
 # create "empty" circle as stimulus
 instr_colour_circle_stim = visual.Circle(win = win,
@@ -2440,7 +2723,6 @@ for trial_idx, curr_word in enumerate(curr_text_training):
     ### End of trial / current word display:
     
     ### save everything in output csv
-    thisExp.addData('word', curr_word)
     thisExp.addData('colour', curr_colour)
     thisExp.addData('target', curr_target)
     thisExp.addData('nback_response', curr_nback_response)
@@ -2451,7 +2733,10 @@ for trial_idx, curr_word in enumerate(curr_text_training):
     thisExp.addData('block_cond', 'None')
     thisExp.addData('block_nr', exp_block_counter)
     thisExp.addData('block_name', 'visual_task_training')
-
+    # careful, make sure to escape quotes in the string 
+    # differently before saving in csv file:
+    thisExp.addData('word', escape_quotes(curr_word))
+    
     # start a new row in the csv
     thisExp.nextEntry()
 
@@ -2780,11 +3065,8 @@ win.setColor(light_bg_col, colorSpace='rgb')
 win.flip()
         
 # go to next block 
- # (or end the experiment, this will probably be the last real block)
 exp_block_counter += 1
 continueRoutine = False
-
-
 
 
 # keep track of which components have finished
@@ -2835,6 +3117,88 @@ for thisComponent in vis_taskComponents:
 # the Routine "vis_task" was not non-slip safe, so reset the non-slip timer
 routineTimer.reset()
 
+# ------Prepare to start Routine "warning"-------
+continueRoutine = True
+# update component parameters for each repeat
+### Show warning sign if task changes
+
+# If task in last block (curr_block) is not the same as the next one, show warning.
+
+# To check this, we compare the first letter in the block name.
+# I won't show a warning if it switches from rectangles to words, 
+# I think people will notice it's different. 
+
+if exp_block_counter < 17: # if there are still blocks left
+    
+    # if the current block and the next one don't with the same letter
+    if curr_block[0] != all_blocks[exp_block_counter][0]: 
+
+        # create ImageStim object
+        curr_instr_pic = visual.ImageStim(win, 
+                                         size = (10, 10),
+                                         pos = (0, 0),
+                                         image = warning_sign) # set path to image here
+
+        # draw image on screen
+        curr_instr_pic.draw()
+        win.flip()
+
+        # Wait for 4 seconds
+        core.wait(4)
+        win.flip()
+else: 
+    print("task in", curr_block, "is the same as in next block", all_blocks[exp_block_counter + 1], "- skipping warning sign!")
+
+# go to next slide
+continueRoutine = False
+# keep track of which components have finished
+warningComponents = []
+for thisComponent in warningComponents:
+    thisComponent.tStart = None
+    thisComponent.tStop = None
+    thisComponent.tStartRefresh = None
+    thisComponent.tStopRefresh = None
+    if hasattr(thisComponent, 'status'):
+        thisComponent.status = NOT_STARTED
+# reset timers
+t = 0
+_timeToFirstFrame = win.getFutureFlipTime(clock="now")
+warningClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
+frameN = -1
+
+# -------Run Routine "warning"-------
+while continueRoutine:
+    # get current time
+    t = warningClock.getTime()
+    tThisFlip = win.getFutureFlipTime(clock=warningClock)
+    tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+    frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+    # update/draw components on each frame
+    
+    # check for quit (typically the Esc key)
+    if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
+        core.quit()
+    
+    # check if all components have finished
+    if not continueRoutine:  # a component has requested a forced-end of Routine
+        break
+    continueRoutine = False  # will revert to True if at least one component still running
+    for thisComponent in warningComponents:
+        if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+            continueRoutine = True
+            break  # at least one component has not yet finished
+    
+    # refresh the screen
+    if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+        win.flip()
+
+# -------Ending Routine "warning"-------
+for thisComponent in warningComponents:
+    if hasattr(thisComponent, "setAutoDraw"):
+        thisComponent.setAutoDraw(False)
+# the Routine "warning" was not non-slip safe, so reset the non-slip timer
+routineTimer.reset()
+
 # ------Prepare to start Routine "pred_tendency"-------
 continueRoutine = True
 # update component parameters for each repeat
@@ -2860,16 +3224,6 @@ trigger_random = 2
 # -------------------------------------------
 
 ### Prediction Tendency Task:
-
-### create fixation cross:
-
-# create text box
-fixation_cross = visual.TextStim(win, 
-                                 text = "+", 
-                                 height = 3, 
-                                 pos = (0, 0),
-                                 font = "Bookman Old Style",
-                                 color = 'black')
 
 ### Prepare sound objects for all 4 tones:
 tones_objects = {}
@@ -2995,7 +3349,7 @@ choice = random.choice(["ordered", "random"])
 ### START PLAYING TASK
 
 # set instruction text
-instr_text = "Im folgenden Block wird Ihnen eine längere Tonsequenz vorgespielt (Dauer ca. 8 min).\n\nBitte schauen Sie auf das Fixationskreuz in der Mitte des Bildschirms und hören Sie einfach nur zu. \n\n\nDrücken Sie die Leertaste, wenn Sie beginnen möchten."
+instr_text = "Im folgenden Block wird Ihnen eine längere Tonsequenz vorgespielt (Dauer ca. 8 min).\n\nSie können nebenbei den Film auf dem Laptop schauen, hören Sie aber bitte trotzdem den Tönen zu. \n\n\nDrücken Sie die Leertaste, wenn Sie beginnen möchten."
 
 # create text box
 instr_text_stim = visual.TextStim(win, 
@@ -3004,7 +3358,7 @@ instr_text_stim = visual.TextStim(win,
                                   pos = (0, 0),
                                   font = "Bookman Old Style",
                                   color = 'black')
-                                  
+
 # display the text on screen & wait for keypress:
 while True:
     instr_text_stim.draw()
@@ -3016,19 +3370,13 @@ while True:
         win.flip()
         break # break while loop
 
-# draw fixation cross on screen:
-fixation_cross.draw()
-win.flip()
-fixation_cross.setAutoDraw(True) # continue drawing this
-    
+
 # loop over list first_sequence with all frequencies:
 for tone_idx, curr_freq in enumerate(task_order_stimuli):
     
     ### BREAK:
     # if we reached the first trial after the 3rd block, include break:
     if tone_idx == break_idx:
-        
-        fixation_cross.setAutoDraw(False) # stop drawing fixation cross on screen
         
         # set instruction text
         instr_text = "Sie können nun eine kurze Pause machen. Drücken Sie die Leertaste, wenn Sie den nächsten Block starten möchten. Bitte hören Sie auch im nächsten Block wieder nur zu."
@@ -3096,8 +3444,7 @@ for tone_idx, curr_freq in enumerate(task_order_stimuli):
             break
     print("------ next tone ------ ")
 
-fixation_cross.setAutoDraw(False) # stop drawing fixation cross on screen
-win.flip()
+win.flip() # clear window (although it should be cleared)
 
 # If everything's finished, go to next routine
 print(" --- ENDING PREDICTION TENDENCY TASK NOW --- ")
@@ -3162,7 +3509,7 @@ win.flip()
 
 ### Show message
 # set text
-instr_text = "Geschafft, das Experiment ist zu Ende!n\n\Bitte sagen Sie der Versuchsleitung Bescheid.n\n\n\n\(Bitte Leertaste drücken um Daten zu sichern!)" 
+instr_text = "Geschafft, das Experiment ist zu Ende!\n\nBitte sagen Sie der Versuchsleitung Bescheid.\n\n\n(Bitte Leertaste drücken um Daten zu sichern!)" 
 
 # create text box
 instr_text_stim = visual.TextStim(win, 
