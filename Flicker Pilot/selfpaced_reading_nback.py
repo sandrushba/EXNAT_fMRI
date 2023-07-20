@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Wed Jun 28 18:01:01 2023
+    on Tue Jul 11 11:41:09 2023
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -127,29 +127,30 @@ import datetime
 import numpy as np
 # for random number generator:
 import random
-# for saving data in csv:
+# for saving data in csv / working with pd data frames:
 import pandas as pd
 # additional timing package (I know we have core.wait, but I also want this one)
 import time
 
-# for hidden markov models 
-# (used in the prediction tendency task 
-# part of the script):
-# --> make sure to pip install scipy, 
-# scikit-learn and hmmlearn this on the lab PC
-from hmmlearn import hmm
 # pylsl for pushing triggers to lsl stream:
-# from pylsl import StreamInlet, resolve_stream, StreamOutlet, StreamInfo
+from pylsl import StreamInlet, resolve_stream, StreamOutlet, StreamInfo
 # for connecting to serial ports:
-# import serial
+import serial
 
 
 # from my custom scripts...
 # import all texts
 from EXNAT2_texts_MC_Qs import *
 # import some additional functions I wrote for the experiment:
-from EXNAT2_study_components import change_bg_colour, generate_trial_sequence # the second one is for the prediction tendency task
-from nback_colour_generator import create_nback_stimlist, draw_without_replacement, get_targets
+from EXNAT2_study_components import change_bg_colour
+from nback_colour_generator import create_nback_stimlist, draw_without_replacement, get_targets, create_0back_stimlist
+
+# load CSVs with tone sequences for prediction tendency task:
+ordered_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/Experiment/Prediction Tendency Task/df_ordered_seqs.csv"
+random_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/Experiment/Prediction Tendency Task/df_random_seqs.csv"
+df_ordered_tone_seqs = pd.read_csv(ordered_path)
+df_random_tone_seqs = pd.read_csv(random_path)
+print("loaded CSVs with stimulus lists for prediction tendency task")
 
 # build little function to flatten nested lists:
 def flatten_list(nested_list):
@@ -350,6 +351,9 @@ empty_placeholder = visual.TextStim(win=win, name='empty_placeholder',
     languageStyle='LTR',
     depth=-2.0);
 
+# Initialize components for Routine "test"
+testClock = core.Clock()
+
 # Initialize components for Routine "pred_tendency"
 pred_tendencyClock = core.Clock()
 
@@ -450,10 +454,110 @@ for thisComponent in settingsComponents:
 thisExp.addData('empty_placeholder.started', empty_placeholder.tStartRefresh)
 thisExp.addData('empty_placeholder.stopped', empty_placeholder.tStopRefresh)
 
+# ------Prepare to start Routine "test"-------
+continueRoutine = True
+# update component parameters for each repeat
+# choose 1 target colour & generate 0-back colour list
+
+
+print(colours)
+target_colour = random.choice(colours)
+print(target_colour)
+#curr_colours = create_0back_stimlist(target_colour = target_colour, nr_targets = 50, colour_codes = colours, nr_words = 300))
+
+# keep background ivory
+win.setColor(light_bg_col, colorSpace='rgb')
+win.flip()
+
+### Show instructions
+
+# set text
+instr_text = "Bitte drücken Sie immer die Taste 'C', wenn Sie ein Wort in der folgenden Farbe sehen:" 
+
+# create text box
+instr_text_stim = visual.TextStim(win, 
+                                  text = instr_text, 
+                                  height = 0.5, # font height: 5° visual angle
+                                  font = "Bookman Old Style",
+                                  pos = (0, 0), # display instructions centered on the screen
+                                  color = "black")
+
+# create "empty" circle as stimulus
+instr_colour_circle_stim = visual.Circle(win = win,
+                                         radius = 1, # radius = 1° visual angle
+                                         # colorSpace = "hex",
+                                         pos = (0,-1)) # move circle slightly down
+
+# set current target colour as colour of circle:
+stim.fillColor = target_colour
+
+# display the text & the circle on screen until Space is pressed
+while True:
+    # keep background ivory
+    win.setColor(light_bg_col, colorSpace='rgb')
+    instr_text_stim.draw()
+    instr_colour_circle_stim.draw()
+    win.flip()
+    # end screen if participant presses space
+    if 'space' in event.getKeys():
+        break 
+
+# keep track of which components have finished
+testComponents = []
+for thisComponent in testComponents:
+    thisComponent.tStart = None
+    thisComponent.tStop = None
+    thisComponent.tStartRefresh = None
+    thisComponent.tStopRefresh = None
+    if hasattr(thisComponent, 'status'):
+        thisComponent.status = NOT_STARTED
+# reset timers
+t = 0
+_timeToFirstFrame = win.getFutureFlipTime(clock="now")
+testClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
+frameN = -1
+
+# -------Run Routine "test"-------
+while continueRoutine:
+    # get current time
+    t = testClock.getTime()
+    tThisFlip = win.getFutureFlipTime(clock=testClock)
+    tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+    frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+    # update/draw components on each frame
+    
+    # check for quit (typically the Esc key)
+    if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
+        core.quit()
+    
+    # check if all components have finished
+    if not continueRoutine:  # a component has requested a forced-end of Routine
+        break
+    continueRoutine = False  # will revert to True if at least one component still running
+    for thisComponent in testComponents:
+        if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+            continueRoutine = True
+            break  # at least one component has not yet finished
+    
+    # refresh the screen
+    if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+        win.flip()
+
+# -------Ending Routine "test"-------
+for thisComponent in testComponents:
+    if hasattr(thisComponent, "setAutoDraw"):
+        thisComponent.setAutoDraw(False)
+# the Routine "test" was not non-slip safe, so reset the non-slip timer
+routineTimer.reset()
+
 # ------Prepare to start Routine "pred_tendency"-------
 continueRoutine = True
 # update component parameters for each repeat
 # Settings for Prediction Tendency Task:
+
+# These settings were used to generate 
+# the tones in the csvs I import at the beginning of the experiment, 
+# we don't really need them here:
 
 # for the sounds:
 tones = [440, 587, 782, 1043]  # Pure tone frequencies in Hz
@@ -463,7 +567,6 @@ tone_volume = 1 # use full volume, but you can adjust this later if you determin
 audio_sample_freq = 44100 # 44100 Hz --> audio sampling rate at the lab (according to Frauke)
 tones_iti = 1/3
 tone_fade = 5e-3
-
 
 # for the paradigm:
 block_trials = 1500  # Number of trials per entropy condition
@@ -475,21 +578,11 @@ trigger_random = 2
 
 # Prediction Tendency Task:
 
-# Generate the trial sequences for both entropy conditions 
-# (both for 1500 tones aka trials)
-ordered_sequence = generate_trial_sequence("ordered")
-random_sequence = generate_trial_sequence("random")
-
-
-''' PREPARE SOUNDS FOR RANDOM SEQUENCE: '''
-# create an empty dict to store the prepared sounds
-tones_random = {}
-
-# loop over list random_sequence with all frequencies
-for tone_idx, curr_freq in enumerate(random_sequence):
-
-    print("current frequency:", curr_freq, "tone index:", tone_idx)
-
+# Prepare sound objects for all 4 tones:
+tones_objects = {}
+for tone_idx, curr_freq in enumerate(tones):
+    print("preparing sound object for tone", curr_freq, "- tone index:", tone_idx)
+    
     # build a time array: you need the sound duration and the right sampling frequency for your device
     # 1 divided by the sampling rate = duration of a single sample in sec
     tone_sample_len = 1/audio_sample_freq
@@ -499,14 +592,16 @@ for tone_idx, curr_freq in enumerate(random_sequence):
     sine_wave = np.sin(2*np.pi*curr_freq*t)
 
     # plot the sine wave
-    plt.plot(t, sine_wave)
-    plt.xlabel('Time (s)')
-    plt.ylabel('Amplitude')
-    plt.show()
+    #plt.plot(t, sine_wave)
+    #plt.xlabel('Time (s)')
+    #plt.ylabel('Amplitude')
+    #plt.show()
 
-    # Apply cosine ramp to "smoothen" the edges of the sound a bit (I'm not an audio expert as you can tell)
+    # Apply cosine ramp to "smoothen" the edges of the sound a bit 
+    # (I'm not an audio expert as you can tell)
     # We basically gradually turn up the sound, play it for a while,
-    # and then decrease the volume again so it doesn't make annoying clicky noises when it's played.
+    # and then decrease the volume again so it doesn't make annoying 
+    # clicking noises when it's played.
 
     # apply cosine ramp:
     # check how many samples we have to use for the fade in/out:
@@ -520,99 +615,160 @@ for tone_idx, curr_freq in enumerate(random_sequence):
       sine_wave[-fade_samples:] *= ramp
 
     # plot the modified sine wave again
-    plt.plot(t, sine_wave)
-    plt.xlabel('Time (s)')
-    plt.ylabel('Amplitude')
-    plt.show()
+    #plt.plot(t, sine_wave)
+    #plt.xlabel('Time (s)')
+    #plt.ylabel('Amplitude')
+    #plt.show()
 
     print("----------------------")
-
 
     # generate sound object for the sound file we built
     sound = Sound(value = sine_wave,
                   secs = tone_duration, # duration of sound in seconds
-                  sampleRate = sRate,
+                  sampleRate = audio_sample_freq,
                   name = f"tone{tone_idx + 1}", # create a name for the sound for logging
                   hamming = False, # don't apply filter, we did this before
                   volume = tone_volume,
                   loops = 0) # don't repeat sound, play only once
     
     # add the sound to the dict
-    tones_random[f"tone{tone_idx + 1}_random"] = sound
+    tones_objects[f"tone_{curr_freq}"] = sound
 
-
-''' PREPARE SOUNDS FOR ORDERED SEQUENCE: '''
-
-# create an empty dict to store the prepared sounds
-tones_ordered = {}
-
-# loop over list ordered_sequence with all frequencies
-for tone_idx, curr_freq in enumerate(ordered_sequence):
-
-    print("current frequency:", curr_freq, "tone index:", tone_idx)
-
-    # build a time array: you need the sound duration and the right sampling frequency for your device
-    # 1 divided by the sampling rate = duration of a single sample in sec
-    tone_sample_len = 1/audio_sample_freq
-    t = np.arange(0, tone_duration, tone_sample_len)
-
-    # generate sine wave:
-    sine_wave = np.sin(2*np.pi*curr_freq*t)
-
-    # plot the sine wave
-    plt.plot(t, sine_wave)
-    plt.xlabel('Time (s)')
-    plt.ylabel('Amplitude')
-    plt.show()
-
-    # Apply cosine ramp to "smoothen" the edges of the sound a bit (I'm not an audio expert as you can tell)
-    # We basically gradually turn up the sound, play it for a while,
-    # and then decrease the volume again so it doesn't make annoying clicky noises when it's played.
-
-    # apply cosine ramp:
-    # check how many samples we have to use for the fade in/out:
-    fade_samples = int(tone_fade * audio_sample_freq)
-
-    # if there are enough, but not too many fade samples,
-    # apply cosine ramp to signal
-    if fade_samples > 0 and fade_samples < len(sine_wave):
-      ramp = np.cos(np.linspace(0, np.pi / 2, fade_samples))
-      sine_wave[:fade_samples] *= ramp[::-1]
-      sine_wave[-fade_samples:] *= ramp
-
-    # plot the modified sine wave again
-    plt.plot(t, sine_wave)
-    plt.xlabel('Time (s)')
-    plt.ylabel('Amplitude')
-    plt.show()
-
-    print("----------------------")
-
-
-    # generate sound object for the sound file we built
-    sound = Sound(value = sine_wave,
-                  secs = tone_duration, # duration of sound in seconds
-                  sampleRate = sRate,
-                  name = f"tone{tone_idx + 1}", # create a name for the sound for logging
-                  hamming = False, # don't apply filter, we did this before
-                  volume = tone_volume,
-                  loops = 0) # don't repeat sound, play only once
-    
-    # add the sound to the dict
-    tones_ordered[f"tone{tone_idx + 1}_ordered"] = sound
-
-print("finished preparing prediction tendency task!")
+print("finished preparing sound objects for prediction tendency task")
 
 # now you can access & play each sound by its name, like this:
-now = ptb.GetSecs()
-tones_ordered["tone1_ordered"].play(when = now)  # Play the first sound immediately
-core.wait(1.5) # wait until sound is finished
+#now = ptb.GetSecs()
+#curr_tone = tones_objects["tone_440"]
+#curr_tone.play(when = now)  # play the sound immediately
+# send a trigger
+#core.wait(0.1) # wait 100 ms until the audio has finished
+#curr_tone.stop() # close the sound
+
+# Get the trial sequences for both entropy conditions 
+# (both for 1500 tones aka trials)
+
+# randomly choose 2 sequences, 1 ordered & 1 random sequence: 
+ordered_row = df_ordered_tone_seqs.sample(n = 1)
+random_row = df_random_tone_seqs.sample(n = 1)
+# access the values in the random rows, exclude the first value (it's the index of the row): 
+ordered_sequence = ordered_row.values[0][1:]
+random_sequence = random_row.values[0][1:]
 
 
+# choose which of the conditions to play first:
+choice = random.choice(["ordered", "random"])
 
+if choice == "ordered":
+    print("starting with ordered sequence as first block!")
+    first_sequence = ordered_sequence
+    second_sequence = random_sequence
+    seq1_name = "ordered"
+    seq2_name = "random"
+else: 
+    print("starting with random sequence as first block!")
+    first_sequence = random_sequence
+    second_sequence = ordered_sequence
+    seq1_name = "random"
+    seq2_name = "ordered"
 
+# PLAY FIRST BLOCK:
 
+# loop over list first_sequence with all frequencies:
+for tone_idx, curr_freq in enumerate(first_sequence):
 
+    print("current frequency:", curr_freq, "tone index:", tone_idx)
+    now = ptb.GetSecs() # get current time stamp
+    print("tone onset:", now)
+    # get sound object for current frequency tone
+    curr_tone = tones_objects[f"tone_{curr_freq}"]
+    curr_tone.play(when = now)  # play the sound immediately
+    # send tone onset trigger to LSL stream
+    marker_text = "pred_tendency_"+ seq1_name + "_" + str(curr_freq) + "_trial_" + str(tone_idx)
+    print(marker_text)
+    #out_marker.push_sample(["STIM_ONSET_" + marker_text])
+
+    ptb.WaitSecs(0.1) # wait 100 ms until the audio has finished
+    curr_tone.stop() # close the sound
+    # send tone offset trigger to LSL stream
+    #out_marker.push_sample(["STIM_OFFSET_" + marker_text])
+    
+    # 1 3Hz cycle = 333.33 ms, so continue waiting until 333.33 ms have 
+    # passed since starting the tone before playing the next tone
+    time_passed = ptb.GetSecs() - now
+    print("time passed since start of tone:", time_passed)
+    core.wait(0.33333 - time_passed)
+    
+    # end this loop after 10 tones if testing mode is activated
+    if expInfo['testing_mode'] == "yes":
+        if tone_idx == 10:
+            break
+    print("------ next tone ------ ")
+
+print(" --- FINISHED BLOCK 1 OF PREDICTION TENDENCY TASK --- ")
+
+# short break:
+
+# set instruction text
+instr_text = "Sie können nun eine kurze Pause machen. Drücken Sie die Leertaste, wenn Sie den nächsten Block starten möchten. Bitte hören Sie auch im nächsten Block wieder nur zu."
+
+# create text box
+instr_text_stim = visual.TextStim(win, 
+                                  text = instr_text, 
+                                  height = 0.5, 
+                                  pos = (0, 0),
+                                  font = "Bookman Old Style",
+                                  color = 'black')
+                                  
+# display the text on screen & wait for keypress:
+while True:
+    instr_text_stim.draw()
+    win.flip()
+    
+    # if space bar is pressed, start second block:
+    if event.getKeys(['space']):
+        # remove words from screen
+        win.flip()
+        break # break while loop
+        
+print("starting second prediction tendency task block")
+
+# PLAY SECOND BLOCK:
+
+# loop over list first_sequence with all frequencies:
+for tone_idx, curr_freq in enumerate(second_sequence):
+
+    print("current frequency:", curr_freq, "tone index:", tone_idx)
+    now = ptb.GetSecs() # get current time stamp
+    print("tone onset:", now)
+    # get sound object for current frequency tone
+    curr_tone = tones_objects[f"tone_{curr_freq}"]
+    curr_tone.play(when = now)  # play the sound immediately
+    # send tone onset trigger to LSL stream
+    marker_text = "pred_tendency_"+ seq2_name + "_" + str(curr_freq) + "_trial_" + str(tone_idx)
+    print(marker_text)
+    #out_marker.push_sample(["STIM_ONSET_" + marker_text])
+
+    ptb.WaitSecs(0.1) # wait 100 ms until the audio has finished
+    curr_tone.stop() # close the sound
+    # send tone offset trigger to LSL stream
+    #out_marker.push_sample(["STIM_OFFSET_" + marker_text])
+    
+    # 1 3Hz cycle = 333.33 ms, so continue waiting until 333.33 ms have 
+    # passed since starting the tone before playing the next tone
+    time_passed = ptb.GetSecs() - now
+    print("time passed since start of tone:", time_passed)
+    core.wait(0.33333 - time_passed)
+    
+    # end this loop after 10 tones if testing mode is activated
+    if expInfo['testing_mode'] == "yes":
+        if tone_idx == 10:
+            break
+    print("------ next tone ------ ")
+
+# If everything's finished, go to next routine
+print(" --- FINISHED BLOCK 2 OF PREDICTION TENDENCY TASK --- ")
+print(" --- ENDING PREDICTION TENDENCY TASK NOW --- ")
+continueRoutine = False
 
 
 # keep track of which components have finished
@@ -1289,19 +1445,19 @@ for thisBlock in blocks:
         # Flicker option 1: use sine-wave (gradient) flicker
         # --> doesn't seem to work, I don't see the words flicker when I play this
         # create current opacity value to continue flickering the word
-        frame_time = core.getTime() # get current time point (in sec)
-        flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
-        opacity = (flicker_intensity + 1) / 2
-    
-        # use square-wave (on-off) flicker
         #frame_time = core.getTime() # get current time point (in sec)
-        #time_passed = frame_time - start_time # calculate time passed since start
-        #cycle_duration = 1 / flicker_freq # calculate duration of one flicker cycle
-        #cycle_passed = time_passed % cycle_duration # calculate time passed in current flicker cycle
-        #if cycle_passed < cycle_duration / 2: # if in the first half of the cycle
-        #    opacity = 1 # set opacity to 1
-        #else: # if in the second half of the cycle
-        #    opacity = 0 # set opacity to 0
+        #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
+        #opacity = (flicker_intensity + 1) / 2
+    
+        # Flicker option 2: use square-wave (on-off) flicker
+        frame_time = core.getTime() # get current time point (in sec)
+        time_passed = frame_time - start_time # calculate time passed since start
+        cycle_duration = 1 / flicker_freq # calculate duration of one flicker cycle
+        cycle_passed = time_passed % cycle_duration # calculate time passed in current flicker cycle
+        if cycle_passed < cycle_duration / 2: # if in the first half of the cycle
+            opacity = 1 # set opacity to 1
+        else: # if in the second half of the cycle
+            opacity = 0 # set opacity to 0
             
         stim_mask.opacity = opacity
         
@@ -2363,7 +2519,7 @@ blocks.saveAsText(filename + 'blocks.csv', delim=',',
 # ------Prepare to start Routine "vis_task"-------
 continueRoutine = True
 # update component parameters for each repeat
-# Purely visual task (-> no motor responses) 
+# Purely visual task (-> more or less no motor responses) 
 
 # In this task, the first reading baseline 
 # text is presented again, but this time the text proceeds 
@@ -2375,19 +2531,28 @@ continueRoutine = True
 # In this block, there's no 1-back or 2-back, but we use a 0-back 
 # task as a motoric "tapping task", so basically the participants always 
 # have to press a certain button if the current word has a certain target colour.
+# So the text stays the same, the durations stay the same, 
+# but I change the colours.
 
-# Put differently: We take both the text from the first reading BL 
-# block AND the measured reading times for each word from this 
-# block and show the text again, but this time with the previously 
-# recorded duration for each word. Every time the word is shown in a 
-# certain colour (e.g. blue), the participant has to press a button, 
-# but there's no real n-back in this block.
+# Target to non-target ratio: 50:250 (16.66% targets just as in the other blocks)
+# The target colour is chosen at random from the 4 colours we use in the experiment.
 
+# Put differently: We take both the text from one of the reading BL 
+# blocks AND the measured reading times for each word from this 
+# block, then we show the text again, but this time with the previously 
+# recorded duration for each word and a different colour sequence. 
+# Every time the word is shown in a certain colour (e.g. blue), 
+# the participant has to press a button, but there's no real n-back in this block.
+# Obviously, the participant will be told which colour 
+# is the target colour before the block.
 
 ### INSTRUCTIONS:
 # keep background ivory
 win.setColor(light_bg_col, colorSpace='rgb')
 win.flip()
+
+# clear buffer of all previously recorded key events:
+event.clearEvents()
 
 ### Show instructions
 # set instruction text
@@ -2426,14 +2591,52 @@ core.wait(0.8)
 win.setColor(dark_bg_col, colorSpace='rgb')
 win.flip()
 
+# clear buffer of all previously recorded key events:
+event.clearEvents()
+
 ### prepare stimuli
-# get text from second block (where exp_counter was 1, that's the first reading BL block)
-curr_text_nr = all_texts_nrs_list[1]
+
+# Now we need a text and RTs from one of the baseline blocks. 
+
+# We have 9 main blocks, 3 of which are baseline blocks, so in theory, 
+# we could choose one of them randomly.
+# Problem: The first block in this study is always a baseline block,
+# but the second and third one is presented at a random position 
+# somewhere in the second half of the experiment. So if we're out of luck, 
+# they could have been the last and penultimate block, so not "far away" 
+# enough from the current one. We don't want to show the same text in 2 consecutive blocks.
+
+# Idea: Find out where the baseline blocks are. 
+# If a baseline block is the last or penultimate block before this one, 
+# don't use it for this task. Worst case is that the second and third BL block are the 
+# penultimate & last block and we have to use the first one.
+# But if at least 2 blocks are "far away" enough from this one, choose 
+# randomly which one's text & RTs will be used.
+
+# find out where the baseline blocks are in the experiment:
+bl_indices = [index for index, block in enumerate(all_blocks) if block == "Reading_Baseline_main"]
+list_length = len(all_blocks)
+
+# exclude all indices that are either 15 or 16 (our list has length 17, 
+# so 15 is the penultimate and 16 the last block)
+bl_indices = [idx for idx in bl_indices if idx != 15 and idx != 16]
+#print("remaining indices", bl_indices)
+
+# from the remaining indices, randomly choose one. 
+# That's the index of the block we want to repeat:
+vis_task_block_idx = random.choice(bl_indices)
+print("repeating block at idx", vis_task_block_idx, "for visual task!")
+
+# get text from block we want to repeat (where exp_counter == vis_task_block_idx)
+curr_text_nr = all_texts_nrs_list[vis_task_block_idx]
 curr_text = locals()[curr_text_nr]
-# get the same colours we used before
-curr_colours = all_colour_lists[exp_block_counter]
-# we don't have targets but we save this anyway
-curr_targets = all_target_lists[exp_block_counter]
+
+# choose 1 target colour & generate 0-back colour list
+target_colour = random.choice(colours)
+curr_colours = create_0back_stimlist(target_colour = target_colour, nr_targets = 50, colour_codes = colours, nr_words = 300))
+
+# save position of targets as True/False list:
+curr_targets = [colour == target_colour for colour in curr_colours]
 
 # the RTs are saved in the array "vis_task_durations"
 
@@ -2480,6 +2683,8 @@ for trial_idx, curr_word in enumerate(curr_text):
     
     # get current colour
     curr_colour = curr_colours[trial_idx]
+    # check if it's a target
+    curr_target = curr_targets[trial_idx]
     
     # get duration for current word
     curr_duration = vis_task_durations[trial_idx]
@@ -2493,19 +2698,19 @@ for trial_idx, curr_word in enumerate(curr_text):
     
     # Flicker option 1: use sine-wave (gradient) flicker
     # create current opacity value to continue flickering the word
-    frame_time = core.getTime() # get current time point (in sec)
-    flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
-    opacity = (flicker_intensity + 1) / 2
+    #frame_time = core.getTime() # get current time point (in sec)
+    #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
+    #opacity = (flicker_intensity + 1) / 2
 
     # use square-wave (on-off) flicker
-    #frame_time = core.getTime() # get current time point (in sec)
-    #time_passed = frame_time - start_time # calculate time passed since start
-    #cycle_duration = 1 / flicker_freq # calculate duration of one flicker cycle
-    #cycle_passed = time_passed % cycle_duration # calculate time passed in current flicker cycle
-    #if cycle_passed < cycle_duration / 2: # if in the first half of the cycle
-    #    opacity = 1 # set opacity to 1
-    #else: # if in the second half of the cycle
-    #    opacity = 0 # set opacity to 0
+    frame_time = core.getTime() # get current time point (in sec)
+    time_passed = frame_time - start_time # calculate time passed since start
+    cycle_duration = 1 / flicker_freq # calculate duration of one flicker cycle
+    cycle_passed = time_passed % cycle_duration # calculate time passed in current flicker cycle
+    if cycle_passed < cycle_duration / 2: # if in the first half of the cycle
+        opacity = 1 # set opacity to 1
+    else: # if in the second half of the cycle
+        opacity = 0 # set opacity to 0
         
     stim_mask.opacity = opacity
     
@@ -2515,50 +2720,102 @@ for trial_idx, curr_word in enumerate(curr_text):
     win.flip() # update the window to clear the screen and display the word
 
     # send word onset trigger to LSL stream
-    marker_text = "trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour
-    #out_marker.push_sample(["STIM_ONSET_vis_task" + marker_text])
+    marker_text = "trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + curr_target
+    #out_marker.push_sample(["STIM_ONSET_vistask" + marker_text])
     
     # record trial onset time
     onset_time = core.getTime()
     print("word duration: " +  str(onset_time + curr_duration) + " ms")
     
-    ### wait until curr_duration is over
-    while core.getTime() < onset_time + curr_duration:
-        # draw the stimulus during the waiting period
+
+    ### wait for key response until curr_duration is over: 
+
+    # create tracker for 0-back responses for the current trial:
+    previous_response = False
+
+    ### start recording responses
+    # start while loop that looks for responses
+    # --> end while loop only if duration for current word is over
+    while core.getTime() < (onset_time + curr_duration):    
+
+        # in each iteration, draw word on screen
+        # --> flicker again
 
         # Flicker option 1: use sine-wave (gradient) flicker
-        frame_time = core.getTime() 
-        flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
-        opacity = (flicker_intensity + 1) / 2
+        #frame_time = core.getTime() 
+        #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
+        #opacity = (flicker_intensity + 1) / 2
 
         # Flicker option 2: use square-wave (on-off) flicker
-        #frame_time = core.getTime() 
-        #time_passed = frame_time - start_time 
-        #cycle_duration = 1 / flicker_freq
-        #cycle_passed = time_passed % cycle_duration
-        #if cycle_passed < cycle_duration / 2:
-        #    opacity = 1
-        #else: 
-        #    opacity = 0
-        
+        frame_time = core.getTime() 
+        time_passed = frame_time - start_time 
+        cycle_duration = 1 / flicker_freq
+        cycle_passed = time_passed % cycle_duration
+        if cycle_passed < cycle_duration / 2:
+            opacity = 1
+        else: 
+            opacity = 0
+            
         stim_mask.opacity = opacity
-    
-        stim.draw() # draw text
-        stim_mask.draw() # draw mask
+        
+        stim.draw()
+        stim_mask.draw()
         win.flip()
+        
+        # if participant pressed button "c" and hasn't already responded in the current trial
+        if event.getKeys(['c']) and previous_response == False:
+            # get reaction time
+            # we measure reaction time from the onset of the current word, even if the target 
+            # was the word before (or occurred even earlier). 
+            # In such cases we can infer the actual reaction times from the df later.
+            # Reason why I don't use the last target as an onset: Doesn't take into 
+            # account that there might be false alarm responses.
+            curr_nback_RT = (core.getTime() - onset_time) * 1000 # *1000 to convert s to ms    
+            ### send trigger to LSL stream to indicate n-back response
+            #out_marker.push_sample(["REACTION_visktask_" + marker_text])
+            # only get first target response, we don't care if they press the button more than once in this trial:
+            previous_response = True
+            print("detected C key press -- 0-back RT: " + str(curr_nback_RT) + " ms") # * 1000 to convert s to ms
+        # If esc is pressed, end the experiment:
+        elif event.getKeys(['escape']):
+            core.quit()
+    
+    ### end trial
+    print("end trial")
+    # stop display of current word
+    win.flip()
+    
+    # check whether response was hit, miss, false alarm or correct rejection
+    # they saw a target and there was one: hit
+    if previous_response and curr_target:
+        curr_nback_response = "hit"
+    # they didn't see a target but there was one: miss
+    elif previous_response == False and curr_target:
+        curr_nback_response = "miss"
+        curr_nback_RT = None
+    # they didn't see a target and there was none: correct rejection
+    elif previous_response == False and curr_target == False:
+        curr_nback_response = "correct rejection"
+        curr_nback_RT = None
+    # they saw a target but there was none: false alarm
+    elif previous_response and curr_target == False:
+        curr_nback_response = "false alarm"
 
+    ### End of trial / current word display:
     
     ### save everything in output csv
     thisExp.addData('word', curr_word)
     thisExp.addData('colour', curr_colour)
     thisExp.addData('target', curr_target)
+    thisExp.addData('nback_response', curr_nback_response)
+    thisExp.addData('nback_RT', curr_nback_RT) # in ms
     thisExp.addData('duration', curr_duration * 1000) # *1000 to convert s to ms
     thisExp.addData('text_nr', curr_text_nr)
     thisExp.addData('trial_nr', curr_trial_nr)
     thisExp.addData('block_cond', 'None')
     thisExp.addData('block_nr', exp_block_counter)
     thisExp.addData('block_name', 'visual_task')
-    
+
     # start a new row in the csv
     thisExp.nextEntry()
 
@@ -2567,9 +2824,8 @@ for trial_idx, curr_word in enumerate(curr_text):
         if trial_idx == 3:
             break
     
-    ### send word offset trigger to LSL stream
-    marker_text = "trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour
-    #out_marker.push_sample(["STIM_OFFSET_vis_task" + marker_text])
+    ### send word offset trigger to LSL stream   
+    #out_marker.push_sample(["STIM_OFFSET_vistask" + marker_text])
     
 print("finished visual task block")
 
@@ -2585,12 +2841,10 @@ core.wait(0.5)
 win.setColor(light_bg_col, colorSpace='rgb')
 win.flip()
         
-# go to next block
+# go to next block 
+ # (or end the experiment, this will probably be the last real block)
 exp_block_counter += 1
 continueRoutine = False
-
-
-
 
 # keep track of which components have finished
 vis_taskComponents = []

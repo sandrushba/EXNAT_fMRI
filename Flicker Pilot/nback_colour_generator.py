@@ -491,10 +491,144 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
 
 
 
+''' ---- 3rd Function: Create stimulus list for 0-back ----------'''
+
+def create_0back_stimlist(target_colour, nr_targets = 50, colour_codes = ["#D292F3", "#F989A2", "#2AB7EF", "#88BA3F"], nr_words = 300):
+  
+
+  """
+  Create pseudorandomized list of colour codes
+  Idea: generate small random lists of colour codes with a balanced number of 
+  colours, then append them so I get an even distribution of colour codes & 
+  even numbers of colour codes over the whole block.
+
+  Parameters:
+  target_colour (str): Which colour code to use as the 0-back target colour
+  nr_targets (int): How many 0-back targets do you want?
+  colour_codes (list): The colour codes you want to use, default: ["#D292F3", "#F989A2", "#2AB7EF", "#88BA3F"] 
+  nr_words = 300 (int): How many colours do you want to generate? Should equal the nr of words in your text.
+    
+  Returns:
+  A list of colours of length nr_words
+      
+  """
+  
+
+  # count how often a colour was drawn in succession, 
+  # shouldn't be more than 6x
+  # targets shouldn't occur more than 2x in a row
+  consecutive_count = 0
+  # store previous colour
+  prev_color = ""
+
+  # how many non-targets do we need?
+  sequence_length = nr_words - nr_targets
+
+  # get colour codes for the non-targets
+  non_target_colours = [colour for colour in colour_codes if colour != target_colour]
+  #print(non_target_colours)
+
+  # Calculate the number of occurrences for each non-target color:
+  non_target_color_count = sequence_length // len(non_target_colours)
+  #print("non_target_color_count", non_target_color_count)
+    
+  nr_remaining = sequence_length - non_target_color_count*len(non_target_colours)
+  #print("nr_remaining", nr_remaining)
+
+  # create color sequence list
+  colour_sequence = []
+
+  # generate sequence of random non-target colours, 
+  # make sure not to use 6x the same colour in succession though
+  count_consecutive = 0
+  last_col = ""
+
+
+  for x in range(nr_words):
+    #print(x)
+
+    # randomly sprinkle in a target if we have some left:
+    if random.choices([0, 1], [5, 1])[0] == 1 and colour_sequence.count(target_colour) < nr_targets:
+      #print("TARGET")
+      next_col = [target_colour]
+      count_consecutive = 0
+
+    else:
+      # check if/which colours are still available
+      if len(non_target_colours) == 0:
+        if colour_sequence.count(target_colour) < nr_targets:
+          #print("TARGET (because other colours are used up)")
+          next_col = [target_colour]
+          count_consecutive = 0
+        else:
+          break
+      for col in non_target_colours:
+        # count occurences of colour in sequence
+        # if we have already reached the number of occurences we 
+        # need for each colour, remove it from the list of non-target colours
+        if colour_sequence.count(col) == non_target_color_count:
+          #print("remove non-target colour")
+          non_target_colours.remove(col)
+
+      # generate next colour:
+        
+      if len(non_target_colours) == 0:  
+        if colour_sequence.count(target_colour) < nr_targets:
+          #print("TARGET (because other colours are used up)")
+          next_col = [target_colour]
+          count_consecutive = 0
+        else: break
+      else:
+        # if it doesn't matter which colour we choose,
+        # use any colour as the next one
+        if count_consecutive < 6:
+          # get random colour
+          #print("get any non-target colour")
+          #print(non_target_colours)
+          next_col = random.sample(non_target_colours, 1)
+          # if the colour we chose is the same as the one 
+          # before, add 1 to count_consecutive
+          if next_col == last_col:
+            count_consecutive = count_consecutive + 1
+          # if it's a different colour, reset counter
+          else: 
+            count_consecutive = 0
+
+        # if the same colour occurred at least 6x in 
+        # succession before, use a different colour
+        else: 
+          #print("use different non-target colour than before")
+          available_colors = [colour for colour in non_target_colours if colour != last_col]
+          #print(available_colors)
+          next_col = random.sample(available_colors, 1)
+          # reset counter
+          count_consecutive = 0
+
+    # append next_col to sequence & save as new last_col
+    #print(next_col)
+    colour_sequence.extend(next_col)
+    #print(len(colour_sequence))
+    #print("-----------")
+    last_col = next_col 
+
+  #print(len(colour_sequence)) # nailed it!
+  # now fill up list with random colours:
+  non_target_colours = [colour for colour in colour_codes if colour != target_colour]
+  remaining_colours = random.sample(non_target_colours, nr_remaining)
+  colour_sequence.extend(remaining_colours)
+  # check whether we have the correct sequence length & number of targets:
+  #print(len(colour_sequence), colour_sequence.count(target_colour)) # nailed it!
+
+  return colour_sequence
+
+
+# test it!  
+#print(create_0back_stimlist(target_colour = "#D292F3", nr_targets = 50, colour_codes = ["#D292F3", "#F989A2", "#2AB7EF", "#88BA3F"], nr_words = 300))
 
 
 
-''' ---- 3rd Function: Get n-back targets ----------'''
+
+''' ---- 4th Function: Get n-back targets ----------'''
 
 
 def get_targets(stim_list, nback_level):
