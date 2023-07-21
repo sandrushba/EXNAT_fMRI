@@ -13,32 +13,51 @@ Version: March 2023
 
 """ Instructions """
 
+# for each block, set instruction texts + path to instruction image you want to show:
+instr_pic_path = "Stimuli_and_Resources/EXNAT2_Instr_Pics/"
+
 instr_Reading_Baseline_training =  "Instruktionen\n\n\nWillkommen zum Experiment!\nIm folgenden Block werden Ihnen einzelne Wörter angezeigt, die einen zusammenhängenden Text bilden.\n\nBitte lesen Sie den Text, indem Sie mithilfe der Leertaste von Wort zu Wort weiterklicken. Die Schriftfarbe der Worte variiert, Sie können das jedoch einfach ignorieren.\n\nAuf den Text folgen drei Fragen zum Textinhalt. \n\nSie können die Aufgabe nun in einem kurzen Übungsblock testen. Bitte drücken Sie die Leertaste um den Übungsblock zu starten."
+instr_pic_Reading_Baseline_training = instr_pic_path + "BL_single.jpeg"
 
 instr_Reading_Baseline_main = "Instruktionen\n\n\nIm nun folgenden Block wird Ihnen ein Text angezeigt.\n\nBitte lesen Sie den Text, indem Sie mithilfe der Leertaste von Wort zu Wort weiterklicken. Bitte ignorieren Sie wie eben auch die sich verändernde Schriftfarbe.\n\nAm Ende des Texts werden Ihnen wieder Fragen zum Inhalt gestellt.\n\nBitte drücken Sie die Leertaste um den Block zu starten."
+instr_pic_Reading_Baseline_main = instr_pic_path + "BL_single.jpeg"
 
 instr_click_training = "Instruktionen\n\n\nNun kommt eine neue Aufgabe:\nIhnen werden gleich nacheinander verschiedenfarbige Rechtecke gezeigt. Wie auch eben bei der Leseaufgabe können Sie mit der Leertaste weiter klicken.\n\nBitte drücken Sie die Leertaste um den Übungsblock zu starten."
+instr_pic_click_training = instr_pic_path + "BL_single.jpeg"
+
 
 instr_1back_single_training1 = "Instruktionen\n\n\nIn den nun folgenden Blöcken geht es darum, auf Wiederholungen der Farben zu achten:\n\nBitte drücken Sie die Taste C auf Ihrer Tastatur, wenn die aktuelle Farbe die Gleiche ist wie die des vorigen Rechtecks (1 zurück).\n\nWie zuvor auch können Sie mithilfe der Leertaste weiterklicken.\n\nBitte drücken Sie die Leertaste um den Übungsblock zu starten."
+instr_pic_1back_single_training1 = instr_pic_path + "1back_rect.jpeg"
 
 instr_1back_single_training2 = "Ende des Übungsblocks!\n\nMöchten Sie die Übung noch einmal wiederholen oder möchten Sie mit dem Hauptblock fortfahren?\nBitte drücken Sie die Taste W, wenn sie die Übung wiederholen möchten oder die Leertaste, wenn Sie fortfahren möchten."
+instr_pic_1back_single_training2 = instr_pic_path + "1back_rect.jpeg"
 
 instr_1back_single_main = "Instruktionen\n\n\nNun folgt ein etwas längerer Block, die Aufgabe bleibt aber die Gleiche:\n\nBitte drücken Sie die Taste C, wenn die aktuelle Farbe die Gleiche ist wie die des vorigen Rechtecks (1 zurück).\n\nWie auch zuvor können Sie mithilfe der Leertaste zum nächsten Rechteck weiterklicken.\n\nBitte drücken Sie die Leertaste um den Block zu starten."
+instr_pic_1back_single_main = instr_pic_path + "1back_rect.jpeg"
 
 instr_1back_dual_main = "Instruktionen\n\n\nIm folgenden Block werden Ihnen einzelne Worte angezeigt, die einen Text bilden.\n\nBitte drücken Sie die Taste C, wenn die Farbe des aktuellen Worts mit der des vorigen Worts (1 zurück) übereinstimmt.\n\nWie auch zuvor können Sie mithilfe der Leertaste zum nächsten Wort weiterklicken. Am Ende des Blocks werden Ihnen 3 Verständnisfragen zum Inhalt des Texts gestellt.\n\nBitte drücken Sie die Leertaste um den Block zu starten."
+instr_pic_1back_dual_main = instr_pic_path + "1back.jpeg"
+
 
 instr_2back_single_training1 = "Instruktionen\n\n\nIn den nun folgenden Blöcken geht es darum, auf Wiederholungen der Farben zu achten:\n\nBitte drücken Sie die Taste C auf Ihrer Tastatur, wenn die aktuelle Farbe die Gleiche ist wie die des vorletzten Rechtecks (2 zurück). Wie zuvor auch können Sie mithilfe der Leertaste weiterklicken.\n\nBitte drücken Sie die Leertaste um den Übungsblock zu starten."
+instr_pic_2back_single_training1 = instr_pic_path + "2back_rect.jpeg"
 
 instr_2back_single_training2 = "Ende des Übungsblocks!\n\nMöchten Sie die Übung noch einmal wiederholen oder möchten Sie mit dem Hauptblock fortfahren?\nBitte drücken Sie die Taste W, wenn sie die Übung wiederholen möchten oder die Leertaste, wenn Sie fortfahren möchten."
+instr_pic_2back_single_training2 = instr_pic_path + "2back_rect.jpeg"
 
 instr_2back_single_main = "Instruktionen\n\n\nNun folgt ein etwas längerer Block, die Aufgabe bleibt aber die Gleiche:\n\nBitte drücken Sie die Taste C, wenn die aktuelle Farbe die Gleiche ist wie die des vorletzten Rechtecks (2 zurück).\n\nWie auch zuvor können Sie mithilfe der Leertaste zum nächsten Rechteck weiterklicken.\n\nBitte drücken Sie die Leertaste um den Block zu starten."
+instr_pic_2back_single_main = instr_pic_path + "2back_rect.jpeg"
 
 instr_2back_dual_main = "Instruktionen\n\n\nIm folgenden Block werden Ihnen einzelne Worte angezeigt, die einen Text bilden.\n\nBitte drücken Sie die Taste C, wenn die Farbe des aktuellen Worts mit der des vorletzten Worts (2 zurück) übereinstimmt.\n\nWie auch zuvor können Sie mithilfe der Leertaste zum nächsten Wort weiterklicken.\n\nAm Ende des Blocks werden Ihnen 3 Verständnisfragen zum Inhalt des Texts gestellt.\n\nBitte drücken Sie die Leertaste um den Block zu starten."
+instr_pic_2back_dual_main = instr_pic_path + "2back.jpeg"
 
-instr_visual_task = "Instruktionen\n\n\nIm folgenden Block wird Ihnen ein Text Wort für Wort angezeigt.\n\nDiesmal müssen Sie gar keine Tasten drücken - die Worte wechseln von allein und es gibt keine Zusatzaufgabe.\n\nBitte lesen Sie einfach nur den Text.\n\nBitte drücken Sie die Leertaste um den Block zu starten."
 
-instr_motor_task = "Instruktionen\n\n\nIm folgenden Block werden Ihnen zuerst einige Vierecke angezeigt.\n\nBitte drücken Sie immer dann die Leertaste, wenn ein Viereck angezeigt wird. Sie werden merken, dass Sie anfangen werden, in einem bestimmten Rhythmus zu drücken.\n\nBitte drücken Sie die Leertaste immer weiter in diesem Rhythmus. Versuchen Sie nicht schneller oder langsamer zu drücken.\n\nDie Vierecke verschwinden irgendwann, lassen Sie sich davon bitte nicht beirren. Drücken Sie bitte trotzdem immer weiter die Leertaste.\n\n\nBitte drücken Sie auf die Leertaste, um den Block zu starten."
+instr_vis_task_1 = "Im folgenden Block werden die Worte von allein abgespielt.\n\nSie müssen also diesmal nicht die Leertaste drücken, lesen Sie aber bitte trotzdem den Text mit.\n\nBitte drücken Sie immer die Taste 'C', wenn Sie ein Wort in der folgenden Farbe sehen:"
+instr_vis_task_2 = "Sie können die Aufgabe kurz üben, bevor der Hauptblock startet.\n\n\nDrücken Sie die Leertaste, wenn Sie bereit sind, den Übungsblock zu starten!"
+instr_pic_vis_task = instr_pic_path + "vis_task.jpeg"
 
+# warning sign for change of task:
+warning_sign = instr_pic_path + "warning.jpeg"
 
 """ Reading Baseline Training: """
 

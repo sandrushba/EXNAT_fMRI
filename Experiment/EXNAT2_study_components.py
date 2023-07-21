@@ -36,10 +36,11 @@ def change_bg_colour(window, start_rgb, end_rgb, seconds = 2):
         # wait for a few ms
         core.wait(1/60)
 
-    # set end color
-    window.setColor(end_rgb, colorSpace = 'rgb')
-    window.flip()
+        # set end bg colour behind the rectangles in the first run
+        if i == 0:
+            window.setColor(end_rgb, colorSpace = 'rgb')
 
     # wait a few ms to ensure the final bg colour is fully set
     core.wait(0.5)
+    
     print("finished changing bg")
