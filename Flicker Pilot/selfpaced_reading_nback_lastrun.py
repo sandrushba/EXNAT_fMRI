@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Thu Jul 20 16:28:42 2023
+    on Juli 21, 2023, at 12:34
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -56,7 +56,7 @@ filename = _thisDir + os.sep + u'data/%s_%s_%s' % (expInfo['participant'], expNa
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath='/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/Flicker Pilot/selfpaced_reading_nback_lastrun.py',
+    originPath='E:\\EXNAT-2\\EEG_study_EXNAT2\\Flicker Pilot\\selfpaced_reading_nback_lastrun.py',
     savePickle=True, saveWideText=True,
     dataFileName=filename)
 logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a file
@@ -68,8 +68,8 @@ frameTolerance = 0.001  # how close to onset before 'same' frame
 
 # Setup the Window
 win = visual.Window(
-    size=[1500, 1000], fullscr=False, screen=0, 
-    winType='pyglet', allowGUI=True, allowStencil=False,
+    size=[1366, 768], fullscr=True, screen=0, 
+    winType='pyglet', allowGUI=False, allowStencil=False,
     monitor='testMonitor', color='', colorSpace='rgb',
     blendMode='avg', useFBO=True, 
     units='deg')
@@ -149,8 +149,8 @@ from EXNAT2_study_components import change_bg_colour
 from nback_colour_generator import create_nback_stimlist, draw_without_replacement, get_targets, create_0back_stimlist
 
 # load CSVs with tone sequences for prediction tendency task:
-ordered_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/Experiment/Prediction Tendency Task/df_ordered_seqs.csv"
-random_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/Experiment/Prediction Tendency Task/df_random_seqs.csv"
+ordered_path = "Prediction Tendency Task/df_ordered_seqs.csv"
+random_path = "Prediction Tendency Task/df_random_seqs.csv"
 df_ordered_tone_seqs = pd.read_csv(ordered_path)
 df_random_tone_seqs = pd.read_csv(random_path)
 print("loaded CSVs with stimulus lists for prediction tendency task")
@@ -389,8 +389,8 @@ difficultyClock = core.Clock()
 # Initialize components for Routine "warning"
 warningClock = core.Clock()
 
-# Initialize components for Routine "warning"
-warningClock = core.Clock()
+# Initialize components for Routine "warning_1"
+warning_1Clock = core.Clock()
 
 # Initialize components for Routine "vis_task"
 vis_taskClock = core.Clock()
@@ -540,13 +540,13 @@ for thisBlock in blocks:
             instr_text_stim = visual.TextStim(win, 
                                              text = instr_text, 
                                              height = 0.5, 
-                                             pos = (0, 7),
+                                             pos = (0, 2),
                                              font = "Bookman Old Style",
                                              color = 'black')
             # create ImageStim object
             curr_instr_pic = visual.ImageStim(win, 
                                               size = (10, 4),
-                                              pos = (0, -2),
+                                              pos = (0, -6),
                                               image = locals()["instr_pic_" + curr_block]) # set path to image here
     
             # display the text & image on screen
@@ -939,12 +939,12 @@ for thisBlock in blocks:
                                           text = instr_text, 
                                           height = 0.5, # font height: 5° visual angle
                                           font = "Bookman Old Style",
-                                          pos = (0, 7), # move up a bit
+                                          pos = (0, 2), # move up a bit
                                           color = "black")
         # create ImageStim object
         curr_instr_pic = visual.ImageStim(win, 
                                           size = (10, 4),
-                                          pos = (0, -2),
+                                          pos = (0, -6),
                                           image = locals()["instr_pic_" + curr_block]) # set path to image here
     
         # display the text on screen
@@ -1022,13 +1022,13 @@ for thisBlock in blocks:
                                           text = instr_text, 
                                           height = 0.5, # font height: 5° visual angle
                                           font = "Bookman Old Style",
-                                          pos = (0, 7),
+                                          pos = (0, 2),
                                           color = "black")
         
         # create ImageStim object
         curr_instr_pic = visual.ImageStim(win, 
                                           size = (10, 4),
-                                          pos = (0, -2),
+                                          pos = (0, -6),
                                           image = locals()["instr_pic_" + curr_block]) # set path to image here
     
         # Display the text on screen
@@ -2164,7 +2164,7 @@ for thisBlock in blocks:
     
     # go to next block!
     exp_block_counter += 1
-    print("Going to block " + str(exp_block_counter + 1) + "/17 now!")
+    print("Going to block " + str(exp_block_counter + 1) + "now!")
     continueRoutine = False
     
     # If there are still blocks left, go to next one.
@@ -2232,7 +2232,7 @@ for thisBlock in blocks:
     # I won't show a warning if it switches from rectangles to words, 
     # I think people will notice it's different. 
     
-    if exp_block_counter < 17: # if there are still blocks left
+    if exp_block_counter < len(all_blocks): # if there are still blocks left
         
         # if the current block and the next one don't with the same letter
         if curr_block[0] != all_blocks[exp_block_counter][0]: 
@@ -2251,7 +2251,7 @@ for thisBlock in blocks:
             core.wait(4)
             win.flip()
     else: 
-        print("task in", curr_block, "is the same as in next block", all_blocks[exp_block_counter + 1], "- skipping warning sign!")
+        print("task in", curr_block, "is the same as in next block - skipping warning sign!")
     
     # go to next slide
     continueRoutine = False
@@ -2316,43 +2316,32 @@ blocks.saveAsText(filename + 'blocks.csv', delim=',',
     stimOut=params,
     dataOut=['n','all_mean','all_std', 'all_raw'])
 
-# ------Prepare to start Routine "warning"-------
+# ------Prepare to start Routine "warning_1"-------
 continueRoutine = True
 # update component parameters for each repeat
 ### Show warning sign if task changes
 
 # If task in last block (curr_block) is not the same as the next one, show warning.
 
-# To check this, we compare the first letter in the block name.
-# I won't show a warning if it switches from rectangles to words, 
-# I think people will notice it's different. 
+# create ImageStim object
+curr_instr_pic = visual.ImageStim(win, 
+                                  size = (10, 10),
+                                  pos = (0, 0),
+                                  image = warning_sign) # set path to image here
 
-if exp_block_counter < 17: # if there are still blocks left
-    
-    # if the current block and the next one don't with the same letter
-    if curr_block[0] != all_blocks[exp_block_counter][0]: 
+# draw image on screen
+curr_instr_pic.draw()
+win.flip()
 
-        # create ImageStim object
-        curr_instr_pic = visual.ImageStim(win, 
-                                         size = (10, 10),
-                                         pos = (0, 0),
-                                         image = warning_sign) # set path to image here
-
-        # draw image on screen
-        curr_instr_pic.draw()
-        win.flip()
-
-        # Wait for 4 seconds
-        core.wait(4)
-        win.flip()
-else: 
-    print("task in", curr_block, "is the same as in next block", all_blocks[exp_block_counter + 1], "- skipping warning sign!")
+# Wait for 4 seconds
+core.wait(4)
+win.flip()
 
 # go to next slide
 continueRoutine = False
 # keep track of which components have finished
-warningComponents = []
-for thisComponent in warningComponents:
+warning_1Components = []
+for thisComponent in warning_1Components:
     thisComponent.tStart = None
     thisComponent.tStop = None
     thisComponent.tStartRefresh = None
@@ -2362,14 +2351,14 @@ for thisComponent in warningComponents:
 # reset timers
 t = 0
 _timeToFirstFrame = win.getFutureFlipTime(clock="now")
-warningClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
+warning_1Clock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
 frameN = -1
 
-# -------Run Routine "warning"-------
+# -------Run Routine "warning_1"-------
 while continueRoutine:
     # get current time
-    t = warningClock.getTime()
-    tThisFlip = win.getFutureFlipTime(clock=warningClock)
+    t = warning_1Clock.getTime()
+    tThisFlip = win.getFutureFlipTime(clock=warning_1Clock)
     tThisFlipGlobal = win.getFutureFlipTime(clock=None)
     frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
     # update/draw components on each frame
@@ -2382,7 +2371,7 @@ while continueRoutine:
     if not continueRoutine:  # a component has requested a forced-end of Routine
         break
     continueRoutine = False  # will revert to True if at least one component still running
-    for thisComponent in warningComponents:
+    for thisComponent in warning_1Components:
         if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
             continueRoutine = True
             break  # at least one component has not yet finished
@@ -2391,11 +2380,11 @@ while continueRoutine:
     if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
         win.flip()
 
-# -------Ending Routine "warning"-------
-for thisComponent in warningComponents:
+# -------Ending Routine "warning_1"-------
+for thisComponent in warning_1Components:
     if hasattr(thisComponent, "setAutoDraw"):
         thisComponent.setAutoDraw(False)
-# the Routine "warning" was not non-slip safe, so reset the non-slip timer
+# the Routine "warning_1" was not non-slip safe, so reset the non-slip timer
 routineTimer.reset()
 
 # ------Prepare to start Routine "vis_task"-------
@@ -2731,7 +2720,7 @@ event.clearEvents()
 
 ### Show instructions
 # set instruction text
-instr_text = locals()["instr_visual_task"]
+instr_text = "Instruktionen\n\n\nNun folgt ein längerer Hauptblock, die Aufgabe bleibt die Gleiche.\n\nBitte drücken Sie die Leertaste um den Hauptblock zu starten."
 # create text box
 instr_text_stim = visual.TextStim(win, 
                                   text = instr_text, 

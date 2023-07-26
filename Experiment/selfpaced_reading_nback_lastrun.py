@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Thu Jul 20 15:01:31 2023
+    on Juli 21, 2023, at 10:02
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -12,10 +12,6 @@ If you publish work using this script the most relevant publication is:
 """
 
 from __future__ import absolute_import, division
-
-import psychopy
-psychopy.useVersion('2021.2.3')
-
 
 from psychopy import locale_setup
 from psychopy import prefs
@@ -56,7 +52,7 @@ filename = _thisDir + os.sep + u'data/%s_%s_%s' % (expInfo['participant'], expNa
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath='/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/Experiment/selfpaced_reading_nback_lastrun.py',
+    originPath='F:\\EXNAT-2\\EEG_study_EXNAT2\\Experiment\\selfpaced_reading_nback_lastrun.py',
     savePickle=True, saveWideText=True,
     dataFileName=filename)
 logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a file
@@ -149,8 +145,8 @@ from EXNAT2_study_components import change_bg_colour
 from nback_colour_generator import create_nback_stimlist, draw_without_replacement, get_targets, create_0back_stimlist
 
 # load CSVs with tone sequences for prediction tendency task:
-ordered_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/Experiment/Prediction Tendency Task/df_ordered_seqs.csv"
-random_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/Experiment/Prediction Tendency Task/df_random_seqs.csv"
+ordered_path = "Prediction Tendency Task/df_ordered_seqs.csv"
+random_path = "Prediction Tendency Task/df_random_seqs.csv"
 df_ordered_tone_seqs = pd.read_csv(ordered_path)
 df_random_tone_seqs = pd.read_csv(random_path)
 print("loaded CSVs with stimulus lists for prediction tendency task")
@@ -176,10 +172,10 @@ def escape_quotes(string):
 ### Setup LSL Stream
 print("create trigger stream") 
 # Create trigger stream:
-#global out_marker
-#info_marker_stream = StreamInfo('PsychoPyMarkers', 'Marker', 1, 0, 'string')
-#out_marker = StreamOutlet(info_marker_stream)
-#out_marker.push_sample(["TEST MARKER"])
+global out_marker
+info_marker_stream = StreamInfo('PsychoPyMarkers', 'Marker', 1, 0, 'string')
+out_marker = StreamOutlet(info_marker_stream)
+out_marker.push_sample(["TEST MARKER"])
 
 ### Stimulus settings
 
@@ -304,10 +300,10 @@ print("create n-back colour lists")
 # First, create list with length of all texts. The length of the blocks is 
 # always in the same order, only the conditions change.
 blocks_textlen = [159, 300, 6, # reading bl blocks + click training
-                  20, 60, 60, 300, 20, 60, 60, 300, # main blocks 1 + trainings & single tasks
+                  20, 20, 60, 300, 20, 20, 60, 300, # main blocks 1 + trainings & single tasks
                   300, 300, 300, 300, 300, 300] # main blocks 2        
 blocks_target_counts = [25, 50, 1, # reading bl blocks + click training
-                        5, 10, 10, 50, 5, 10, 10, 50, # main blocks 1 + trainings & single tasks
+                        5, 5, 10, 50, 5, 5, 10, 50, # main blocks 1 + trainings & single tasks
                         50, 50, 50, 50, 50, 50]
 # Now loop this list. Check which condition we have there and the create colour list for each text.
 all_colour_lists = []
@@ -382,14 +378,14 @@ difficultyClock = core.Clock()
 # Initialize components for Routine "warning"
 warningClock = core.Clock()
 
-# Initialize components for Routine "warning"
-warningClock = core.Clock()
+# Initialize components for Routine "warning_1"
+warning_1Clock = core.Clock()
 
 # Initialize components for Routine "vis_task"
 vis_taskClock = core.Clock()
 
-# Initialize components for Routine "warning"
-warningClock = core.Clock()
+# Initialize components for Routine "warning_1"
+warning_1Clock = core.Clock()
 
 # Initialize components for Routine "pred_tendency"
 pred_tendencyClock = core.Clock()
@@ -695,7 +691,7 @@ for thisBlock in blocks:
     
                     # send word onset trigger to LSL stream
                     marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_col
-                    #out_marker.push_sample(["STIM_ONSET_" + marker_text])
+                    out_marker.push_sample(["STIM_ONSET_" + marker_text])
                     
                     # record trial onset time
                     onset_time = core.getTime()
@@ -745,7 +741,7 @@ for thisBlock in blocks:
                             curr_duration = core.getTime() - onset_time
                             ### send trigger to LSL stream to indicate participant wants to go to next word
                             marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_col
-                            #out_marker.push_sample(["REACTION_NEXT_STIM_" + marker_text])
+                            out_marker.push_sample(["REACTION_NEXT_STIM_" + marker_text])
                             print("detected space key press -- RT: " + str(curr_duration * 1000) + " ms") # *1000 to convert s to ms
                             # break while loop
                             break
@@ -757,7 +753,7 @@ for thisBlock in blocks:
                             curr_nback_RT = (core.getTime() - onset_time) * 1000 # *1000 to convert s to ms  
                             ### send trigger to LSL stream to indicate n-back response
                             marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_col
-                            #out_marker.push_sample(["NBACK_REACTION_" + marker_text])
+                            out_marker.push_sample(["NBACK_REACTION_" + marker_text])
                             # only get first target response, we don't care if they press the button more than once:
                             saw_target = True
                             print("detected C key press -- n-back RT: " + str(curr_nback_RT) + " ms")
@@ -813,7 +809,7 @@ for thisBlock in blocks:
                     
                     ### send stimulus offset trigger to LSL stream
                     marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + str(curr_nback_response)
-                    #out_marker.push_sample(["STIM_OFFSET_" + marker_text])
+                    out_marker.push_sample(["STIM_OFFSET_" + marker_text])
                     
                 print("finished presenting trials")
                 
@@ -1213,7 +1209,7 @@ for thisBlock in blocks:
                 curr_duration = core.getTime() - onset_time
                 ### send trigger to LSL stream to indicate participant wants to go to next word
                 marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_word
-                #out_marker.push_sample(["REACTION_NEXT_STIM_" + marker_text])
+                out_marker.push_sample(["REACTION_NEXT_STIM_" + marker_text])
                 print("detected space key press -- RT: " + str(curr_duration * 1000) + " ms") #* 1000 to covert s to ms
                 # break while loop
                 break
@@ -1225,7 +1221,7 @@ for thisBlock in blocks:
                 curr_nback_RT = (core.getTime() - onset_time) * 1000 # *1000 to convert s to ms    
                 ### send trigger to LSL stream to indicate n-back response
                 marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_word
-                #out_marker.push_sample(["NBACK_REACTION_" + marker_text])
+                out_marker.push_sample(["NBACK_REACTION_" + marker_text])
                 # only get first target response, we don't care if they press the button more than once:
                 saw_target = True
                 print("detected C key press -- n-back RT: " + str(curr_nback_RT) + " ms") # * 1000 to convert s to ms
@@ -2188,20 +2184,18 @@ for thisBlock in blocks:
     
     # If task in last block (curr_block) is not the same as the next one, show warning.
     
-    # To check this, we compare the first letter in the block name.
-    # I won't show a warning if it switches from rectangles to words, 
-    # I think people will notice it's different. 
+    # To check this, we compare the first letter in the block names.
+    # I won't show a warning if it switches from rectangles to words,
+    # I think people will notice it's different.
     
     if exp_block_counter < 17: # if there are still blocks left
-        
-        # if the current block and the next one don't with the same letter
-        if curr_block[0] != all_blocks[exp_block_counter][0]: 
+        if curr_block[0] != all_blocks[exp_block_counter][0]:
     
             # create ImageStim object
             curr_instr_pic = visual.ImageStim(win, 
-                                             size = (10, 10),
-                                             pos = (0, 0),
-                                             image = warning_sign) # set path to image here
+                                          size = (10, 10),
+                                          pos = (0, 0),
+                                          image = warning_sign) # set path to image here
     
             # draw image on screen
             curr_instr_pic.draw()
@@ -2210,8 +2204,7 @@ for thisBlock in blocks:
             # Wait for 4 seconds
             core.wait(4)
             win.flip()
-    else: 
-        print("task in", curr_block, "is the same as in next block", all_blocks[exp_block_counter + 1], "- skipping warning sign!")
+    else: print("task in current block", curr_block, "is the same as in next block - skipping warning sign!")
     
     # go to next slide
     continueRoutine = False
@@ -2276,43 +2269,32 @@ blocks.saveAsText(filename + 'blocks.csv', delim=',',
     stimOut=params,
     dataOut=['n','all_mean','all_std', 'all_raw'])
 
-# ------Prepare to start Routine "warning"-------
+# ------Prepare to start Routine "warning_1"-------
 continueRoutine = True
 # update component parameters for each repeat
 ### Show warning sign if task changes
 
 # If task in last block (curr_block) is not the same as the next one, show warning.
 
-# To check this, we compare the first letter in the block name.
-# I won't show a warning if it switches from rectangles to words, 
-# I think people will notice it's different. 
+# create ImageStim object
+curr_instr_pic = visual.ImageStim(win, 
+                              size = (10, 10),
+                              pos = (0, 0),
+                              image = warning_sign) # set path to image here
 
-if exp_block_counter < 17: # if there are still blocks left
-    
-    # if the current block and the next one don't with the same letter
-    if curr_block[0] != all_blocks[exp_block_counter][0]: 
+# draw image on screen
+curr_instr_pic.draw()
+win.flip()
 
-        # create ImageStim object
-        curr_instr_pic = visual.ImageStim(win, 
-                                         size = (10, 10),
-                                         pos = (0, 0),
-                                         image = warning_sign) # set path to image here
-
-        # draw image on screen
-        curr_instr_pic.draw()
-        win.flip()
-
-        # Wait for 4 seconds
-        core.wait(4)
-        win.flip()
-else: 
-    print("task in", curr_block, "is the same as in next block", all_blocks[exp_block_counter + 1], "- skipping warning sign!")
+# Wait for 4 seconds
+core.wait(4)
+win.flip()
 
 # go to next slide
 continueRoutine = False
 # keep track of which components have finished
-warningComponents = []
-for thisComponent in warningComponents:
+warning_1Components = []
+for thisComponent in warning_1Components:
     thisComponent.tStart = None
     thisComponent.tStop = None
     thisComponent.tStartRefresh = None
@@ -2322,14 +2304,14 @@ for thisComponent in warningComponents:
 # reset timers
 t = 0
 _timeToFirstFrame = win.getFutureFlipTime(clock="now")
-warningClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
+warning_1Clock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
 frameN = -1
 
-# -------Run Routine "warning"-------
+# -------Run Routine "warning_1"-------
 while continueRoutine:
     # get current time
-    t = warningClock.getTime()
-    tThisFlip = win.getFutureFlipTime(clock=warningClock)
+    t = warning_1Clock.getTime()
+    tThisFlip = win.getFutureFlipTime(clock=warning_1Clock)
     tThisFlipGlobal = win.getFutureFlipTime(clock=None)
     frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
     # update/draw components on each frame
@@ -2342,7 +2324,7 @@ while continueRoutine:
     if not continueRoutine:  # a component has requested a forced-end of Routine
         break
     continueRoutine = False  # will revert to True if at least one component still running
-    for thisComponent in warningComponents:
+    for thisComponent in warning_1Components:
         if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
             continueRoutine = True
             break  # at least one component has not yet finished
@@ -2351,11 +2333,11 @@ while continueRoutine:
     if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
         win.flip()
 
-# -------Ending Routine "warning"-------
-for thisComponent in warningComponents:
+# -------Ending Routine "warning_1"-------
+for thisComponent in warning_1Components:
     if hasattr(thisComponent, "setAutoDraw"):
         thisComponent.setAutoDraw(False)
-# the Routine "warning" was not non-slip safe, so reset the non-slip timer
+# the Routine "warning_1" was not non-slip safe, so reset the non-slip timer
 routineTimer.reset()
 
 # ------Prepare to start Routine "vis_task"-------
@@ -2553,7 +2535,7 @@ for trial_idx, curr_word in enumerate(curr_text_training):
 
     # send word onset trigger to LSL stream
     marker_text = "trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + str(curr_target)
-    #out_marker.push_sample(["STIM_ONSET_vistask_training" + marker_text])
+    out_marker.push_sample(["STIM_ONSET_vistask_training" + marker_text])
     
     # record trial onset time
     onset_time = core.getTime()
@@ -2605,7 +2587,7 @@ for trial_idx, curr_word in enumerate(curr_text_training):
             # account that there might be false alarm responses.
             curr_nback_RT = (core.getTime() - onset_time) * 1000 # *1000 to convert s to ms    
             ### send trigger to LSL stream to indicate n-back response
-            #out_marker.push_sample(["REACTION_visktask__training" + marker_text])
+            out_marker.push_sample(["REACTION_visktask__training" + marker_text])
             # only get first target response, we don't care if they press the button more than once in this trial:
             previous_response = True
             print("detected C key press -- 0-back RT: " + str(curr_nback_RT) + " ms") # * 1000 to convert s to ms
@@ -2660,7 +2642,7 @@ for trial_idx, curr_word in enumerate(curr_text_training):
             break
     
     ### send word offset trigger to LSL stream   
-    #out_marker.push_sample(["STIM_OFFSET_vistask_training" + marker_text])
+    out_marker.push_sample(["STIM_OFFSET_vistask_training" + marker_text])
     
 print("finished visual task block")
 
@@ -2691,7 +2673,7 @@ event.clearEvents()
 
 ### Show instructions
 # set instruction text
-instr_text = locals()["instr_visual_task"]
+instr_text = "Instruktionen\n\n\nGut gemacht!\n\nNun folgt ein etwas längerer Hauptblock, die Aufgabe bleibt aber die Gleiche.\n\nBitte drücken Sie die Leertaste, um den Block zu starten."
 # create text box
 instr_text_stim = visual.TextStim(win, 
                                   text = instr_text, 
@@ -2856,7 +2838,7 @@ for trial_idx, curr_word in enumerate(curr_text):
 
     # send word onset trigger to LSL stream
     marker_text = "trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + str(curr_target)
-    #out_marker.push_sample(["STIM_ONSET_vistask" + marker_text])
+    out_marker.push_sample(["STIM_ONSET_vistask" + marker_text])
     
     # record trial onset time
     onset_time = core.getTime()
@@ -2907,7 +2889,7 @@ for trial_idx, curr_word in enumerate(curr_text):
             # account that there might be false alarm responses.
             curr_nback_RT = (core.getTime() - onset_time) * 1000 # *1000 to convert s to ms    
             ### send trigger to LSL stream to indicate n-back response
-            #out_marker.push_sample(["REACTION_visktask_" + marker_text])
+            out_marker.push_sample(["REACTION_visktask_" + marker_text])
             # only get first target response, we don't care if they press the button more than once in this trial:
             previous_response = True
             print("detected C key press -- 0-back RT: " + str(curr_nback_RT) + " ms") # * 1000 to convert s to ms
@@ -2962,7 +2944,7 @@ for trial_idx, curr_word in enumerate(curr_text):
             break
     
     ### send word offset trigger to LSL stream   
-    #out_marker.push_sample(["STIM_OFFSET_vistask" + marker_text])
+    out_marker.push_sample(["STIM_OFFSET_vistask" + marker_text])
     
 print("finished visual task block")
 
@@ -3031,43 +3013,32 @@ for thisComponent in vis_taskComponents:
 # the Routine "vis_task" was not non-slip safe, so reset the non-slip timer
 routineTimer.reset()
 
-# ------Prepare to start Routine "warning"-------
+# ------Prepare to start Routine "warning_1"-------
 continueRoutine = True
 # update component parameters for each repeat
 ### Show warning sign if task changes
 
 # If task in last block (curr_block) is not the same as the next one, show warning.
 
-# To check this, we compare the first letter in the block name.
-# I won't show a warning if it switches from rectangles to words, 
-# I think people will notice it's different. 
+# create ImageStim object
+curr_instr_pic = visual.ImageStim(win, 
+                              size = (10, 10),
+                              pos = (0, 0),
+                              image = warning_sign) # set path to image here
 
-if exp_block_counter < 17: # if there are still blocks left
-    
-    # if the current block and the next one don't with the same letter
-    if curr_block[0] != all_blocks[exp_block_counter][0]: 
+# draw image on screen
+curr_instr_pic.draw()
+win.flip()
 
-        # create ImageStim object
-        curr_instr_pic = visual.ImageStim(win, 
-                                         size = (10, 10),
-                                         pos = (0, 0),
-                                         image = warning_sign) # set path to image here
-
-        # draw image on screen
-        curr_instr_pic.draw()
-        win.flip()
-
-        # Wait for 4 seconds
-        core.wait(4)
-        win.flip()
-else: 
-    print("task in", curr_block, "is the same as in next block", all_blocks[exp_block_counter + 1], "- skipping warning sign!")
+# Wait for 4 seconds
+core.wait(4)
+win.flip()
 
 # go to next slide
 continueRoutine = False
 # keep track of which components have finished
-warningComponents = []
-for thisComponent in warningComponents:
+warning_1Components = []
+for thisComponent in warning_1Components:
     thisComponent.tStart = None
     thisComponent.tStop = None
     thisComponent.tStartRefresh = None
@@ -3077,14 +3048,14 @@ for thisComponent in warningComponents:
 # reset timers
 t = 0
 _timeToFirstFrame = win.getFutureFlipTime(clock="now")
-warningClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
+warning_1Clock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
 frameN = -1
 
-# -------Run Routine "warning"-------
+# -------Run Routine "warning_1"-------
 while continueRoutine:
     # get current time
-    t = warningClock.getTime()
-    tThisFlip = win.getFutureFlipTime(clock=warningClock)
+    t = warning_1Clock.getTime()
+    tThisFlip = win.getFutureFlipTime(clock=warning_1Clock)
     tThisFlipGlobal = win.getFutureFlipTime(clock=None)
     frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
     # update/draw components on each frame
@@ -3097,7 +3068,7 @@ while continueRoutine:
     if not continueRoutine:  # a component has requested a forced-end of Routine
         break
     continueRoutine = False  # will revert to True if at least one component still running
-    for thisComponent in warningComponents:
+    for thisComponent in warning_1Components:
         if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
             continueRoutine = True
             break  # at least one component has not yet finished
@@ -3106,11 +3077,11 @@ while continueRoutine:
     if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
         win.flip()
 
-# -------Ending Routine "warning"-------
-for thisComponent in warningComponents:
+# -------Ending Routine "warning_1"-------
+for thisComponent in warning_1Components:
     if hasattr(thisComponent, "setAutoDraw"):
         thisComponent.setAutoDraw(False)
-# the Routine "warning" was not non-slip safe, so reset the non-slip timer
+# the Routine "warning_1" was not non-slip safe, so reset the non-slip timer
 routineTimer.reset()
 
 # ------Prepare to start Routine "pred_tendency"-------
@@ -3328,12 +3299,12 @@ for tone_idx, curr_freq in enumerate(task_order_stimuli):
     # send tone onset trigger to LSL stream
     marker_text = "pred_tendency_"+ str(task_order_trigger[tone_idx]) + "_" + str(curr_freq) + "_trial_" + str(tone_idx)
     print(marker_text)
-    #out_marker.push_sample(["STIM_ONSET_" + marker_text])
+    out_marker.push_sample(["STIM_ONSET_" + marker_text])
 
     ptb.WaitSecs(0.1) # wait 100 ms until the audio has finished
     curr_tone.stop() # close the sound
     # send tone offset trigger to LSL stream
-    #out_marker.push_sample(["STIM_OFFSET_" + marker_text])
+    out_marker.push_sample(["STIM_OFFSET_" + marker_text])
     
     # 1 3Hz cycle = 333.33 ms, so continue waiting until 333.33 ms have 
     # passed since starting the tone before playing the next tone
