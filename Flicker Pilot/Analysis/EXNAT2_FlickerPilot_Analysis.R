@@ -342,7 +342,23 @@ for (i in 1:length(file_list)) {
   
   
   
-  # TO DO: 
+  # Fix messed up block numbers:
+  # Loop rows, if task_name changes, add 1 to block counter.
+  block_counter <- 1
+  subj_df$block_nr <- ""
+  # loop rows, but skip the first one
+  for (row_idx in 2:length(subj_df$ID)){
+    curr_row <- subj_df[row_idx, ]
+    # if it's the same text_nr as in the row before, 
+    # assign block counter as in the row before. Only do this for the main blocks though, I don't care about the rest for now:
+    if (curr_row$text_nr == subj_df[row_idx-1, ]$text_nr & curr_row$block_kind %in% c("visual_task", "Reading_Baseline_main", "1back_dual_main", "2back_dual_main")){
+      subj_df[row_idx, ]$block_nr <- block_counter 
+    } else if (curr_row$text_nr != subj_df[row_idx-1, ]$text_nr & curr_row$block_kind %in% c("visual_task", "Reading_Baseline_main", "1back_dual_main", "2back_dual_main")){
+      block_counter <- block_counter + 1
+      subj_df[row_idx, ]$block_nr <- block_counter 
+    }
+  }
+  # The block numbers are still a bit odd but who cares.
   
   
   ### WORD FREQUENCIES & SURPRISAL SCORES ####
@@ -366,29 +382,54 @@ for (i in 1:length(file_list)) {
   for (curr_text_nr in unique(subj_df$text_nr)){
     
     # in some blocks we don't have texts, so skip those
-    if (curr_text_nr == "" | is.na(curr_text_nr)){
-      next
-      # if it's a text block, though, assign word frequencies from csv
-    } else {
-      #print(curr_text_nr) # uncomment this if you'd like to show the texts each participant read
+    # skip BL training as well
+    if (curr_text_nr != "" & !is.na(curr_text_nr) & curr_text_nr != "reading_bl_training_text" & curr_text_nr != "None"){
+
+      
+      print(curr_text_nr) # uncomment this if you'd like to show the texts each participant read
       
       # get word frequencies for current text nr
       curr_word_freqs <- subset(word_freqs_df, text_nr == curr_text_nr)$word_frequency
-      # find out where in the subj_df text the text is located and add the word frequencies there
-      subj_df[which(subj_df$text_nr == curr_text_nr),]$word_frequency <- curr_word_freqs
       
-      # Do the same for the surprisal scores.
-      curr_surprisals <- subset(surprisal_df, text_nr == curr_text_nr)
+      # find out where in the subj_df text the text is located and add the word frequencies there. 
+      # Take only the first 300 rows because the rest are the questions' rows.
+      # If the text occurs twice in the df, that's because it was shown again in the visual task block, so 
+      # add the word frequencies twice there.
+      if (length(subj_df[which(subj_df$text_nr == curr_text_nr),]$word) > 400){
+        print("block was repeated for vis task")
+        # loop block numbers and assign word frequencies to the words in both blocks
+        curr_block_nrs = as.vector(na.exclude(unique(subset(subj_df, text_nr == curr_text_nr)$block_nr)))
+        for (block_nr in curr_block_nrs){
+          subj_df[which(subj_df$text_nr == curr_text_nr & subj_df$block_nr == block_nr),]$word_frequency[0:300] <- curr_word_freqs
+        }
+      # if the block was only shown once:
+      } else {
+        print("block was only shown once")
+        # assign word frequencies only once
+        subj_df[which(subj_df$text_nr == curr_text_nr),]$word_frequency[0:300] <- curr_word_freqs
+      }
+      print("---------------------")
+    }
+  
+    
+    
+    # TO DO:
+    
+    # Do the same for the surprisal scores.
+    curr_surprisals <- subset(surprisal_df, text_nr == curr_text_nr)
       
-      # find out where in the subj_df text the current text nr is located
-      curr_row <- which(subj_df$text_nr == curr_text_nr)
+    # find out where in the subj_df text the current text nr is located
+    curr_row <- which(subj_df$text_nr == curr_text_nr)
       
+    if (length(curr_row) < 400){
       # add the surprisal scores (untransformed & orthogonalized scores) there
       subj_df[curr_row, c("surprisal_1", "surprisal_4",
                           "surprisal_12", "surprisal_60")]  <- curr_surprisals[c("surprisal_1", "surprisal_4",
                                                                                  "surprisal_12",  "surprisal_60")]
+    } else{
+        print("BL + vis task block")
+    }
 
-    }# END if
   }# END loop texts
   
   
