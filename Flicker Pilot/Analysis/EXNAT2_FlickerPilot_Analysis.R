@@ -670,23 +670,24 @@ df_text_data_clean <- subset(df_text_data_clean, excl_trial == FALSE)
 
 # ---- PLOT STANDARDIZED READING SPEED x N-BACK x FLICKER ----
 
+# Maybe exclude non-native speakers?
 
-
-# I only have 3 participants so I'll have a look at their data individually:
-
-plot_df <- subset(df_text_data_clean, reaction == F) # exclude trials where you had a reaction
+plot_df <- subset(df_text_data_clean, 
+                  reaction == F 
+                  #& native_speaker == T
+                  ) # exclude trials where you had a reaction & data by non-native speakers
 
 plot_df <- setNames(aggregate(plot_df$reading_speed_standardized,
-                              by = list(plot_df$ID, plot_df$block_names_numbered, plot_df$flicker_on),
+                              by = list(plot_df$ID, plot_df$block_kind, plot_df$flicker_on),
                               FUN = mean),
                     c("ID", "Condition", "Flicker", "reading_speed_standardized"))
 
 
 # change order of n-back levels:
 plot_df$Condition <- as.factor(plot_df$Condition)
-plot_df$Condition <- factor(plot_df$Condition, levels = c("Reading_Baseline_main_1", "Reading_Baseline_main_2", 
-                                                          "1back_dual_main_1", "1back_dual_main_2",
-                                                          "2back_dual_main_1", "2back_dual_main_2"))
+plot_df$Condition <- factor(plot_df$Condition, levels = c("Reading_Baseline_main", 
+                                                          "1back_dual_main",
+                                                          "2back_dual_main"))
 
 # plot normalized reading times
 pirateplot(formula = reading_speed_standardized ~ Condition * Flicker,
@@ -698,17 +699,16 @@ pirateplot(formula = reading_speed_standardized ~ Condition * Flicker,
            point.cex = 0.8,
            point.col = c("darkseagreen4", "darkgoldenrod3", "indianred3"),
            avg.line.col = c("darkseagreen4", "darkgoldenrod3", "indianred3"), # avg line col
-           main = paste("standardized reading speed in each n-back condition (N = ", length(unique(plot_df$ID)), ")", sep = ""),
+           main = paste("Standardized reading speed in each n-back & flicker condition (N = ", length(unique(plot_df$ID)), ")", sep = ""),
            ylab = "standardized reading speed",
            ylim = c(-2, 2), # start y-lim at -2
            inf.method = "ci", # plot confidence interval as box around M
            inf.p = 0.95, # use 95% for confidence interval
            plot = T) # plot the plot
-# Okayyyy looks like they got better?! 
-
-# The weird improvement in BL due to flicker is probably a Reihenfolgeeffekt 
+ 
+# The weird improvement in BL in the nd and hs datasets due to flicker is probably a Reihenfolgeeffekt 
 # (BL blocks were first both not flickered and then later on flickered by chance)
-# Ich lehne mich mal gefährlich weit aus dem Fenster (weil wegen N = 2) und sage der Flicker macht 
+# Ich lehne mich mal gefährlich weit aus dem Fenster (weil wegen N = 3 und 1 non-native speaker) und sage der Flicker macht 
 # nichts oder zumindest nicht viel mit den Lesezeiten. Das ist gut.
 
 
