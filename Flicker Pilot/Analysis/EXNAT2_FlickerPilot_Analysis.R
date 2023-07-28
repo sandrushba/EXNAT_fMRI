@@ -117,8 +117,8 @@ for (i in 1:length(file_list)) {
   # print message
   message(paste(i, " - Reading in file ", file_list[i], ", participant ID: ", id, sep = ""))
   
-  # if it's by the HiWi who's not from Germany, set native_speaker to False:
-  if (id == "eg"){
+  # if it's by the non-German-speaking HiWis, set native_speaker to False:
+  if (id == "eg" | id == "at"){
     native_speaker <-  FALSE
   } else { 
     native_speaker <- TRUE
@@ -708,6 +708,26 @@ pirateplot(formula = reading_speed_standardized ~ Condition * Flicker,
 
 # The weird improvement in BL due to flicker is probably a Reihenfolgeeffekt 
 # (BL blocks were first both not flickered and then later on flickered by chance)
+# Ich lehne mich mal gefährlich weit aus dem Fenster (weil wegen N = 2) und sage der Flicker macht 
+# nichts oder zumindest nicht viel mit den Lesezeiten. Das ist gut.
+
+
+
+
+
+#####################
+
+### Check visual task performance:
+
+# Idea: Compute time it took to respond for every target. 
+# If no response and a new target is shown, count as a miss. 
+# Also compare between training (with default speed 100 words/min) 
+# and main block (known text with their own speed).
+# --> not really comparable but will do for a rough estimate 
+# I guess because they knew all the texts anyway.
+
+
+
 
   
   
