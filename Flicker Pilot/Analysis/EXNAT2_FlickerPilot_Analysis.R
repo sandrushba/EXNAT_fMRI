@@ -117,12 +117,19 @@ for (i in 1:length(file_list)) {
   # print message
   message(paste(i, " - Reading in file ", file_list[i], ", participant ID: ", id, sep = ""))
   
+  # if it's by the non-German-speaking HiWis, set native_speaker to False:
+  if (id == "eg" | id == "at"){
+    native_speaker <-  FALSE
+  } else { 
+    native_speaker <- TRUE
+  }
+  
   # add column with info on whether participant should be excluded
   excl <- FALSE
   
   # append to demographics df
   df_demogr <- as.data.frame(rbind(df_demogr,
-                                   cbind(id, age, gender, handedness)))
+                                   cbind(id, age, gender, handedness, native_speaker)))
   
   # remove helper variables to keep things tidy
   rm (age, gender, handedness, excl)
@@ -140,9 +147,15 @@ for (i in 1:length(file_list)) {
   # name column "block_name" "block_kind" and "participant" "ID" so it matches the EXNAT-1 variables
   names(subj_df)[which(names(subj_df) == "block_name")] <- "block_kind"
   names(subj_df)[which(names(subj_df) == "participant")] <- "ID"
+
+  # add native speaker column
+  subj_df$native_speaker <- native_speaker
   
   # get rid of reading baseline training (that was just a practice block for the participants)
   subj_df <- subset(subj_df, block_kind != "Reading_Baseline_training")
+  
+  # save raw df for later
+  subj_df_raw <- subj_df
   
   ###########################
   
@@ -159,13 +172,11 @@ for (i in 1:length(file_list)) {
   change_blocknames <- c("Reading_Baseline_main", "1back_dual_main", "2back_dual_main")
   
   for (change_block_name in change_blocknames){
-    # get the first 300 trials (each block has 300 trials so the first 300 trials = 1st block.
-    # There are 2 rows for each trial, which means we need the first 600 rows for the 1st block.)
-    subj_df[which(subj_df$block_names_numbered == change_block_name), ]$block_names_numbered[c(1:300)] <- paste(change_block_name,"_1", sep = "")
-    subj_df[which(subj_df$block_names_numbered == change_block_name), ]$block_names_numbered           <- paste(change_block_name,"_2", sep = "")
+    # get the first 309 rows (each block has 300 trials so the first 300 trials = 1st block + 9 question rows).
+    subj_df[which(subj_df$block_names_numbered == change_block_name), ]$block_names_numbered[c(1:309)] <- paste(change_block_name,"_1", sep = "")
+    subj_df[which(subj_df$block_names_numbered == change_block_name), ]$block_names_numbered <- paste(change_block_name,"_2", sep = "")
   }
-  
-  
+
   # Also add block number aka position of the block in the experiment.
   # This way, I can control for tiredness effects.
   
@@ -342,7 +353,23 @@ for (i in 1:length(file_list)) {
   
   
   
-  # TO DO: 
+  # Fix messed up block numbers:
+  # Loop rows, if task_name changes, add 1 to block counter.
+  block_counter <- 1
+  subj_df$block_nr <- ""
+  # loop rows, but skip the first one
+  for (row_idx in 2:length(subj_df$ID)){
+    curr_row <- subj_df[row_idx, ]
+    # if it's the same text_nr as in the row before, 
+    # assign block counter as in the row before. Only do this for the main blocks though, I don't care about the rest for now:
+    if (curr_row$text_nr == subj_df[row_idx-1, ]$text_nr & curr_row$block_kind %in% c("visual_task", "Reading_Baseline_main", "1back_dual_main", "2back_dual_main")){
+      subj_df[row_idx, ]$block_nr <- block_counter 
+    } else if (curr_row$text_nr != subj_df[row_idx-1, ]$text_nr & curr_row$block_kind %in% c("visual_task", "Reading_Baseline_main", "1back_dual_main", "2back_dual_main")){
+      block_counter <- block_counter + 1
+      subj_df[row_idx, ]$block_nr <- block_counter 
+    }
+  }
+  # The block numbers are still a bit odd but who cares.
   
   
   ### WORD FREQUENCIES & SURPRISAL SCORES ####
@@ -366,29 +393,343 @@ for (i in 1:length(file_list)) {
   for (curr_text_nr in unique(subj_df$text_nr)){
     
     # in some blocks we don't have texts, so skip those
-    if (curr_text_nr == "" | is.na(curr_text_nr)){
-      next
-      # if it's a text block, though, assign word frequencies from csv
-    } else {
-      #print(curr_text_nr) # uncomment this if you'd like to show the texts each participant read
+    # skip BL training as well
+    if (curr_text_nr != "" & !is.na(curr_text_nr) & curr_text_nr != "reading_bl_training_text" & curr_text_nr != "None"){
+
+      
+      print(curr_text_nr) # uncomment this if you'd like to show the texts each participant read
       
       # get word frequencies for current text nr
       curr_word_freqs <- subset(word_freqs_df, text_nr == curr_text_nr)$word_frequency
-      # find out where in the subj_df text the text is located and add the word frequencies there
-      subj_df[which(subj_df$text_nr == curr_text_nr),]$word_frequency <- curr_word_freqs
       
-      # Do the same for the surprisal scores.
+      # get surprisal scores:
       curr_surprisals <- subset(surprisal_df, text_nr == curr_text_nr)
       
-      # find out where in the subj_df text the current text nr is located
-      curr_row <- which(subj_df$text_nr == curr_text_nr)
-      
-      # add the surprisal scores (untransformed & orthogonalized scores) there
-      subj_df[curr_row, c("surprisal_1", "surprisal_4",
-                          "surprisal_12", "surprisal_60")]  <- curr_surprisals[c("surprisal_1", "surprisal_4",
-                                                                                 "surprisal_12",  "surprisal_60")]
+      # find out where in the subj_df text the text is located and add the word frequencies there. 
+      # Take only the first 300 rows because the rest are the questions' rows.
+      # If the text occurs twice in the df, that's because it was shown again in the visual task block, so 
+      # add the word frequencies twice there.
+      if (length(subj_df[which(subj_df$text_nr == curr_text_nr),]$word) > 400){
+        print("block was repeated for vis task")
+        # loop block numbers and assign word frequencies to the words in both blocks
+        curr_block_nrs = as.vector(na.exclude(unique(subset(subj_df, text_nr == curr_text_nr)$block_nr)))
+        for (block_nr in curr_block_nrs){
+          # add word frequencies:
+          subj_df[which(subj_df$text_nr == curr_text_nr & subj_df$block_nr == block_nr),]$word_frequency[0:300] <- curr_word_freqs
+          # add surprisal scores:
+          curr_row <- which(subj_df$text_nr == curr_text_nr & subj_df$block_nr == block_nr & subj_df$word != "")
+          subj_df[curr_row, c("surprisal_1", "surprisal_4",
+                              "surprisal_12", "surprisal_60")]  <- curr_surprisals[c("surprisal_1", "surprisal_4",
+                                                                                     "surprisal_12",  "surprisal_60")]
+        }
+      # if the block was only shown once:
+      } else {
+        print("block was only shown once")
+        # assign word frequencies only once
+        subj_df[which(subj_df$text_nr == curr_text_nr),]$word_frequency[0:300] <- curr_word_freqs
+        # add surprisal scores:
+        curr_row <- which(subj_df$text_nr == curr_text_nr & subj_df$word != "")
+        subj_df[curr_row, c("surprisal_1", "surprisal_4",
+                            "surprisal_12", "surprisal_60")]  <- curr_surprisals[c("surprisal_1", "surprisal_4",
+                                                                                   "surprisal_12",  "surprisal_60")]
+      }
+      print("---------------------")
+    }
+  
+    
+  }# END loop texts 
 
-    }# END if
-  }# END loop texts
+  
+  ### GET SURPRISAL SCORES OF PREVIOUS WORD ####
+  # --> skipped this part from the EXNAT-1 analysis
+  
+  
+  ###########################
+  # GET PERFORMANCE MEASURES:
+  
+  ### COMPREHENSION QUESTION PERFORMANCE ####
+  # Check the performance in the reading comprehension questions in the 2 baseline blocks:
+  # If they don't have 3/3 in at least one of the blocks, exclude their data.
+  
+  # We now get all question data:
+  Q_df <- subset(subj_df, chosen_ans != "")[,c("question", "chosen_ans", "ans_correct", "text_nr", "block_kind", "ID", "block_names_numbered")]
+  
+  # Just look at the MC questions:
+  # For now I don't really care about the answer, I only want to know if they chose the correct one or not.
+
+  # typecast everything to logical
+  Q_df$ans_correct <- as.logical(Q_df$ans_correct)
+  
+  # get performance in Qs
+  Q_df$nr_correct <- c(rep(NA, times = length(Q_df$ID)))
+  
+  # for each block, count how many questions were answered correctly.
+  for (curr_block in unique(Q_df$block_names_numbered)){
+    curr_Q_df <- subset(Q_df, block_names_numbered == curr_block)
+    # count how many questions were answered correctly in the current block
+    nr_correct <- length(subset(curr_Q_df, ans_correct == TRUE)$ans_correct)
+    # append to Q_df & subj_df$Q_nr_correct
+    Q_df[which(Q_df$block_names_numbered == curr_block), ]$nr_correct <- nr_correct
+  }
+  
+  # append Q_df to bigger df for all participants
+  df_comprehension_Qs <- as.data.frame(rbind(df_comprehension_Qs, Q_df))
+
+
+  ### N-BACK PERFORMANCE ####
+
+  # check n-back performance in each block:
+  # --> important: don't check by condition, but by block here!
+  nback_block_names = c("1back_single_training1", "1back_single_training2", "1back_single_main", "1back_dual_main_1","1back_dual_main_2",
+                        "2back_single_training1", "2back_single_training2", "2back_single_main", "2back_dual_main_1", "2back_dual_main_2")
+  
+  # append empty d-prime column to df:
+  subj_df$dprime <- c(rep(NA, times = length(subj_df$word)))
+  
+  
+  
+  
+  # TO DO:
+  # I assume the d-prime function has a problem with my data format?
+  
+  # loop block names:
+  for (block_name in nback_block_names){
+
+    # check if block name exists in df:
+    if (length(which(unique(subj_df$block_names_numbered) == block_name)) > 0){
+      # if so, compute d-primes:
+      
+      # get data for current block
+      curr_block <- subset(subj_df, block_names_numbered == block_name)
+      
+      # remove trials where the RT was way too fast
+      # (= participant reacted by accident)
+      curr_block <- subset(curr_block, (nback_RT >= 100 | is.na(nback_RT)))
+      
+      # if there are still some trials left, compute d-prime
+      if (length(curr_block$ID) > 10){
+        
+        # the main blocks are played twice in the experiment, so separate them
+        if (length(curr_block$ID) > 400){
+          # get first half, compute d-prime & add to bigger df
+          d_prime <- get_dprime(curr_block[c(1:300),]$nback_response)
+          subj_df[which(subj_df$block_names_numbered == block_name)[c(1:300)],]$dprime <- d_prime
+          
+          # same procedure for the second half
+          d_prime <- get_dprime(curr_block[c(301:600),]$nback_response)
+          subj_df[which(subj_df$block_names_numbered == block_name)[c(310:618)],]$dprime <- d_prime
+          
+          # if there's only one block:
+        } else if (length(curr_block$ID) <= 310){
+          # do it only once
+          d_prime <- get_dprime(curr_block$nback_response)
+          subj_df[which(subj_df$block_names_numbered == block_name),]$dprime <- d_prime
+        } # END if loop - check if block exists twice
+      } # END if loop - check if there are still enough trials left
+    } # END if loop - check for block name in df
+  }# END loop - compute d-primes
+  
+  ###########################
+  
+  # get rid of all rows where flicker_freq is NA
+  # (they shouldn't be there actually, there's some kind of weird error in my script I guess)
+  subj_df <- subset(subj_df, !is.na(flicker_freq))
+  
+  ###########################
+  
+  ### MARK PARTICIPANTS / TRIALS FOR EXCLUSION:
+  
+  # append "empty" exclude trial / exclude participant columns to df
+  subj_df$excl_trial       <- FALSE
+  subj_df$excl_participant <- FALSE
+  
+  
+  ### EXCLUDE PARTICIPANTS ####
+  # Skipped this because I was sitting right next to them and everything worked as intended.
+  
+  
+  
+  
+  
+  # append subj_df chunk to df_text_data where we collect the data of all participants
+  df_text_data <- as.data.frame(rbind(df_text_data, subj_df))
+  message("------------------------")
+          
+}# END LOOP PARTICIPANTS
+
+# clean up!
+rm(list=ls()[! ls() %in% c("df_text_data", "df_demogr", "df_comprehension_Qs", "word_freqs_df", "surprisal_df", "blocks")])
+
+# save preprocessed data for further analysis:
+#write.csv(df_text_data,       file = "/Users/merleschuckart/Desktop/EXNAT1 data/preproc_data/preproc_data.csv")
+#write.csv(df_text_data_clean, file = "/Users/merleschuckart/Desktop/EXNAT1 data/preproc_data/preproc_data_clean.csv")
+#write.csv(df_demogr,          file = "/Users/merleschuckart/Desktop/EXNAT1 data/preproc_data/preproc_demogr_data.csv")
+
+
+
+
+###########################
+
+### CLEAN DATA (at least a bit, exclude breaks & outliers & stuff)
+
+# only use data from the main blocks from now on:
+df_text_data_clean <- subset(df_text_data, block_kind == "Reading_Baseline_main" |
+                               block_kind == "1back_dual_main" |
+                               block_kind == "2back_dual_main")
+
+### EXCLUDE BREAKS ####
+# --> Exclude all trials where participants took more than 3 seconds (arbitrary value)
+#     I don't want breaks to influence the scaling of my "usable" data in the next steps
+# to go to the next word
+df_text_data_clean <- subset(df_text_data_clean, duration <= 3000)
+
+# Now have a look at the distribution of the reading times (basically reaction times) in comparison to the
+# reading speed data
+# in comparison to the reading times data (those are basically reaction times)
+#--> which distribution looks more normal? (probably the reading speed distributions, but better check this.)
+
+plot_reading_times <- subset(df_text_data_clean, reading_speed <= 500)
+#densityplot(subset(plot_reading_times)$reading_speed)
+#densityplot(subset(plot_reading_times)$duration)
+# Okay so it's pretty obvious that the reading speed data distribution looks better. We'll work with that one.
+
+
+
+### TRANSFORM DATA, EXCLUDE OUTLIERS ####
+
+#range(df_text_data_clean$reading_speed)
+#range(df_text_data_clean$duration)
+
+# Try outlier exclusion as described in Cousineau & Chartier, 2010
+# I found this approach in this paper, where it's recommended as the best outlier exclusion method for skewed data
+# https://doi.org/10.3389/fpsyg.2021.675558
+
+# "For each transformed value, the square root of the untransformed value minus the minimum value of the sample divided
+# through the sample range is calculated. The fraction bounds all values between 0 and 1,
+# while the square root enlarges small values (Cousineau and Chartier, 2010).
+# Afterwards, these values are z-transformed and values exceeding a particular z-score (e.g., 2 or 3)
+# are excluded. For the present simulations, we excluded RTs associated with a z-score larger/smaller than ±2 as outliers."
+# (Berger & Kiefer, 2021)
+
+# Long story short:
+# transf_val = sqrt (  ( x - sample_min ) / ( sample_max - sample_min)  )
+# --> after this, z-transform all values and exclude all values exceeding a value of ± 2 (or ± 3, but they used 2 in the paper)
+
+# This is basically a POMS (Little (2013), read in Moeller (2013)) transformation where you get
+# the square root of the output afterwards and z-transform everything.
+
+# Careful, you have to to the transformation over all participants & conditions, so
+# everything gets "pulled" into the same range.
+# If I'd do this for each subject & condition separately, I couldn't compare means
+# anymore, because every subset of data would have its own scale.
+
+
+# get min reading speed
+# sample_min <- min(df_text_data$reading_speed)
+sample_min <- 0 # use smallest possible value here (this is described in a book by Little, 2013) - in this case: 0 words / 100 ms
+
+# get max reading speed (use sample maximum here)
+sample_max <- max(df_text_data_clean$reading_speed)
+
+# do sqrt(POMS) transform of raw reading speed values
+df_text_data_clean$reading_speed_standardized <- sqrt((df_text_data_clean$reading_speed - sample_min) / (sample_max - sample_min))
+
+# z-transform reading data
+df_text_data_clean$reading_speed_standardized <- as.vector(scale(df_text_data_clean$reading_speed_standardized, center = T, scale = T))
+
+
+# Check out the new distribution!
+#densityplot(subset(df_text_data_clean)$reading_speed_standardized)
+
+
+### Mark outliers for exclusion ####
+
+# --> exclude single trials that are outliers
+
+# get index of all values < - 2 or > 2 in subj_df$reading_speed_standardized & exclude those trials
+excl_row_idx <- which(df_text_data_clean$reading_speed_standardized < -2 | df_text_data_clean$reading_speed_standardized > 2)
+
+message(paste("excluding", length(excl_row_idx), "outlier trials now because they fell out of the -2 - 2 range after the z-sqrt-POMS transformation", sep = " "))
+
+# check how the corresponding untransformed RTs look like so we get a feeling for what's being excluded:
+#summary(df_text_data[excl_row_idx, "duration"]) # looks good!
+
+# kick them out
+df_text_data_clean[excl_row_idx, "excl_trial"] <- TRUE
+df_text_data_clean <- subset(df_text_data_clean, excl_trial == FALSE)
+
+# plot again:
+#densityplot(df_text_data_clean$reading_speed_standardized)
+
+# The data are still not normally distributed if I divide them by n-back condition & block
+# --> Is this a problem for my linear mixed model?!
+#qqnorm(subset(df_text_data_clean, block_names_numbered == "1back_main_2")$reading_speed_standardized)
+#qqline(subset(df_text_data_clean, block_names_numbered == "1back_main_2")$reading_speed_standardized)
+
+
+
+# ---- PLOT STANDARDIZED READING SPEED x N-BACK x FLICKER ----
+
+# Maybe exclude non-native speakers?
+
+plot_df <- subset(df_text_data_clean, 
+                  reaction == F 
+                  #& native_speaker == T
+                  ) # exclude trials where you had a reaction & data by non-native speakers
+
+plot_df <- setNames(aggregate(plot_df$reading_speed_standardized,
+                              by = list(plot_df$ID, plot_df$block_kind, plot_df$flicker_on),
+                              FUN = mean),
+                    c("ID", "Condition", "Flicker", "reading_speed_standardized"))
+
+
+# change order of n-back levels:
+plot_df$Condition <- as.factor(plot_df$Condition)
+plot_df$Condition <- factor(plot_df$Condition, levels = c("Reading_Baseline_main", 
+                                                          "1back_dual_main",
+                                                          "2back_dual_main"))
+
+# plot normalized reading times
+pirateplot(formula = reading_speed_standardized ~ Condition * Flicker,
+           data = plot_df,
+           theme = 1,
+           pal = c("darkseagreen3", "darkgoldenrod1", "indianred1"),
+           bean.b.col = c("darkseagreen3", "darkgoldenrod1", "indianred1"),
+           bean.b.o = 1,
+           inf.f.o = 0,
+           point.o = 1,
+           point.cex = 0.8,
+           point.col = c("darkseagreen4", "darkgoldenrod3", "indianred3"),
+           avg.line.col = c("darkseagreen4", "darkgoldenrod3", "indianred3"), # avg line col
+           main = paste("Standardized reading speed in each n-back & flicker condition (N = ", length(unique(plot_df$ID)), ")", sep = ""),
+           ylab = "standardized reading speed",
+           ylim = c(-2, 2), # start y-lim at -2
+           inf.method = "ci", # plot confidence interval as box around M
+           inf.p = 0.95, # use 95% for confidence interval
+           plot = T) # plot the plot
+ 
+# The weird improvement in BL in the nd and hs datasets due to flicker is probably a Reihenfolgeeffekt 
+# (BL blocks were first both not flickered and then later on flickered by chance)
+# Ich lehne mich mal gefährlich weit aus dem Fenster (weil wegen N = 3 und 1 non-native speaker) und sage der Flicker macht 
+# nichts oder zumindest nicht viel mit den Lesezeiten. Das ist gut.
+
+
+
+
+
+#####################
+
+### Check visual task performance:
+
+# Idea: Compute time it took to respond for every target. 
+# If no response and a new target is shown, count as a miss. 
+# Also compare between training (with default speed 100 words/min) 
+# and main block (known text with their own speed).
+# --> not really comparable but will do for a rough estimate 
+# I guess because they knew all the texts anyway.
+
+
+
+
   
   
