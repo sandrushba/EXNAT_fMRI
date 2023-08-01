@@ -486,12 +486,6 @@ for (i in 1:length(file_list)) {
   # append empty d-prime column to df:
   subj_df$dprime <- c(rep(NA, times = length(subj_df$word)))
   
-  
-  
-  
-  # TO DO:
-  # I assume the d-prime function has a problem with my data format?
-  
   # loop block names:
   for (block_name in nback_block_names){
 
@@ -546,9 +540,6 @@ for (i in 1:length(file_list)) {
   
   ### EXCLUDE PARTICIPANTS ####
   # Skipped this because I was sitting right next to them and everything worked as intended.
-  
-  
-  
   
   
   # append subj_df chunk to df_text_data where we collect the data of all participants
@@ -712,6 +703,109 @@ pirateplot(formula = reading_speed_standardized ~ Condition * Flicker,
 # (BL blocks were first both not flickered and then later on flickered by chance)
 # Ich lehne mich mal gefährlich weit aus dem Fenster (weil wegen N = 3 und 1 non-native speaker) und sage der Flicker macht 
 # nichts oder zumindest nicht viel mit den Lesezeiten. Das ist gut.
+
+
+
+######### Linear mixed models #########
+
+# shrink the df a bit: exclude rows that don't have surprisal scores on all time scales
+lmm_df <- subset(df_text_data_clean, !is.na(surprisal_60))
+
+# typecast values in block_kind to ordered factors with levels Reading_BL_main as Baseline, 1back_main and 2back_main:
+lmm_df$block_kind <- ordered(lmm_df$block_kind, levels = c("Reading_BL_main", "1back_dual_main", "2back_dual_main"))
+
+# create a Simple Coding scheme for the variable block_kind
+# https://stats.oarc.ucla.edu/r/library/r-library-contrast-coding-systems-for-categorical-variables/
+# creating the contrast matrix manually by modifying the dummy coding scheme
+c <- contr.treatment(3) # create dummy coding scheme
+my.coding <- matrix(rep(1/3, 6), ncol = 2) # make matrix with only 1/3 values
+# change values in dummy coding scheme to either -1/3 or 2/6 by
+# subtracting 1/3 from 0s and 1s in the dummy coding scheme
+my.simple <- c-my.coding
+# show new coding scheme
+#my.simple
+
+#assign the new coding scheme to lmm_df$block_kind
+contrasts(lmm_df$block_kind) <- my.simple
+
+# typecast "reaction" to factor because sjplot complains about logicals
+# --> I tried just typecasting it to "TRUE" and "FALSE" as factor strings, but for some reason 
+# it got converted to logicals again. 
+# So I recoded the factor levels as 1 and -1 (aka factor ints) and hope it doesn't get converted again 
+lmm_df$reaction <- as.factor(ifelse(lmm_df$reaction == "TRUE", 1, -1)) # 1 = TRUE and -1 = FALSE
+
+# ----------- z-transform continuous variables for mixed models -----------
+
+# Define columns you want to z-transform:
+freq_length_cols <- c("word_frequency", "word_length_single") # columns: word freq & word length
+
+non_ortho_cols   <- c(paste0("surprisal_", c(1, 4, 12, 60))) # columns: surprisal_X with X being each of the TSs
+
+# Apply scale function to each column
+# --> set center to TRUE to subtract the sample mean from each value, set scale to TRUE to divide by standard deviation
+lmm_df[paste0(freq_length_cols, "_z")] <- lapply(lmm_df[freq_length_cols], scale, center = TRUE, scale = TRUE)
+
+lmm_df[paste0(non_ortho_cols, "_z")]   <- lapply(lmm_df[non_ortho_cols], scale, center = TRUE, scale = TRUE)
+
+# ----------- scramble all surprisal scores & add as new columns: -----------
+
+# scramble all timescales:
+# loop timescales
+
+for (i in c(1, 4, 12, 60)) {
+  # set random seed to make sure they are all shuffled in a different way
+  # --> easiest way to make sure the seed is always different: Use i as seed
+  set.seed(i)
+  # shuffle the current timescale x & create new column called surprisal_x_z_scrambled:
+  lmm_df[[paste0("surprisal_", i, "_z_scrambled")]] <- sample(lmm_df[[paste0("surprisal_", i, "_z")]])
+}
+
+
+# ----------- define linear mixed model formula(s) -------------------
+
+model_all <- reading_speed_standardized ~ block_kind      + # fixed effect: n-back condition
+  flicker_on + # fixed effect: flicker on or off
+  surprisal_1_z   + # fixed effect: surprisal on TS 1
+  surprisal_4_z   + # fixed effect: surprisal on TS 4
+  surprisal_12_z  + # fixed effect: surprisal on TS 12
+  surprisal_60_z  + # fixed effect: surprisal on TS 60
+  native_speaker  + # fixed effect: native speaker or not --> some of my participants might read slower because they're not native speakers
+  word_frequency_z   + # fixed effect: word frequency
+  word_length_single_z +
+  reaction           + # nuisance regressor: people probably have longer RTs if they also reacted in the n-back task
+  block_nr           + # nuisance regressor: people might be a bit slower in the later blocks due to fatigue effects
+  trial_nr           + # nuisance regressor: people might be a bit slower at the end of each block due to fatigue
+  #                     effects or quicker than in the beginning because they got used to the task
+  # Interactions:
+  block_kind : flicker_on +     # interaction n-back condition x flicker on or off
+  block_kind : surprisal_1_z  + # interaction n-back condition x surprisal on TS 1
+  block_kind : surprisal_4_z  + # interaction n-back condition x surprisal on TS 4
+  block_kind : surprisal_12_z + # interaction n-back condition x surprisal on TS 12
+  block_kind : surprisal_60_z + # interaction n-back condition x surprisal on TS 60
+  
+  # Random effects (aka variables that explain why some people deviate from the mean in my fixed effects conditions
+  (1 | ID) +                      # random effect: ID
+  (1 | text_nr) +                 # random effect: text nr: Text 1 could be different than text 2 and in a way, my texts are also just samples from the distribution of all texts I could have used
+  (1 + flicker_on | ID) +         # subject-specific random slope: flicker by ID - participant might react differently to the flicker than other participants
+  (1 + block_kind | ID) +         # subject-specific random slope: block_kind by ID - participant might perform differently in the tasks than other participants
+  (1 + surprisal_1_z  | ID) +     # subject-specific random slope: surprisal on TS 1 by ID - participant might perform differently
+                                  # when surprisal is high vs when surprisal is low compared to other participants
+  (1 + surprisal_4_z  | ID) + # subject-specific random slope: surprisal on TS 4 by ID
+  (1 + surprisal_12_z | ID) + # subject-specific random slope: surprisal on TS 12 by ID
+  (1 + surprisal_60_z | ID) + # subject-specific random slope: surprisal on TS 60 by ID
+  (1 + word_frequency_z | ID) + # subject-specific random slope: word frequency by ID
+  (1 + word_length_single_z | ID) # subject-specific random slope: word length by ID
+
+
+# ----------- fit frequentist linear mixed model (lmer4) ----------
+
+# (this might take some time):
+mixed.lmer_all <- lmer(formula = model_all,  data = lmm_df)
+summary(mixed.lmer_all)
+Anova(mixed.lmer_all)
+
+# play super mario sound when this is finished
+beep(sound = "mario")
 
 
 
