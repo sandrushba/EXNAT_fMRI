@@ -452,7 +452,7 @@ for (i in 1:length(file_list)) {
   # If they don't have 3/3 in at least one of the blocks, exclude their data.
   
   # We now get all question data:
-  Q_df <- subset(subj_df, chosen_ans != "")[,c("question", "chosen_ans", "ans_correct", "text_nr", "block_kind", "ID", "block_names_numbered")]
+  Q_df <- subset(subj_df, chosen_ans != "")[,c("question", "chosen_ans", "ans_correct", "text_nr", "block_kind", "ID", "block_names_numbered", "flicker_on")]
   
   # Just look at the MC questions:
   # For now I don't really care about the answer, I only want to know if they chose the correct one or not.
@@ -940,10 +940,25 @@ for (curr_id in unique(vis_task_responses_df$ID)){
 # Okay so seems like for some it's easy, for some it's not (or they didn't understand the task), 
 # but it's kinda difficult to compute dprimes without a measure of correct rejections 
 # because the trials are way too fast to analyse it all trial-wise.
+
+# Comparing the hits/miss/f.a. counts and the RT results in the plot, it looks like the 
+# people who have high hit rates and low miss/f.a. rates also have lower RTs than the 
+# other two. So I'd say they were confused by the task.
+
 # I don't even know if it matters if they suck at the task as long as they press the 
 # button sometimes so I get motor responses.
 
 
 
 
+### Analyse comprehension Qs in flicker/no flicker blocks:
+# Important: the participants either knew none of the texts or all of them, so I guess 
+# this can be ignored.
+
+# Just quickly check how many correct answers we have in flicker / no flicker blocks:
+length(subset(df_comprehension_Qs, flicker_on == "False" & ans_correct == T)$ID)
+length(subset(df_comprehension_Qs, flicker_on == "True" & ans_correct == T)$ID)
+# Ooookay 
+
+# I could check the difference statistically but this looks super balanced
 
