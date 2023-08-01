@@ -807,7 +807,11 @@ Anova(mixed.lmer_all)
 # play super mario sound when this is finished
 beep(sound = "mario")
 
-
+# compute Type II Wald Chi^2 test to check
+# which effects are significant:
+Anova(mixed.lmer_all)
+summary(mixed.lmer_all)
+# Nice! Flicker on/off doesn't really seem to have an effect. 
 
 
 
@@ -822,8 +826,124 @@ beep(sound = "mario")
 # --> not really comparable but will do for a rough estimate 
 # I guess because they knew all the texts anyway.
 
+# only get data for visual task:
+df_vis_task <- subset(df_text_data, block_kind == "visual_task")
 
+ID <- c() # participant ID
+duration <- c() # duration of response
+response_kind <- c() # hit or miss? 
 
+# I was really really dumb and forgot to save the data from the training.
+# But doesn't really matter, let's check the performance in the main block:
 
+# loop participants:
+for (curr_ID in unique(df_vis_task$ID)){
+  print(curr_ID)
   
-  
+  # get part of current participant's dataset where we have either the training or the main block of the vis task:
+  curr_dataset <- subset(df_vis_task, ID == curr_ID)
+  first_target_shown = F
+  participant_responded = F
+
+  # loop rows in current dataset and check for targets and responses 
+  # (doesn't have to be in the same row though)
+  for (row_idx in 1:length(curr_dataset$ID)){
+    #print(row_idx)
+    # get current row
+    curr_row <- curr_dataset[row_idx, ]
+    
+    # check if there was a target:
+    if (curr_row$target == "True"){ 
+      print("---------------") 
+      
+      print("target!")
+      # reset target detection time because there's a new target
+      target_detection_time = 0
+      
+      # check if participant noticed last target:
+      
+      # MISS: New target, but participant still hasn't responded for the one before:
+      if (participant_responded == F){
+        print("participant didn't see previous target!") 
+        # save data:
+        ID <- c(ID, curr_ID)
+        response_kind <- c(response_kind, "miss")
+        duration <- c(duration, NA) # no reaction so RT is NA
+      }
+
+      # if this was the first target, change first_target_shown to True:
+      if (first_target_shown == F){
+        first_target_shown = T
+      }
+      # reset response counter
+      participant_responded = F
+    }
+    
+    # HIT: if the participant reacted, add RT to target_detection_time and print target_detection_time
+    if (curr_row$reaction == T & first_target_shown == T & participant_responded == F){ 
+      print("response!")
+      target_detection_time = target_detection_time + as.vector(curr_row$duration)
+      print(target_detection_time)
+      participant_responded = T
+      # save data:
+      ID <- c(ID, curr_ID)
+      response_kind <- c(response_kind, "hit")
+      duration <- c(duration, target_detection_time)
+    
+    # if they didn't react, just add RT to target_detection_time and go to next trial
+    } else if (curr_row$reaction == F & first_target_shown == T) {
+      target_detection_time = target_detection_time + curr_row$duration
+    
+    # FALSE ALARM: if participant responded but has already responded for the current target
+    } else if (curr_row$reaction == T & first_target_shown == T & participant_responded == T) {
+      # save data:
+      ID <- c(ID, curr_ID)
+      response_kind <- c(response_kind, "false alarm")
+      duration <- c(duration, NA) # don't care about the false alarm RTs
+  }  
+ }
+}
+
+# create df:
+vis_task_responses_df <- as.data.frame(cbind(ID, response_kind, duration))
+vis_task_responses_df$duration <- as.numeric(vis_task_responses_df$duration)
+#View(vis_task_responses_df)  
+
+
+# get rid of NAs
+plot_df <- na.omit(vis_task_responses_df)
+
+# plot the raw durations from hit trials
+pirateplot(formula = duration ~ response_kind * ID,
+           data = plot_df,
+           theme = 1,
+           bean.b.o = 1,
+           inf.f.o = 0,
+           point.o = 1,
+           point.cex = 0.8,
+           main = paste("Raw RTs in the visual task (N = ", length(unique(plot_df$ID)), ")", sep = ""),
+           ylab = "RT in ms",
+           inf.method = "ci", # plot confidence interval as box around M
+           inf.p = 0.95, # use 95% for confidence interval
+           plot = T) # plot the plot
+
+# check how many targets they missed
+for (curr_id in unique(vis_task_responses_df$ID)){
+  print(paste("Participant ID:", curr_id, sep = " "))
+  curr_dataset <- subset(vis_task_responses_df, ID == curr_id)
+  print(paste("# misses:", length(which(curr_dataset$response_kind == "miss") == T), sep = " "))
+  print(paste("# hits:", length(which(curr_dataset$response_kind == "hit") == T), sep = " "))
+  print(paste("# false alarms:", length(which(curr_dataset$response_kind == "false alarm") == T), sep = " "))
+  print("------------")
+}
+
+# Okay so seems like for some it's easy, for some it's not (or they didn't understand the task), 
+# but it's kinda difficult to compute dprimes without a measure of correct rejections 
+# because the trials are way too fast to analyse it all trial-wise.
+# I don't even know if it matters if they suck at the task as long as they press the 
+# button sometimes so I get motor responses.
+
+
+
+
+
