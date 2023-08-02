@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 7.00
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "simpleio", "simpleio.vbproj", "{C57FC28A-F283-4DC6-B1B4-71BF11BF586F}"
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		ConfigName.0 = Debug
+		ConfigName.1 = Release
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{C57FC28A-F283-4DC6-B1B4-71BF11BF586F}.Debug.ActiveCfg = Debug|.NET
+		{C57FC28A-F283-4DC6-B1B4-71BF11BF586F}.Debug.Build.0 = Debug|.NET
+		{C57FC28A-F283-4DC6-B1B4-71BF11BF586F}.Release.ActiveCfg = Release|.NET
+		{C57FC28A-F283-4DC6-B1B4-71BF11BF586F}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
