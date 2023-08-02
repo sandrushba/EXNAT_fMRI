@@ -947,7 +947,8 @@ for (curr_id in unique(vis_task_responses_df$ID)){
 
 # I don't even know if it matters if they suck at the task as long as they press the 
 # button sometimes so I get motor responses.
-
+# The only thing I can see is that there are quite a lot of false alarms from some participants, 
+# so maybe reduce the number of targets a bit so we don't get too many motor responses?
 
 
 
@@ -958,7 +959,6 @@ for (curr_id in unique(vis_task_responses_df$ID)){
 # Just quickly check how many correct answers we have in flicker / no flicker blocks:
 length(subset(df_comprehension_Qs, flicker_on == "False" & ans_correct == T)$ID)
 length(subset(df_comprehension_Qs, flicker_on == "True" & ans_correct == T)$ID)
-# Ooookay 
-
-# I could check the difference statistically but this looks super balanced
+# Ooookay those are exactly the same counts, that's interesting.
+# I could check the difference statistically now but this looks super balanced
 
