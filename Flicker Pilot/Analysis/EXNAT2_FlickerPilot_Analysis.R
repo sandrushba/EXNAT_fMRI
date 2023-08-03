@@ -681,17 +681,17 @@ plot_df$Condition <- factor(plot_df$Condition, levels = c("Reading_Baseline_main
                                                           "2back_dual_main"))
 
 # plot normalized reading times
-pirateplot(formula = reading_speed_standardized ~ Condition * Flicker,
+pirateplot(formula = reading_speed_standardized ~ Flicker * Condition,
            data = plot_df,
            theme = 1,
-           pal = c("darkseagreen3", "darkgoldenrod1", "indianred1"),
-           bean.b.col = c("darkseagreen3", "darkgoldenrod1", "indianred1"),
+           pal = c("darkseagreen3","darkseagreen3", "darkgoldenrod1", "darkgoldenrod1", "indianred1","indianred1"),
+           bean.b.col = c("darkseagreen3","darkseagreen3", "darkgoldenrod1", "darkgoldenrod1", "indianred1","indianred1"),
            bean.b.o = 1,
            inf.f.o = 0,
            point.o = 1,
            point.cex = 0.8,
-           point.col = c("darkseagreen4", "darkgoldenrod3", "indianred3"),
-           avg.line.col = c("darkseagreen4", "darkgoldenrod3", "indianred3"), # avg line col
+           point.col = c("darkseagreen4","darkseagreen4", "darkgoldenrod3", "darkgoldenrod3", "indianred3", "indianred3"),
+           avg.line.col = c("darkseagreen4","darkseagreen4", "darkgoldenrod3", "darkgoldenrod3", "indianred3", "indianred3"), # avg line col
            main = paste("Standardized reading speed in each n-back & flicker condition (N = ", length(unique(plot_df$ID)), ")", sep = ""),
            ylab = "standardized reading speed",
            ylim = c(-2, 2), # start y-lim at -2
