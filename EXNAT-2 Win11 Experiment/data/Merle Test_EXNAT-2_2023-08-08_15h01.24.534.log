@@ -1,0 +1,14 @@
+17.2373 	EXP 	Created window1 = Window(allowGUI=True, allowStencil=False, autoLog=True, backendConf=UNKNOWN, backgroundFit=<method-wrapper '__getattribute__' of attributeSetter object at 0x7ff4e9604310>, backgroundImage=<method-wrapper '__getattribute__' of attributeSetter object at 0x7ff4e96042b0>, bitsMode=UNKNOWN, blendMode='avg', bpc=(8, 8, 8), color=array([0, 0, 0]), colorSpace='rgb', depthBits=8, fullscr=<method-wrapper '__getattribute__' of attributeSetter object at 0x7ff4e9604100>, gamma=None, gammaErrorPolicy='raise', lms=UNKNOWN, monitor=<psychopy.monitors.calibTools.Monitor object at 0x7ff4e96a5130>, multiSample=False, name='window1', numSamples=2, pos=(-30, 53), screen=0, size=array([1500, 1000]), stencilBits=0, stereo=False, title='PsychoPy', units='deg', useFBO=True, useRetina=False, viewOri=0.0, viewPos=None, viewScale=None, waitBlanking=True, winType='pyglet')
+17.2375 	EXP 	window1: mouseVisible = True
+17.2375 	EXP 	window1: backgroundImage = ''
+17.2375 	EXP 	window1: backgroundFit = 'none'
+17.2411 	EXP 	window1: Attempting to measure frame rate of screen (0) ...
+17.2411 	EXP 	window1: recordFrameIntervals = False
+17.3412 	EXP 	window1: recordFrameIntervals = True
+17.3920 	WARNING 	t of last frame was 12.09ms (=1/82)
+17.4626 	EXP 	Screen (0) actual frame rate measured at 99.72Hz
+17.4627 	EXP 	window1: recordFrameIntervals = False
+17.4628 	EXP 	window1: mouseVisible = True
+17.4629 	EXP 	EXNAT-2: status = STARTED
+17.5360 	WARNING 	psychopy.parallel has been imported on a Mac (which doesn't have a parallel port?)
+17.5506 	EXP 	window1: mouseVisible = True
