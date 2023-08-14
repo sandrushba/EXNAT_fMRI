@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Juli 25, 2023, at 12:54
+    on August 14, 2023, at 15:55
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -16,7 +16,7 @@ from __future__ import absolute_import, division
 from psychopy import locale_setup
 from psychopy import prefs
 prefs.hardware['audioLib'] = 'ptb'
-from psychopy import sound, gui, visual, core, data, event, logging, clock, colors
+from psychopy import sound, gui, visual, core, data, event, logging, clock, colors, iohub, hardware
 from psychopy.constants import (NOT_STARTED, STARTED, PLAYING, PAUSED,
                                 STOPPED, FINISHED, PRESSED, RELEASED, FOREVER)
 
@@ -52,7 +52,7 @@ filename = _thisDir + os.sep + u'data/%s_%s_%s' % (expInfo['participant'], expNa
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath='C:\\Users\\AC\\Desktop\\Merle\\EXNAT-2\\Experiment\\selfpaced_reading_nback_lastrun.py',
+    originPath='F:\\EXNAT-2\\EEG_study_EXNAT2\\EXNAT-2 Win7 Experiment EYELINK\\selfpaced_reading_nback_lastrun.py',
     savePickle=True, saveWideText=True,
     dataFileName=filename)
 logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a file
@@ -64,8 +64,8 @@ frameTolerance = 0.001  # how close to onset before 'same' frame
 
 # Setup the Window
 win = visual.Window(
-    size=[1500, 1000], fullscr=False, screen=0, 
-    winType='pyglet', allowGUI=True, allowStencil=False,
+    size=[1920, 1080], fullscr=True, screen=0, 
+    winType='pyglet', allowGUI=False, allowStencil=False,
     monitor='testMonitor', color='', colorSpace='rgb',
     blendMode='avg', useFBO=True, 
     units='deg')
@@ -84,6 +84,9 @@ defaultKeyboard = keyboard.Keyboard()
 
 # Initialize components for Routine "settings"
 settingsClock = core.Clock()
+# set screen resolution for eyetracker here:
+SCN_W, SCN_H = (1280, 800)
+
 ### import packages:
 
 # for setting the output encoding to UTF-8
@@ -131,59 +134,6 @@ import pandas as pd
 # additional timing package (I know we have core.wait, but I also want this one)
 import time
 
-# pylsl for pushing triggers to lsl stream:
-#from pylsl import StreamInlet, resolve_stream, StreamOutlet, StreamInfo
-
-# for sending triggers the oldschool way by using serial ports:
-from psychopy import parallel
-port = parallel.ParallelPort() # create port object
-port.setPortAddress(0x378) # set address of port
-
-### List of Trigger Values
-trigger_map = {
-    'block_onset': 1,
-    'response_target': 2,
-    'response_continue': 3,
-    'trial_onset': 4,
-    'Reading_BL': 5,
-    '1back': 6,
-    '2back': 7,
-    'prediction_tendency_task': 8,
-    'visual_task': 9,
-    'main': 10,
-    'training': 11,
-    'dual_task': 12,
-    'single_task': 13,
-    'block_offset': 14,
-    'freq_440_onset': 15,
-    'freq_440_offset': 16,
-    'freq_587_onset': 17,
-    'freq_587_offset': 18,
-    'freq_782_onset': 19,
-    'freq_782_offset': 20,
-    'freq_1043_onset': 21,
-    'freq_1043_offset': 22,
-    'ordered': 23,
-    'random': 24,
-    'start_experiment': 255
-}
-
-# Function to send trigger value by specifying event name
-def send_trigger(event_name):
-    # get corresponding trigger value:
-    trigger_value = trigger_map[event_name]
-    # send trigger:
-    parallel.setData(trigger_value)
-    # send trigger for 1ms
-    core.wait(0.0001)
-    # turn off trigger
-    parallel.setData(0)
-
-# send test triggers to parallel port
-send_trigger(event_name = 'start_experiment')
-
-
-
 # Get functions from my custom scripts:
 # import all texts
 from EXNAT2_texts_MC_Qs import *
@@ -217,13 +167,12 @@ def escape_quotes(string):
 
 
 ### Setup LSL Stream
-print("create trigger stream") 
+#print("create trigger stream") 
 # Create trigger stream:
-global out_marker
-info_marker_stream = StreamInfo('PsychoPyMarkers', 'Marker', 1, 0, 'string')
-out_marker = StreamOutlet(info_marker_stream)
-out_marker.push_sample(["TEST MARKER"])
-
+#global out_marker
+#info_marker_stream = StreamInfo('PsychoPyMarkers', 'Marker', 1, 0, 'string')
+#out_marker = StreamOutlet(info_marker_stream)
+#out_marker.push_sample(["TEST MARKER"])
 ### Stimulus settings
 
 # set flicker frequency (in Hz)
@@ -267,9 +216,14 @@ print("Preparing experiment with n-back colours:", colours)
 ### Shuffle order of texts
 print("shuffle texts") 
 # collect the text IDs in lists so I know which text was shown 
-all_main_texts_nrs_list = ["text_01", "text_02", "text_03", "text_04", "text_05", "text_06", "text_07", "text_08", "text_09"]
+all_main_texts_nrs_list = ["text_01", "text_02", "text_03", "text_04", "text_05", "text_06", "text_07", "text_08", "text_09", "text_10"]
 # shuffle text numbers
 random.shuffle(all_main_texts_nrs_list)
+
+# only get first 9 texts for the main blocks, the last one will be used for the vis task:
+vis_task_text_nr = all_main_texts_nrs_list[-1]
+all_main_texts_nrs_list = all_main_texts_nrs_list[0:-1]
+
 # append "empty" text numbers to the list where we have blocks that are not main blocks.
 all_texts_nrs_list = []
 for t_idx, t in enumerate(all_main_texts_nrs_list):
@@ -404,6 +358,12 @@ empty_placeholder = visual.TextStim(win=win, name='empty_placeholder',
     languageStyle='LTR',
     depth=-2.0);
 
+# Initialize components for Routine "eyetr_calibr"
+eyetr_calibrClock = core.Clock()
+
+# Initialize components for Routine "triggers"
+triggersClock = core.Clock()
+
 # Initialize components for Routine "no_text_blocks"
 no_text_blocksClock = core.Clock()
 
@@ -448,6 +408,162 @@ routineTimer = core.CountdownTimer()  # to track time remaining of each (non-sli
 continueRoutine = True
 routineTimer.add(0.500000)
 # update component parameters for each repeat
+### Set up connection to EyeLink Eyetracker
+
+# for connecting to Eyelink:
+import pylink
+import platform # ?
+from PIL import Image # for host backdrop image
+from EyeLinkCoreGraphicsPsychoPy import EyeLinkCoreGraphicsPsychoPy # ?
+from string import ascii_letters, digits # ?
+
+# set up EDF data file:
+edf_name = expInfo['participant'] # make sure file name (without .edf) is <= 8 characters
+if len(edf_name) >4:
+    print("edf file name is too long - choose shorter participant code!")
+# eyetracking data should be saved in folder "eyetracking_data", 
+# located in the same folder as this script
+
+# We download the EDF file with the data from the Eyelink Host PC (aka the Eyetracking PC) 
+# at the end of this experiment and put it into this folder.
+
+
+### Connect to the Eyelink Host PC
+
+eyelink_IP = "100.1.1.1" # set IP address of host PC here
+el_tracker = pylink.EyeLink(eyelink_IP)
+
+### Open an EDF file on the Host PC:
+edf_file = edf_name + ".EDF"
+el_tracker.openDataFile(edf_file)
+
+# Modify EDF file (this is optional):
+# If the text starts with "RECORDED BY", it will be available in the DataViewer's Inspector window
+# if you click on the EDF session node in the top panel and look for the "Recorded By:" field
+# in the bottom panel of the inspector.
+preamble_text = "RECORDED BY %s" % os.path.basename(__file__)
+el_tracker.sendCommand("add_file_preamble_text '%s'" % preamble_text)
+
+
+### Configure the Eyetracker:
+# put the tracker in offline mode before we change the tracking parameters:
+el_tracker.setOfflineMode()
+
+# Get software version: 1-EyeLink I, 2-EyeLink II, 3/4-EyeLink 1000, 5-EyeLink 1000 Plus, 6-Portable DUO
+#vstr = el_tracker.getTrackerVersionString()
+#eyelink_ver = int(vstr.split()[-1].split('.')[0]
+# print version info:
+#print("running experiment on %s, version %d" % (vstr, eyelink_ver))
+
+
+### Data control:
+
+# Which events do you want to save in the EDF file? 
+# --> include everything by default!
+file_event_flags = 'LEFT,RIGHT,FIXATION,SACCADE,BLINK,MESSAGE,BUTTON,INPUT'
+# Which events should be made available over the link?
+# --> include everything by default!
+link_event_flags = 'LEFT,RIGHT,FIXATION,SACCADE,BLINK,MESSAGE,BUTTON,INPUT'
+# What sample data should be saved in the EDF data file and made available over the link?
+# --> include the "HTARGET" flag to save head target sticker data for supported eye trackers with version > 3
+eyelink_ver = 5
+if eyelink_ver > 3:
+    file_sample_flags = 'LEFT,RIGHT,GAZE,HREF,RAW,AREA,HTARGET,GAZERES,BUTTON,STATUS,INPUT'
+    link_sample_flags = 'LEFT,RIGHT,GAZE,GAZERES,AREA,HTARGET,STATUS,INPUT'
+else:
+    file_sample_flags = 'LEFT,RIGHT,GAZE,HREF,RAW,AREA,GAZERES,BUTTON,STATUS,INPUT'
+    link_sample_flags = 'LEFT,RIGHT,GAZE,GAZERES,AREA,STATUS,INPUT'
+
+# Optional tracking parameters:
+# Sample rate: 250, 500, 1000 or 2000 (depending on tracker)
+el_tracker.sendCommand("sample_rate = 1000")
+# choose a calibration type: H3, HV3, HV5, HV13 (HV = Horizontal/Vertical)
+el_tracker.sendCommand("calibration_type = HV9") # use 9 target dots for calibration/validation screen
+# Set a gamepad button to accept calibration/drift check target
+# You need a supported gamepad/button box that's connected to the Host PC
+el_tracker.sendCommand("button_function 5 'accept_target_fixation'") # I think that's enter on our keyboard?
+
+### Set screen resolution:
+
+# get the native screen resolution used by PsychoPy
+scn_width, scn_height = win.size
+
+# pass the display pixel coordinates (left, top, right, bottom) to the tracker
+el_coords = "screen_pixel_coords = 0 0 %d %d" % (scn_width - 1, scn_height - 1)
+el_tracker.sendCommand(el_coords)
+
+# write a DISPLAY_COORDS message to the EDF file
+# Data Viewer needs this piece of info for proper visualisation, 
+# see "Protocol for Eyelink Data to Viewer Integration" in DataViewer user manual
+dv_coords = "DISPLAY_COORDS 0 0 %d %d" % (scn_width - 1, scn_height - 1)
+el_tracker.sendMessage(dv_coords)
+
+
+
+def et_abort_exp():
+    """Ends recording """
+    el_tracker = pylink.getEYELINK()
+
+    # Stop recording
+    if el_tracker.isRecording():
+        # add 100 ms to catch final trial events
+        pylink.pumpDelay(100)
+        el_tracker.stopRecording()
+        
+    # put eyetracker into Offline Mode:
+    el_tracker.setOfflineMode()
+        
+    # clear eyetracking host PC screen and wait for 500 ms
+    el_tracker.sendCommand('clear_screen 0')
+    pylink.msecDelay(500)
+        
+    # close data file:
+    el_tracker.closeDataFile()
+        
+    # print file transfer message:
+    print("EDF data is transferring from Eyetracking PC")
+        
+    # download the EDF data from the Host PC to a local data folder:
+    el_tracker.receiveDataFile(edf_file, edf_file)
+        
+    # Wait 2s to ensure data isn't lost:
+    core.wait(2)  
+        
+    # close eyetracker:
+    el_tracker.close()
+        
+    # Wait again:
+    core.wait(2) 
+
+
+### -------------------- OLD:  --------------------  
+
+### Drift check function:
+# We need to correct for small changes or shifts that might occur
+# in the eye tracking system's calibration over time. Those drifts can be caused 
+# by slight movements of the eye tracking hardware or changes in the 
+# environment that influence the hardware (e.g. temperature changes).
+# Long story short, we have to correct for those drifts from time to time.
+
+#def do_drift_check(): 
+#    
+#    # get connection to tracker
+#    el_tracker = pylink.getEYELINK()
+#    
+#    # terminate the task if connection to tracker is lost/can't be found:
+#    if not el_tracker.isConnected():
+#        print("lost connection to Eyetracker, terminating experiment now!")
+#        # quit PsychoPy 
+#        core.quit()
+#        sys.exit()
+#
+#    # if the connection can be found, try running drift correction:
+#    try: 
+#        el_tracker.doDriftCorrect(int(scn_width/2.0),
+#                                  int(scn_height/2.0), 
+#                                  1, 1)
+#    except: pass # do nothing if drift correction didn't work
+
 # keep track of which components have finished
 settingsComponents = [empty_placeholder]
 for thisComponent in settingsComponents:
@@ -512,6 +628,250 @@ for thisComponent in settingsComponents:
         thisComponent.setAutoDraw(False)
 thisExp.addData('empty_placeholder.started', empty_placeholder.tStartRefresh)
 thisExp.addData('empty_placeholder.stopped', empty_placeholder.tStopRefresh)
+
+# ------Prepare to start Routine "eyetr_calibr"-------
+continueRoutine = True
+# update component parameters for each repeat
+### Calibration/Validation Setup
+
+
+### Configure Graphics ENVironment (= genv) for the tracker calibration:
+genv = EyeLinkCoreGraphicsPsychoPy(el_tracker, win)
+print("version number of EyelinkCoreGraphics library:" + str(genv))
+
+# set colours for the calibratio target
+# (-1, -1, -1) = black
+# (1, 1, 1) = white
+# (0, 0, 0) = mid grey
+foreground_color = (-1, -1, -1) # black
+background_color = tuple(win.color)
+genv.setCalibrationColors(foreground_color, background_color)
+
+# set up the calibration target
+
+# The target could be: "circle" (default), "picture", "movie" clip, or a rotating "spiral"
+# To change the type of calibration target, set TargetType like so:
+# genv.setTargetType("picture")
+# genv.setPictureTarget(os.path.join("images", "fixTarget.bmp"))
+
+# We use the default circle here. 
+
+# Configure the size of the target in pixels:
+# (this is only possible for "circle" and "spiral")
+genv.setTargetSize(24)
+
+# Beeps to play during calibration, validation and drift correction:
+# parameters: target, good, error
+#             target: sound to play when target moves
+#             good: sound to play on successful operation
+#             bad: sound to play on failure or interruption
+# You can use "" for default sounds, "off" for no sounds, or a wav file for custom sounds.
+# --> we use the default sounds:
+genv.setCalibrationSounds("off", "off", "off")
+
+# request pylink to use the PsychoPy window genv we created above for calibration:
+pylink.openGraphicsEx(genv)
+
+
+# --> Remember we set el_tracker.setOfflineMode()? 
+#     We didn't set it back to online mode, but the tracker 
+#     should now switch to online mode automatically as we start the recording.
+
+### Calibrate the Tracker:
+el_tracker.doTrackerSetup()
+# This will open a window where the calibration is run. 
+# After the calibration you'll be asked to run the validation.
+
+
+### Start Recording
+el_tracker.startRecording(1, # sample_to_file = yes
+                       1, # events_to_file = yes 
+                       1, # sample_over_link = yes 
+                       1) # event_over_link = yes
+
+# wait for 500 ms before starting experiment:
+pylink.pumpDelay(500)
+
+
+
+
+# keep track of which components have finished
+eyetr_calibrComponents = []
+for thisComponent in eyetr_calibrComponents:
+    thisComponent.tStart = None
+    thisComponent.tStop = None
+    thisComponent.tStartRefresh = None
+    thisComponent.tStopRefresh = None
+    if hasattr(thisComponent, 'status'):
+        thisComponent.status = NOT_STARTED
+# reset timers
+t = 0
+_timeToFirstFrame = win.getFutureFlipTime(clock="now")
+eyetr_calibrClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
+frameN = -1
+
+# -------Run Routine "eyetr_calibr"-------
+while continueRoutine:
+    # get current time
+    t = eyetr_calibrClock.getTime()
+    tThisFlip = win.getFutureFlipTime(clock=eyetr_calibrClock)
+    tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+    frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+    # update/draw components on each frame
+    
+    # check for quit (typically the Esc key)
+    if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
+        core.quit()
+    
+    # check if all components have finished
+    if not continueRoutine:  # a component has requested a forced-end of Routine
+        break
+    continueRoutine = False  # will revert to True if at least one component still running
+    for thisComponent in eyetr_calibrComponents:
+        if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+            continueRoutine = True
+            break  # at least one component has not yet finished
+    
+    # refresh the screen
+    if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+        win.flip()
+
+# -------Ending Routine "eyetr_calibr"-------
+for thisComponent in eyetr_calibrComponents:
+    if hasattr(thisComponent, "setAutoDraw"):
+        thisComponent.setAutoDraw(False)
+# the Routine "eyetr_calibr" was not non-slip safe, so reset the non-slip timer
+routineTimer.reset()
+
+# ------Prepare to start Routine "triggers"-------
+continueRoutine = True
+# update component parameters for each repeat
+### Prepare triggers
+
+# pylsl for pushing triggers to lsl stream:
+#from pylsl import StreamInlet, resolve_stream, StreamOutlet, StreamInfo
+
+# for sending triggers the oldschool way by using serial ports:
+from psychopy import parallel
+#port = parallel.ParallelPort() # create port object
+#port.setPortAddress(0xB010) # set address of port
+port = parallel.setPortAddress(0xB010)# set address of port
+
+### List of Trigger Values
+trigger_map = {
+    'block_onset': 2,
+    'response_target': 4,
+    'response_continue': 6,
+    'trial_onset': 8,
+    'click_training_onset': 10,
+    'Reading_Baseline_training_onset': 12,
+    'Reading_Baseline_main_onset': 14,
+    '1back_single_training1_onset': 16,
+    '1back_single_training2_onset': 18,
+    '1back_single_main_onset': 20,
+    '1back_dual_main_onset': 22,
+    '2back_single_training1_onset': 24,
+    '2back_single_training2_onset': 26,
+    '2back_single_main_onset': 28,
+    '2back_dual_main_onset': 30,
+    'prediction_tendency_task_onset': 32,
+    'visual_task_main_onset': 34,
+    'visual_task_training_onset': 36,
+    'block_offset': 38,
+    'freq_440_onset': 40,
+    'freq_440_offset': 42,
+    'freq_587_onset': 44,
+    'freq_587_offset': 46,
+    'freq_782_onset': 48,
+    'freq_782_offset': 50,
+    'freq_1043_onset': 52,
+    'freq_1043_offset': 54,
+    'ordered': 56,
+    'random': 58,
+    'start_experiment': 60,
+    'end_experiment': 62,
+    'trial_offset': 64
+}
+
+# Function to send trigger value by specifying event name
+def send_trigger(event_name):
+    # get corresponding trigger value:
+    trigger_value = trigger_map[event_name]
+    
+    # send trigger to EEG:
+    parallel.setData(trigger_value)
+    #core.wait(0.01) # you need a break between the triggers: wait for 10 ms
+    # turn off trigger
+    #parallel.setData(0) 
+    # I do this after each trigger "manually" because I don't want 
+    # to wait for 10 ms while nothing is happening.
+    
+    # send trigger to Eyetracker:
+    el_tracker.sendMessage(event_name)
+
+# send test triggers to parallel port to check if they all work
+for i in [num for num in range(2, 57) if num % 2 == 0]:
+    # send trigger:
+    parallel.setData(i)
+    core.wait(0.01) # you need a break between the triggers: wait for 10 ms
+    # turn off trigger
+    parallel.setData(0)
+    
+    # send trigger as string to Eyetracker:
+    el_tracker.sendMessage(str(i))
+    
+
+core.wait(1) # wait 1 s
+
+send_trigger(event_name = 'start_experiment')
+
+# keep track of which components have finished
+triggersComponents = []
+for thisComponent in triggersComponents:
+    thisComponent.tStart = None
+    thisComponent.tStop = None
+    thisComponent.tStartRefresh = None
+    thisComponent.tStopRefresh = None
+    if hasattr(thisComponent, 'status'):
+        thisComponent.status = NOT_STARTED
+# reset timers
+t = 0
+_timeToFirstFrame = win.getFutureFlipTime(clock="now")
+triggersClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
+frameN = -1
+
+# -------Run Routine "triggers"-------
+while continueRoutine:
+    # get current time
+    t = triggersClock.getTime()
+    tThisFlip = win.getFutureFlipTime(clock=triggersClock)
+    tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+    frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+    # update/draw components on each frame
+    
+    # check for quit (typically the Esc key)
+    if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
+        core.quit()
+    
+    # check if all components have finished
+    if not continueRoutine:  # a component has requested a forced-end of Routine
+        break
+    continueRoutine = False  # will revert to True if at least one component still running
+    for thisComponent in triggersComponents:
+        if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+            continueRoutine = True
+            break  # at least one component has not yet finished
+    
+    # refresh the screen
+    if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+        win.flip()
+
+# -------Ending Routine "triggers"-------
+for thisComponent in triggersComponents:
+    if hasattr(thisComponent, "setAutoDraw"):
+        thisComponent.setAutoDraw(False)
+# the Routine "triggers" was not non-slip safe, so reset the non-slip timer
+routineTimer.reset()
 
 # set up handler to look after randomisation of conditions etc
 blocks = data.TrialHandler(nReps=30.0, method='sequential', 
@@ -628,7 +988,7 @@ for thisBlock in blocks:
                                  start_rgb = light_bg_col, 
                                  end_rgb = dark_bg_col, 
                                  seconds = 2)
-                # Wait for a brief period of time so bg is set
+                # Wait for a brief period of time (800 ms) so bg is set
                 core.wait(0.8)
                 # keep background grey
                 win.setColor(dark_bg_col, colorSpace='rgb')
@@ -682,6 +1042,13 @@ for thisBlock in blocks:
                 # clear buffer of all previously recorded key events:
                 event.clearEvents()
     
+                # send block onset trigger
+                send_trigger(curr_block + "_onset")
+                # wait for 10 ms before sending 0 trigger
+                core.wait(0.01) 
+                parallel.setData(0)
+                core.wait(0.1) #wait 100ms before starting first trial
+    
                 # loop colours in current text
                 for trial_idx, curr_col in enumerate(curr_colours):
                     print("current idx: " + str(trial_idx) + ", curr colour:" + curr_col)
@@ -732,18 +1099,17 @@ for thisBlock in blocks:
                     stim.draw()
                     win.flip()
             
-                    # show stimulus on screen
+                    # show stimulus on screen & send trigger:
                     stim.draw() # draw stimulus on screen
-                    win.flip() # update the window to clear the screen and display the stimulus
-    
-                    # send word onset trigger to LSL stream
-                    marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_col
-                    out_marker.push_sample(["STIM_ONSET_" + marker_text])
-                    
+                    # update the window to clear the screen and display 
+                    # the stimulus, send trigger on flip
+                    trig_off = False # haven't turned off trigger yet
+                    win.callOnFlip(send_trigger, "trial_onset") 
+                                    
                     # record trial onset time
                     onset_time = core.getTime()
                     print("onset time: " + str(onset_time * 1000) + " ms" )
-                                        
+                                           
                     ### wait for key response: 
                     # In blocks with n-back task, participants can press "c" to indicate they saw a target colour and "space" to go to the next word/stimulus.
                     # In blocks without n-back task, participants can only press "space" to go to the next stimulus.
@@ -751,10 +1117,14 @@ for thisBlock in blocks:
                         
                     ### start recording responses
                     # start "endless" while loop that looks for responses
-                    while True:        
-                        # in each iteration, draw word on screen
-                        
-                                        
+                    # in each iteration, draw word on screen
+                    while True:       
+                        # check if 10 ms have passed since trigger was sent,
+                        # if yes, send 0 to parallel port
+                        if trig_off == False and core.getTime() >= onset_time + 0.1: # trigger onset + 10 ms
+                            parallel.setData(0)
+                            trig_off = True # remember you turned off the trigger
+    
                         # Flicker option 1: use sine-wave (gradient) flicker
                         #frame_time = core.getTime() # get current time point (in sec)
                         #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
@@ -786,11 +1156,13 @@ for thisBlock in blocks:
                         if event.getKeys(['space']):
                             # get reaction time
                             curr_duration = core.getTime() - onset_time
-                            ### send trigger to LSL stream to indicate participant wants to go to next word
-                            marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_col
-                            out_marker.push_sample(["REACTION_NEXT_STIM_" + marker_text])
-                            print("detected space key press -- RT: " + str(curr_duration * 1000) + " ms") # *1000 to convert s to ms
-                            # break while loop
+                            # send trigger for response:
+                            send_trigger("response_continue")
+                            # wait 10ms
+                            core.wait(0.01)
+                            parallel.setData(0)
+                            
+                            # break while loop to go to next trial
                             break
     
                         # if participant pressed button "c" for the first time and it's an n-back condition 
@@ -798,21 +1170,34 @@ for thisBlock in blocks:
                         elif event.getKeys(['c']) and curr_nback_cond != None and saw_target == False:
                             # get reaction time
                             curr_nback_RT = (core.getTime() - onset_time) * 1000 # *1000 to convert s to ms  
-                            ### send trigger to LSL stream to indicate n-back response
-                            marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_col
-                            out_marker.push_sample(["NBACK_REACTION_" + marker_text])
+    
+                            # send trigger for response:
+                            send_trigger("response_target")
+                            # wait 10ms
+                            core.wait(0.01)
+                            parallel.setData(0)
+                            
                             # only get first target response, we don't care if they press the button more than once:
                             saw_target = True
-                            print("detected C key press -- n-back RT: " + str(curr_nback_RT) + " ms")
+    
                         # If esc is pressed, end the experiment:
                         elif event.getKeys(['escape']):
+                            et_abort_exp() # shut down eyetrigger and download incremental data
+                            # make sure parallel port is closed
+                            core.wait(0.1)
+                            parallel.setData(0)
+                            core.wait(0.5)
+                            # end experiment
                             core.quit()
                     
                     ### end trial
                     print("end trial")
-                    # stop display of current stimulus
-                    win.flip()
-                    
+                                       
+                    # stop display of current word & send trial offset trigger
+                    win.callOnFlip(send_trigger, "trial_offset")
+                    core.wait(0.1)
+                    parallel.setData(0)
+         
                     # check whether response was hit, miss, false alarm or correct rejection
                     # they saw a target and there was one: hit
                     if curr_nback_cond != None: 
@@ -853,11 +1238,7 @@ for thisBlock in blocks:
                     if expInfo['testing_mode'] == "yes":
                         if trial_idx == 3:
                             break
-                    
-                    ### send stimulus offset trigger to LSL stream
-                    marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + str(curr_nback_response)
-                    out_marker.push_sample(["STIM_OFFSET_" + marker_text])
-                    
+    
                 print("finished presenting trials")
                 
                 # change background colour from grey (RGB: 10, 10, 10)
@@ -873,6 +1254,13 @@ for thisBlock in blocks:
                 win.flip()
             
             ### End currrent block
+            core.wait(0.01) # wait 10 ms
+            # send block offset trigger
+            send_trigger("block_offset")
+            # wait for 10 ms before sending 0 trigger
+            core.wait(0.01) 
+            parallel.setData(0)
+                
             # add 1 to the block counter to go load the next block
             exp_block_counter = exp_block_counter + 1
             print("Going to block " + str(exp_block_counter + 1) + "/17 now!")
@@ -964,6 +1352,7 @@ for thisBlock in blocks:
         
     # if it's the reading bl training block, prepare training stimuli:
     elif curr_block == "Reading_Baseline_training":
+        
         # keep background ivory
         win.setColor(light_bg_col, colorSpace='rgb')
         win.flip()
@@ -1111,10 +1500,11 @@ for thisBlock in blocks:
         
     ### Start block loop
     
-    # if it's the first reading BL block, save response 
-    # times in an array - we need that later for the visual task
+    # if it's the first reading BL block, create arrays for saving response 
+    # times & words - we need that later for the visual task
     if exp_block_counter == 1:
         vis_task_durations = []
+        vis_task_words = []
     
     # create empty text stimulus 
     stim = visual.TextStim(win = win, 
@@ -1139,6 +1529,13 @@ for thisBlock in blocks:
     
     # clear buffer of all previously recorded key events:
     event.clearEvents()
+    
+    # send block onset trigger
+    send_trigger(curr_block + "_onset")
+    # wait for 10 ms before sending 0 trigger
+    core.wait(0.01) 
+    parallel.setData(0)
+    core.wait(0.1) #wait 100ms before starting first trial
     
     # loop words in current text
     for trial_idx, curr_word in enumerate(curr_text):
@@ -1180,21 +1577,27 @@ for thisBlock in blocks:
             
         stim_mask.opacity = opacity
         
-        # show word on screen
+        # show word on screen & send trigger:
         stim.draw() # draw word on screen
         stim_mask.draw() # draw mask on screen
-        win.flip() # update the window to clear the screen and display the word
-    
-        # send word onset trigger to LSL stream
-        marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_word
-        #out_marker.push_sample(["STIM_ONSET_" + marker_text])
         
+        # update the window to clear the screen and display 
+        # the stimulus, send word onset trigger on flip
+        trig_off = False # haven't turned off trigger yet
+        win.callOnFlip(send_trigger, "trial_onset") 
+                    
         # record trial onset time
         onset_time = core.getTime()
         print("onset time: " + str(onset_time) + " s")
         
         ### wait for 50 ms
         while core.getTime() < onset_time + 0.05:
+            
+            # if it's time to turn off trigger, do so:
+            if core.getTime() <= onset_time + 0.01 and trig_off == False:
+                parallel.setData(0)
+                trig_off = True
+            
             # draw the stimulus during the waiting period
     
             # Flicker option 1: use sine-wave (gradient) flicker
@@ -1225,7 +1628,8 @@ for thisBlock in blocks:
             
         ### start recording responses
         # start "endless" while loop that looks for responses
-        while True:        
+        while True:   
+                    
             # in each iteration, draw word on screen
             # --> flicker again
     
@@ -1254,10 +1658,13 @@ for thisBlock in blocks:
             if event.getKeys(['space']):
                 # get reaction time
                 curr_duration = core.getTime() - onset_time
-                ### send trigger to LSL stream to indicate participant wants to go to next word
-                marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_word
-                out_marker.push_sample(["REACTION_NEXT_STIM_" + marker_text])
-                print("detected space key press -- RT: " + str(curr_duration * 1000) + " ms") #* 1000 to covert s to ms
+    
+                # send trigger for response:
+                send_trigger("response_continue")
+                # wait 10ms
+                core.wait(0.01)
+                parallel.setData(0)
+                
                 # break while loop
                 break
     
@@ -1266,20 +1673,31 @@ for thisBlock in blocks:
             elif event.getKeys(['c']) and curr_nback_cond != None and saw_target == False:
                 # get reaction time
                 curr_nback_RT = (core.getTime() - onset_time) * 1000 # *1000 to convert s to ms    
-                ### send trigger to LSL stream to indicate n-back response
-                marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_word
-                out_marker.push_sample(["NBACK_REACTION_" + marker_text])
+                
+                # send trigger for response:
+                send_trigger("response_target")
+                # wait 10ms
+                core.wait(0.01)
+                parallel.setData(0)
+                
                 # only get first target response, we don't care if they press the button more than once:
                 saw_target = True
-                print("detected C key press -- n-back RT: " + str(curr_nback_RT) + " ms") # * 1000 to convert s to ms
+                
             # If esc is pressed, end the experiment:
             elif event.getKeys(['escape']):
+                et_abort_exp() # shut down eyetrigger and download incremental data             
+                # close parallel port
+                core.wait(0.1)
+                parallel.setData(0)
+                core.wait(0.5)
                 core.quit()
         
         ### end trial
         print("end trial")
-        # stop display of current word
-        win.flip()
+        # stop display of current word & send trial offset trigger
+        win.callOnFlip(send_trigger, "trial_offset")
+        core.wait(0.1)
+        parallel.setData(0)
         
         # check whether response was hit, miss, false alarm or correct rejection
         # they saw a target and there was one: hit
@@ -1321,22 +1739,27 @@ for thisBlock in blocks:
         # start a new row in the csv
         thisExp.nextEntry()
         
-        # if it's the first reading BL block, we need to 
-        # also collect the RTs in an array
-        if exp_block_counter == 1:
+        # if it's a reading BL block, we need to 
+        # also collect the RTs in an array for the visual task later
+        if curr_block == "Reading_Baseline_main":
             vis_task_durations.append(curr_duration)
+            vis_task_words.append(curr_word)
     
         ### IF TESTING MODE ENABLED: end loop after 4 trials
         if expInfo['testing_mode'] == "yes":
             if trial_idx == 3:
                 break
-        
-        ### send word offset trigger to LSL stream
-        marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + str(curr_nback_response)
-        #out_marker.push_sample(["STIM_OFFSET_" + marker_text])
     
     print("finished presenting trials")
     
+    # Send end of block trigger:
+    core.wait(0.01) # wait 10 ms
+    # send block offset trigger
+    send_trigger("block_offset")
+    # wait for 10 ms before sending 0 trigger
+    core.wait(0.01) 
+    parallel.setData(0)
+            
     ### Prepare questions
     
     # change background colour from grey to ivory
@@ -1460,7 +1883,7 @@ for thisBlock in blocks:
                                alignText = 'center') for i in range(len(Q1_answers))]
     # set up instruction text
     instr_text = visual.TextStim(win, 
-                                 text = "(Bitte benutzen Sie die Pfeiltasten um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
+                                 text = "(Bitte benutzen Sie die Tasten 1, 2, 3 und 4 um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
                                  color = "grey",
                                  pos = (0, -10),
                                  wrapWidth = 20,
@@ -1663,7 +2086,7 @@ for thisBlock in blocks:
                                alignText = 'center') for i in range(len(Q1_answers))]
     # set up instruction text
     instr_text = visual.TextStim(win, 
-                                 text = "(Bitte benutzen Sie die Pfeiltasten um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
+                                 text = "(Bitte benutzen Sie die Tasten 1, 2, 3 und 4 um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
                                  color = "grey",
                                  pos = (0, -10),
                                  wrapWidth = 20,
@@ -1865,7 +2288,7 @@ for thisBlock in blocks:
                                alignText = 'center') for i in range(len(Q1_answers))]
     # set up instruction text
     instr_text = visual.TextStim(win, 
-                                 text = "(Bitte benutzen Sie die Pfeiltasten um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
+                                 text = "(Bitte benutzen Sie die Tasten 1, 2, 3 und 4 um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
                                  color = "grey",
                                  pos = (0, -10),
                                  wrapWidth = 20,
@@ -2227,6 +2650,15 @@ for thisBlock in blocks:
     # ------Prepare to start Routine "warning"-------
     continueRoutine = True
     # update component parameters for each repeat
+    ### Eyetracker: Run drift correction
+    # do_drift_check()
+    # --> I think you only have to this once every hour or so, 
+    # so doing this after each block would be too much. 
+    # My experiment is only 1.5h long or so, so I guess it's 
+    # not that important. 
+    # More importantly: I think it stops the recording, which I don't want.
+    
+    
     ### Show warning sign if task changes
     
     # If task in last block (curr_block) is not the same as the next one, show warning.
@@ -2392,6 +2824,36 @@ continueRoutine = True
 # update component parameters for each repeat
 ### VISUAL TASK TRAINING & MAIN BLOCK
 
+# TO DO: Use the text with this text_nr:
+#vis_task_text_nr
+# Format something like this: "text_01"
+
+# I collected all RTs from the baseline blocks in vis_task_durations.
+
+# exclude all RTs where participant was way too fast (< 50 ms) or
+# way too slow (> 2s), also remove the corresponding words from vis_task_words
+
+filtered_durations = []
+filtered_words = []
+for duration, word in zip(vis_task_durations, vis_task_words):
+    if 50 <= duration <= 2000:
+        filtered_durations.append(duration)
+        filtered_words.append(word)
+
+# Now get number of letters (not words, I want to know how fast they read 1 letter on average!):
+letters_total = sum(len(word) for word in filtered_words)
+
+# also get time it took in total to read them all:
+reading_time_total = sum(filtered_durations) # in ms
+
+# Now check how many words / min they read on average.
+#reading_speed_wpm = words_total / (reading_time_total/60000)
+#print("reading speed in words / min:" + str(reading_speed_wpm))
+
+# Check average RT / letter
+RT_per_letter = reading_time_total/letters_total
+print(RT_per_letter)
+
 # In this task, the first reading baseline 
 # text is presented again, but this time the text proceeds 
 # automatically without the participant having to press the Space bar.
@@ -2490,9 +2952,8 @@ event.clearEvents()
 # prepare stimuli:
 curr_text_training = ['Einen', 'Augenblick', 'herrschte', 'totale', 'Stille.', 'Man', 'hörte', 'plötzlich', 'die', 'Wellen', 'rauschen', 'und', 'das', 'Radio', 'aus', 'dem', 'Salon', 'herüberjazzen,', 'man', 'vernahm', 'jeden', 'Schritt', 'vom', 'Promenadendeck', 'und', 'das', 'leise,', 'feine', 'Sausen', 'des', 'Winds,', 'der', 'durch', 'die', 'Fugen', 'der', 'Fenster', 'fuhr.', 'Keiner', 'von', 'uns', 'atmete,', 'es', 'war', 'zu', 'plötzlich', 'gekommen', 'und', 'wir', 'alle', 'noch', 'geradezu', 'erschrocken', 'über', 'das', 'Unwahrscheinliche,', 'daß', 'dieser', 'Unbekannte', 'dem', 'Weltmeister', 'in', 'einer', 'schon', 'halb', 'verlorenen', 'Partie', 'seinen', 'Willen', 'aufgezwungen', 'haben', 'sollte.', 'McConnor', 'lehnte', 'sich', 'mit', 'einem', 'Ruck', 'zurück,', 'der', 'zurückgehaltene', 'Atem', 'fuhr', 'ihm', 'hörbar', 'in', 'einem', 'beglückten', "\"Ah!\"", 'von', 'den', 'Lippen.', 'Ich', 'wiederum', 'beobachtete', 'Czentovic.', 'Schon', 'bei', 'den', 'letzten', 'Zügen', 'hatte', 'mir', 'geschienen,', 'als', 'ob', 'er', 'blässer', 'geworden', 'sei.', 'Aber', 'er','verstand', 'sich', 'gut', 'zusammenzuhalten.', 'Er', 'verharrte', 'in', 'seiner', 'scheinbar', 'gleichmütigen', 'Starre', 'und', 'fragte', 'nur', 'in', 'lässigster', 'Weise,', 'während', 'er', 'die', 'Figuren', 'mit', 'ruhiger', 'Hand', 'vom', 'Brette', 'schob:', "\"Wünschen", 'die', 'Herren', 'noch', 'eine', 'dritte', 'Partie?\"']
 
-# compute average reading speed by dividing the 
-# let's say we use 40 ms / letter, that would be 200 ms for a short word like "Einen", so still quite a lot:
-curr_durations_training = [len(word) * 40 / 1000 for word in curr_text_training] # in ms
+# compute RTs using patrticipant's average reading speed / letter
+curr_durations_training = [len(word) * RT_per_letter for word in curr_text_training] # in ms
 # print(curr_durations_training)
 
 # generate random colour list:
@@ -2535,6 +2996,11 @@ stim.draw()
 stim_mask.draw()
 win.flip()
 
+# send block onset trigger
+send_trigger("vis_task_training_onset")
+core.wait(0.01)
+parallel.setData(0)
+core.wait(0.1) #wait 100ms before starting first trial
 
 # loop words in current text
 for trial_idx, curr_word in enumerate(curr_text_training):
@@ -2578,12 +3044,9 @@ for trial_idx, curr_word in enumerate(curr_text_training):
     # show word on screen
     stim.draw() # draw word on screen
     stim_mask.draw() # draw mask on screen
-    win.flip() # update the window to clear the screen and display the word
+    trig_off = False # haven't sent 0 to port yet
+    win.callOnFlip(send_trigger, "trial_onset")
 
-    # send word onset trigger to LSL stream
-    marker_text = "trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + str(curr_target)
-    out_marker.push_sample(["STIM_ONSET_vistask_training" + marker_text])
-    
     # record trial onset time
     onset_time = core.getTime()
     print("onset_time:", onset_time)
@@ -2598,7 +3061,13 @@ for trial_idx, curr_word in enumerate(curr_text_training):
     ### start recording responses
     # start while loop that looks for responses
     # --> end while loop only if duration for current word is over
-    while core.getTime() < (onset_time + curr_duration):    
+    while core.getTime() < (onset_time + curr_duration):
+        
+        # if it's time to turn off trigger, do so:
+        if core.getTime() <= onset_time + 0.01 and trig_off == False:
+            parallel.setData(0)
+            trig_off = True
+            
         print("curr time stamp:", core.getTime())
         # in each iteration, draw word on screen
         # --> flicker again
@@ -2633,19 +3102,30 @@ for trial_idx, curr_word in enumerate(curr_text_training):
             # Reason why I don't use the last target as an onset: Doesn't take into 
             # account that there might be false alarm responses.
             curr_nback_RT = (core.getTime() - onset_time) * 1000 # *1000 to convert s to ms    
-            ### send trigger to LSL stream to indicate n-back response
-            out_marker.push_sample(["REACTION_visktask__training" + marker_text])
-            # only get first target response, we don't care if they press the button more than once in this trial:
+           
+            # send trigger to indicate n-back response
+            send_trigger("response_target")
+            core.wait(0.01) # wait 10 ms
+            parallel.setData(0)
+            
             previous_response = True
-            print("detected C key press -- 0-back RT: " + str(curr_nback_RT) + " ms") # * 1000 to convert s to ms
+            
         # If esc is pressed, end the experiment:
         elif event.getKeys(['escape']):
+            et_abort_exp() # shut down eyetrigger and download incremental data
+            # close parallel port
+            core.wait(0.1)
+            parallel.setData(0)
+            core.wait(0.5)
             core.quit()
+           
     
     ### end trial
     print("end trial")
-    # stop display of current word
-    win.flip()
+    # stop display of current word & send trial offset trigger
+    win.callOnFlip(send_trigger, "trial_offset")
+    core.wait(0.1)
+    parallel.setData(0)
     
     # check whether response was hit, miss, false alarm or correct rejection
     # they saw a target and there was one: hit
@@ -2688,10 +3168,12 @@ for trial_idx, curr_word in enumerate(curr_text_training):
         if trial_idx == 3:
             break
     
-    ### send word offset trigger to LSL stream   
-    out_marker.push_sample(["STIM_OFFSET_vistask_training" + marker_text])
-    
-print("finished visual task block")
+print("finished visual task training block")
+# send block offset trigger
+send_trigger("block_offset")
+core.wait(0.01) # wait 10 ms
+parallel.setData(0)
+core.wait(0.1) # wait 100 ms
 
 # change background colour from grey to ivory
 change_bg_colour(window = win, 
@@ -2709,7 +3191,15 @@ win.flip()
 exp_block_counter += 1
 
 
+
+
+
+
 # ----------------------------------
+
+
+
+
 
 
 ### START VISUAL TASK BLOCK
@@ -2760,40 +3250,13 @@ event.clearEvents()
 
 ### prepare stimuli
 
-# Now we need a text and RTs from one of the baseline blocks. 
+# get text for vis task main
+curr_text_nr = vis_task_text_nr
+curr_text = locals()[vis_task_text_nr]
 
-# We have 9 main blocks, 3 of which are baseline blocks, so in theory, 
-# we could choose one of them randomly.
-# Problem: The first block in this study is always a baseline block,
-# but the second and third one is presented at a random position 
-# somewhere in the second half of the experiment. So if we're out of luck, 
-# they could have been the last and penultimate block, so not "far away" 
-# enough from the current one. We don't want to show the same text in 2 consecutive blocks.
-
-# Idea: Find out where the baseline blocks are. 
-# If a baseline block is the last or penultimate block before this one, 
-# don't use it for this task. Worst case is that the second and third BL block are the 
-# penultimate & last block and we have to use the first one.
-# But if at least 2 blocks are "far away" enough from this one, choose 
-# randomly which one's text & RTs will be used.
-
-# find out where the baseline blocks are in the experiment:
-bl_indices = [index for index, block in enumerate(all_blocks) if block == "Reading_Baseline_main"]
-list_length = len(all_blocks)
-
-# exclude all indices that are either 15 or 16 (our list has length 17, 
-# so 15 is the penultimate and 16 the last block)
-bl_indices = [idx for idx in bl_indices if idx != 15 and idx != 16]
-#print("remaining indices", bl_indices)
-
-# from the remaining indices, randomly choose one. 
-# That's the index of the block we want to repeat:
-vis_task_block_idx = random.choice(bl_indices)
-print("repeating block at idx", vis_task_block_idx, "for visual task!")
-
-# get text from block we want to repeat (where exp_counter == vis_task_block_idx)
-curr_text_nr = all_texts_nrs_list[vis_task_block_idx]
-curr_text = locals()[curr_text_nr]
+# compute RTs using participant's average reading speed / letter
+vis_task_durations = [len(word) * RT_per_letter for word in curr_text] # in ms
+# print(vis_task_durations)
 
 # choose 1 target colour & generate 0-back colour list
 target_colour = random.choice(colours)
@@ -2801,8 +3264,6 @@ curr_colours = create_0back_stimlist(target_colour = target_colour, nr_targets =
 
 # save position of targets as True/False list:
 curr_targets = [colour == target_colour for colour in curr_colours]
-
-# the RTs are saved in the array "vis_task_durations"
 
 
 ### prepare flicker
@@ -2838,6 +3299,11 @@ stim.draw()
 stim_mask.draw()
 win.flip()
 
+# send block onset trigger
+send_trigger("vis_task_onset")
+core.wait(0.01)
+parallel.setData(0)
+core.wait(0.1)
 
 # loop words in current text
 for trial_idx, curr_word in enumerate(curr_text):
@@ -2878,19 +3344,15 @@ for trial_idx, curr_word in enumerate(curr_text):
         
     stim_mask.opacity = opacity
     
-    # show word on screen
+    # show word on screen & send trial onset trigger
     stim.draw() # draw word on screen
     stim_mask.draw() # draw mask on screen
-    win.flip() # update the window to clear the screen and display the word
+    trig_off = False # we haven't sent 0 to port yet   
+    win.callOnFlip(send_trigger, "trial_onset")
 
-    # send word onset trigger to LSL stream
-    marker_text = "trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + str(curr_target)
-    out_marker.push_sample(["STIM_ONSET_vistask" + marker_text])
-    
     # record trial onset time
     onset_time = core.getTime()
     print("word duration: " +  str(onset_time + curr_duration) + " ms")
-    
 
     ### wait for key response until curr_duration is over: 
 
@@ -2900,7 +3362,12 @@ for trial_idx, curr_word in enumerate(curr_text):
     ### start recording responses
     # start while loop that looks for responses
     # --> end while loop only if duration for current word is over
-    while core.getTime() < (onset_time + curr_duration):    
+    while core.getTime() < (onset_time + curr_duration):  
+
+        # if it's time to turn off trigger, do so:
+        if core.getTime() <= onset_time + 0.01 and trig_off == False:
+            parallel.setData(0)
+            trig_off = True  
 
         # in each iteration, draw word on screen
         # --> flicker again
@@ -2935,19 +3402,30 @@ for trial_idx, curr_word in enumerate(curr_text):
             # Reason why I don't use the last target as an onset: Doesn't take into 
             # account that there might be false alarm responses.
             curr_nback_RT = (core.getTime() - onset_time) * 1000 # *1000 to convert s to ms    
-            ### send trigger to LSL stream to indicate n-back response
-            out_marker.push_sample(["REACTION_visktask_" + marker_text])
+            
+            # send trigger to indicate n-back response
+            send_trigger("response_target")
+            core.wait(0.01) # wait 10 ms
+            parallel.setData(0)
+            
             # only get first target response, we don't care if they press the button more than once in this trial:
             previous_response = True
             print("detected C key press -- 0-back RT: " + str(curr_nback_RT) + " ms") # * 1000 to convert s to ms
         # If esc is pressed, end the experiment:
         elif event.getKeys(['escape']):
+            et_abort_exp() # shut down eyetrigger and download incremental data
+            # close parallel port
+            core.wait(0.1)
+            parallel.setData(0)
+            core.wait(0.5)
             core.quit()
     
     ### end trial
     print("end trial")
-    # stop display of current word
-    win.flip()
+    # stop display of current word & send trial offset trigger
+    win.callOnFlip(send_trigger, "trial_offset")
+    core.wait(0.1)
+    parallel.setData(0)
     
     # check whether response was hit, miss, false alarm or correct rejection
     # they saw a target and there was one: hit
@@ -2989,11 +3467,16 @@ for trial_idx, curr_word in enumerate(curr_text):
     if expInfo['testing_mode'] == "yes":
         if trial_idx == 3:
             break
-    
-    ### send word offset trigger to LSL stream   
-    out_marker.push_sample(["STIM_OFFSET_vistask" + marker_text])
-    
+            
 print("finished visual task block")
+
+# send trigger to indicate block offset
+send_trigger("block_offset")
+core.wait(0.01) # wait 10 ms
+parallel.setData(0)
+core.wait(0.1) # wait 100 ms           
+# Send end of block trigger:
+core.wait(0.01) # wait 100 ms
 
 # change background colour from grey to ivory
 change_bg_colour(window = win, 
@@ -3302,14 +3785,19 @@ while True:
         win.flip()
         break # break while loop
 
+# send block onset trigger
+send_trigger("prediction_tendency_task_onset")
+core.wait(0.01) # wait 10 ms
+parallel.setData(0)
+core.wait(0.1) # wait 100 ms
 
 # loop over list first_sequence with all frequencies:
 for tone_idx, curr_freq in enumerate(task_order_stimuli):
-    
+      
     ### BREAK:
     # if we reached the first trial after the 3rd block, include break:
     if tone_idx == break_idx:
-        
+               
         # set instruction text
         instr_text = "Sie können nun eine kurze Pause machen. Drücken Sie die Leertaste, wenn Sie den nächsten Block starten möchten. Bitte hören Sie auch im nächsten Block wieder nur zu."
 
@@ -3336,27 +3824,66 @@ for tone_idx, curr_freq in enumerate(task_order_stimuli):
         fixation_cross.setAutoDraw(True) # start drawing fixation cross on screen again
         ptb.WaitSecs(0.5) # wait 500 ms before playing the first tone of the next sequence
 
+
+    ### Block onset/offset triggers
+    # check which condition it is currently:
+    # if it's the first trial of the task, there were no earlier trials, so 
+    # set last_trial_cond as current condition, send block onset trigger and move on.
+    if tone_idx == 0:
+        last_trial_cond = str(task_order_trigger[tone_idx])
+        print("vis task - starting block of condition" + str(task_order_trigger[tone_idx]) + "now")
+        # current block's onset trigger
+        send_trigger(str(task_order_trigger[tone_idx]) + "_onset")
+        core.wait(0.01) # wait 10 ms
+        parallel.setData(0)
+        core.wait(0.01) # wait 10 ms
+      
+    # if it's not, check if the condition of the last trial is the same as the current one.
+    # If yes, don't do anything, if not, send block offset trigger for the block before, 
+    # send block onset trigger for the new one and 
+    # update last_trial_cond to current (new) condition.
+    elif tone_idx > 0 and last_trial_cond != str(task_order_trigger[tone_idx]):
+      print("vis task - starting block of condition" + str(task_order_trigger[tone_idx]) + "now")
+      # old block's offset trigger:
+      send_trigger(last_trial_cond + "_offset")
+      core.wait(0.01) # wait 10 ms
+      parallel.setData(0)
+      core.wait(0.01) # wait 10 ms
+      
+      # current block's onset trigger
+      send_trigger(str(task_order_trigger[tone_idx]) + "_onset")
+      core.wait(0.01) # wait 10 ms
+      parallel.setData(0)
+      core.wait(0.01) # wait 10 ms
+      
+      # set new condition as last_trial_cond:
+      last_trial_cond = str(task_order_trigger[tone_idx])
+    
+    
     ### RUN TRIAL:
-    print("current frequency:", curr_freq, "tone index:", tone_idx) 
-    now = ptb.GetSecs() # get current time stamp
-    print("tone onset:", now)
     # get sound object for current frequency tone
     curr_tone = tones_objects[f"tone_{curr_freq}"]
+    now = ptb.GetSecs() # get current time stamp
     curr_tone.play(when = now)  # play the sound immediately
+    
     # send tone onset trigger to LSL stream
-    marker_text = "pred_tendency_"+ str(task_order_trigger[tone_idx]) + "_" + str(curr_freq) + "_trial_" + str(tone_idx)
-    print(marker_text)
-    out_marker.push_sample(["STIM_ONSET_" + marker_text])
-
-    ptb.WaitSecs(0.1) # wait 100 ms until the audio has finished
-    curr_tone.stop() # close the sound
-    # send tone offset trigger to LSL stream
-    out_marker.push_sample(["STIM_OFFSET_" + marker_text])
+    send_trigger("freq_" + str(curr_freq) + "_onset")
+    core.wait(0.01) # wait 10 ms
+    parallel.setData(0)
+    # wait another 90 ms until the audio has finished (because we already 
+    # waited 10 ms to close the trigger, so wait 100 ms in total).
+    ptb.WaitSecs(0.09) # wait 90 ms
+    
+    # close the sound, send tone offset trigger
+    curr_tone.stop() 
+    send_trigger("freq_" + str(curr_freq) + "_offset")
+    core.wait(0.01) # wait 10 ms
+    parallel.setData(0)
     
     # 1 3Hz cycle = 333.33 ms, so continue waiting until 333.33 ms have 
     # passed since starting the tone before playing the next tone
     time_passed = ptb.GetSecs() - now
-    print("time passed since start of tone:", time_passed)
+    #print("time passed since start of tone:", time_passed)
     core.wait(0.33333 - time_passed)
     
     ### save information on current trial in output csv
@@ -3377,6 +3904,14 @@ for tone_idx, curr_freq in enumerate(task_order_stimuli):
     print("------ next tone ------ ")
 
 win.flip() # clear window (although it should be cleared)
+
+# Send end of block trigger:
+core.wait(0.01) # wait 100 ms
+# send block offset trigger
+send_trigger("block_offset")
+# wait for 100 ms before sending 0 trigger
+core.wait(0.01) 
+parallel.setData(0)
 
 # If everything's finished, go to next routine
 print(" --- ENDING PREDICTION TENDENCY TASK NOW --- ")
@@ -3434,7 +3969,7 @@ routineTimer.reset()
 # ------Prepare to start Routine "end"-------
 continueRoutine = True
 # update component parameters for each repeat
-### END MESSAGE:
+### END OF EXPERIMENT:
 # keep background ivory
 win.setColor(light_bg_col, colorSpace='rgb')
 win.flip()
@@ -3459,7 +3994,53 @@ while True:
     win.flip()
     # end screen if participant presses space
     if 'space' in event.getKeys():
+        
+        # send end of experiment trigger:
+        core.wait(0.01) # wait 10 ms
+        # send trigger
+        send_trigger("end_experiment")
+        # wait for 10 ms before sending 0 trigger
+        core.wait(0.01) 
+        parallel.setData(0)
+        
+        
+        ### STOP EYETRACKER:
+        
+        # wait 500 ms to catch final events before stopping
+        pylink.pumpDelay(500)
+
+        # stop recording:
+        eyelink.stopRecording()
+        
+        # put eyetracker into Offline Mode:
+        eyelink.setOfflineMode()
+        
+        # clear eyetracking host PC screen and wait for 500 ms
+        el_tracker.sendCommand('clear_screen 0')
+        pylink.msecDelay(500)
+        
+        # close data file:
+        el_tracker.closeDataFile()
+        
+        # print file transfer message:
+        print("EDF data is transferring from Eyetracking PC")
+        
+        # download the EDF data from the Host PC to a local data folder:
+        local_edf = os.path.join(expInfo['participant'] + "EL" + ".EDF")
+        el_tracker.receiveDataFile(edf_file, local_edf)
+        
+        # Wait 2s to ensure data isn't lost:
+        core.wait(2)  
+        
+        # close eyetracker:
+        el_tracker.close()
+        
+        # Wait again:
+        core.wait(2) 
+        
+        # end experiment
         break 
+
 
 # keep track of which components have finished
 endComponents = []
