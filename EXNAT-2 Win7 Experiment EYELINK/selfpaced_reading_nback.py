@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Fri Aug  4 11:08:24 2023
+    on August 15, 2023, at 14:30
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -27,7 +27,6 @@ from numpy.random import random, randint, normal, shuffle, choice as randchoice
 import os  # handy system and path functions
 import sys  # to get file system encoding
 
-import psychopy.iohub as io
 from psychopy.hardware import keyboard
 
 
@@ -53,7 +52,7 @@ filename = _thisDir + os.sep + u'data/%s_%s_%s' % (expInfo['participant'], expNa
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath='/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EXNAT-2 CBBM Experiment/selfpaced_reading_nback.py',
+    originPath='C:\\Users\\AC\\Desktop\\Merle\\EXNAT-2 Win7 Experiment EYELINK\\selfpaced_reading_nback.py',
     savePickle=True, saveWideText=True,
     dataFileName=filename)
 logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a file
@@ -65,8 +64,8 @@ frameTolerance = 0.001  # how close to onset before 'same' frame
 
 # Setup the Window
 win = visual.Window(
-    size=[1500, 1000], fullscr=False, screen=0, 
-    winType='pyglet', allowGUI=True, allowStencil=False,
+    size=[1920, 1080], fullscr=True, screen=0, 
+    winType='pyglet', allowGUI=False, allowStencil=False,
     monitor='testMonitor', color='', colorSpace='rgb',
     blendMode='avg', useFBO=True, 
     units='deg')
@@ -78,34 +77,7 @@ else:
     frameDur = 1.0 / 60.0  # could not measure, so guess
 
 # Setup eyetracking
-ioDevice = 'eyetracker.hw.sr_research.eyelink.EyeTracker'
-ioConfig = {
-    ioDevice: {
-        'name': 'tracker',
-        'model_name': 'EYELINK 1000 DESKTOP',
-        'simulation_mode': False,
-        'network_settings': '100.1.1.1',
-        'default_native_data_file_name': 'EXPFILE',
-        'runtime_settings': {
-            'sampling_rate': 1000.0,
-            'track_eyes': 'RIGHT_EYE',
-            'sample_filtering': {
-                'sample_filtering': 'FILTER_LEVEL_OFF',
-                'elLiveFiltering': 'FILTER_LEVEL_OFF',
-            },
-            'vog_settings': {
-                'pupil_measure_types': 'PUPIL_DIAMETER',
-                'tracking_mode': 'PUPIL_CR_TRACKING',
-                'pupil_center_algorithm': 'ELLIPSE_FIT',
-            }
-        }
-    }
-}
-ioSession = '1'
-if 'session' in expInfo:
-    ioSession = str(expInfo['session'])
-ioServer = io.launchHubServer(window=win, **ioConfig)
-eyetracker = ioServer.getDevice('tracker')
+ioDevice = ioConfig = ioSession = ioServer = eyetracker = None
 
 # create a default keyboard (e.g. to check for escape)
 defaultKeyboard = keyboard.Keyboard()
@@ -123,9 +95,6 @@ import sys
 sys.stdout = open(sys.stdout.fileno(), mode = 'w', encoding = 'utf8', buffering = 1)
 # print Python environment psychopy is currently using
 print(sys.executable)
-
-# for connecting to EyeLink DM890 eyetracker
-import pylink
 
 # for showing pictures
 from psychopy import visual
@@ -164,158 +133,6 @@ import random
 import pandas as pd
 # additional timing package (I know we have core.wait, but I also want this one)
 import time
-
-# pylsl for pushing triggers to lsl stream:
-#from pylsl import StreamInlet, resolve_stream, StreamOutlet, StreamInfo
-
-# build connection to EyeLink eyetracker:
-eyelink = pylink.EyeLink()
-
-# Set tracking parameters (e.g. sampling rate & screen resolution)
-# put tracker in offline mode before messing with the tracking parameters:
-eyelink.setOfflineMode()
-# set sampling rate to 1000 Hz:
-#eyelink.sendCommand("sample_rate 1000")
-# set screen resolution:
-#eyelink.sendCommand(f'screen_pixel_coords = 0 0 {SCN_W-1} {SCN_H-1}')
-
-
-# Set up the eyelink
-# We have an Eyelink DM-890 in the lab, which is a EyeLink 1000 Plus model I think?
-
-# I found these resources to be quite helpful:
-# https://psychopy.org/api/iohub/device/eyetracker_interface/SR_Research_Implementation_Notes.html
-# https://psychopy.org/hardware/eyeTracking.html
-
-pylink.flushGetkeyQueue()  # Empty any pending keys
-eyelink.sendCommand("file_sample_data = LEFT,RIGHT,GAZE,HREF,GAZERES,PUPIL,AREA,STATUS") # sample data written to edf file
-eyelink.sendCommand("file_event_filter = LEFT,RIGHT,FIXATION,SACCADE,BLINK,MESSAGE,BUTTON") # events written to edf file
-eyelink.sendCommand("link_event_filter = LEFT,RIGHT,FIXATION,SACCADE,BLINK,MESSAGE,BUTTON") # events sent through link
-eyelink.sendCommand("link_sample_data = LEFT,RIGHT,GAZE,HREF,GAZERES,PUPIL,AREA,STATUS") # data samples sent through link
-eyelink.sendCommand("pupil_size_diameter = DIAMETER") # set pupil diameter size measurement
-eyelink.sendCommand("active_eye = RIGHT") # set right eye as the active eye
-eyelink.sendCommand("binocular_enabled = NO") # no binocular tracking
-# set sampling rate:
-fs_eye = eyelink.sendMessage("GET_SAMPLE_RATE")
-eyelink_srate = int(fs_eye[0])
-eyelink.sendCommand("sample_rate" + str(eyelink_srate))
-
-# open an EDF file on the Eyetracking PC:
-#eyelink.openDataFile(expInfo['participant'] + "_EXNAT2_eyelink.edf")
-
-
-# open a calibration window
-pylink.openGraphics()
-# calibrate the tracker:
-eyelink.doTrackerSetup()
-
-
-# Step 3: Set tracking parameters, e.g., sampling rate
-#
-# Put the tracker in offline mode before we change its parameters
-tk.setOfflineMode()
-# Send screen resolution to the tracker
-tk.sendCommand(f'screen_pixel_coords = 0 0 {SCN_W-1} {SCN_H-1}')
-
-
-# run a little test:
-filename_eyetracker = f'et{subjID}'
-eyelink.openDataFile("EXNAT2_eyetracker_test.edf")
-for i in range(50):
-    # log a message in the EDF data file
-    eyelink.sendMessage(f'Trigger: {i}')
-    
-    # start recording
-    eyelink.startRecording(1, 1, 1, 1)
-    
-    # record data for 2 seconds
-    pylink.msecDelay(2000)
-    
-    # stop recording
-    eyelink.stopRecording()
-
-# Step 6: close the EDF data file and download it from the Host PC
-eyelink.closeDataFile()
-eyelink.receiveDataFile('test.edf', 'test.edf')
-
-# Step 7: close the link to the tracker, then close the window
-#tk.close()
-#pylink.closeGraphics()
-
-
-
-
-
-#eyelink.sendCommand("screen pixel coords = 0 0 %d %d" % (799, 599))
-#eyelink.sendMessage("DISPLAY_COORDS 0 0 %d %d" % (799, 599))
-#pylink.flushGetkeyQueue() # empty any pending keys
-
-# open a file to record eyetracking data:
-#eyelink.openDataFile(expInfo['participant'] + "_EXNAT2_eyelink.edf") 
-
-# send a trigger:
-#eyelink.sendMessage(trigger_code)
-
-
-
-# for sending triggers the oldschool way by using serial ports:
-from psychopy import parallel
-port = parallel.ParallelPort() # create port object
-port.setPortAddress(0xB010) # set address of port
-
-### List of Trigger Values
-trigger_map = {
-    'block_onset': 2,
-    'response_target': 4,
-    'response_continue': 6,
-    'trial_onset': 8,
-    'Reading_BL': 10,
-    '1back': 12,
-    '2back': 14,
-    'prediction_tendency_task': 16,
-    'visual_task': 18,
-    'main': 20,
-    'training': 22,
-    'dual_task': 24,
-    'single_task': 26,
-    'block_offset': 28,
-    'freq_440_onset': 30,
-    'freq_440_offset': 32,
-    'freq_587_onset': 34,
-    'freq_587_offset': 36,
-    'freq_782_onset': 38,
-    'freq_782_offset': 40,
-    'freq_1043_onset': 42,
-    'freq_1043_offset': 44,
-    'ordered': 46,
-    'random': 48,
-    'start_experiment': 50,
-    'end_experiment': 52
-}
-
-# Function to send trigger value by specifying event name
-def send_trigger(event_name):
-    # get corresponding trigger value:
-    trigger_value = trigger_map[event_name]
-    # send trigger:
-    parallel.setData(trigger_value)
-    #core.wait(0.01) # you need a break between the triggers: wait for 10 ms
-    # turn off trigger
-    #parallel.setData(0) 
-    # I do this after each trigger "manually" because I don't want 
-    # to wait for 10 ms while nothing is happening.
-
-# send test triggers to parallel port to check if they all work
-for i in [num for num in range(2, 53) if num % 2 == 0]:
-    # send trigger:
-    parallel.setData(trigger_value)
-    core.wait(0.01) # you need a break between the triggers: wait for 10 ms
-    # turn off trigger
-    parallel.setData(0)
-
-core.wait(1) # wait 1 s
-
-send_trigger(event_name = 'start_experiment')
 
 # Get functions from my custom scripts:
 # import all texts
@@ -356,6 +173,11 @@ def escape_quotes(string):
 #info_marker_stream = StreamInfo('PsychoPyMarkers', 'Marker', 1, 0, 'string')
 #out_marker = StreamOutlet(info_marker_stream)
 #out_marker.push_sample(["TEST MARKER"])
+
+
+# make mouse invisible during experiment
+#mouse = io.devices.mouse
+win.setMouseVisible(False)
 ### Stimulus settings
 
 # set flicker frequency (in Hz)
@@ -539,14 +361,13 @@ empty_placeholder = visual.TextStim(win=win, name='empty_placeholder',
     pos=(0, 0), height=0.1, wrapWidth=None, ori=0.0, 
     color='white', colorSpace='rgb', opacity=None, 
     languageStyle='LTR',
-    depth=-2.0);
+    depth=-3.0);
 
-# Initialize components for Routine "Eyetracking"
-EyetrackingClock = core.Clock()
-etRecord = hardware.eyetracker.EyetrackerControl(
-    server=ioServer,
-    tracker=eyetracker
-)
+# Initialize components for Routine "eyetr_calibr"
+eyetr_calibrClock = core.Clock()
+
+# Initialize components for Routine "triggers"
+triggersClock = core.Clock()
 
 # Initialize components for Routine "no_text_blocks"
 no_text_blocksClock = core.Clock()
@@ -592,6 +413,278 @@ routineTimer = core.CountdownTimer()  # to track time remaining of each (non-sli
 continueRoutine = True
 routineTimer.add(0.500000)
 # update component parameters for each repeat
+### Set up connection to EyeLink Eyetracker
+
+# for connecting to Eyelink:
+import pylink
+import platform # ?
+from PIL import Image # for host backdrop image
+from EyeLinkCoreGraphicsPsychoPy import EyeLinkCoreGraphicsPsychoPy # ?
+from string import ascii_letters, digits # ?
+
+# set up EDF data file:
+edf_name = expInfo['participant'] # make sure file name (without .edf) is <= 8 characters
+if len(edf_name) >4:
+    print("edf file name is too long - choose shorter participant code!")
+# eyetracking data should be saved in folder "eyetracking_data", 
+# located in the same folder as this script
+
+# We download the EDF file with the data from the Eyelink Host PC (aka the Eyetracking PC) 
+# at the end of this experiment and put it into this folder.
+
+
+### Connect to the Eyelink Host PC
+
+eyelink_IP = "100.1.1.1" # set IP address of host PC here
+el_tracker = pylink.EyeLink(eyelink_IP)
+
+### Open an EDF file on the Host PC:
+edf_file = edf_name + ".EDF"
+el_tracker.openDataFile(edf_file)
+
+# Modify EDF file (this is optional):
+# If the text starts with "RECORDED BY", it will be available in the DataViewer's Inspector window
+# if you click on the EDF session node in the top panel and look for the "Recorded By:" field
+# in the bottom panel of the inspector.
+preamble_text = "RECORDED BY %s" % os.path.basename(__file__)
+el_tracker.sendCommand("add_file_preamble_text '%s'" % preamble_text)
+
+
+### Configure the Eyetracker:
+# put the tracker in offline mode before we change the tracking parameters:
+el_tracker.setOfflineMode()
+
+# Get software version: 1-EyeLink I, 2-EyeLink II, 3/4-EyeLink 1000, 5-EyeLink 1000 Plus, 6-Portable DUO
+#vstr = el_tracker.getTrackerVersionString()
+#eyelink_ver = int(vstr.split()[-1].split('.')[0]
+# print version info:
+#print("running experiment on %s, version %d" % (vstr, eyelink_ver))
+
+
+### Data control:
+
+# Which events do you want to save in the EDF file? 
+# --> include everything by default!
+file_event_flags = 'LEFT,RIGHT,FIXATION,SACCADE,BLINK,MESSAGE,BUTTON,INPUT'
+# Which events should be made available over the link?
+# --> include everything by default!
+link_event_flags = 'LEFT,RIGHT,FIXATION,SACCADE,BLINK,MESSAGE,BUTTON,INPUT'
+# What sample data should be saved in the EDF data file and made available over the link?
+# --> include the "HTARGET" flag to save head target sticker data for supported eye trackers with version > 3
+eyelink_ver = 5
+if eyelink_ver > 3:
+    file_sample_flags = 'LEFT,RIGHT,GAZE,HREF,RAW,AREA,HTARGET,GAZERES,BUTTON,STATUS,INPUT'
+    link_sample_flags = 'LEFT,RIGHT,GAZE,GAZERES,AREA,HTARGET,STATUS,INPUT'
+else:
+    file_sample_flags = 'LEFT,RIGHT,GAZE,HREF,RAW,AREA,GAZERES,BUTTON,STATUS,INPUT'
+    link_sample_flags = 'LEFT,RIGHT,GAZE,GAZERES,AREA,STATUS,INPUT'
+
+# Optional tracking parameters:
+# Sample rate: 250, 500, 1000 or 2000 (depending on tracker)
+el_tracker.sendCommand("sample_rate = 1000")
+# choose a calibration type: H3, HV3, HV5, HV13 (HV = Horizontal/Vertical)
+el_tracker.sendCommand("calibration_type = HV9") # use 9 target dots for calibration/validation screen
+# Set a gamepad button to accept calibration/drift check target
+# You need a supported gamepad/button box that's connected to the Host PC
+el_tracker.sendCommand("button_function 5 'accept_target_fixation'") # I think that's enter on our keyboard?
+
+### Set screen resolution:
+
+# get the native screen resolution used by PsychoPy
+scn_width, scn_height = win.size
+
+# pass the display pixel coordinates (left, top, right, bottom) to the tracker
+el_coords = "screen_pixel_coords = 0 0 %d %d" % (scn_width - 1, scn_height - 1)
+el_tracker.sendCommand(el_coords)
+
+# write a DISPLAY_COORDS message to the EDF file
+# Data Viewer needs this piece of info for proper visualisation, 
+# see "Protocol for Eyelink Data to Viewer Integration" in DataViewer user manual
+dv_coords = "DISPLAY_COORDS 0 0 %d %d" % (scn_width - 1, scn_height - 1)
+el_tracker.sendMessage(dv_coords)
+
+
+
+def et_abort_exp():
+    """Ends recording """
+    el_tracker = pylink.getEYELINK()
+
+    # Stop recording
+    if el_tracker.isRecording():
+        # add 100 ms to catch final trial events
+        pylink.pumpDelay(100)
+        el_tracker.stopRecording()
+        
+    # put eyetracker into Offline Mode:
+    el_tracker.setOfflineMode()
+        
+    # clear eyetracking host PC screen and wait for 500 ms
+    el_tracker.sendCommand('clear_screen 0')
+    pylink.msecDelay(500)
+        
+    # close data file:
+    el_tracker.closeDataFile()
+        
+    # print file transfer message:
+    print("EDF data is transferring from Eyetracking PC")
+        
+    # download the EDF data from the Host PC to a local data folder:
+    el_tracker.receiveDataFile(edf_file, edf_file)
+        
+    # Wait 2s to ensure data isn't lost:
+    core.wait(2)  
+        
+    # close eyetracker:
+    el_tracker.close()
+        
+    # Wait again:
+    core.wait(2) 
+
+
+### -------------------- OLD:  --------------------  
+
+### Drift check function:
+# We need to correct for small changes or shifts that might occur
+# in the eye tracking system's calibration over time. Those drifts can be caused 
+# by slight movements of the eye tracking hardware or changes in the 
+# environment that influence the hardware (e.g. temperature changes).
+# Long story short, we have to correct for those drifts from time to time.
+
+#def do_drift_check(): 
+#    
+#    # get connection to tracker
+#    el_tracker = pylink.getEYELINK()
+#    
+#    # terminate the task if connection to tracker is lost/can't be found:
+#    if not el_tracker.isConnected():
+#        print("lost connection to Eyetracker, terminating experiment now!")
+#        # quit PsychoPy 
+#        core.quit()
+#        sys.exit()
+#
+#    # if the connection can be found, try running drift correction:
+#    try: 
+#        el_tracker.doDriftCorrect(int(scn_width/2.0),
+#                                  int(scn_height/2.0), 
+#                                  1, 1)
+#    except: pass # do nothing if drift correction didn't work
+
+### Determine hearing threshold
+
+import sounds_custom # sounds3 module from Sarah's cuecue study T2
+import sounddevice as sd
+print(sd.query_devices()) # print all sound devices we can access
+import os
+
+# prepare instructions
+instr_hearthres = visual.TextStim(win=win, text = "Zum Starten bitte die Leertaste drücken!", pos = (0,0), color = "black", height = 0.5, wrapWidth = 1600)
+
+message1 = visual.TextStim(win=win, text = "Laut nach leise.\n\nDrücken Sie bitte die Leertaste, wenn nichts mehr zu hören ist.", pos = (0,0), color = "black", height = 0.5, wrapWidth = 1600)
+message2 = visual.TextStim(win=win, text = "Leise nach laut.\n\nDrücken Sie bitte die Leertaste, sobald etwas zu hören ist.", pos = (0,0), color = "black", height = 0.5, wrapWidth = 1600)
+pause = visual.TextStim(win=win, text = "Kurze Pause!", pos = (0,0), color = "black", height = 0.5, wrapWidth = 1600)
+
+
+# sound setup
+sound_file = "cuecue_stim.wav"
+#sound_device = 34 # from CueCue
+sound_device = "ASIO Fireface USB" # 55 ASIO4ALL v2 ASIO
+sound = sounds_custom.Sound(sound_file, sound_device, 10, [3,4]) # [3,4] are the output channels
+
+# loud to soft:
+def thres_down(start, step, limit):
+    b = start
+    while True:
+
+        if "esc" in event.getKeys():
+            core.quit()
+        elif b < limit and not event.getKeys("space"):
+            sound = sounds_custom.Sound(sound_file, sound_device, b)
+            sound.play()
+            b = b + step
+        elif b >= limit or event.getKeys("space"):
+            sound = sounds_custom.Sound(sound_file, sound_device, b)
+            sound.play()
+            sound.stop()
+            print(b)
+            return(b)
+
+#soft to loud, start at 10dB attenuation and go up to 100dB attenuation max.
+def thres_up(start, step, limit):
+    b = start
+    while True:
+        if "esc" in event.getKeys():
+            core.quit()
+        elif b > limit and not event.getKeys("space"):
+            sound = sounds_custom.Sound(sound_file, sound_device, b)
+            sound.play()
+            b = b - step
+        elif b <= limit or event.getKeys("space"):
+            sound = sounds_custom.Sound(sound_file, sound_device, b)
+            sound.play()
+            sound.stop()
+            print(b)
+            return(b)
+            
+# Start tests:
+values_down = []
+values_up = []
+values_av = []
+start_down = 10
+step = 3
+limit_down = 100
+limit_up = 0
+
+# show instruction
+while True:
+    instr_hearthres.draw()
+    win.flip()
+    if event.getKeys("space"):
+        break
+
+# clear screen & wait a second
+win.flip()
+core.wait(1)
+
+#run test 5x:
+for t_idx in range(1,6):
+    core.wait(0.5)
+    # loud to soft:
+    message1.setAutoDraw(True)
+    win.flip()
+    thres_down = thres_down(start_down, step, limit_down)
+    values_down.append(thres_down)
+    message1.setAutoDraw(False)
+    win.flip()
+    core.wait(1)
+    
+    # soft to loud:
+    start_up = thres_down + 15.0
+    message2.setAutoDraw(True)
+    win.flip()
+    thres_up = thres_up(start_up, step, limit_up)
+    values_up.append(thres_up)
+    message2.setAutoDraw(False)
+    win.flip()
+    core.wait(1)
+    
+    # get average of the 2 thresholds:
+    thres_av = (thres_down + thres_up)/2.0
+    print(thres_av)
+    values_av.append(thres_av)
+    
+    # break:
+    pause.setAutoDraw(True)
+    win.flip()
+    core.wait(3.0)
+    pause.setAutoDraw(False)
+    win.flip()
+    
+# get mean attenuation we need for the experiment:
+av_attenuation = np.mean(values_av) 
+threshold = av_attenuation - 50 # - 50 dB to be 50dB above threshold
+print("average attenuation:", av_attenuation, " - threshold to use:", threshold)
+
+
 # keep track of which components have finished
 settingsComponents = [empty_placeholder]
 for thisComponent in settingsComponents:
@@ -657,12 +750,75 @@ for thisComponent in settingsComponents:
 thisExp.addData('empty_placeholder.started', empty_placeholder.tStartRefresh)
 thisExp.addData('empty_placeholder.stopped', empty_placeholder.tStopRefresh)
 
-# ------Prepare to start Routine "Eyetracking"-------
+# ------Prepare to start Routine "eyetr_calibr"-------
 continueRoutine = True
 # update component parameters for each repeat
+### Calibration/Validation Setup
+
+
+### Configure Graphics ENVironment (= genv) for the tracker calibration:
+genv = EyeLinkCoreGraphicsPsychoPy(el_tracker, win)
+print("version number of EyelinkCoreGraphics library:" + str(genv))
+
+# set colours for the calibratio target
+# (-1, -1, -1) = black
+# (1, 1, 1) = white
+# (0, 0, 0) = mid grey
+foreground_color = (-1, -1, -1) # black
+background_color = tuple(win.color)
+genv.setCalibrationColors(foreground_color, background_color)
+
+# set up the calibration target
+
+# The target could be: "circle" (default), "picture", "movie" clip, or a rotating "spiral"
+# To change the type of calibration target, set TargetType like so:
+# genv.setTargetType("picture")
+# genv.setPictureTarget(os.path.join("images", "fixTarget.bmp"))
+
+# We use the default circle here. 
+
+# Configure the size of the target in pixels:
+# (this is only possible for "circle" and "spiral")
+genv.setTargetSize(24)
+
+# Beeps to play during calibration, validation and drift correction:
+# parameters: target, good, error
+#             target: sound to play when target moves
+#             good: sound to play on successful operation
+#             bad: sound to play on failure or interruption
+# You can use "" for default sounds, "off" for no sounds, or a wav file for custom sounds.
+# --> we use the default sounds:
+genv.setCalibrationSounds("off", "off", "off")
+
+# request pylink to use the PsychoPy window genv we created above for calibration:
+pylink.openGraphicsEx(genv)
+
+
+# --> Remember we set el_tracker.setOfflineMode()? 
+#     We didn't set it back to online mode, but the tracker 
+#     should now switch to online mode automatically as we start the recording.
+
+### Calibrate the Tracker:
+el_tracker.doTrackerSetup()
+# This will open a window where the calibration is run. 
+# After the calibration you'll be asked to run the validation.
+
+
+### Start Recording
+el_tracker.startRecording(1, # sample_to_file = yes
+                       1, # events_to_file = yes 
+                       1, # sample_over_link = yes 
+                       1) # event_over_link = yes
+
+# wait for 500 ms before starting experiment:
+pylink.pumpDelay(500)
+
+
+
+
 # keep track of which components have finished
-EyetrackingComponents = [etRecord]
-for thisComponent in EyetrackingComponents:
+eyetr_calibrComponents = []
+for thisComponent in eyetr_calibrComponents:
     thisComponent.tStart = None
     thisComponent.tStop = None
     thisComponent.tStartRefresh = None
@@ -672,25 +828,17 @@ for thisComponent in EyetrackingComponents:
 # reset timers
 t = 0
 _timeToFirstFrame = win.getFutureFlipTime(clock="now")
-EyetrackingClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
+eyetr_calibrClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
 frameN = -1
 
-# -------Run Routine "Eyetracking"-------
+# -------Run Routine "eyetr_calibr"-------
 while continueRoutine:
     # get current time
-    t = EyetrackingClock.getTime()
-    tThisFlip = win.getFutureFlipTime(clock=EyetrackingClock)
+    t = eyetr_calibrClock.getTime()
+    tThisFlip = win.getFutureFlipTime(clock=eyetr_calibrClock)
     tThisFlipGlobal = win.getFutureFlipTime(clock=None)
     frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
     # update/draw components on each frame
-    # *etRecord* updates
-    if etRecord.status == NOT_STARTED and t >= 0.0-frameTolerance:
-        # keep track of start time/frame for later
-        etRecord.frameNStart = frameN  # exact frame index
-        etRecord.tStart = t  # local t and not account for scr refresh
-        etRecord.tStartRefresh = tThisFlipGlobal  # on global time
-        win.timeOnFlip(etRecord, 'tStartRefresh')  # time at next scr refresh
-        etRecord.status = STARTED
     
     # check for quit (typically the Esc key)
     if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
@@ -700,7 +848,7 @@ while continueRoutine:
     if not continueRoutine:  # a component has requested a forced-end of Routine
         break
     continueRoutine = False  # will revert to True if at least one component still running
-    for thisComponent in EyetrackingComponents:
+    for thisComponent in eyetr_calibrComponents:
         if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
             continueRoutine = True
             break  # at least one component has not yet finished
@@ -709,14 +857,141 @@ while continueRoutine:
     if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
         win.flip()
 
-# -------Ending Routine "Eyetracking"-------
-for thisComponent in EyetrackingComponents:
+# -------Ending Routine "eyetr_calibr"-------
+for thisComponent in eyetr_calibrComponents:
     if hasattr(thisComponent, "setAutoDraw"):
         thisComponent.setAutoDraw(False)
-# make sure the eyetracker recording stops
-if etRecord.status != FINISHED:
-    etRecord.status = FINISHED
-# the Routine "Eyetracking" was not non-slip safe, so reset the non-slip timer
+# the Routine "eyetr_calibr" was not non-slip safe, so reset the non-slip timer
+routineTimer.reset()
+
+# ------Prepare to start Routine "triggers"-------
+continueRoutine = True
+# update component parameters for each repeat
+### Prepare triggers
+
+# pylsl for pushing triggers to lsl stream:
+#from pylsl import StreamInlet, resolve_stream, StreamOutlet, StreamInfo
+
+# for sending triggers the oldschool way by using serial ports:
+from psychopy import parallel
+#port = parallel.ParallelPort() # create port object
+#port.setPortAddress(0xB010) # set address of port
+port = parallel.setPortAddress(0xB010)# set address of port
+
+### List of Trigger Values
+trigger_map = {
+    'block_onset': 2,
+    'response_target': 4,
+    'response_continue': 6,
+    'trial_onset': 8,
+    'click_training_onset': 10,
+    'Reading_Baseline_training_onset': 12,
+    'Reading_Baseline_main_onset': 14,
+    '1back_single_training1_onset': 16,
+    '1back_single_training2_onset': 18,
+    '1back_single_main_onset': 20,
+    '1back_dual_main_onset': 22,
+    '2back_single_training1_onset': 24,
+    '2back_single_training2_onset': 26,
+    '2back_single_main_onset': 28,
+    '2back_dual_main_onset': 30,
+    'prediction_tendency_task_onset': 32,
+    'visual_task_main_onset': 34,
+    'visual_task_training_onset': 36,
+    'block_offset': 38,
+    'freq_440_onset': 40,
+    'freq_440_offset': 42,
+    'freq_587_onset': 44,
+    'freq_587_offset': 46,
+    'freq_782_onset': 48,
+    'freq_782_offset': 50,
+    'freq_1043_onset': 52,
+    'freq_1043_offset': 54,
+    'ordered': 56,
+    'random': 58,
+    'start_experiment': 60,
+    'end_experiment': 62,
+    'trial_offset': 64
+}
+
+# Function to send trigger value by specifying event name
+def send_trigger(event_name):
+    # get corresponding trigger value:
+    trigger_value = trigger_map[event_name]
+    
+    # send trigger to EEG:
+    parallel.setData(trigger_value)
+    #core.wait(0.01) # you need a break between the triggers: wait for 10 ms
+    # turn off trigger
+    #parallel.setData(0) 
+    # I do this after each trigger "manually" because I don't want 
+    # to wait for 10 ms while nothing is happening.
+    
+    # send trigger to Eyetracker:
+    el_tracker.sendMessage(event_name)
+
+# send test triggers to parallel port to check if they all work
+for i in [num for num in range(2, 57) if num % 2 == 0]:
+    # send trigger:
+    parallel.setData(i)
+    core.wait(0.01) # you need a break between the triggers: wait for 10 ms
+    # turn off trigger
+    parallel.setData(0)
+    
+    # send trigger as string to Eyetracker:
+    el_tracker.sendMessage(str(i))
+    
+
+core.wait(1) # wait 1 s
+
+send_trigger(event_name = 'start_experiment')
+
+# keep track of which components have finished
+triggersComponents = []
+for thisComponent in triggersComponents:
+    thisComponent.tStart = None
+    thisComponent.tStop = None
+    thisComponent.tStartRefresh = None
+    thisComponent.tStopRefresh = None
+    if hasattr(thisComponent, 'status'):
+        thisComponent.status = NOT_STARTED
+# reset timers
+t = 0
+_timeToFirstFrame = win.getFutureFlipTime(clock="now")
+triggersClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
+frameN = -1
+
+# -------Run Routine "triggers"-------
+while continueRoutine:
+    # get current time
+    t = triggersClock.getTime()
+    tThisFlip = win.getFutureFlipTime(clock=triggersClock)
+    tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+    frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+    # update/draw components on each frame
+    
+    # check for quit (typically the Esc key)
+    if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
+        core.quit()
+    
+    # check if all components have finished
+    if not continueRoutine:  # a component has requested a forced-end of Routine
+        break
+    continueRoutine = False  # will revert to True if at least one component still running
+    for thisComponent in triggersComponents:
+        if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+            continueRoutine = True
+            break  # at least one component has not yet finished
+    
+    # refresh the screen
+    if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+        win.flip()
+
+# -------Ending Routine "triggers"-------
+for thisComponent in triggersComponents:
+    if hasattr(thisComponent, "setAutoDraw"):
+        thisComponent.setAutoDraw(False)
+# the Routine "triggers" was not non-slip safe, so reset the non-slip timer
 routineTimer.reset()
 
 # set up handler to look after randomisation of conditions etc
@@ -967,7 +1242,7 @@ for thisBlock in blocks:
                     while True:       
                         # check if 10 ms have passed since trigger was sent,
                         # if yes, send 0 to parallel port
-                        if trig_off == False and core.getTime >= onset_time + 0.1 # trigger onset + 10 ms
+                        if trig_off == False and core.getTime() >= onset_time + 0.1: # trigger onset + 10 ms
                             parallel.setData(0)
                             trig_off = True # remember you turned off the trigger
     
@@ -1028,6 +1303,12 @@ for thisBlock in blocks:
     
                         # If esc is pressed, end the experiment:
                         elif event.getKeys(['escape']):
+                            et_abort_exp() # shut down eyetrigger and download incremental data
+                            # make sure parallel port is closed
+                            core.wait(0.1)
+                            parallel.setData(0)
+                            core.wait(0.5)
+                            # end experiment
                             core.quit()
                     
                     ### end trial
@@ -1078,11 +1359,7 @@ for thisBlock in blocks:
                     if expInfo['testing_mode'] == "yes":
                         if trial_idx == 3:
                             break
-                    
-                    ### send stimulus offset trigger to LSL stream
-                    marker_text = "block_" + curr_block + "_trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + str(curr_nback_response)
-                    out_marker.push_sample(["STIM_OFFSET_" + marker_text])
-                    
+    
                 print("finished presenting trials")
                 
                 # change background colour from grey (RGB: 10, 10, 10)
@@ -1529,11 +1806,11 @@ for thisBlock in blocks:
                 
             # If esc is pressed, end the experiment:
             elif event.getKeys(['escape']):
-                # close port
+                et_abort_exp() # shut down eyetrigger and download incremental data             
+                # close parallel port
                 core.wait(0.1)
                 parallel.setData(0)
-                core.wait(3)
-                
+                core.wait(0.5)
                 core.quit()
         
         ### end trial
@@ -2494,6 +2771,15 @@ for thisBlock in blocks:
     # ------Prepare to start Routine "warning"-------
     continueRoutine = True
     # update component parameters for each repeat
+    ### Eyetracker: Run drift correction
+    # do_drift_check()
+    # --> I think you only have to this once every hour or so, 
+    # so doing this after each block would be too much. 
+    # My experiment is only 1.5h long or so, so I guess it's 
+    # not that important. 
+    # More importantly: I think it stops the recording, which I don't want.
+    
+    
     ### Show warning sign if task changes
     
     # If task in last block (curr_block) is not the same as the next one, show warning.
@@ -2667,6 +2953,8 @@ continueRoutine = True
 
 # exclude all RTs where participant was way too fast (< 50 ms) or
 # way too slow (> 2s), also remove the corresponding words from vis_task_words
+print("vis_task_durations:", vis_task_durations)
+print("vis_task_words:", vis_task_durations)
 
 filtered_durations = []
 filtered_words = []
@@ -2674,10 +2962,12 @@ for duration, word in zip(vis_task_durations, vis_task_words):
     if 50 <= duration <= 2000:
         filtered_durations.append(duration)
         filtered_words.append(word)
+print("filtered_durations:", filtered_durations)
+print("filtered_words:", filtered_words)
 
 # Now get number of letters (not words, I want to know how fast they read 1 letter on average!):
 letters_total = sum(len(word) for word in filtered_words)
-
+print("letters_total:", letters_total)
 # also get time it took in total to read them all:
 reading_time_total = sum(filtered_durations) # in ms
 
@@ -2947,7 +3237,13 @@ for trial_idx, curr_word in enumerate(curr_text_training):
             
         # If esc is pressed, end the experiment:
         elif event.getKeys(['escape']):
+            et_abort_exp() # shut down eyetrigger and download incremental data
+            # close parallel port
+            core.wait(0.1)
+            parallel.setData(0)
+            core.wait(0.5)
             core.quit()
+           
     
     ### end trial
     print("end trial")
@@ -3242,6 +3538,11 @@ for trial_idx, curr_word in enumerate(curr_text):
             print("detected C key press -- 0-back RT: " + str(curr_nback_RT) + " ms") # * 1000 to convert s to ms
         # If esc is pressed, end the experiment:
         elif event.getKeys(['escape']):
+            et_abort_exp() # shut down eyetrigger and download incremental data
+            # close parallel port
+            core.wait(0.1)
+            parallel.setData(0)
+            core.wait(0.5)
             core.quit()
     
     ### end trial
@@ -3298,7 +3599,7 @@ print("finished visual task block")
 send_trigger("block_offset")
 core.wait(0.01) # wait 10 ms
 parallel.setData(0)
- core.wait(0.1) # wait 100 ms           
+core.wait(0.1) # wait 100 ms           
 # Send end of block trigger:
 core.wait(0.01) # wait 100 ms
 
@@ -3690,7 +3991,7 @@ for tone_idx, curr_freq in enumerate(task_order_stimuli):
     now = ptb.GetSecs() # get current time stamp
     curr_tone.play(when = now)  # play the sound immediately
     
-    # send tone onset trigger to LSL stream
+    # send tone onset trigger
     send_trigger("freq_" + str(curr_freq) + "_onset")
     core.wait(0.01) # wait 10 ms
     parallel.setData(0)
@@ -3827,21 +4128,37 @@ while True:
         core.wait(0.01) 
         parallel.setData(0)
         
-        # STOP EYETRACKER:
+        
+        ### STOP EYETRACKER:
+        
+        # wait 500 ms to catch final events before stopping
+        pylink.pumpDelay(500)
+
         # stop recording:
         eyelink.stopRecording()
+        
         # put eyetracker into Offline Mode:
         eyelink.setOfflineMode()
+        
+        # clear eyetracking host PC screen and wait for 500 ms
+        el_tracker.sendCommand('clear_screen 0')
+        pylink.msecDelay(500)
+        
         # close data file:
-        eyelink.closeDataFile()
+        el_tracker.closeDataFile()
+        
+        # print file transfer message:
+        print("EDF data is transferring from Eyetracking PC")
+        
+        # download the EDF data from the Host PC to a local data folder:
+        local_edf = os.path.join(expInfo['participant'] + "EL" + ".EDF")
+        el_tracker.receiveDataFile(edf_file, local_edf)
+        
         # Wait 2s to ensure data isn't lost:
         core.wait(2)  
-        # download data file:
-        eyelink.receiveDataFile(filename_eyetracker, eyelinkpath, 1)
-        # Wait 2 s to ensure data isn't lost:
-        core.wait(2) 
+        
         # close eyetracker:
-        eyelink.close()
+        el_tracker.close()
         
         # Wait again:
         core.wait(2) 

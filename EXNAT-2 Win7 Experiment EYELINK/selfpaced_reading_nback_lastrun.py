@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on August 14, 2023, at 15:55
+    on August 15, 2023, at 16:41
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -52,7 +52,7 @@ filename = _thisDir + os.sep + u'data/%s_%s_%s' % (expInfo['participant'], expNa
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath='F:\\EXNAT-2\\EEG_study_EXNAT2\\EXNAT-2 Win7 Experiment EYELINK\\selfpaced_reading_nback_lastrun.py',
+    originPath='C:\\Users\\AC\\Desktop\\Merle\\EXNAT-2 Win7 Experiment EYELINK\\selfpaced_reading_nback_lastrun.py',
     savePickle=True, saveWideText=True,
     dataFileName=filename)
 logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a file
@@ -173,6 +173,11 @@ def escape_quotes(string):
 #info_marker_stream = StreamInfo('PsychoPyMarkers', 'Marker', 1, 0, 'string')
 #out_marker = StreamOutlet(info_marker_stream)
 #out_marker.push_sample(["TEST MARKER"])
+
+
+# make mouse invisible during experiment
+#mouse = io.devices.mouse
+win.setMouseVisible(False)
 ### Stimulus settings
 
 # set flicker frequency (in Hz)
@@ -356,7 +361,7 @@ empty_placeholder = visual.TextStim(win=win, name='empty_placeholder',
     pos=(0, 0), height=0.1, wrapWidth=None, ori=0.0, 
     color='white', colorSpace='rgb', opacity=None, 
     languageStyle='LTR',
-    depth=-2.0);
+    depth=-3.0);
 
 # Initialize components for Routine "eyetr_calibr"
 eyetr_calibrClock = core.Clock()
@@ -563,6 +568,136 @@ def et_abort_exp():
 #                                  int(scn_height/2.0), 
 #                                  1, 1)
 #    except: pass # do nothing if drift correction didn't work
+
+### Determine hearing threshold
+
+import sounds_custom # sounds3 module from Sarah's cuecue study T2
+import sounddevice as sd
+#print(sd.query_devices()) # print all sound devices we can access to check which one you need
+import os
+
+# prepare instructions
+instr_hearthres = visual.TextStim(win=win, text = "Zum Starten bitte die Leertaste drücken!", pos = (0,0), color = "black", height = 0.5, wrapWidth = 1600)
+
+message1 = visual.TextStim(win=win, text = "Laut nach leise.\n\nDrücken Sie bitte die Leertaste, wenn nichts mehr zu hören ist.", pos = (0,0), color = "black", height = 0.5, wrapWidth = 1600)
+message2 = visual.TextStim(win=win, text = "Leise nach laut.\n\nDrücken Sie bitte die Leertaste, sobald etwas zu hören ist.", pos = (0,0), color = "black", height = 0.5, wrapWidth = 1600)
+pause = visual.TextStim(win=win, text = "Kurze Pause!", pos = (0,0), color = "black", height = 0.5, wrapWidth = 1600)
+
+
+# sound setup
+sound_file = "cuecue_stim.wav"
+# pick the right channels here: 7+8 are the in-ear headphone channels, so 5+6 (#34 as used in Sarah's CueCue) could be the loudspeakers?
+sound_device = "Analog (7+8) (RME Fireface UC), Windows DirectSound" # 7+8 are the output channels
+sound = sounds_custom.Sound(sound_file, sound_device, 10) 
+
+# loud to soft:
+def staircase_down(start, step, limit):
+    event.clearEvents() # clear all previous keypresses from buffer
+    b = start
+    while True:
+        pressed_keys = event.getKeys()
+        if 'escape' in pressed_keys:
+            core.quit()
+        if b < limit and not pressed_keys:
+            sound = sounds_custom.Sound(sound_file, sound_device, b)
+            sound.play()
+            b = b + step
+        else:
+            sound = sounds_custom.Sound(sound_file, sound_device, b)
+            #sound.play()
+            sound.stop()
+            print("detected threshold for current run:", b)
+            return(b)
+            
+            
+            
+#soft to loud, start at 10dB attenuation and go up to 100dB attenuation max.
+def staircase_up(start, step, limit):
+    event.clearEvents() # clear all previous keypresses from buffer
+    b = start
+    while True:
+        pressed_keys = event.getKeys()
+        if 'escape' in pressed_keys:
+            core.quit()
+        if b > limit and not pressed_keys:
+            sound = sounds_custom.Sound(sound_file, sound_device, b)
+            sound.play()
+            b = b - step
+        else:
+            sound = sounds_custom.Sound(sound_file, sound_device, b)
+            #sound.play()
+            sound.stop()
+            print("detected threshold for current run:", b)
+            return(b)
+
+            
+# Start tests:
+values_down = []
+values_up = []
+values_av = []
+start_down = 10
+step = 3
+limit_down = 100
+limit_up = 0
+
+# show instruction
+while True:
+    instr_hearthres.draw()
+    win.flip()
+    if event.getKeys(['space']):
+        break
+
+# clear screen & wait a second
+win.flip()
+core.wait(1)
+
+#run test 5x:
+for t_idx in range(1,6):
+    print("hearing ts trial:", t_idx)
+    print("start down:", start_down)
+    print("step:", step)
+    print("limit down:", limit_down)
+    print("limit up", limit_up)
+    
+    core.wait(0.5)
+    # loud to soft:
+    message1.setAutoDraw(True)
+    win.flip()
+    thres_down = staircase_down(start_down, step, limit_down)
+    values_down.append(thres_down)
+    message1.setAutoDraw(False)
+    win.flip()
+    core.wait(1)
+    
+    # soft to loud:
+    start_up = thres_down + 15.0
+    print("start_up", start_up)
+    message2.setAutoDraw(True)
+    win.flip()
+    thres_up = staircase_up(start_up, step, limit_up)
+    values_up.append(thres_up)
+    message2.setAutoDraw(False)
+    win.flip()
+    core.wait(1)
+    
+    # get average of the 2 thresholds:
+    thres_av = (thres_down + thres_up)/2.0
+    print(thres_av)
+    values_av.append(thres_av)
+    
+    # break:
+    pause.setAutoDraw(True)
+    win.flip()
+    core.wait(3.0)
+    pause.setAutoDraw(False)
+    win.flip()
+    print("-------------")
+    
+# get mean attenuation we need for the experiment:
+av_attenuation = np.mean(values_av) 
+threshold = av_attenuation - 50 # - 50 dB to be 50dB above threshold
+print("average attenuation:", av_attenuation, " - threshold to use:", threshold)
+
 
 # keep track of which components have finished
 settingsComponents = [empty_placeholder]
@@ -2832,6 +2967,8 @@ continueRoutine = True
 
 # exclude all RTs where participant was way too fast (< 50 ms) or
 # way too slow (> 2s), also remove the corresponding words from vis_task_words
+print("vis_task_durations:", vis_task_durations)
+print("vis_task_words:", vis_task_durations)
 
 filtered_durations = []
 filtered_words = []
@@ -2839,10 +2976,12 @@ for duration, word in zip(vis_task_durations, vis_task_words):
     if 50 <= duration <= 2000:
         filtered_durations.append(duration)
         filtered_words.append(word)
+print("filtered_durations:", filtered_durations)
+print("filtered_words:", filtered_words)
 
 # Now get number of letters (not words, I want to know how fast they read 1 letter on average!):
 letters_total = sum(len(word) for word in filtered_words)
-
+print("letters_total:", letters_total)
 # also get time it took in total to read them all:
 reading_time_total = sum(filtered_durations) # in ms
 
@@ -3866,7 +4005,7 @@ for tone_idx, curr_freq in enumerate(task_order_stimuli):
     now = ptb.GetSecs() # get current time stamp
     curr_tone.play(when = now)  # play the sound immediately
     
-    # send tone onset trigger to LSL stream
+    # send tone onset trigger
     send_trigger("freq_" + str(curr_freq) + "_onset")
     core.wait(0.01) # wait 10 ms
     parallel.setData(0)
