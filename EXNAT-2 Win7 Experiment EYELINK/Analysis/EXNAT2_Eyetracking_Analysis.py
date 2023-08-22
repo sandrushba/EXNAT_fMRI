@@ -73,7 +73,7 @@ curr_data_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EXNAT-2 Win7 Ex
 eyelink_raw = read_raw_eyelink(curr_data_path, 
                                create_annotations=["blinks", "messages"], # mark blinks in the stream & add trigger messages
                                preload=True,
-                               apply_offsets = False) # adjust onset time of the mne.Annotations created from exp. messages (= triggers)
+                               apply_offsets = True) # adjust onset time of the mne.Annotations created from exp. messages (= triggers) --> doesn't make a difference what I do here for my data, we don't have that information
 
 # Check out info to see if everything looks fine:
 eyelink_raw.info
@@ -351,7 +351,9 @@ for onset_row_idx, onset_row in enumerate(onset_events):
     
     
 
-    # Loop epochs, get corresponding word and save word, surprisal scores as annotations?
+    # Loop epochs, get average, max and min
+    
+    # get corresponding word and save avg, max, min, and word, surprisal scores as annotations?
     
     
     
