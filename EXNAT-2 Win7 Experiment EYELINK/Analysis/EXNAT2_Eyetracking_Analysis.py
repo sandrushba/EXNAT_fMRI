@@ -40,6 +40,8 @@ Version: August 16, 2023
 import os
 os.chdir('/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EXNAT-2 Win7 Experiment EYELINK/Analysis/')
 
+# for getting file list
+import glob
 
 import numpy as np
 
@@ -63,51 +65,127 @@ import matplotlib.pyplot as plt
 
 # ----------------------------------------------------- # 
 
-# set path to data here:
-curr_data_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EXNAT-2 Win7 Experiment EYELINK/Analysis/data_eyelink_asc/test.asc"
+# set working directory
 
+# get directory of this script:
+os.getcwd()
+
+# set working directory 
 
 # ----------------------------------------------------- # 
 
-""" Read in ascii Dataset as MNE Raw Object"""
-eyelink_raw = read_raw_eyelink(curr_data_path, 
-                               create_annotations=["blinks", "messages"], # mark blinks in the stream & add trigger messages
-                               preload=True,
-                               apply_offsets = True) # adjust onset time of the mne.Annotations created from exp. messages (= triggers) --> doesn't make a difference what I do here for my data, we don't have that information
+""" Get surprisal scores & word frequencies """
 
-# Check out info to see if everything looks fine:
-eyelink_raw.info
-
-# plot all channels:
-eyelink_raw.plot(scalings = dict(eyegaze = 1e3))
-
-""" Check quality of calibration: """
-cals = read_eyelink_calibration(curr_data_path)
-print(f"number of calibrations: {len(cals)}")
-first_cal = cals[0]  # let's access the first (and only in this case) calibration
-print(first_cal)
-# plot calibrations to check quality:
-# first_cal.plot()
+# read in csv with surprisal scores:
+surprisal_scores_df = pd.read_csv('surprisal scores/surprisal_scores_masked_context.csv')   
+# get rid of weird first column:
+surprisal_scores_df = surprisal_scores_df.drop(columns = ['Unnamed: 0'])
+# rename "word_no_punct" column to just "word"
+surprisal_scores_df = surprisal_scores_df.rename(columns = {'word_no_punct': 'word'})
 
 
-""" Preprocessing: Interpolate missing data in blink periods """
+# get word frequency df
+word_freqs_df = pd.read_csv('word frequencies/Word_freqs.csv', 
+                            sep=';')
+# get rid of weird first column:
+word_freqs_df = word_freqs_df.drop(columns=['Unnamed: 0'])
 
-# plot raw eyetracking data from pupil size channel of right eye 
-# to see if everything's there and the triggers were recorded properly:
-pupil_channel_idx = mne.pick_channels(eyelink_raw.ch_names, ["pupil_right"])
-#eyelink_raw.plot(scalings = dict(eyegaze = 1e3), order = pupil_channel_idx)
+# assign word frequency to each word in surprisal_scores_df
+# --> merge dfs based on columns word, text_nr & trial_nr
+surprisal_scores_df = pd.merge(surprisal_scores_df, word_freqs_df, 
+                               on = ['text_nr', 'word', 'trial_nr'])
 
-# There are blinks in our data, so sometimes pupil dilation = 0. 
-# We don't want to throw away data here, so interpolate the missing bits.
-# We'll use 0.05 = 50 ms before and 0.2 = 200 ms after the blink as the interpolation 
-# window, so that the noisy data surrounding the blink is also interpolated
-#mne.preprocessing.eyetracking.interpolate_blinks(eyelink_raw, 
-#                                                 buffer = (0.05, 0.2), 
-#                                                 interpolate_gaze = True) # also interpolate gaze coordinates although eye movements can occur during blinks which makes the gaze data less suitable for interpolation
+# ----------------------------------------------------- # 
 
-# plot again: 
-#eyelink_raw.plot(scalings = dict(eyegaze = 1e3))
+# Loop participants
+# get file list from "data_psychopy" folder
 
+file_list = glob.glob(os.path.join("data_psychopy/", '*.csv'))
+
+# loop files in file list
+for file_idx, file in enumerate(file_list):
+
+
+    """ Read in behavioral data csv from Psychopy"""
+    psychopy_df = pd.read_csv(file)
+    
+    # get current participant's ID:
+    curr_id = psychopy_df["participant"][0]
+    
+    # get age 
+    curr_age = psychopy_df["age"][0]
+        
+    # get handedness
+    curr_handedness = psychopy_df["handedness"][0]
+    
+    # get gender
+    curr_gender = psychopy_df["gender"][0]
+    
+    # get date & time of measurement:
+    curr_date = psychopy_df["date"][0]
+        
+    # small message so we know which dataset we're dealing with:
+    print("reading in file", file_idx+1, "of", len(file_list), "- current participant's ID:", curr_id)
+
+    # create df for their data, append column with their ID:
+    curr_df = surprisal_scores_df.copy()
+    curr_df.insert(0, 'id', curr_id)
+    curr_df.insert(1, 'age', curr_age)
+    curr_df.insert(2, 'gender', curr_gender)
+    curr_df.insert(3, 'handedness', curr_handedness)
+    curr_df.insert(4, 'measurement_date', curr_date)
+
+    # append empty columns for pupil size mean, min and max, RT, target,...
+    curr_df['pupil_mean'] = None
+    curr_df['pupil_min']  = None
+    curr_df['pupil_max']  = None
+    curr_df['excluded']   = True # turn this to False if epoch wasn't excluded
+    curr_df['RT']         = None
+    curr_df['nback_response'] = None
+    curr_df['target']         = None
+
+    """ Read in corresponding Eyelink ascii Dataset as MNE Raw Object"""
+    eyelink_raw = read_raw_eyelink("data_eyelink_asc/" + curr_id + ".asc", 
+                                   create_annotations=["blinks", "messages"], # mark blinks in the stream & add trigger messages
+                                   preload=True,
+                                   apply_offsets = True) # adjust onset time of the mne.Annotations created from exp. messages (= triggers) --> doesn't make a difference what I do here for my data, we don't have that information
+
+    # Check out info to see if everything looks fine:
+    #eyelink_raw.info
+
+    # include measurement date in the dataframe
+    
+    
+    # plot all channels:
+    #eyelink_raw.plot(scalings = dict(eyegaze = 1e3))
+
+    """ Check quality of calibration: """
+    cals = read_eyelink_calibration(curr_data_path)
+    print(f"number of calibrations: {len(cals)}")
+    first_cal = cals[0]  # let's access the first (and only in this case) calibration
+    print(first_cal)
+    # plot calibrations to check quality:
+    # first_cal.plot()
+
+
+    """ Preprocessing: Interpolate missing data in blink periods """
+    
+    # plot raw eyetracking data from pupil size channel of right eye 
+    # to see if everything's there and the triggers were recorded properly:
+    pupil_channel_idx = mne.pick_channels(eyelink_raw.ch_names, ["pupil_right"])
+    #eyelink_raw.plot(scalings = dict(eyegaze = 1e3), order = pupil_channel_idx)
+    
+    # There are blinks in our data, so sometimes pupil dilation = 0. 
+    # We don't want to throw away data here, so interpolate the missing bits.
+    # We'll use 0.05 = 50 ms before and 0.2 = 200 ms after the blink as the interpolation 
+    # window, so that the noisy data surrounding the blink is also interpolated
+    #mne.preprocessing.eyetracking.interpolate_blinks(eyelink_raw, 
+    #                                                 buffer = (0.05, 0.2), 
+    #                                                 interpolate_gaze = True) # also interpolate gaze coordinates although eye movements can occur during blinks which makes the gaze data less suitable for interpolation
+    
+    # plot again: 
+    #eyelink_raw.plot(scalings = dict(eyegaze = 1e3))
+    
 
 
 """ Preprocessing: Control for potential influence of eye movements on pupil size """
@@ -352,12 +430,47 @@ for onset_row_idx, onset_row in enumerate(onset_events):
     
 
     # Loop epochs, get average, max and min
-    
-    # get corresponding word and save avg, max, min, and word, surprisal scores as annotations?
+    for epoch in curr_block_epochs:
+        print()
+        
+        
+        # get pupil size data for the current epoch
+        pupil_data = epoch['residual_pupil_size']  
+
+        # calculate the mean, minimum, and maximum pupil size:
+        epoch_average = np.mean(pupil_data)
+        epoch_minimum = np.min(pupil_data)
+        epoch_maximum = np.max(pupil_data)
+
+        # Find out which block, trial & text_nr we're looking at
+        curr_text_nr = pass
+        curr_trial = pass
+        curr_block = [key for key, value in all_block_onset_triggers.items() if value == onset_trigger_val][0]
+        # remove substring "_onset" from block name string
+        curr_block = curr_block.replace("_onset", "")
+
+        
+
+        # get corresponding trial and save avg, max, min, and word, surprisal scores as annotations?
     
     
     
 curr_block_epochs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
