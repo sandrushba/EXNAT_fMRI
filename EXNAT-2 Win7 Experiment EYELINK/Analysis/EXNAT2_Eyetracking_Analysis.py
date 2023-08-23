@@ -491,8 +491,8 @@ for file_idx, file in enumerate(file_list):
             # remove substring "_onset" from block name string
             curr_block = curr_block.replace("_onset", "")
             
-            # if it's the click training block, skip the next part:
-            if curr_block == "click_training":
+            # if it's the clicktraining or prediction tendency task block, skip the next part
+            if curr_block in ["click_training", "prediction_tendency_task"]:
                 continue
             
             # if not, find out which block nr we have here:
@@ -507,8 +507,8 @@ for file_idx, file in enumerate(file_list):
                                                 (curr_df['trial_nr'] == 1),
                                                 ['block_nr']][reading_BL_main_counter]
                     # add 1 to counter because we found one of the blocks:
-                    reading_BL_main_counter = reading_BL_main + 1
-                
+                    reading_BL_main_counter = reading_BL_main_counter + 1
+                 
                 
                 # do the same for 1-back and 2-back main blocks:
                 elif curr_block == "1back_dual_main":
@@ -528,14 +528,23 @@ for file_idx, file in enumerate(file_list):
                     twoback_dual_main_counter = twoback_dual_main_counter + 1
                 
                 # for the blocks where we have only one anyway:
-                elif curr_block in ["Reading_Baseline_training", "visual_task_main", "visual_task_training", "prediction_tendency_task"]:
-                    curr_block_nr = curr_df.query(block_name == curr_block | trial_nr == 1)["block_nr"]
-                                
-    
-
-
-            
-
+                elif curr_block in ["Reading_Baseline_training", 
+                                    "1back_single_training1", "1back_single_training2", "1back_single_main",
+                                    "2back_single_training1", "2back_single_training2", "2back_single_main",
+                                    "visual_task_main", "visual_task_training", "prediction_tendency_task"]:
+                    
+                    curr_block_nr = curr_df.loc[(curr_df['block_name'] == curr_block) & 
+                                                (curr_df['trial_nr'] == 1),
+                                                ['block_nr']][0]
+                 
+                    
+                    
+                # TO DO:
+                # for the prediction tendency task random & ordered blocks:
+                elif curr_block in ["ordered", "random"]:
+                    pass
+                    
+                    
             
                 # get pupil size data for the current epoch
                 pupil_data = epoch.get_data(picks = ['residual_pupil_size']) 
