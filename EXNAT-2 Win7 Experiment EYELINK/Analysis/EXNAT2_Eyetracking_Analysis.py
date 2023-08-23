@@ -145,6 +145,18 @@ for file_idx, file in enumerate(file_list):
     curr_df = pd.merge(curr_df,surprisal_scores_df, 
                                on = ['text_nr', 'word_punct', 'trial_nr'])
 
+
+
+
+
+    # PROBLEM: The merge removes all rows that don't have a text_nr. Maybe add a row in surprisal_scores_df where text_nr is empty?
+
+
+
+
+    
+
+
     # change the order of the columns because it's a bit messy.
     curr_df = curr_df[['participant','age','handedness','gender','date', # session & participant info
                        'block_nr', 'block_name','block_kind','text_nr', # block info
@@ -420,29 +432,9 @@ for file_idx, file in enumerate(file_list):
         # reading_BL_training is 1, then it's the first one and we can set the counter to 2. 
         # If it's set to 2, it's the second one. 
         
-        reading_BL_training = 1
-        reading_BL_main = 1
-        
-        oneback_training = 1
-        oneback_dual_main = 1
-        
-        twoback_training = False
-        twoback_dual_main = False
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        reading_BL_main_counter   = 0           
+        oneback_dual_main_counter = 0
+        twoback_dual_main_counter = 0
         
         
         # Now that we have the block, create epochs around the stim onsets:
@@ -502,9 +494,46 @@ for file_idx, file in enumerate(file_list):
             # if it's the click training block, skip the next part:
             if curr_block == "click_training":
                 continue
+            
+            # if not, find out which block nr we have here:
             else:
             
-                curr_text_nr = pass
+                if curr_block == "Reading_Baseline_main":
+                                        
+                    # now get all blocks where we have the current block name. Get all first trials, 
+                    # that means with 3 blocks, we get 3 rows with different block numbers. 
+                    # Then take the block number at the index reading_BL_main_counter
+                    curr_block_nr = curr_df.loc[(curr_df['block_name'] == curr_block) & 
+                                                (curr_df['trial_nr'] == 1),
+                                                ['block_nr']][reading_BL_main_counter]
+                    # add 1 to counter because we found one of the blocks:
+                    reading_BL_main_counter = reading_BL_main + 1
+                
+                
+                # do the same for 1-back and 2-back main blocks:
+                elif curr_block == "1back_dual_main":
+                    
+                    curr_block_nr = curr_df.loc[(curr_df['block_name'] == curr_block) & 
+                                                (curr_df['trial_nr'] == 1),
+                                                ['block_nr']][oneback_dual_main_counter]
+
+                    oneback_dual_main_counter = oneback_dual_main_counter + 1
+                    
+                
+                elif curr_block == "2back_dual_main":
+                    curr_block_nr = curr_df.loc[(curr_df['block_name'] == curr_block) & 
+                                                (curr_df['trial_nr'] == 1),
+                                                ['block_nr']][twoback_dual_main_counter]
+
+                    twoback_dual_main_counter = twoback_dual_main_counter + 1
+                
+                # for the blocks where we have only one anyway:
+                elif curr_block in ["Reading_Baseline_training", "visual_task_main", "visual_task_training", "prediction_tendency_task"]:
+                    curr_block_nr = curr_df.query(block_name == curr_block | trial_nr == 1)["block_nr"]
+                                
+    
+
+
             
 
             
