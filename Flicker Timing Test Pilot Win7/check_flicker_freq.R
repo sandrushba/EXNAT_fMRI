@@ -181,7 +181,52 @@ cat("Mean flicker frequency:", flicker_frequency, "Hz")
 # -------------------------------------------------------------------------------------
 
 # Test 9: Test everything with activated triggers & connected devices on the lab PC
+1/mean(c(62+17 , 62+17, 62+17,38+41,38+41,38+41,38+41,62+17, 62+17)/1000) # 14.98 Hz. I don't see any gaps in the signal.
 
 
 
 
+
+# Plot the flicker:
+
+install.packages("ggplot2")
+library(ggplot2)
+
+# duration of on- and off-states in ms:
+durations <- c(62, 17, 62, 17, 62, 17, 38, 41, 38, 41, 38, 41, 38, 41, 62, 17, 62, 17)
+# states: either "on" = 1 or "off" = 0, starting with 1:
+states <- rep(c(1, 0), length(durations))
+
+# Create a time vector: 
+# gradually sum up durations so we see how many 
+# ms we have in total at each point:
+time <- c(0, cumsum(durations))
+
+sfreq = 100 
+# let's say we have 100 sampling points / sec 
+# (I think the blackbox has 6000Hz, but doesn't matter here)
+
+# Generate the time series
+time_series <- data.frame(Time = seq(0, max(time), 1/sfreq))
+time_series$State <- 0  # Initialize the state as "Off"
+
+# Update the state based on the time vector
+for (i in 1:length(time) - 1) {
+  start_time <- time[i]
+  end_time <- time[i + 1]
+  state_value <- states[i]
+  
+  time_series$State[which(time_series$Time >= start_time & time_series$Time < end_time)] <- state_value
+}
+
+# Plot the time series
+ggplot(time_series, 
+       aes(x = Time, y = State)) +
+geom_step(direction = "hv") +
+labs(title = "Flicker in EXNAT-2",
+     x = "Time (ms)",
+     y = "State (On/Off)") + 
+theme_minimal() +  # Removes background
+theme(axis.text.y = element_blank(), # remove y-axis labels
+      panel.grid = element_blank(), # remove gridlines
+      axis.line = element_line(color = "black")) # keep axes
