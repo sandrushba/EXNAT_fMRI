@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on Thu Aug 31 14:04:37 2023
+    on August 31, 2023, at 14:37
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -56,7 +56,7 @@ filename = _thisDir + os.sep + u'data/%s_%s_%s' % (expInfo['participant'], expNa
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath='/Volumes/MERLE 1/EXNAT-2/EEG_study_EXNAT2/Flicker Pilot Win7 15Hz/selfpaced_reading_nback_lastrun.py',
+    originPath='E:\\EXNAT-2\\EEG_study_EXNAT2\\Flicker Pilot Win7 15Hz\\selfpaced_reading_nback_lastrun.py',
     savePickle=True, saveWideText=True,
     dataFileName=filename)
 logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a file
@@ -197,13 +197,15 @@ flicker_freq = frame_rate/4 # 60/4 = 15 Hz
 #light_bg_col_hex = "#FDFBF0" # ivory instructions background
 #dark_bg_col_hex  = "#505050" # dark grey background for stimuli
 light_bg_col = [(x / 127.5) - 1 for x in (253, 251, 240)] # ivory instructions background (use RGB -1:1)
-dark_bg_col  = [(x / 127.5) - 1 for x in (80, 80, 80)] # dark grey background for stimuli (use RGB -1:1)
+#dark_bg_col  = [(x / 127.5) - 1 for x in (80, 80, 80)] # dark grey background for stimuli (use RGB -1:1)
+dark_bg_col = [(x / 127.5) - 1 for x in (253, 251, 240)] # for testing
 
 # make background light for a start - use rgb -1:1 colour codes
 win.setColor(light_bg_col, colorSpace='rgb')
 
 # set colours you want to use for the stimuli:
-colours = ["#D292F3", "#F989A2", "#2AB7EF", "#88BA3F"]
+#colours = ["#D292F3", "#F989A2", "#2AB7EF", "#88BA3F"]
+colours = ["#000000", "#0e0e0e", "#151515", "#070707"] #all black for testing
 print("Preparing experiment with n-back colours:", colours)
 
 #  #D292F3 = weird lilac with a 2000s vibe
@@ -1107,7 +1109,8 @@ for thisBlock in blocks:
                            text = " ", 
                            pos = (0,0), # center stimulus
                            font = "Times New Roman",
-                           height = 1) # font height = 1° visual angle
+                           height = 6) # for testing
+                           #height = 1) # font height = 1° visual angle
     
     if flicker_on:
         # create grey rectangle that masks the text if I set opacity to 1
@@ -1246,11 +1249,9 @@ for thisBlock in blocks:
             
             # check for responses
             keys = event.getKeys(["space", "c", "escape"])
-            print(keys)
             
             # if there was a response:
             for key in keys:
-                print(key)
                 # if participant presses space bar on their keyboard...
                 if key == 'space':
                     # get reaction time
@@ -2538,10 +2539,16 @@ stim_mask.draw()
 win.flip()
 
 
+# create block clock
+my_block_clock = core.Clock()
+my_block_clock.reset() # start block clock
+start_time = my_block_clock.getTime() # get start time of block
+# also create trial clock:
+my_trial_clock = core.Clock()
+            
 # loop words in current text
 for trial_idx, curr_word in enumerate(curr_text_training):
-    print("current idx: " + str(trial_idx) + ", curr word:" + curr_word)
-    
+
     ### prepare & show current word:
     
     # get current colour
@@ -2561,12 +2568,12 @@ for trial_idx, curr_word in enumerate(curr_text_training):
     
     # Flicker option 1: use sine-wave (gradient) flicker
     # create current opacity value to continue flickering the word
-    #frame_time = core.getTime() # get current time point (in sec)
+    #frame_time = my_block_clock.getTime() # get current time point (in sec)
     #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
     #opacity = (flicker_intensity + 1) / 2
 
     # use square-wave (on-off) flicker
-    frame_time = core.getTime() # get current time point (in sec)
+    frame_time = my_block_clock.getTime() # get current time point (in sec)
     time_passed = frame_time - start_time # calculate time passed since start
     cycle_duration = 1 / flicker_freq # calculate duration of one flicker cycle
     cycle_passed = time_passed % cycle_duration # calculate time passed in current flicker cycle
@@ -2582,15 +2589,9 @@ for trial_idx, curr_word in enumerate(curr_text_training):
     stim_mask.draw() # draw mask on screen
     win.flip() # update the window to clear the screen and display the word
 
-    # send word onset trigger to LSL stream
-    marker_text = "trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + str(curr_target)
-    #out_marker.push_sample(["STIM_ONSET_vistask_training" + marker_text])
-    
     # record trial onset time
-    onset_time = core.getTime()
-    print("onset_time:", onset_time)
-    print("word duration: " +  str(onset_time + curr_duration) + " ms")
-    
+    my_trial_clock.reset()
+    onset_time = my_trial_clock.getTime()
 
     ### wait for key response until curr_duration is over: 
 
@@ -2600,18 +2601,17 @@ for trial_idx, curr_word in enumerate(curr_text_training):
     ### start recording responses
     # start while loop that looks for responses
     # --> end while loop only if duration for current word is over
-    while core.getTime() < (onset_time + curr_duration):    
-        print("curr time stamp:", core.getTime())
+    while my_trial_clock.getTime() < (onset_time + curr_duration):    
         # in each iteration, draw word on screen
         # --> flicker again
 
         # Flicker option 1: use sine-wave (gradient) flicker
-        #frame_time = core.getTime() 
+        #frame_time = my_block_clock.getTime() 
         #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
         #opacity = (flicker_intensity + 1) / 2
 
         # Flicker option 2: use square-wave (on-off) flicker
-        frame_time = core.getTime() 
+        frame_time = my_block_clock.getTime() 
         time_passed = frame_time - start_time 
         cycle_duration = 1 / flicker_freq
         cycle_passed = time_passed % cycle_duration
@@ -2626,24 +2626,28 @@ for trial_idx, curr_word in enumerate(curr_text_training):
         stim_mask.draw()
         win.flip()
         
+        # record responses:
+        keys = event.getKeys(["c", "escape"])
+        
         # if participant pressed button "c" and hasn't already responded in the current trial
-        if event.getKeys(['c']) and previous_response == False:
-            # get reaction time
-            # we measure reaction time from the onset of the current word, even if the target 
-            # was the word before (or occurred even earlier). 
-            # In such cases we can infer the actual reaction times from the df later.
-            # Reason why I don't use the last target as an onset: Doesn't take into 
-            # account that there might be false alarm responses.
-            curr_nback_RT = (core.getTime() - onset_time) * 1000 # *1000 to convert s to ms    
-            ### send trigger to LSL stream to indicate n-back response
-            #out_marker.push_sample(["REACTION_visktask__training" + marker_text])
-            # only get first target response, we don't care if they press the button more than once in this trial:
-            previous_response = True
-            print("detected C key press -- 0-back RT: " + str(curr_nback_RT) + " ms") # * 1000 to convert s to ms
-        # If esc is pressed, end the experiment:
-        elif event.getKeys(['escape']):
-            core.quit()
-    
+        for key in keys:
+            if key == 'c' and previous_response == False:
+                # get reaction time
+                # we measure reaction time from the onset of the current word, even if the target 
+                # was the word before (or occurred even earlier). 
+                # In such cases we can infer the actual reaction times from the df later.
+                # Reason why I don't use the last target as an onset: Doesn't take into 
+                # account that there might be false alarm responses.
+                curr_nback_RT = my_trial_clock.getTime * 1000 # *1000 to convert s to ms    
+                ### send trigger to LSL stream to indicate n-back response
+                #out_marker.push_sample(["REACTION_visktask__training" + marker_text])
+                # only get first target response, we don't care if they press the button more than once in this trial:
+                previous_response = True
+
+            # If esc is pressed, end the experiment:
+            elif key == 'escape':
+                core.quit()
+        
     ### end trial
     print("end trial")
     # stop display of current word
@@ -2689,10 +2693,7 @@ for trial_idx, curr_word in enumerate(curr_text_training):
     if expInfo['testing_mode'] == "yes":
         if trial_idx == 3:
             break
-    
-    ### send word offset trigger to LSL stream   
-    #out_marker.push_sample(["STIM_OFFSET_vistask_training" + marker_text])
-    
+
 print("finished visual task block")
 
 # change background colour from grey to ivory
@@ -2834,11 +2835,16 @@ stim.draw()
 stim_mask.draw()
 win.flip()
 
+# create block clock
+my_block_clock = core.Clock()
+my_block_clock.reset() # start block clock
+start_time = my_block_clock.getTime() # get start time of block
+# also create trial clock:
+my_trial_clock = core.Clock()
 
 # loop words in current text
 for trial_idx, curr_word in enumerate(curr_text):
-    print("current idx: " + str(trial_idx) + ", curr word:" + curr_word)
-    
+
     ### prepare & show current word:
     
     # get current colour
@@ -2858,12 +2864,12 @@ for trial_idx, curr_word in enumerate(curr_text):
     
     # Flicker option 1: use sine-wave (gradient) flicker
     # create current opacity value to continue flickering the word
-    #frame_time = core.getTime() # get current time point (in sec)
+    #frame_time = my_block_clock.getTime() # get current time point (in sec)
     #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
     #opacity = (flicker_intensity + 1) / 2
 
     # Flicker option 2: use square-wave (on-off) flicker
-    frame_time = core.getTime() # get current time point (in sec)
+    frame_time = my_block_clock.getTime() # get current time point (in sec)
     time_passed = frame_time - start_time # calculate time passed since start
     cycle_duration = 1 / flicker_freq # calculate duration of one flicker cycle
     cycle_passed = time_passed % cycle_duration # calculate time passed in current flicker cycle
@@ -2879,14 +2885,10 @@ for trial_idx, curr_word in enumerate(curr_text):
     stim_mask.draw() # draw mask on screen
     win.flip() # update the window to clear the screen and display the word
 
-    # send word onset trigger to LSL stream
-    marker_text = "trial_" + str(curr_trial_nr) + "_" + curr_word + "_" + curr_colour + "_" + str(curr_target)
-    #out_marker.push_sample(["STIM_ONSET_vistask" + marker_text])
-    
     # record trial onset time
-    onset_time = core.getTime()
-    print("word duration: " +  str(onset_time + curr_duration) + " ms")
-    
+    my_trial_clock.reset()
+    onset_time = my_trial_clock.getTime()
+
 
     ### wait for key response until curr_duration is over: 
 
@@ -2896,18 +2898,18 @@ for trial_idx, curr_word in enumerate(curr_text):
     ### start recording responses
     # start while loop that looks for responses
     # --> end while loop only if duration for current word is over
-    while core.getTime() < (onset_time + curr_duration):    
+    while my_trial_clock.getTime() < (onset_time + curr_duration):    
 
         # in each iteration, draw word on screen
         # --> flicker again
 
         # Flicker option 1: use sine-wave (gradient) flicker
-        #frame_time = core.getTime() 
+        #frame_time = my_block_clock.getTime() 
         #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
         #opacity = (flicker_intensity + 1) / 2
 
         # Flicker option 2: use square-wave (on-off) flicker
-        frame_time = core.getTime() 
+        frame_time = my_block_clock.getTime() 
         time_passed = frame_time - start_time 
         cycle_duration = 1 / flicker_freq
         cycle_passed = time_passed % cycle_duration
@@ -2922,26 +2924,25 @@ for trial_idx, curr_word in enumerate(curr_text):
         stim_mask.draw()
         win.flip()
         
-        # if participant pressed button "c" and hasn't already responded in the current trial
-        if event.getKeys(['c']) and previous_response == False:
-            # get reaction time
-            # we measure reaction time from the onset of the current word, even if the target 
-            # was the word before (or occurred even earlier). 
-            # In such cases we can infer the actual reaction times from the df later.
-            # Reason why I don't use the last target as an onset: Doesn't take into 
-            # account that there might be false alarm responses.
-            curr_nback_RT = (core.getTime() - onset_time) * 1000 # *1000 to convert s to ms    
-            ### send trigger to LSL stream to indicate n-back response
-            #out_marker.push_sample(["REACTION_visktask_" + marker_text])
-            # only get first target response, we don't care if they press the button more than once in this trial:
-            previous_response = True
-            print("detected C key press -- 0-back RT: " + str(curr_nback_RT) + " ms") # * 1000 to convert s to ms
-        # If esc is pressed, end the experiment:
-        elif event.getKeys(['escape']):
-            core.quit()
-    
+        # get key responses:
+        keys = event.getKeys(["c", "escape"])
+        for key in keys:
+            # if participant pressed button "c" and hasn't already responded in the current trial
+            if key == 'c' and previous_response == False:
+                # get reaction time
+                # we measure reaction time from the onset of the current word, even if the target 
+                # was the word before (or occurred even earlier). 
+                # In such cases we can infer the actual reaction times from the df later.
+                # Reason why I don't use the last target as an onset: Doesn't take into 
+                # account that there might be false alarm responses.
+                curr_nback_RT = (my_trial_clock.getTime() - onset_time) * 1000 # *1000 to convert s to ms    
+                previous_response = True
+               
+            # If esc is pressed, end the experiment:
+            elif key == 'escape':
+                core.quit()
+        
     ### end trial
-    print("end trial")
     # stop display of current word
     win.flip()
     
@@ -2987,10 +2988,7 @@ for trial_idx, curr_word in enumerate(curr_text):
     if expInfo['testing_mode'] == "yes":
         if trial_idx == 3:
             break
-    
-    ### send word offset trigger to LSL stream   
-    #out_marker.push_sample(["STIM_OFFSET_vistask" + marker_text])
-    
+
 print("finished visual task block")
 
 # change background colour from grey to ivory
