@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2021.2.3),
-    on August 15, 2023, at 14:30
+    on September 04, 2023, at 12:19
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -38,7 +38,7 @@ os.chdir(_thisDir)
 # Store info about the experiment session
 psychopyVersion = '2021.2.3'
 expName = 'EXNAT-2'  # from the Builder filename that created this script
-expInfo = {'participant': '', 'age': '', 'handedness': 'r', 'gender': 'w', 'testing_mode': 'yes'}
+expInfo = {'participant': '', 'age': '', 'handedness': 'r', 'gender': 'w', 'testing_mode': 'yes', 'meas_hearing': 'no', 'test_triggers': 'no'}
 dlg = gui.DlgFromDict(dictionary=expInfo, sortKeys=False, title=expName)
 if dlg.OK == False:
     core.quit()  # user pressed cancel
@@ -52,7 +52,7 @@ filename = _thisDir + os.sep + u'data/%s_%s_%s' % (expInfo['participant'], expNa
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath='C:\\Users\\AC\\Desktop\\Merle\\EXNAT-2 Win7 Experiment EYELINK\\selfpaced_reading_nback.py',
+    originPath='F:\\EXNAT-2\\EEG_study_EXNAT2\\EXNAT-2 Win7 Experiment EYELINK TIMING IMPROVED\uf025\\selfpaced_reading_nback.py',
     savePickle=True, saveWideText=True,
     dataFileName=filename)
 logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a file
@@ -123,6 +123,8 @@ from psychopy import sound
 from psychopy.sound import Sound
 print(Sound) # should look roughly like this: <class 'psychopy.sound.SoundPtb'>
 
+import os
+
 # for getting current date & time:
 import datetime
 # numpy for being able to calculate
@@ -178,18 +180,25 @@ def escape_quotes(string):
 # make mouse invisible during experiment
 #mouse = io.devices.mouse
 win.setMouseVisible(False)
+
+# create 10 ms timer that we can use instead of core.wait()
+my_timer = core.CountdownTimer(0.01)
 ### Stimulus settings
 
+# measure frame rate (in Hz)
+frame_rate = win.getActualFrameRate() # frame rate in Hz
+print("measured frame rate:", frame_rate, "Hz")
 # set flicker frequency (in Hz)
-flicker_freq = 17.3
-# set frame rate (in Hz)
-frame_rate = 60
+flicker_freq = frame_rate/4 # 60/4 = 15 Hz
 
 # set colours you want to use for background:
 #light_bg_col_hex = "#FDFBF0" # ivory instructions background
 #dark_bg_col_hex  = "#505050" # dark grey background for stimuli
 light_bg_col = [(x / 127.5) - 1 for x in (253, 251, 240)] # ivory instructions background (use RGB -1:1)
-dark_bg_col  = [(x / 127.5) - 1 for x in (80, 80, 80)] # dark grey background for stimuli (use RGB -1:1)
+#dark_bg_col  = [(x / 127.5) - 1 for x in (80, 80, 80)] # dark grey background for stimuli (use RGB -1:1)
+
+# for timing test:
+dark_bg_col = [(x / 127.5) - 1 for x in (255, 255, 255)]
 
 # make background light for a start - use rgb -1:1 colour codes
 win.setColor(light_bg_col, colorSpace='rgb')
@@ -197,9 +206,11 @@ win.setColor(light_bg_col, colorSpace='rgb')
 # set colours you want to use for the stimuli:
 colours = ["#D292F3", "#F989A2", "#2AB7EF", "#88BA3F"]
 print("Preparing experiment with n-back colours:", colours)
+# for timing test:
+colours = ["#000000", "#F989A2", "#2AB7EF", "#88BA3F"]
 
 #  #D292F3 = weird lilac with a 2000s vibe
-#  #F989A2 = bubblegum pink
+#  #F989A2 = Barbie pink
 #  #2AB7EF = Twitter blue
 #  #88BA3F = medium grass green
 # (#D8A244 = dark curry-ish yellow --> excluded!)
@@ -369,6 +380,9 @@ eyetr_calibrClock = core.Clock()
 # Initialize components for Routine "triggers"
 triggersClock = core.Clock()
 
+# Initialize components for Routine "sounds"
+soundsClock = core.Clock()
+
 # Initialize components for Routine "no_text_blocks"
 no_text_blocksClock = core.Clock()
 
@@ -393,8 +407,154 @@ warningClock = core.Clock()
 # Initialize components for Routine "warning_1"
 warning_1Clock = core.Clock()
 
-# Initialize components for Routine "vis_task"
-vis_taskClock = core.Clock()
+# Initialize components for Routine "vistask_t"
+vistask_tClock = core.Clock()
+
+# Initialize components for Routine "vistask_m"
+vistask_mClock = core.Clock()
+##########################################################
+#            Text Comprehension Questions - Q3           #
+##########################################################
+
+### Settings:
+# keep background ivory
+win.setColor(light_bg_col, colorSpace='rgb')
+win.flip()
+
+# clear buffer of all previously recorded key events:
+event.clearEvents()
+
+# get current text nr:
+curr_text_nr = vis_task_text_nr
+
+# load third question for current text & their respective answers
+Q3 = locals()[curr_text_nr + "_Q3"]
+Q3_answers = locals()[curr_text_nr + "_Q3_ans"]
+Q3_corr = locals()[curr_text_nr + "_Q3_corr"]
+
+# Define text positions and formatting
+question_pos = (0, 3)
+answer_xpos = -7 # move questions a bit to the left 
+answer_ypos = [ 0, -2, -4, -6] # set the y axis positions of all 4 answers
+
+# Create text stim for the question:
+question = visual.TextStim(win, 
+                           text = Q3, 
+                           pos = question_pos,
+                           color = "black",
+                           height = 0.5,
+                           font = "Bookman Old Style",
+                           anchorHoriz = 'center',
+                           alignText = 'center', 
+                           wrapWidth = 10)
+# create 1 text stim for each answer option:
+answers = [visual.TextStim(win, 
+                           text = Q3_answers[i], 
+                           pos = (answer_xpos, answer_ypos[i]), 
+                           color = "black", # set all to black as a default
+                           height = 0.5, 
+                           font = "Bookman Old Style",
+                           wrapWidth = 15,
+                           anchorHoriz = 'left', 
+                           alignText = 'center') for i in range(len(Q1_answers))]
+# set up instruction text
+instr_text = visual.TextStim(win, 
+                             text = "(Bitte benutzen Sie die Tasten 1, 2, 3 und 4 um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
+                             color = "grey",
+                             pos = (0, -10),
+                             wrapWidth = 20,
+                             height = 0.4,
+                             font = "Bookman Old Style")
+                             
+### Show all on screen until I set .autoDraw = False
+question.autoDraw = True
+instr_text.autoDraw = True
+for answer in answers:
+    answer.autoDraw = True
+win.flip()
+
+
+### Record key responses:
+Q3_chosen_ans = None
+
+while True:        
+    # if 1 was pressed...
+    if event.getKeys(['1']):
+        print('a')
+        # save Q3 answer as a 
+        Q3_chosen_ans = "a"
+        # set font colour of the first answer (answer a) to 
+        # green and the rest to black:
+        answers[0].setColor("green")
+        for answer in answers[1:]:
+            answer.setColor("black")
+            # draw updated stimulus:
+            win.flip()
+    # same procedure for all other answer options:
+    if event.getKeys(['2']):
+        print('b')
+        Q3_chosen_ans = "b"
+        # set font colour of the second answer (answer b) to 
+        # green and the rest to black:
+        answers[1].setColor("green")
+        for answer in [answers[0]] + answers[2:]:
+            answer.setColor("black")
+            # draw updated stimulus:
+            win.flip()
+    if event.getKeys(['3']):
+        print('c')
+        Q3_chosen_ans = "c"
+        # set font colour of the third answer (answer c) to 
+        # green and the rest to black:
+        answers[2].setColor("green")
+        for answer in answers[:2] + answers[3:]:
+            answer.setColor("black")
+        # draw updated stimulus:
+        win.flip()
+    if event.getKeys(['4']):
+        print('d')
+        Q3_chosen_ans = "d"
+        # set font colour of the fourth answer (answer d) to 
+        # green and the rest to black:
+        answers[3].setColor("green")
+        for answer in answers[:-1]:
+            answer.setColor("black")
+        # draw updated stimulus 
+        win.flip()
+    # if participant pressed "space", check whether they chose an answer.
+    # if yes, end this routine and go to next question, if not, wait for valid answer.
+    elif event.getKeys(['space']) and Q3_chosen_ans != None:
+        break
+
+# print chosen answer for Q3
+print("answer for Q3:" + str(Q3_chosen_ans))
+
+# check if answer was correct:
+if Q3_chosen_ans == Q3_corr: 
+    print("answer correct!")
+else: 
+    print("answer incorrect!")
+    
+# save data:
+thisExp.addData('question', 'Q3')
+thisExp.addData('chosen_ans', Q3_chosen_ans)
+thisExp.addData('ans_correct', Q3_chosen_ans == Q3_corr)
+thisExp.addData('text_nr', curr_text_nr)
+thisExp.addData('block_nr', exp_block_counter)
+thisExp.addData('block_name', "visual_task_main")
+thisExp.addData('block_kind', "visual_task_main")
+
+# start a new row in the csv
+thisExp.nextEntry()
+
+### End Q3: Set .autoDraw = False to stop showing question & answers
+question.autoDraw = False
+instr_text.autoDraw = False
+for answer in answers:
+    answer.autoDraw = False
+
+# end current routine
+#continueRoutine = False
 
 # Initialize components for Routine "warning_1"
 warning_1Clock = core.Clock()
@@ -569,122 +729,6 @@ def et_abort_exp():
 #                                  1, 1)
 #    except: pass # do nothing if drift correction didn't work
 
-### Determine hearing threshold
-
-import sounds_custom # sounds3 module from Sarah's cuecue study T2
-import sounddevice as sd
-print(sd.query_devices()) # print all sound devices we can access
-import os
-
-# prepare instructions
-instr_hearthres = visual.TextStim(win=win, text = "Zum Starten bitte die Leertaste drücken!", pos = (0,0), color = "black", height = 0.5, wrapWidth = 1600)
-
-message1 = visual.TextStim(win=win, text = "Laut nach leise.\n\nDrücken Sie bitte die Leertaste, wenn nichts mehr zu hören ist.", pos = (0,0), color = "black", height = 0.5, wrapWidth = 1600)
-message2 = visual.TextStim(win=win, text = "Leise nach laut.\n\nDrücken Sie bitte die Leertaste, sobald etwas zu hören ist.", pos = (0,0), color = "black", height = 0.5, wrapWidth = 1600)
-pause = visual.TextStim(win=win, text = "Kurze Pause!", pos = (0,0), color = "black", height = 0.5, wrapWidth = 1600)
-
-
-# sound setup
-sound_file = "cuecue_stim.wav"
-#sound_device = 34 # from CueCue
-sound_device = "ASIO Fireface USB" # 55 ASIO4ALL v2 ASIO
-sound = sounds_custom.Sound(sound_file, sound_device, 10, [3,4]) # [3,4] are the output channels
-
-# loud to soft:
-def thres_down(start, step, limit):
-    b = start
-    while True:
-
-        if "esc" in event.getKeys():
-            core.quit()
-        elif b < limit and not event.getKeys("space"):
-            sound = sounds_custom.Sound(sound_file, sound_device, b)
-            sound.play()
-            b = b + step
-        elif b >= limit or event.getKeys("space"):
-            sound = sounds_custom.Sound(sound_file, sound_device, b)
-            sound.play()
-            sound.stop()
-            print(b)
-            return(b)
-
-#soft to loud, start at 10dB attenuation and go up to 100dB attenuation max.
-def thres_up(start, step, limit):
-    b = start
-    while True:
-        if "esc" in event.getKeys():
-            core.quit()
-        elif b > limit and not event.getKeys("space"):
-            sound = sounds_custom.Sound(sound_file, sound_device, b)
-            sound.play()
-            b = b - step
-        elif b <= limit or event.getKeys("space"):
-            sound = sounds_custom.Sound(sound_file, sound_device, b)
-            sound.play()
-            sound.stop()
-            print(b)
-            return(b)
-            
-# Start tests:
-values_down = []
-values_up = []
-values_av = []
-start_down = 10
-step = 3
-limit_down = 100
-limit_up = 0
-
-# show instruction
-while True:
-    instr_hearthres.draw()
-    win.flip()
-    if event.getKeys("space"):
-        break
-
-# clear screen & wait a second
-win.flip()
-core.wait(1)
-
-#run test 5x:
-for t_idx in range(1,6):
-    core.wait(0.5)
-    # loud to soft:
-    message1.setAutoDraw(True)
-    win.flip()
-    thres_down = thres_down(start_down, step, limit_down)
-    values_down.append(thres_down)
-    message1.setAutoDraw(False)
-    win.flip()
-    core.wait(1)
-    
-    # soft to loud:
-    start_up = thres_down + 15.0
-    message2.setAutoDraw(True)
-    win.flip()
-    thres_up = thres_up(start_up, step, limit_up)
-    values_up.append(thres_up)
-    message2.setAutoDraw(False)
-    win.flip()
-    core.wait(1)
-    
-    # get average of the 2 thresholds:
-    thres_av = (thres_down + thres_up)/2.0
-    print(thres_av)
-    values_av.append(thres_av)
-    
-    # break:
-    pause.setAutoDraw(True)
-    win.flip()
-    core.wait(3.0)
-    pause.setAutoDraw(False)
-    win.flip()
-    
-# get mean attenuation we need for the experiment:
-av_attenuation = np.mean(values_av) 
-threshold = av_attenuation - 50 # - 50 dB to be 50dB above threshold
-print("average attenuation:", av_attenuation, " - threshold to use:", threshold)
-
-
 # keep track of which components have finished
 settingsComponents = [empty_placeholder]
 for thisComponent in settingsComponents:
@@ -755,15 +799,20 @@ continueRoutine = True
 # update component parameters for each repeat
 ### Calibration/Validation Setup
 
+# show instruction for starting Calibration / Validation:
+instr_calibr = visual.TextStim(win = win, text = "Soundcheck abgeschlossen. Zum Starten der Eyetracker-Kalibrierung bitte die Leertaste drücken!", pos = (0,0), color = "black", height = 0.5, wrapWidth = 1600)
+while True: 
+    instr_calibr.draw()
+    win.flip()
+    if event.getKeys(['space']):
+        break
+
 
 ### Configure Graphics ENVironment (= genv) for the tracker calibration:
 genv = EyeLinkCoreGraphicsPsychoPy(el_tracker, win)
 print("version number of EyelinkCoreGraphics library:" + str(genv))
 
 # set colours for the calibratio target
-# (-1, -1, -1) = black
-# (1, 1, 1) = white
-# (0, 0, 0) = mid grey
 foreground_color = (-1, -1, -1) # black
 background_color = tuple(win.color)
 genv.setCalibrationColors(foreground_color, background_color)
@@ -806,9 +855,9 @@ el_tracker.doTrackerSetup()
 
 ### Start Recording
 el_tracker.startRecording(1, # sample_to_file = yes
-                       1, # events_to_file = yes 
-                       1, # sample_over_link = yes 
-                       1) # event_over_link = yes
+                          1, # events_to_file = yes 
+                          1, # sample_over_link = yes 
+                          1) # event_over_link = yes
 
 # wait for 500 ms before starting experiment:
 pylink.pumpDelay(500)
@@ -878,6 +927,8 @@ from psychopy import parallel
 #port.setPortAddress(0xB010) # set address of port
 port = parallel.setPortAddress(0xB010)# set address of port
 
+time_after_trigger = 0.003 # wait for 3ms after a trigger before clearing the line with the 0 trigger
+
 ### List of Trigger Values
 trigger_map = {
     'block_onset': 2,
@@ -907,11 +958,13 @@ trigger_map = {
     'freq_782_offset': 50,
     'freq_1043_onset': 52,
     'freq_1043_offset': 54,
-    'ordered': 56,
-    'random': 58,
+    'ordered_onset': 56,
+    'random_onset': 58,
     'start_experiment': 60,
     'end_experiment': 62,
-    'trial_offset': 64
+    'trial_offset': 64,
+    'eyetracking_baseline': 66,
+    'test_trigger': 68
 }
 
 # Function to send trigger value by specifying event name
@@ -931,10 +984,10 @@ def send_trigger(event_name):
     el_tracker.sendMessage(event_name)
 
 # send test triggers to parallel port to check if they all work
-for i in [num for num in range(2, 57) if num % 2 == 0]:
+for i in [num for num in range(2, 69) if num % 2 == 0]:
     # send trigger:
     parallel.setData(i)
-    core.wait(0.01) # you need a break between the triggers: wait for 10 ms
+    core.wait(time_after_trigger) # you need a break between the triggers: wait for a few ms
     # turn off trigger
     parallel.setData(0)
     
@@ -946,6 +999,36 @@ core.wait(1) # wait 1 s
 
 send_trigger(event_name = 'start_experiment')
 
+# This is just for checking if the triggers we send 
+# are in the correct spot in the data 
+# (we can only check this roughly, but if there's a 
+# trigger and we don't see any neural or pupil response #
+# afterwards, there's definitely something off)
+
+# Send 100 tones + light flashes with 1 s in between
+
+# prepare sound:
+#test_sound = pass
+# prepare visual stimulus
+#vis_stim = pass
+
+if expInfo["test_triggers"] == "yes": # check if we're in testing mode
+    
+    for test_trial in range(1, 51): 
+        print("sound & light flash test - trial", test_trial, "/ 50")
+        
+        # send flash + trigger + sound
+        
+        # send EEG trigger:
+        parallel.setData(68)
+
+        # send Eyetracker trigger:
+        el_tracker.sendMessage(str("test_trigger"))
+        
+        # turn off EEG trigger
+        core.wait(0.01)
+        parallel.setData(0)
+        
 # keep track of which components have finished
 triggersComponents = []
 for thisComponent in triggersComponents:
@@ -992,6 +1075,291 @@ for thisComponent in triggersComponents:
     if hasattr(thisComponent, "setAutoDraw"):
         thisComponent.setAutoDraw(False)
 # the Routine "triggers" was not non-slip safe, so reset the non-slip timer
+routineTimer.reset()
+
+# ------Prepare to start Routine "sounds"-------
+continueRoutine = True
+# update component parameters for each repeat
+### Setup for playing sounds
+#--> we need this for the prediction tendency task!
+from sounds_custom import Sound
+import sounddevice as sd 
+sound_device = 34
+
+# settings for the sounds:
+tone_volume = 1 # use full volume and make sure the system volume is
+               # set to a value where the tones are played with 40dB
+tones = [440, 587, 782, 1043]  # Pure tone frequencies in Hz
+tone_duration = 0.1  # Duration of each pure tone in seconds (each lasted 100 ms)
+tone_rate = 3  # Rate of pure tone presentation in Hz
+audio_sample_freq = 44100 # 44100 Hz --> audio sampling rate at the lab (according to Frauke)
+tones_iti = 1/3
+tone_fade = 5e-3
+
+
+
+### HEARING THRESHOLD TEST
+
+# We want to play the sounds with a volume of 40 dB above hearing threshold.
+
+#import os
+#import sounds_custom # sounds3 module from Sarah's cuecue study T2
+#import sounddevice as sd
+#print(sd.query_devices()) # print all sound devices we can access to check which one you need
+
+
+if expInfo["meas_hearing"] == "yes":
+    
+    # prepare instructions
+    instr_hearthres = visual.TextStim(win=win, text = "Messung der Hörschwelle. Zum Starten bitte die Leertaste drücken!", pos = (0,0), color = "black", height = 0.5, wrapWidth = 1600)
+
+    message1 = visual.TextStim(win=win, text = "Laut nach leise.\n\nDrücken Sie bitte die Leertaste, wenn nichts mehr zu hören ist.", pos = (0,0), color = "black", height = 0.5, wrapWidth = 1600)
+    message2 = visual.TextStim(win=win, text = "Leise nach laut.\n\nDrücken Sie bitte die Leertaste, sobald etwas zu hören ist.", pos = (0,0), color = "black", height = 0.5, wrapWidth = 1600)
+    pause = visual.TextStim(win=win, text = "Kurze Pause!", pos = (0,0), color = "black", height = 0.5, wrapWidth = 1600)
+
+
+    # sound setup
+    sound_file = "soundcheck_stim.wav"
+    # pick the right channels here: 7+8 are the in-ear headphone channels, so 5+6 (#34 as used in Sarah's CueCue) could be the loudspeakers?
+    sound_device = "Analog (7+8) (RME Fireface UC), Windows DirectSound" # 7+8 are the output channels
+    sound = Sound(sound_file, sound_device, 10) 
+
+    # loud to soft:
+    def staircase_down(start, step, limit):
+        event.clearEvents() # clear all previous keypresses from buffer
+        b = start
+        while True:
+            pressed_keys = event.getKeys()
+            if 'escape' in pressed_keys:
+                core.quit()
+            if b < limit and not pressed_keys:
+                sound = Sound(sound_file, sound_device, b)
+                sound.play()
+                b = b + step
+            else:
+                sound = Sound(sound_file, sound_device, b)
+                #sound.play()
+                sound.stop()
+                print("detected threshold for current run:", b)
+                return(b)
+                
+                
+                
+    #soft to loud, start at 10dB attenuation and go up to 100dB attenuation max.
+    def staircase_up(start, step, limit):
+        event.clearEvents() # clear all previous keypresses from buffer
+        b = start
+        while True:
+            pressed_keys = event.getKeys()
+            if 'escape' in pressed_keys:
+                core.quit()
+            if b > limit and not pressed_keys:
+                sound = Sound(sound_file, sound_device, b)
+                sound.play()
+                b = b - step
+            else:
+                sound = Sound(sound_file, sound_device, b)
+                #sound.play()
+                sound.stop()
+                print("detected threshold for current run:", b)
+                return(b)
+
+                
+    # Start tests:
+    values_down = []
+    values_up = []
+    values_av = []
+    start_down = 10
+    step = 3
+    limit_down = 100
+    limit_up = 0
+
+    # show instruction
+    while True:
+        instr_hearthres.draw()
+        win.flip()
+        if event.getKeys(['space']):
+            break
+
+    # clear screen & wait a second
+    win.flip()
+    core.wait(1)
+
+    #run test 5x:
+    for t_idx in range(1,6):
+        print("hearing ts trial:", t_idx)
+        print("start down:", start_down)
+        print("step:", step)
+        print("limit down:", limit_down)
+        print("limit up", limit_up)
+        
+        core.wait(0.5)
+        # loud to soft:
+        message1.setAutoDraw(True)
+        win.flip()
+        thres_down = staircase_down(start_down, step, limit_down)
+        values_down.append(thres_down)
+        message1.setAutoDraw(False)
+        win.flip()
+        core.wait(1)
+        
+        # soft to loud:
+        start_up = thres_down + 15.0
+        print("start_up", start_up)
+        message2.setAutoDraw(True)
+        win.flip()
+        thres_up = staircase_up(start_up, step, limit_up)
+        values_up.append(thres_up)
+        message2.setAutoDraw(False)
+        win.flip()
+        core.wait(1)
+        
+        # get average of the 2 thresholds:
+        thres_av = (thres_down + thres_up)/2.0
+        print(thres_av)
+        values_av.append(thres_av)
+        
+        # break:
+        pause.setAutoDraw(True)
+        win.flip()
+        core.wait(3.0)
+        pause.setAutoDraw(False)
+        win.flip()
+        print("-------------")
+        
+    # get mean attenuation we need for the experiment:
+    av_attenuation = np.mean(values_av) 
+    threshold = av_attenuation - 40 # - 40 dB to be 40dB above threshold
+    print("average attenuation:", av_attenuation, " - threshold to use:", threshold)
+    
+# if we don't want to run the test, use default value for av_attenuation:
+elif expInfo["meas_hearing"] == "no":
+    av_attenuation = 50
+    threshold = av_attenuation - 40 # - 40 dB to be 40dB above threshold
+    print("default attenuation:", av_attenuation, " - threshold to use:", threshold)
+
+
+
+### SOUNDCHECK: Can we hear the test sounds properly?
+
+# show instructions
+instr_test_sounds = visual.TextStim(win = win, text = "Soundcheck! Zum Starten bitte die Leertaste drücken!", pos = (0,0), color = "black", height = 0.5, wrapWidth = 1600)
+
+while True: 
+    instr_test_sounds.draw()
+    win.flip()
+    
+    if event.getKeys(['space']):
+        break
+
+# loop tones and play them to test if everything works:
+for test_freq in tones:
+
+    # build a time array: you need the sound duration and the right sampling frequency for your device
+    # 1 divided by the sampling rate = duration of a single sample in sec
+    tone_sample_len = 1/audio_sample_freq
+    
+    # calculate the number of samples required for a 100 ms duration
+    num_samples = int(audio_sample_freq * tone_duration)
+
+    # build a time array
+    t = np.arange(0, num_samples) / audio_sample_freq  # Adjust the time array
+    
+    # generate sine wave:
+    sine_wave = np.sin(2 * np.pi * test_freq * t)
+
+    # apply cosine ramp:
+    # check how many samples we have to use for the fade in/out:
+    fade_samples = int(tone_fade * audio_sample_freq)
+
+    # if there are enough, but not too many fade samples,
+    # apply cosine ramp to signal
+    if fade_samples > 0 and fade_samples < len(sine_wave):
+      ramp = np.cos(np.linspace(0, np.pi / 2, fade_samples))
+      sine_wave[:fade_samples] *= ramp[::-1]
+      sine_wave[-fade_samples:] *= ramp
+
+    # save sine_wave object as an audio file in .wav format
+    sf.write("sine_wave.wav", sine_wave, audio_sample_freq)
+
+    # create a Sound object that can be used by our custom Sound function
+    curr_sound = Sound(filename = "sine_wave.wav", 
+                       device = sound_device, 
+                       mul = threshold) # use threshold we determined before
+    
+    # create trial clock:
+    my_trial_clock = core.Clock()
+    
+    # play sound 10x
+    for test_sound_run in range(1, 11):     
+        # get current time:
+        now = ptb.GetSecs()
+        
+        # send tone onset trigger
+        send_trigger("freq_" + str(test_freq) + "_onset")
+        my_trial_clock.reset() # start trial clock
+        
+        # play the sound immediately:
+        curr_sound.play() # duration: 100 ms
+        
+        # send 0 trigger to EEG, wait, then send tone offset trigger
+        parallel.setData(0)
+        core.wait(time_after_trigger) # wait 3 ms
+        send_trigger("freq_" + str(test_freq) + "_offset")
+        core.wait(time_after_trigger) # wait 3 ms
+        parallel.setData(0)
+        
+        # 1 3Hz cycle = 333.33 ms, so continue waiting until 333.33 ms have 
+        # passed since starting the tone before playing the next tone
+        #print("time passed since start of tone:", time_passed)
+        core.wait(0.33333 - my_trial_clock.getTime())
+        
+# keep track of which components have finished
+soundsComponents = []
+for thisComponent in soundsComponents:
+    thisComponent.tStart = None
+    thisComponent.tStop = None
+    thisComponent.tStartRefresh = None
+    thisComponent.tStopRefresh = None
+    if hasattr(thisComponent, 'status'):
+        thisComponent.status = NOT_STARTED
+# reset timers
+t = 0
+_timeToFirstFrame = win.getFutureFlipTime(clock="now")
+soundsClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
+frameN = -1
+
+# -------Run Routine "sounds"-------
+while continueRoutine:
+    # get current time
+    t = soundsClock.getTime()
+    tThisFlip = win.getFutureFlipTime(clock=soundsClock)
+    tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+    frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+    # update/draw components on each frame
+    
+    # check for quit (typically the Esc key)
+    if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
+        core.quit()
+    
+    # check if all components have finished
+    if not continueRoutine:  # a component has requested a forced-end of Routine
+        break
+    continueRoutine = False  # will revert to True if at least one component still running
+    for thisComponent in soundsComponents:
+        if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+            continueRoutine = True
+            break  # at least one component has not yet finished
+    
+    # refresh the screen
+    if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+        win.flip()
+
+# -------Ending Routine "sounds"-------
+for thisComponent in soundsComponents:
+    if hasattr(thisComponent, "setAutoDraw"):
+        thisComponent.setAutoDraw(False)
+# the Routine "sounds" was not non-slip safe, so reset the non-slip timer
 routineTimer.reset()
 
 # set up handler to look after randomisation of conditions etc
@@ -1138,18 +1506,47 @@ for thisBlock in blocks:
                 # for current text nr, get text whose name = current text nr
                 curr_text = locals()[curr_text_nr]
     
-                # start block loop
     
+                
+                ### PUPIL SIZE BASELINE MEASUREMENT BLOCK
+                
+                start_block_instr = visual.TextStim(win = win, text = "Der Block startet in 30 Sekunden. Bitte schauen Sie auf das Fixationskreuz auf dem Bildschirm.", pos = (0,0), color = "black", height = 3, wrapWidth = 1600)
+                while True: 
+                    start_block_instr.draw()
+                    win.flip()
+                    if event.getKeys(['space']):
+                        break
+                fix_cross = visual.TextStim(win = win, text = "+", pos = (0,0), color = "black", height = 3, wrapWidth = 1600)
+                
+                # CREATE CLOCK:
+                my_block_clock = core.Clock()
+                my_block_clock.reset() # start block clock
+                
+                # show fixation cross for 2 seconds
+                while my_block_clock.getTime < 2: 
+                    fix_cross.draw()
+                    win.flip()
+                    if event.getKeys(['escape']):
+                        break
+    
+    
+    
+                ### Start block loop
+                
                 # prepare flicker
                 # hint: flicker_freq and frame_rate are set in the settings 
                 # code component at the beginning of the experiment.
                 
                 # create flicker phase variable - start at phase = 0
                 flicker_phase = 0
-                # we also need the start time (let's set it as current time 
-                # at this point in the script):
-                start_time = core.getTime()
-        
+                
+                # CREATE CLOCKS: 
+                my_block_clock = core.Clock()
+                my_block_clock.reset() # start block clock
+                start_time = my_block_clock.getTime() # get start time of block
+                # also create trial clock
+                my_trial_clock = core.Clock()
+               
                 # create empty stimulus 
                 stim = visual.Rect(win = win,
                                    width = 3, # width = 3 * 1° visual angle (to make it look rectangle-ish)
@@ -1165,14 +1562,14 @@ for thisBlock in blocks:
     
                 # send block onset trigger
                 send_trigger(curr_block + "_onset")
-                # wait for 10 ms before sending 0 trigger
-                core.wait(0.01) 
+                # wait for a few ms before sending 0 trigger
+                core.wait(time_after_trigger) 
                 parallel.setData(0)
                 core.wait(0.1) #wait 100ms before starting first trial
     
                 # loop colours in current text
                 for trial_idx, curr_col in enumerate(curr_colours):
-                    print("current idx: " + str(trial_idx) + ", curr colour:" + curr_col)
+                    #print("current idx: " + str(trial_idx) + ", curr colour:" + curr_col)
                     
                     ### prepare & show current word:
                     
@@ -1188,24 +1585,30 @@ for thisBlock in blocks:
                     # --> I also tried 500, but if the break is too long it 
                     # messes up the flicker and it starts looking really weird.
                     # So I guess we have to deal with the not really visible repetitions.
-                    while core.getTime() < onset_time + 0.2:
-                        # draw the stimulus during the waiting period, 
-                        # but use grey as a fill colour
-                        stim.Colour = dark_bg_col
-                        stim.draw()
-                        win.flip()
+                    
+                    # draw the stimulus during the waiting period, 
+                    # but use grey as a fill colour
+                    stim.Colour = dark_bg_col
+                    stim.draw()
+                    win.flip()
+                    
+                    my_trial_clock.reset() # start clock
+                    onset_time = my_trial_clock.getTime() # get current time
+                
+                    while my_trial_clock.getTime() < onset_time + 0.2:
+                        pass
                         
                     # set current colour as colour of rectangle
                     stim.fillColor = curr_col
                     
                     # Flicker option 1: use sine-wave (gradient) flicker
-                    #frame_time = core.getTime() # get current time point (in sec)
+                    #frame_time = my_block_clock.getTime() # get current time point (in sec)
                     #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
                     #opacity = (flicker_intensity + 1) / 2
         
                     # Flicker option 2: use square-wave (on-off) flicker
-                    frame_time = core.getTime() 
-                    time_passed = frame_time - start_time 
+                    frame_time = my_block_clock.getTime()
+                    time_passed = frame_time - start_time # subtract current time from block onset time
                     cycle_duration = 1 / flicker_freq
                     cycle_passed = time_passed % cycle_duration
                     
@@ -1227,32 +1630,33 @@ for thisBlock in blocks:
                     trig_off = False # haven't turned off trigger yet
                     win.callOnFlip(send_trigger, "trial_onset") 
                                     
-                    # record trial onset time
-                    onset_time = core.getTime()
-                    print("onset time: " + str(onset_time * 1000) + " ms" )
+                    # start trial clock for measuring RTs from stimulus onset
+                    my_trial_clock.reset()
+    
+                    #onset_time = my_trial_clock.getTime()
                                            
                     ### wait for key response: 
                     # In blocks with n-back task, participants can press "c" to indicate they saw a target colour and "space" to go to the next word/stimulus.
                     # In blocks without n-back task, participants can only press "space" to go to the next stimulus.
-                    print("start tracking key responses")
+                    #print("start tracking key responses")
                         
                     ### start recording responses
                     # start "endless" while loop that looks for responses
                     # in each iteration, draw word on screen
                     while True:       
-                        # check if 10 ms have passed since trigger was sent,
+                        # check if 3 ms have passed since trigger was sent,
                         # if yes, send 0 to parallel port
-                        if trig_off == False and core.getTime() >= onset_time + 0.1: # trigger onset + 10 ms
+                        if trig_off == False and my_trial_clock.getTime() >= onset_time + time_after_trigger: # trigger onset + 3 ms
                             parallel.setData(0)
                             trig_off = True # remember you turned off the trigger
     
                         # Flicker option 1: use sine-wave (gradient) flicker
-                        #frame_time = core.getTime() # get current time point (in sec)
+                        #frame_time = my_block_clock.getTime() # get current time point (in sec)
                         #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
                         #opacity = (flicker_intensity + 1) / 2
                     
                         # Flicker option 2: use square-wave (on-off) flicker
-                        frame_time = core.getTime() 
+                        frame_time = my_block_clock.getTime()
                         time_passed = frame_time - start_time 
                         cycle_duration = 1 / flicker_freq
                         cycle_passed = time_passed % cycle_duration
@@ -1267,56 +1671,59 @@ for thisBlock in blocks:
                         # draw stimulus on screen
                         stim.draw()
                         win.flip()
-                
-                        # show stimulus on screen
-                        stim.draw() # draw stimulus on screen
-                        win.flip() # update the window to clear the screen and display the stimulus
-    
                         
-                        # if participant presses space bar on their keyboard...
-                        if event.getKeys(['space']):
-                            # get reaction time
-                            curr_duration = core.getTime() - onset_time
-                            # send trigger for response:
-                            send_trigger("response_continue")
-                            # wait 10ms
-                            core.wait(0.01)
-                            parallel.setData(0)
+                        # check for responses: 
+                        keys = event.getKeys(['space', 'c', 'escape'])
+                        
+                        # check if there was a response. If there wasn't, we can go straight 
+                        # to the next iteration which will hopefully save us some dropped 
+                        # frames in the flicker.
+                        for key in keys:
                             
-                            # break while loop to go to next trial
-                            break
+                            # if participant pressed the space bar on their keyboard...
+                            if key == 'space':
+                                # get reaction time
+                                curr_duration = my_trial_clock.getTime()
+                                # send trigger for response:
+                                send_trigger("response_continue")
+                                # wait 3ms
+                                core.wait(time_after_trigger)
+                                parallel.setData(0)
+                                
+                                # break while loop to go to next trial
+                                break
     
-                        # if participant pressed button "c" for the first time and it's an n-back condition 
-                        # where they're actually supposed to do that (aka not a reading baseline condition)...
-                        elif event.getKeys(['c']) and curr_nback_cond != None and saw_target == False:
-                            # get reaction time
-                            curr_nback_RT = (core.getTime() - onset_time) * 1000 # *1000 to convert s to ms  
+                            # if participant pressed button "c" for the first time and it's an n-back condition 
+                            # where they're actually supposed to do that (aka not a reading baseline condition)...
+                            elif key == 'c' and curr_nback_cond != None and saw_target == False:
+                                # get reaction time
+                                curr_nback_RT = my_trial_clock.getTime()
     
-                            # send trigger for response:
-                            send_trigger("response_target")
-                            # wait 10ms
-                            core.wait(0.01)
-                            parallel.setData(0)
-                            
-                            # only get first target response, we don't care if they press the button more than once:
-                            saw_target = True
+                                # send trigger for response:
+                                send_trigger("response_target")
+                                # wait 3ms
+                                core.wait(time_after_trigger)
+                                parallel.setData(0)
+                                
+                                # only get first target response, we don't care if they press the button more than once:
+                                saw_target = True
     
-                        # If esc is pressed, end the experiment:
-                        elif event.getKeys(['escape']):
-                            et_abort_exp() # shut down eyetrigger and download incremental data
-                            # make sure parallel port is closed
-                            core.wait(0.1)
-                            parallel.setData(0)
-                            core.wait(0.5)
-                            # end experiment
-                            core.quit()
-                    
+                            # If esc is pressed, end the experiment:
+                            elif key == 'escape':
+                                et_abort_exp() # shut down eyetrigger and download incremental data
+                                # make sure parallel port line is cleared
+                                core.wait(time_after_trigger)
+                                parallel.setData(0)
+                                core.wait(0.5)
+                                # end experiment
+                                core.quit()
+                        
                     ### end trial
-                    print("end trial")
+                    #print("end trial")
                                        
                     # stop display of current word & send trial offset trigger
                     win.callOnFlip(send_trigger, "trial_offset")
-                    core.wait(0.1)
+                    core.wait(time_after_trigger)
                     parallel.setData(0)
          
                     # check whether response was hit, miss, false alarm or correct rejection
@@ -1345,7 +1752,7 @@ for thisBlock in blocks:
                     thisExp.addData('colour', curr_colour)
                     thisExp.addData('target', curr_target)
                     thisExp.addData('nback_response', curr_nback_response)
-                    thisExp.addData('nback_RT', curr_nback_RT) # in ms
+                    thisExp.addData('nback_RT', curr_nback_RT * 1000) # * 1000 to convert s to ms
                     thisExp.addData('duration', curr_duration * 1000) # * 1000 to convert s to ms
                     thisExp.addData('trial_nr', curr_trial_nr)
                     thisExp.addData('block_nr', exp_block_counter)
@@ -1375,11 +1782,11 @@ for thisBlock in blocks:
                 win.flip()
             
             ### End currrent block
-            core.wait(0.01) # wait 10 ms
+            core.wait(time_after_trigger) # wait 3 ms
             # send block offset trigger
             send_trigger("block_offset")
-            # wait for 10 ms before sending 0 trigger
-            core.wait(0.01) 
+            # wait for 3 ms before sending 0 trigger
+            core.wait(time_after_trigger) 
             parallel.setData(0)
                 
             # add 1 to the block counter to go load the next block
@@ -1608,16 +2015,7 @@ for thisBlock in blocks:
         curr_colours = all_colour_lists[exp_block_counter]
         # for current text nr, get text whose name = current text nr
         curr_text = locals()[curr_text_nr]
-        
-        ### prepare flicker
-        # hint: flicker_freq and frame_rate are set in the settings 
-        # code component at the beginning of the experiment.
-        
-        # create flicker phase variable - start at phase = 0
-        flicker_phase = 0
-        # we also need the start time (let's set it as current time 
-        # at this point in the script):
-        start_time = core.getTime()
+    
         
     ### Start block loop
     
@@ -1653,14 +2051,28 @@ for thisBlock in blocks:
     
     # send block onset trigger
     send_trigger(curr_block + "_onset")
-    # wait for 10 ms before sending 0 trigger
-    core.wait(0.01) 
+    # wait for 3 ms before sending 0 trigger
+    core.wait(time_after_trigger) 
     parallel.setData(0)
     core.wait(0.1) #wait 100ms before starting first trial
     
+    ### prepare flicker
+    # hint: flicker_freq and frame_rate are set in the settings 
+    # code component at the beginning of the experiment.    
+    # create flicker phase variable - start at phase = 0
+    flicker_phase = 0
+    # we also need the start time, this is recorded where we create the block clocks
+    
+    # CREATE CLOCKS: 
+    my_block_clock = core.Clock()
+    my_block_clock.reset() # start block clock
+    start_time = my_block_clock.getTime() # get start time of block
+    # also create trial clock
+    my_trial_clock = core.Clock()
+                
     # loop words in current text
     for trial_idx, curr_word in enumerate(curr_text):
-        print("current idx: " + str(trial_idx) + ", curr word:" + curr_word)
+        #print("current idx: " + str(trial_idx) + ", curr word:" + curr_word)
         
         ### prepare & show current word:
         
@@ -1679,15 +2091,16 @@ for thisBlock in blocks:
         stim.color = curr_colour
         stim.text = curr_word
         
+        
         # Flicker option 1: use sine-wave (gradient) flicker
         # --> doesn't seem to work, I don't see the words flicker when I play this
         # create current opacity value to continue flickering the word
-        #frame_time = core.getTime() # get current time point (in sec)
+        #frame_time = my_block_clock.getTime() # get current time point (in sec)
         #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
         #opacity = (flicker_intensity + 1) / 2
     
         # Flicker option 2: use square-wave (on-off) flicker
-        frame_time = core.getTime() # get current time point (in sec)
+        frame_time = my_block_clock.getTime() # get current time point (in sec)
         time_passed = frame_time - start_time # calculate time passed since start
         cycle_duration = 1 / flicker_freq # calculate duration of one flicker cycle
         cycle_passed = time_passed % cycle_duration # calculate time passed in current flicker cycle
@@ -1707,27 +2120,27 @@ for thisBlock in blocks:
         trig_off = False # haven't turned off trigger yet
         win.callOnFlip(send_trigger, "trial_onset") 
                     
-        # record trial onset time
-        onset_time = core.getTime()
-        print("onset time: " + str(onset_time) + " s")
+        # start trial clock
+        my_trial_clock.reset()
+        onset_time = my_trial_clock.getTime()
         
         ### wait for 50 ms
-        while core.getTime() < onset_time + 0.05:
+        while my_trial_clock.getTime() < onset_time + 0.05:
             
             # if it's time to turn off trigger, do so:
-            if core.getTime() <= onset_time + 0.01 and trig_off == False:
+            if my_trial_clock.getTime() <= onset_time + time_after_trigger and trig_off == False:
                 parallel.setData(0)
                 trig_off = True
             
             # draw the stimulus during the waiting period
     
             # Flicker option 1: use sine-wave (gradient) flicker
-            #frame_time = core.getTime() 
+            #frame_time = my_block_clock.getTime() 
             #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
             #opacity = (flicker_intensity + 1) / 2
     
             # Flicker option 2: use square-wave (on-off) flicker
-            frame_time = core.getTime() 
+            frame_time = my_block_clock.getTime() 
             time_passed = frame_time - start_time 
             cycle_duration = 1 / flicker_freq
             cycle_passed = time_passed % cycle_duration
@@ -1745,7 +2158,7 @@ for thisBlock in blocks:
         ### wait for key response: 
         # In blocks with n-back task, participants can press "c" to indicate they saw a target colour and "space" to go to the next word/stimulus.
         # In blocks without n-back task, participants can only press "space" to go to the next word/stimulus.
-        print("start tracking key responses")
+        #print("start tracking key responses")
             
         ### start recording responses
         # start "endless" while loop that looks for responses
@@ -1755,12 +2168,12 @@ for thisBlock in blocks:
             # --> flicker again
     
             # Flicker option 1: use sine-wave (gradient) flicker
-            #frame_time = core.getTime() 
+            #frame_time = my_block_clock.getTime() 
             #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
             #opacity = (flicker_intensity + 1) / 2
     
             # Flicker option 2: use square-wave (on-off) flicker
-            frame_time = core.getTime() 
+            frame_time = my_block_clock.getTime() 
             time_passed = frame_time - start_time 
             cycle_duration = 1 / flicker_freq
             cycle_passed = time_passed % cycle_duration
@@ -1775,49 +2188,54 @@ for thisBlock in blocks:
             stim_mask.draw()
             win.flip()
             
-            # if participant presses space bar on their keyboard...
-            if event.getKeys(['space']):
-                # get reaction time
-                curr_duration = core.getTime() - onset_time
+            # check for key responses:
+            keys = event.getKeys(['space', 'c', 'escape'])
+            
+            # if we recorded a response, check which one. 
+            # If not, we go  to the next "while" iteration, 
+            # so I hope this saves us a few dropped frames in the flicker.
+            for key in keys:
+                
+                # if participant pressed space bar on their keyboard...
+                if key == 'space':
+                    # get reaction time
+                    curr_duration = my_trial_clock.getTime()
+                    # send trigger for response:
+                    send_trigger("response_continue")
+                    # wait 3ms before closing trigger
+                    core.wait(time_after_trigger)
+                    parallel.setData(0)
+                    # break while loop
+                    break
     
-                # send trigger for response:
-                send_trigger("response_continue")
-                # wait 10ms
-                core.wait(0.01)
-                parallel.setData(0)
-                
-                # break while loop
-                break
-    
-            # if participant pressed button "c" for the first time and it's an n-back condition 
-            # where they're actually supposed to do that (aka not a reading baseline condition)...
-            elif event.getKeys(['c']) and curr_nback_cond != None and saw_target == False:
-                # get reaction time
-                curr_nback_RT = (core.getTime() - onset_time) * 1000 # *1000 to convert s to ms    
-                
-                # send trigger for response:
-                send_trigger("response_target")
-                # wait 10ms
-                core.wait(0.01)
-                parallel.setData(0)
-                
-                # only get first target response, we don't care if they press the button more than once:
-                saw_target = True
-                
-            # If esc is pressed, end the experiment:
-            elif event.getKeys(['escape']):
-                et_abort_exp() # shut down eyetrigger and download incremental data             
-                # close parallel port
-                core.wait(0.1)
-                parallel.setData(0)
-                core.wait(0.5)
-                core.quit()
-        
+                # if participant pressed button "c" for the first time and it's an n-back condition 
+                # where they're actually supposed to do that (aka not a reading baseline condition)...
+                elif key == 'c' and curr_nback_cond != None and saw_target == False:
+                    # get reaction time
+                    curr_nback_RT = my_trial_clock.getTime()    
+                    # send trigger for response:
+                    send_trigger("response_target")
+                    # wait 3ms before closing trigger
+                    core.wait(time_after_trigger)
+                    parallel.setData(0)
+                    
+                    # only get first target response, we don't care if they press the button more than once:
+                    saw_target = True
+                    
+                # If esc is pressed, end the experiment:
+                elif key =='escape':
+                    et_abort_exp() # shut down eyetrigger and download incremental data             
+                    # close trigger & close experiment
+                    core.wait(time_after_trigger)
+                    parallel.setData(0)
+                    core.wait(0.5)
+                    core.quit()
+            
         ### end trial
         print("end trial")
         # stop display of current word & send trial offset trigger
         win.callOnFlip(send_trigger, "trial_offset")
-        core.wait(0.1)
+        core.wait(time_after_trigger)
         parallel.setData(0)
         
         # check whether response was hit, miss, false alarm or correct rejection
@@ -1846,7 +2264,7 @@ for thisBlock in blocks:
         thisExp.addData('colour', curr_colour)
         thisExp.addData('target', curr_target)
         thisExp.addData('nback_response', curr_nback_response)
-        thisExp.addData('nback_RT', curr_nback_RT) # in ms
+        thisExp.addData('nback_RT', curr_nback_RT * 1000) # *1000 to convert s to ms
         thisExp.addData('duration', curr_duration * 1000) # *1000 to convert s to ms
         thisExp.addData('text_nr', curr_text_nr)
         thisExp.addData('trial_nr', curr_trial_nr)
@@ -1874,11 +2292,11 @@ for thisBlock in blocks:
     print("finished presenting trials")
     
     # Send end of block trigger:
-    core.wait(0.01) # wait 10 ms
+    core.wait(time_after_trigger) # wait 3 ms
     # send block offset trigger
     send_trigger("block_offset")
-    # wait for 10 ms before sending 0 trigger
-    core.wait(0.01) 
+    # wait for3 ms before sending 0 trigger
+    core.wait(time_after_trigger) 
     parallel.setData(0)
             
     ### Prepare questions
@@ -2557,7 +2975,7 @@ for thisBlock in blocks:
     continueRoutine = True
     # update component parameters for each repeat
     ##########################################################
-    #            Text Difficulty Rating - Item 1            #
+    #                 Text Difficulty Rating                 #
     ##########################################################
     
     ### Settings:
@@ -2940,21 +3358,43 @@ for thisComponent in warning_1Components:
 # the Routine "warning_1" was not non-slip safe, so reset the non-slip timer
 routineTimer.reset()
 
-# ------Prepare to start Routine "vis_task"-------
+# ------Prepare to start Routine "vistask_t"-------
 continueRoutine = True
 # update component parameters for each repeat
-### VISUAL TASK TRAINING & MAIN BLOCK
+##########################################################
+#                 VISUAL TASK: TRAINING BLOCK            #
+##########################################################
 
-# TO DO: Use the text with this text_nr:
-#vis_task_text_nr
-# Format something like this: "text_01"
+# In this task, we present a new text, but the text proceeds 
+# automatically without the participant having to press the Space bar.
+# To make sure the words are not presented too fast, 
+# we compute the average reading speed per letter and compute "reading speeds" 
+# for each word in the new text.
 
-# I collected all RTs from the baseline blocks in vis_task_durations.
+# In both the training & main block, there's no 1-back or 2-back, but we use a 0-back 
+# task as a motoric "tapping task", so basically the participants always 
+# have to press a certain button if the current word has a certain target colour.
+# Target to non-target ratio: 50:250 (16.66% targets just as in the other blocks)
+# The target colour is chosen at random from the 4 colours we use in the experiment.
+
+# Put differently: We take the words & the measured reading times for each 
+# word all BL main blocks and compute an average reading time / letter. 
+# Then we show a new text, using the reading time / letter to generate 
+# durations so the text can proceed automatically. 
+# Every time a word is shown in a certain target colour (e.g. blue), 
+# the participant has to press a button, but there's no real n-back in this block.
+# Obviously, the participant will be told which colour is the target colour before each block.
+
+
+# First things first: Compute average reading time / letter:
+
+# I collected all RTs & words from the Reading_Baseline_main 
+# blocks in vis_task_durations and vis_task_words.
 
 # exclude all RTs where participant was way too fast (< 50 ms) or
 # way too slow (> 2s), also remove the corresponding words from vis_task_words
 print("vis_task_durations:", vis_task_durations)
-print("vis_task_words:", vis_task_durations)
+print("vis_task_words:", vis_task_words)
 
 filtered_durations = []
 filtered_words = []
@@ -2979,33 +3419,14 @@ reading_time_total = sum(filtered_durations) # in ms
 RT_per_letter = reading_time_total/letters_total
 print(RT_per_letter)
 
-# In this task, the first reading baseline 
-# text is presented again, but this time the text proceeds 
-# automatically without the participant having to press the Space bar.
-# To make sure the words are not presented too fast, 
-# we take the exact time each word was presented on screen 
-# from the block where the participant could control the speed.
-
-# In this block, there's no 1-back or 2-back, but we use a 0-back 
-# task as a motoric "tapping task", so basically the participants always 
-# have to press a certain button if the current word has a certain target colour.
-# So the text stays the same, the durations stay the same, 
-# but I change the colours.
-
-# Target to non-target ratio: 50:250 (16.66% targets just as in the other blocks)
-# The target colour is chosen at random from the 4 colours we use in the experiment.
-
-# Put differently: We take both the text from one of the reading BL 
-# blocks AND the measured reading times for each word from this 
-# block, then we show the text again, but this time with the previously 
-# recorded duration for each word and a different colour sequence. 
-# Every time the word is shown in a certain colour (e.g. blue), 
-# the participant has to press a button, but there's no real n-back in this block.
-# Obviously, the participant will be told which colour 
-# is the target colour before the block.
- 
 # choose 1 target colour & generate 0-back colour list
 target_colour = random.choice(colours)
+
+# save this in the output csv:
+thisExp.addData('vistask_RT_per_letter', RT_per_letter)
+thisExp.addData('vistask_target', target_colour)
+thisExp.addData('block_cond', 'None')
+thisExp.addData('block_name', 'visual_task_training')
 
 # keep background ivory
 win.setColor(light_bg_col, colorSpace='rgb')
@@ -3075,7 +3496,7 @@ event.clearEvents()
 
 
 # prepare stimuli:
-curr_text_training = ['Einen', 'Augenblick', 'herrschte', 'totale', 'Stille.', 'Man', 'hörte', 'plötzlich', 'die', 'Wellen', 'rauschen', 'und', 'das', 'Radio', 'aus', 'dem', 'Salon', 'herüberjazzen,', 'man', 'vernahm', 'jeden', 'Schritt', 'vom', 'Promenadendeck', 'und', 'das', 'leise,', 'feine', 'Sausen', 'des', 'Winds,', 'der', 'durch', 'die', 'Fugen', 'der', 'Fenster', 'fuhr.', 'Keiner', 'von', 'uns', 'atmete,', 'es', 'war', 'zu', 'plötzlich', 'gekommen', 'und', 'wir', 'alle', 'noch', 'geradezu', 'erschrocken', 'über', 'das', 'Unwahrscheinliche,', 'daß', 'dieser', 'Unbekannte', 'dem', 'Weltmeister', 'in', 'einer', 'schon', 'halb', 'verlorenen', 'Partie', 'seinen', 'Willen', 'aufgezwungen', 'haben', 'sollte.', 'McConnor', 'lehnte', 'sich', 'mit', 'einem', 'Ruck', 'zurück,', 'der', 'zurückgehaltene', 'Atem', 'fuhr', 'ihm', 'hörbar', 'in', 'einem', 'beglückten', "\"Ah!\"", 'von', 'den', 'Lippen.', 'Ich', 'wiederum', 'beobachtete', 'Czentovic.', 'Schon', 'bei', 'den', 'letzten', 'Zügen', 'hatte', 'mir', 'geschienen,', 'als', 'ob', 'er', 'blässer', 'geworden', 'sei.', 'Aber', 'er','verstand', 'sich', 'gut', 'zusammenzuhalten.', 'Er', 'verharrte', 'in', 'seiner', 'scheinbar', 'gleichmütigen', 'Starre', 'und', 'fragte', 'nur', 'in', 'lässigster', 'Weise,', 'während', 'er', 'die', 'Figuren', 'mit', 'ruhiger', 'Hand', 'vom', 'Brette', 'schob:', "\"Wünschen", 'die', 'Herren', 'noch', 'eine', 'dritte', 'Partie?\"']
+curr_text_training = ['Einen', 'Augenblick', 'herrschte', 'totale', 'Stille.', 'Man', 'hörte', 'plötzlich', 'die', 'Wellen', 'rauschen', 'und', 'das', 'Radio', 'aus', 'dem', 'Salon', 'herüberjazzen,', 'man', 'vernahm', 'jeden', 'Schritt', 'vom', 'Promenadendeck', 'und', 'das', 'leise,', 'feine', 'Sausen', 'des', 'Winds,', 'der', 'durch', 'die', 'Fugen', 'der', 'Fenster', 'fuhr.', 'Keiner', 'von', 'uns', 'atmete,', 'es', 'war', 'zu', 'plötzlich', 'gekommen', 'und', 'wir', 'alle', 'noch', 'geradezu', 'erschrocken', 'über', 'das', 'Unwahrscheinliche,', 'dass', 'dieser', 'Unbekannte', 'dem', 'Weltmeister', 'in', 'einer', 'schon', 'halb', 'verlorenen', 'Partie', 'seinen', 'Willen', 'aufgezwungen', 'haben', 'sollte.', 'McConnor', 'lehnte', 'sich', 'mit', 'einem', 'Ruck', 'zurück,', 'der', 'zurückgehaltene', 'Atem', 'fuhr', 'ihm', 'hörbar', 'in', 'einem', 'beglückten', "\"Ah!\"", 'von', 'den', 'Lippen.', 'Ich', 'wiederum', 'beobachtete', 'Czentovic.', 'Schon', 'bei', 'den', 'letzten', 'Zügen', 'hatte', 'mir', 'geschienen,', 'als', 'ob', 'er', 'blässer', 'geworden', 'sei.', 'Aber', 'er','verstand', 'sich', 'gut', 'zusammenzuhalten.', 'Er', 'verharrte', 'in', 'seiner', 'scheinbar', 'gleichmütigen', 'Starre', 'und', 'fragte', 'nur', 'in', 'lässigster', 'Weise,', 'während', 'er', 'die', 'Figuren', 'mit', 'ruhiger', 'Hand', 'vom', 'Brette', 'schob:', "\"Wünschen", 'die', 'Herren', 'noch', 'eine', 'dritte', 'Partie?\"']
 
 # compute RTs using patrticipant's average reading speed / letter
 curr_durations_training = [len(word) * RT_per_letter for word in curr_text_training] # in ms
@@ -3096,7 +3517,14 @@ curr_targets_training = [colour == target_colour for colour in curr_colours_trai
 flicker_phase = 0
 # we also need the start time (let's set it as current time 
 # at this point in the script):
-start_time = core.getTime()
+#start_time = core.getTime()
+
+# CREATE CLOCKS: 
+my_block_clock = core.Clock()
+my_block_clock.reset() # start block clock
+start_time = my_block_clock.getTime() # get start time of block
+# also create trial clock
+my_trial_clock = core.Clock()
 
 ### start block loop
 
@@ -3123,13 +3551,13 @@ win.flip()
 
 # send block onset trigger
 send_trigger("vis_task_training_onset")
-core.wait(0.01)
+core.wait(time_after_trigger)
 parallel.setData(0)
 core.wait(0.1) #wait 100ms before starting first trial
 
 # loop words in current text
 for trial_idx, curr_word in enumerate(curr_text_training):
-    print("current idx: " + str(trial_idx) + ", curr word:" + curr_word)
+    #print("current idx: " + str(trial_idx) + ", curr word:" + curr_word)
     
     ### prepare & show current word:
     
@@ -3150,12 +3578,12 @@ for trial_idx, curr_word in enumerate(curr_text_training):
     
     # Flicker option 1: use sine-wave (gradient) flicker
     # create current opacity value to continue flickering the word
-    #frame_time = core.getTime() # get current time point (in sec)
+    #frame_time = my_block_clock.getTime() # get current time point (in sec)
     #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
     #opacity = (flicker_intensity + 1) / 2
 
     # use square-wave (on-off) flicker
-    frame_time = core.getTime() # get current time point (in sec)
+    frame_time = my_block_clock.getTime() # get current time point (in sec)
     time_passed = frame_time - start_time # calculate time passed since start
     cycle_duration = 1 / flicker_freq # calculate duration of one flicker cycle
     cycle_passed = time_passed % cycle_duration # calculate time passed in current flicker cycle
@@ -3172,11 +3600,9 @@ for trial_idx, curr_word in enumerate(curr_text_training):
     trig_off = False # haven't sent 0 to port yet
     win.callOnFlip(send_trigger, "trial_onset")
 
-    # record trial onset time
+    # start trial clock
+    my_trial_clock.reset()
     onset_time = core.getTime()
-    print("onset_time:", onset_time)
-    print("word duration: " +  str(onset_time + curr_duration) + " ms")
-    
 
     ### wait for key response until curr_duration is over: 
 
@@ -3186,24 +3612,24 @@ for trial_idx, curr_word in enumerate(curr_text_training):
     ### start recording responses
     # start while loop that looks for responses
     # --> end while loop only if duration for current word is over
-    while core.getTime() < (onset_time + curr_duration):
+    while my_trial_clock.getTime() < (onset_time + curr_duration):
         
         # if it's time to turn off trigger, do so:
-        if core.getTime() <= onset_time + 0.01 and trig_off == False:
+        if my_trial_clock.getTime() <= onset_time + time_after_trigger and trig_off == False:
             parallel.setData(0)
             trig_off = True
             
-        print("curr time stamp:", core.getTime())
+        #print("curr time stamp:", core.getTime())
         # in each iteration, draw word on screen
         # --> flicker again
 
         # Flicker option 1: use sine-wave (gradient) flicker
-        #frame_time = core.getTime() 
+        #frame_time = my_block_clock.getTime() 
         #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
         #opacity = (flicker_intensity + 1) / 2
 
         # Flicker option 2: use square-wave (on-off) flicker
-        frame_time = core.getTime() 
+        frame_time = my_block_clock.getTime() 
         time_passed = frame_time - start_time 
         cycle_duration = 1 / flicker_freq
         cycle_passed = time_passed % cycle_duration
@@ -3218,38 +3644,44 @@ for trial_idx, curr_word in enumerate(curr_text_training):
         stim_mask.draw()
         win.flip()
         
-        # if participant pressed button "c" and hasn't already responded in the current trial
-        if event.getKeys(['c']) and previous_response == False:
-            # get reaction time
-            # we measure reaction time from the onset of the current word, even if the target 
-            # was the word before (or occurred even earlier). 
-            # In such cases we can infer the actual reaction times from the df later.
-            # Reason why I don't use the last target as an onset: Doesn't take into 
-            # account that there might be false alarm responses.
-            curr_nback_RT = (core.getTime() - onset_time) * 1000 # *1000 to convert s to ms    
-           
-            # send trigger to indicate n-back response
-            send_trigger("response_target")
-            core.wait(0.01) # wait 10 ms
-            parallel.setData(0)
+        # check if there were responses:
+        keys = event.getKeys(['c', 'escape'])
+        
+        # if there were, check responses:
+        for key in keys:
             
-            previous_response = True
-            
-        # If esc is pressed, end the experiment:
-        elif event.getKeys(['escape']):
-            et_abort_exp() # shut down eyetrigger and download incremental data
-            # close parallel port
-            core.wait(0.1)
-            parallel.setData(0)
-            core.wait(0.5)
-            core.quit()
-           
+            # if participant pressed button "c" and hasn't already responded in the current trial
+            if key == 'c' and previous_response == False:
+                # get reaction time
+                # we measure reaction time from the onset of the current word, even if the target 
+                # was the word before (or occurred even earlier). 
+                # In such cases we can infer the actual reaction times from the df later.
+                # Reason why I don't use the last target as an onset: Doesn't take into 
+                # account that there might be false alarm responses.
+                curr_nback_RT = my_trial_clock.getTime() * 1000 
+               
+                # send trigger to indicate n-back response
+                send_trigger("response_target")
+                core.wait(time_after_trigger) # wait 3 ms
+                parallel.setData(0)
+                
+                previous_response = True
+                
+            # If esc is pressed, end the experiment:
+            elif key == 'escape':
+                et_abort_exp() # shut down eyetrigger and download incremental data
+                # close parallel port
+                core.wait(time_after_trigger)
+                parallel.setData(0)
+                core.wait(0.5)
+                core.quit()
+               
     
     ### end trial
-    print("end trial")
+    #print("end trial")
     # stop display of current word & send trial offset trigger
     win.callOnFlip(send_trigger, "trial_offset")
-    core.wait(0.1)
+    core.wait(time_after_trigger)
     parallel.setData(0)
     
     # check whether response was hit, miss, false alarm or correct rejection
@@ -3275,7 +3707,7 @@ for trial_idx, curr_word in enumerate(curr_text_training):
     thisExp.addData('target', curr_target)
     thisExp.addData('nback_response', curr_nback_response)
     thisExp.addData('nback_RT', curr_nback_RT) # in ms
-    thisExp.addData('duration', curr_duration * 1000) # *1000 to convert s to ms
+    thisExp.addData('duration', curr_duration) # in ms
     thisExp.addData('text_nr', None)
     thisExp.addData('trial_nr', curr_trial_nr)
     thisExp.addData('block_cond', 'None')
@@ -3290,13 +3722,13 @@ for trial_idx, curr_word in enumerate(curr_text_training):
 
     ### IF TESTING MODE ENABLED: end loop after 4 trials
     if expInfo['testing_mode'] == "yes":
-        if trial_idx == 3:
+        if trial_idx == 10:
             break
     
 print("finished visual task training block")
 # send block offset trigger
 send_trigger("block_offset")
-core.wait(0.01) # wait 10 ms
+core.wait(time_after_trigger) # wait 10 ms
 parallel.setData(0)
 core.wait(0.1) # wait 100 ms
 
@@ -3311,23 +3743,636 @@ core.wait(0.5)
 # keep background ivory
 win.setColor(light_bg_col, colorSpace='rgb')
 win.flip()
+
+##########################################################
+#            Text Comprehension Questions - Q1           #
+##########################################################
+
+### Settings:
+# keep background ivory
+win.setColor(light_bg_col, colorSpace='rgb')
+win.flip()
+
+# clear buffer of all previously recorded key events:
+event.clearEvents()
+
+# get current text nr:
+curr_text_nr = vis_task_text_nr
+
+# define first question for current text & their respective answers
+Q1 = "Welche Geräusche hören die Figuren aus dem benachbarten Salon kommen?"
+Q1_answers = ["1) Musik aus einem Radio", "2) einen lauten Streit", "3) Kinderlachen", "4) einen bellenden Hund"]
+Q1_corr = "a"
+
+# Define text positions and formatting
+question_pos = (0, 3)
+answer_xpos = -7 # move questions a bit to the left 
+answer_ypos = [ 0, -2, -4, -6] # set the y axis positions of all 4 answers
+
+# Create text stim for the question:
+question = visual.TextStim(win, 
+                           text = Q1, 
+                           pos = question_pos,
+                           color = "black",
+                           height = 0.5,
+                           font = "Bookman Old Style",
+                           anchorHoriz = 'center',
+                           alignText = 'center', 
+                           wrapWidth = 10)
+# create 1 text stim for each answer option:
+answers = [visual.TextStim(win, 
+                           text = Q1_answers[i], 
+                           pos = (answer_xpos, answer_ypos[i]), 
+                           color = "black", # set all to black as a default
+                           height = 0.5, 
+                           font = "Bookman Old Style",
+                           wrapWidth = 15,
+                           anchorHoriz = 'left', 
+                           alignText = 'center') for i in range(len(Q1_answers))]
+# set up instruction text
+instr_text = visual.TextStim(win, 
+                             text = "(Bitte benutzen Sie die Tasten 1, 2, 3 und 4 um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
+                             color = "grey",
+                             pos = (0, -10),
+                             wrapWidth = 20,
+                             height = 0.4,
+                             font = "Bookman Old Style")
+
+### Show all on screen until I set .autoDraw = False
+question.autoDraw = True
+instr_text.autoDraw = True
+for answer in answers:
+    answer.autoDraw = True
+win.flip()
+
+
+### Record key responses:
+Q1_chosen_ans = None
+
+while True:        
+    # if 1 was pressed...
+    if event.getKeys(['1']):
+        print('a')
+        # save Q1 answer as a 
+        Q1_chosen_ans = "a"
+        # set font colour of the first answer (answer a) to 
+        # green and the rest to black:
+        answers[0].setColor("green")
+        for answer in answers[1:]:
+            answer.setColor("black")
+            # draw updated stimulus:
+            win.flip()
+    # same procedure for all other answer options:
+    if event.getKeys(['2']):
+        print('b')
+        Q1_chosen_ans = "b"
+        # set font colour of the second answer (answer b) to 
+        # green and the rest to black:
+        answers[1].setColor("green")
+        for answer in [answers[0]] + answers[2:]:
+            answer.setColor("black")
+            # draw updated stimulus:
+            win.flip()
+    if event.getKeys(['3']):
+        print('c')
+        Q1_chosen_ans = "c"
+        # set font colour of the third answer (answer c) to 
+        # green and the rest to black:
+        answers[2].setColor("green")
+        for answer in answers[:2] + answers[3:]:
+            answer.setColor("black")
+        # draw updated stimulus:
+        win.flip()
+    if event.getKeys(['4']):
+        print('d')
+        Q1_chosen_ans = "d"
+        # set font colour of the fourth answer (answer d) to 
+        # green and the rest to black:
+        answers[3].setColor("green")
+        for answer in answers[:-1]:
+            answer.setColor("black")
+        # draw updated stimulus 
+        win.flip()
+    # if participant pressed "space", check whether they chose an answer.
+    # if yes, end this routine and go to next question, if not, wait for valid answer.
+    elif event.getKeys(['space']) and Q1_chosen_ans != None:
+        break
+
+# print chosen answer for Q1
+print("answer for Q1:" + str(Q1_chosen_ans))
+
+# check if answer was correct:
+if Q1_chosen_ans == Q1_corr: 
+    print("answer correct!")
+else: 
+    print("answer incorrect!")
+    
+# save data:
+thisExp.addData('question', 'Q1')
+thisExp.addData('chosen_ans', Q1_chosen_ans)
+thisExp.addData('ans_correct', Q1_chosen_ans == Q1_corr)
+thisExp.addData('text_nr', "vis_task_training")
+thisExp.addData('block_nr', exp_block_counter)
+thisExp.addData('block_name', "visual_task_training")
+thisExp.addData('block_kind', "visual_task_training")
+                
+# start a new row in the csv
+thisExp.nextEntry()
+
+### End Q1: Set .autoDraw = False to stop showing question & answers
+question.autoDraw = False
+instr_text.autoDraw = False
+for answer in answers:
+    answer.autoDraw = False
+
+# end current routine
+#continueRoutine = False
+##########################################################
+#            Text Comprehension Questions - Q2           #
+##########################################################
+
+### Settings:
+# keep background ivory
+win.setColor(light_bg_col, colorSpace='rgb')
+win.flip()
+
+# get current text nr:
+curr_text_nr = vis_task_text_nr
+
+# load second question for current text & their respective answers
+Q2 = "Was tun die Figuren am Anfang des Textes?"
+Q2_answers = ["1) jubeln", "2) Jive tanzen", "3) den Atem anhalten", "4) Dart spielen"]
+Q2_corr = "c"
+
+# Define text positions and formatting
+question_pos = (0, 3)
+answer_xpos = -7 # move questions a bit to the left 
+answer_ypos = [ 0, -2, -4, -6] # set the y axis positions of all 4 answers
+
+# Create text stim for the question:
+question = visual.TextStim(win, 
+                           text = Q2, 
+                           pos = question_pos,
+                           color = "black",
+                           height = 0.5,
+                           font = "Bookman Old Style",
+                           anchorHoriz = 'center',
+                           alignText = 'center', 
+                           wrapWidth = 10)
+# create 1 text stim for each answer option:
+answers = [visual.TextStim(win, 
+                           text = Q2_answers[i], 
+                           pos = (answer_xpos, answer_ypos[i]), 
+                           color = "black", # set all to black as a default
+                           height = 0.5, 
+                           font = "Bookman Old Style",
+                           wrapWidth = 15,
+                           anchorHoriz = 'left', 
+                           alignText = 'center') for i in range(len(Q1_answers))]
+# set up instruction text
+instr_text = visual.TextStim(win, 
+                             text = "(Bitte benutzen Sie die Tasten 1, 2, 3 und 4 um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
+                             color = "grey",
+                             pos = (0, -10),
+                             wrapWidth = 20,
+                             height = 0.4,
+                             font = "Bookman Old Style")
+### Show all on screen until I set .autoDraw = False
+question.autoDraw = True
+instr_text.autoDraw = True
+for answer in answers:
+    answer.autoDraw = True
+win.flip()
+
+
+### Record key responses:
+Q2_chosen_ans = None
+
+while True:        
+    # if 1 was pressed...
+    if event.getKeys(['1']):
+        print('a')
+        # save Q2 answer as a 
+        Q2_chosen_ans = "a"
+        # set font colour of the first answer (answer a) to 
+        # green and the rest to black:
+        answers[0].setColor("green")
+        for answer in answers[1:]:
+            answer.setColor("black")
+            # draw updated stimulus:
+            win.flip()
+    # same procedure for all other answer options:
+    if event.getKeys(['2']):
+        print('b')
+        Q2_chosen_ans = "b"
+        # set font colour of the second answer (answer b) to 
+        # green and the rest to black:
+        answers[1].setColor("green")
+        for answer in [answers[0]] + answers[2:]:
+            answer.setColor("black")
+            # draw updated stimulus:
+            win.flip()
+    if event.getKeys(['3']):
+        print('c')
+        Q2_chosen_ans = "c"
+        # set font colour of the third answer (answer c) to 
+        # green and the rest to black:
+        answers[2].setColor("green")
+        for answer in answers[:2] + answers[3:]:
+            answer.setColor("black")
+        # draw updated stimulus:
+        win.flip()
+    if event.getKeys(['4']):
+        print('d')
+        Q2_chosen_ans = "d"
+        # set font colour of the fourth answer (answer d) to 
+        # green and the rest to black:
+        answers[3].setColor("green")
+        for answer in answers[:-1]:
+            answer.setColor("black")
+        # draw updated stimulus 
+        win.flip()
+    # if participant pressed "space", check whether they chose an answer.
+    # if yes, end this routine and go to next question, if not, wait for valid answer.
+    elif event.getKeys(['space']) and Q2_chosen_ans != None:
+        break
+
+# print chosen answer for Q2
+print("answer for Q2:" + str(Q2_chosen_ans))
+
+# check if answer was correct:
+if Q2_chosen_ans == Q2_corr: 
+    print("answer correct!")
+else: 
+    print("answer incorrect!")
+    
+# save data:
+thisExp.addData('question', 'Q2')
+thisExp.addData('chosen_ans', Q2_chosen_ans)
+thisExp.addData('ans_correct', Q2_chosen_ans == Q2_corr)
+thisExp.addData('text_nr', curr_text_nr)
+thisExp.addData('block_nr', exp_block_counter)
+thisExp.addData('block_name', "visual_task_training")
+thisExp.addData('block_kind', "visual_task_training")
+                
+# start a new row in the csv
+thisExp.nextEntry()
+
+### End Q2: Set .autoDraw = False to stop showing question & answers
+question.autoDraw = False
+instr_text.autoDraw = False
+for answer in answers:
+    answer.autoDraw = False
+
+# end current routine
+#continueRoutine = False
+##########################################################
+#            Text Comprehension Questions - Q3           #
+##########################################################
+
+### Settings:
+# keep background ivory
+win.setColor(light_bg_col, colorSpace='rgb')
+win.flip()
+
+# clear buffer of all previously recorded key events:
+event.clearEvents()
+
+# get current text nr:
+curr_text_nr = vis_task_text_nr
+
+# set third question for current text & the respective answers
+Q3 = "Was fragt Czentovic die umstehenden Herren?"
+Q3_answers = ["1) ob sie noch eine Partie spielen wollen", "2) ob sie Interesse an einer Runde Skat haben", "3) ob sie Feuer haben", "4) ob er sie auf einen Drink einladen darf"]
+Q3_corr = "a"
+
+# Define text positions and formatting
+question_pos = (0, 3)
+answer_xpos = -7 # move questions a bit to the left 
+answer_ypos = [ 0, -2, -4, -6] # set the y axis positions of all 4 answers
+
+# Create text stim for the question:
+question = visual.TextStim(win, 
+                           text = Q3, 
+                           pos = question_pos,
+                           color = "black",
+                           height = 0.5,
+                           font = "Bookman Old Style",
+                           anchorHoriz = 'center',
+                           alignText = 'center', 
+                           wrapWidth = 10)
+# create 1 text stim for each answer option:
+answers = [visual.TextStim(win, 
+                           text = Q3_answers[i], 
+                           pos = (answer_xpos, answer_ypos[i]), 
+                           color = "black", # set all to black as a default
+                           height = 0.5, 
+                           font = "Bookman Old Style",
+                           wrapWidth = 15,
+                           anchorHoriz = 'left', 
+                           alignText = 'center') for i in range(len(Q1_answers))]
+# set up instruction text
+instr_text = visual.TextStim(win, 
+                             text = "(Bitte benutzen Sie die Tasten 1, 2, 3 und 4 um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
+                             color = "grey",
+                             pos = (0, -10),
+                             wrapWidth = 20,
+                             height = 0.4,
+                             font = "Bookman Old Style")
+                             
+### Show all on screen until I set .autoDraw = False
+question.autoDraw = True
+instr_text.autoDraw = True
+for answer in answers:
+    answer.autoDraw = True
+win.flip()
+
+
+### Record key responses:
+Q3_chosen_ans = None
+
+while True:        
+    # if 1 was pressed...
+    if event.getKeys(['1']):
+        print('a')
+        # save Q3 answer as a 
+        Q3_chosen_ans = "a"
+        # set font colour of the first answer (answer a) to 
+        # green and the rest to black:
+        answers[0].setColor("green")
+        for answer in answers[1:]:
+            answer.setColor("black")
+            # draw updated stimulus:
+            win.flip()
+    # same procedure for all other answer options:
+    if event.getKeys(['2']):
+        print('b')
+        Q3_chosen_ans = "b"
+        # set font colour of the second answer (answer b) to 
+        # green and the rest to black:
+        answers[1].setColor("green")
+        for answer in [answers[0]] + answers[2:]:
+            answer.setColor("black")
+            # draw updated stimulus:
+            win.flip()
+    if event.getKeys(['3']):
+        print('c')
+        Q3_chosen_ans = "c"
+        # set font colour of the third answer (answer c) to 
+        # green and the rest to black:
+        answers[2].setColor("green")
+        for answer in answers[:2] + answers[3:]:
+            answer.setColor("black")
+        # draw updated stimulus:
+        win.flip()
+    if event.getKeys(['4']):
+        print('d')
+        Q3_chosen_ans = "d"
+        # set font colour of the fourth answer (answer d) to 
+        # green and the rest to black:
+        answers[3].setColor("green")
+        for answer in answers[:-1]:
+            answer.setColor("black")
+        # draw updated stimulus 
+        win.flip()
+    # if participant pressed "space", check whether they chose an answer.
+    # if yes, end this routine and go to next question, if not, wait for valid answer.
+    elif event.getKeys(['space']) and Q3_chosen_ans != None:
+        break
+
+# print chosen answer for Q3
+print("answer for Q3:" + str(Q3_chosen_ans))
+
+# check if answer was correct:
+if Q3_chosen_ans == Q3_corr: 
+    print("answer correct!")
+else: 
+    print("answer incorrect!")
+    
+# save data:
+thisExp.addData('question', 'Q3')
+thisExp.addData('chosen_ans', Q3_chosen_ans)
+thisExp.addData('ans_correct', Q3_chosen_ans == Q3_corr)
+thisExp.addData('text_nr', curr_text_nr)
+thisExp.addData('block_nr', exp_block_counter)
+thisExp.addData('block_name', "visual_task_training")
+thisExp.addData('block_kind', "visual_task_training")
+
+# start a new row in the csv
+thisExp.nextEntry()
+
+### End Q3: Set .autoDraw = False to stop showing question & answers
+question.autoDraw = False
+instr_text.autoDraw = False
+for answer in answers:
+    answer.autoDraw = False
+
+# end current routine
+#continueRoutine = False
+##########################################################
+#                 Text Difficulty Rating                 #
+##########################################################
+
+### Settings:
+# keep background ivory
+win.setColor(light_bg_col, colorSpace='rgb')
+win.flip()
+
+# get current text nr:
+curr_text_nr = vis_task_text_nr
+
+# create a keyboard object to check if key is currently pressed 
+# (not really possible with event.getKey())
+kb = keyboard.Keyboard()
+
+# set question texts, item names and labels:
+items = ["Wie anstrengend war es für Sie, dem Text zu folgen?", "Wie schwierig fanden Sie den Text inhaltlich?", "Wie verständlich war der Text für Sie?", "Wie sehr mussten Sie sich beim Lesen konzentrieren?", "Wie einfach fanden Sie die Formulierungen im Text?", "Wie interessant fanden Sie den Text?"]
+item_names = ["subj_reading_effort1", "subj_text_difficulty", "subj_text_incomprehensibility1", "subj_reading_effort2", "subj_text_incomprehensibility2", "subj_interest_in_text"]
+item_labels = [["gar nicht anstrengend", "sehr anstrengend"], ["sehr leicht", "sehr schwierig"], ["sehr verständlich", "gar nicht verständlich"], ["gar nicht", "sehr stark"], ["sehr einfach","sehr schwierig"], ["sehr langweilig","sehr interessant"]]
+
+# loop items
+for item_idx, curr_item in enumerate(items):
+    print("rating text difficulty – current item: " + item_names[item_idx])
+
+    # clear buffer of all previously recorded key events:
+    event.clearEvents()
+    
+    # get matching labels & name of current item
+    curr_item_labels = item_labels[item_idx]
+    print("item labels: ", curr_item_labels)
+    curr_item_name = item_names[item_idx]
+    
+    # set up slider
+    slider = visual.Slider(win = win,
+                           pos = (0, 0), # position of the slider (centered on screen)
+                           size = (10, 0.5), # size of the scale
+                           labels = curr_item_labels, # labels for the ticks
+                           ticks = [0, 100], # make ticks at 0 and 100
+                           units = "deg", # unit = viewing angle degrees
+                           color = "black", 
+                           fillColor = "green", 
+                           borderColor = "black", 
+                           granularity = 1, # scale step size
+                           labelHeight = 0.5, # font size of the labels I guess?
+                           font = "Bookman Old Style")
+    slider.markerPos = 50  # initial position of slider button
+
+    # set up question text
+    question_text = visual.TextStim(win, 
+                                    text = curr_item,
+                                    color = "black",
+                                    pos = (0, 2),
+                                    height = 0.6,
+                                    font = "Bookman Old Style")
+                                        
+    # set up instruction text
+    instr_text = visual.TextStim(win, 
+                                 text = "(Bitte benutzen Sie die Pfeiltasten um den Punkt zu bewegen. Mit der Leertaste können Sie Ihre Bewertung bestätigen.)",
+                                 color = "grey",
+                                 pos = (0,-3), 
+                                 height = 0.4,
+                                 font = "Bookman Old Style")
+    # show all on screen
+    question_text.draw()
+    instr_text.draw()
+    slider.draw()
+    win.flip()                              
+    core.wait(0.1)
         
-# go to next block  
+    # check for key responses
+    print("set question & slider - awaiting key responses now!")
+    moved_slider = False
+        
+    while True:
+        # show stimuli on screen
+        question_text.draw()
+        instr_text.draw()
+        slider.draw()
+        win.flip()
+        
+        # check for key events
+        keys = event.getKeys()
+        # if there was a key response...
+        if keys:
+            # get the last key that was pressed
+            key = keys[-1]
+            
+            # if esc was pressed, end the experiment:
+            if key == "escape":
+                print("quitting experiment")
+                core.quit()
+
+            # if left arrow key was pressed, move slider button 1 unit to the left
+            elif key == "left":
+                # move slider button
+                slider.markerPos -= 1
+                
+                # keep in mind that participant moved the slider button
+                moved_slider = True
+                    
+                # update slider on screen
+                core.wait(0.1)
+                question_text.draw()
+                instr_text.draw()
+                slider.draw()
+                win.flip()
+
+            # if right arrow key is pressed, move slider button 1 unit to the right
+            elif key == "right":
+                
+                # move slider button
+                slider.markerPos += 1
+                
+                # keep in mind that participant moved the slider button
+                moved_slider = True
+                
+                # update slider on screen
+                core.wait(0.1)
+                question_text.draw()
+                instr_text.draw()
+                slider.draw()
+                win.flip()
+                print("moving slider button to the right")
+
+            # if space bar is pressed and participant moved slider, save rating and go to next item
+            elif key == "space" and moved_slider == True:
+                # get slider position aka rating
+                curr_rating = slider.markerPos
+                print("Participant rated " +  curr_item_name +  " as: ", curr_rating)
+                
+                # save data:
+                thisExp.addData('question', curr_item_name)
+                thisExp.addData('chosen_ans', curr_rating)
+                thisExp.addData('text_nr', curr_text_nr)                    
+                thisExp.addData('block_nr', exp_block_counter)
+                thisExp.addData('block_name', "visual_task_training")
+                thisExp.addData('block_kind', "visual_task_training")
+                # start a new row in the csv
+                thisExp.nextEntry()            
+                
+                # clear window for next item
+                win.flip()
+                # wait for 500 ms before drawing the next item on screen
+                core.wait(0.5)
+                break  # end the while loop
+
+# go to next block!
 exp_block_counter += 1
+continueRoutine = False
+# keep track of which components have finished
+vistask_tComponents = []
+for thisComponent in vistask_tComponents:
+    thisComponent.tStart = None
+    thisComponent.tStop = None
+    thisComponent.tStartRefresh = None
+    thisComponent.tStopRefresh = None
+    if hasattr(thisComponent, 'status'):
+        thisComponent.status = NOT_STARTED
+# reset timers
+t = 0
+_timeToFirstFrame = win.getFutureFlipTime(clock="now")
+vistask_tClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
+frameN = -1
 
+# -------Run Routine "vistask_t"-------
+while continueRoutine:
+    # get current time
+    t = vistask_tClock.getTime()
+    tThisFlip = win.getFutureFlipTime(clock=vistask_tClock)
+    tThisFlipGlobal = win.getFutureFlipTime(clock=None)
+    frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
+    # update/draw components on each frame
+    
+    # check for quit (typically the Esc key)
+    if endExpNow or defaultKeyboard.getKeys(keyList=["escape"]):
+        core.quit()
+    
+    # check if all components have finished
+    if not continueRoutine:  # a component has requested a forced-end of Routine
+        break
+    continueRoutine = False  # will revert to True if at least one component still running
+    for thisComponent in vistask_tComponents:
+        if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+            continueRoutine = True
+            break  # at least one component has not yet finished
+    
+    # refresh the screen
+    if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
+        win.flip()
 
+# -------Ending Routine "vistask_t"-------
+for thisComponent in vistask_tComponents:
+    if hasattr(thisComponent, "setAutoDraw"):
+        thisComponent.setAutoDraw(False)
+# the Routine "vistask_t" was not non-slip safe, so reset the non-slip timer
+routineTimer.reset()
 
-
-
-
-# ----------------------------------
-
-
-
-
-
-
-### START VISUAL TASK BLOCK
+# ------Prepare to start Routine "vistask_m"-------
+continueRoutine = True
+# update component parameters for each repeat
+##########################################################
+#                 VISUAL TASK: MAIN BLOCK                #
+##########################################################
 
 # clear buffer of all previously recorded key events:
 event.clearEvents()
@@ -3399,7 +4444,14 @@ curr_targets = [colour == target_colour for colour in curr_colours]
 flicker_phase = 0
 # we also need the start time (let's set it as current time 
 # at this point in the script):
-start_time = core.getTime()
+#start_time = core.getTime()
+
+# CREATE CLOCKS: 
+my_block_clock = core.Clock()
+my_block_clock.reset() # start block clock
+start_time = my_block_clock.getTime() # get start time of block
+# also create trial clock
+my_trial_clock = core.Clock()
 
 ### start block loop
 
@@ -3426,13 +4478,13 @@ win.flip()
 
 # send block onset trigger
 send_trigger("vis_task_onset")
-core.wait(0.01)
+core.wait(time_after_trigger)
 parallel.setData(0)
-core.wait(0.1)
+core.wait(0.1) # wait 100 ms
 
 # loop words in current text
 for trial_idx, curr_word in enumerate(curr_text):
-    print("current idx: " + str(trial_idx) + ", curr word:" + curr_word)
+    #print("current idx: " + str(trial_idx) + ", curr word:" + curr_word)
     
     ### prepare & show current word:
     
@@ -3453,12 +4505,12 @@ for trial_idx, curr_word in enumerate(curr_text):
     
     # Flicker option 1: use sine-wave (gradient) flicker
     # create current opacity value to continue flickering the word
-    #frame_time = core.getTime() # get current time point (in sec)
+    #frame_time = my_block_clock.getTime() # get current time point (in sec)
     #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
     #opacity = (flicker_intensity + 1) / 2
 
     # Flicker option 2: use square-wave (on-off) flicker
-    frame_time = core.getTime() # get current time point (in sec)
+    frame_time = my_block_clock.getTime() # get current time point (in sec)
     time_passed = frame_time - start_time # calculate time passed since start
     cycle_duration = 1 / flicker_freq # calculate duration of one flicker cycle
     cycle_passed = time_passed % cycle_duration # calculate time passed in current flicker cycle
@@ -3475,9 +4527,9 @@ for trial_idx, curr_word in enumerate(curr_text):
     trig_off = False # we haven't sent 0 to port yet   
     win.callOnFlip(send_trigger, "trial_onset")
 
-    # record trial onset time
-    onset_time = core.getTime()
-    print("word duration: " +  str(onset_time + curr_duration) + " ms")
+    # start trial clock & record trial onset time
+    my_trial_clock.reset()
+    onset_time = my_trial_clock.getTime()
 
     ### wait for key response until curr_duration is over: 
 
@@ -3487,10 +4539,10 @@ for trial_idx, curr_word in enumerate(curr_text):
     ### start recording responses
     # start while loop that looks for responses
     # --> end while loop only if duration for current word is over
-    while core.getTime() < (onset_time + curr_duration):  
+    while my_trial_clock.getTime() < (onset_time + curr_duration):  
 
         # if it's time to turn off trigger, do so:
-        if core.getTime() <= onset_time + 0.01 and trig_off == False:
+        if my_trial_clock.getTime() <= onset_time + time_after_trigger and trig_off == False:
             parallel.setData(0)
             trig_off = True  
 
@@ -3498,12 +4550,12 @@ for trial_idx, curr_word in enumerate(curr_text):
         # --> flicker again
 
         # Flicker option 1: use sine-wave (gradient) flicker
-        #frame_time = core.getTime() 
+        #frame_time = my_block_clock.getTime() 
         #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
         #opacity = (flicker_intensity + 1) / 2
 
         # Flicker option 2: use square-wave (on-off) flicker
-        frame_time = core.getTime() 
+        frame_time = my_block_clock.getTime() 
         time_passed = frame_time - start_time 
         cycle_duration = 1 / flicker_freq
         cycle_passed = time_passed % cycle_duration
@@ -3518,38 +4570,345 @@ for trial_idx, curr_word in enumerate(curr_text):
         stim_mask.draw()
         win.flip()
         
-        # if participant pressed button "c" and hasn't already responded in the current trial
-        if event.getKeys(['c']) and previous_response == False:
-            # get reaction time
-            # we measure reaction time from the onset of the current word, even if the target 
-            # was the word before (or occurred even earlier). 
-            # In such cases we can infer the actual reaction times from the df later.
-            # Reason why I don't use the last target as an onset: Doesn't take into 
-            # account that there might be false alarm responses.
-            curr_nback_RT = (core.getTime() - onset_time) * 1000 # *1000 to convert s to ms    
+        # check for key presses
+        keys = event.getKeys(['c', 'escape'])
+        
+        # if there are any key presses recorded:
+        if len(keys) > 0:
             
-            # send trigger to indicate n-back response
-            send_trigger("response_target")
-            core.wait(0.01) # wait 10 ms
-            parallel.setData(0)
+            # if participant pressed button "c" and hasn't already responded in the current trial
+            if event.getKeys(['c']) and previous_response == False:
+                # get reaction time
+                # we measure reaction time from the onset of the current word, even if the target 
+                # was the word before (or occurred even earlier). 
+                # In such cases we can infer the actual reaction times from the df later.
+                # Reason why I don't use the last target as an onset: Doesn't take into 
+                # account that there might be false alarm responses.
+                curr_nback_RT = my_trial_clock.getTime()
+                
+                # send trigger to indicate n-back response
+                send_trigger("response_target")
+                core.wait(time_after_trigger) # wait 10 ms
+                parallel.setData(0)
+                
+                # only get first target response, we don't care if they press the button more than once in this trial:
+                previous_response = True
+                #print("detected C key press -- 0-back RT: " + str(curr_nback_RT) + " ms") # * 1000 to convert s to ms
             
-            # only get first target response, we don't care if they press the button more than once in this trial:
-            previous_response = True
-            print("detected C key press -- 0-back RT: " + str(curr_nback_RT) + " ms") # * 1000 to convert s to ms
-        # If esc is pressed, end the experiment:
-        elif event.getKeys(['escape']):
-            et_abort_exp() # shut down eyetrigger and download incremental data
-            # close parallel port
-            core.wait(0.1)
-            parallel.setData(0)
-            core.wait(0.5)
-            core.quit()
-    
+            # If esc is pressed, end the experiment:
+            elif event.getKeys(['escape']):
+                et_abort_exp() # shut down eyetrigger and download incremental data
+                # close parallel port
+                core.wait(time_after_trigger)
+                parallel.setData(0)
+                core.wait(0.5)
+                core.quit()
+        
     ### end trial
-    print("end trial")
+    #print("end trial")
     # stop display of current word & send trial offset trigger
     win.callOnFlip(send_trigger, "trial_offset")
-    core.wait(0.1)
+    core.wait(time_after_trigger)
+    parallel.setData(0)
+    
+    # check whether response was hit, miss, false alarm or correct rejection
+    # they saw a target and there was one: hit
+    if previous_response and curr_target:
+        curr_nback_response = "hit"
+    # they didn't see a target but there was one: miss
+    elif previous_response == False and curr_target:
+        curr_nback_response = "miss"
+        curr_nback_RT = None
+    # they didn't see a target and there was none: correct rejection
+    elif previous_response == False and curr_target == False:
+        curr_nback_response = "correct rejection"
+        curr_nback_RT = None
+    # they saw a target but there was none: false alarm
+    elif previous_response and curr_target == False:
+        curr_nback_response = "false alarm"
+
+    ### End of trial / current word display:
+    
+    ### save everything in output csv
+    thisExp.addData('colour', curr_colour)
+    thisExp.addData('target', curr_target)
+    thisExp.addData('nback_response', curr_nback_response)
+    thisExp.addData('nback_RT', curr_nback_RT * 1000) # *1000 to convert s to ms
+    thisExp.addData('duration', curr_duration * 1000) # *1000 to convert s to ms
+    thisExp.addData('text_nr', curr_text_nr)
+    thisExp.addData('trial_nr', curr_trial_nr)
+    thisExp.addData('block_cond', 'None')
+    thisExp.addData('block_nr', exp_block_counter)
+    thisExp.addData('block_name', 'visual_task')
+    # careful, make sure quotes in the strings are escaped using a 
+    # quote (weird, I know) so it's properly saved in the CSV:
+    thisExp.addData('word', escape_quotes(curr_word))
+    
+    # start a new row in the csv
+    thisExp.nextEntry()
+
+    ### IF TESTING MODE ENABLED: end loop after 4 trials
+    if expInfo['testing_mode'] == "yes":
+        if trial_idx == 3:
+            break
+            
+print("finished visual task block")
+
+# send trigger to indicate block offset
+send_trigger("block_offset")
+core.wait(time_after_trigger) # wait 3 ms
+parallel.setData(0)
+core.wait(0.1) # wait 100 ms           
+
+# change background colour from grey to ivory
+change_bg_colour(window = win, 
+                 start_rgb = dark_bg_col, 
+                 end_rgb = light_bg_col, 
+                 seconds = 2)
+# Wait for a brief period of time so bg is set
+core.wait(0.5)
+
+# keep background ivory
+win.setColor(light_bg_col, colorSpace='rgb')
+win.flip()
+       
+### START VISUAL TASK BLOCK
+
+# clear buffer of all previously recorded key events:
+event.clearEvents()
+
+
+### Show instructions
+# set instruction text
+instr_text = "Instruktionen\n\n\nGut gemacht!\n\nNun folgt ein etwas längerer Hauptblock, die Aufgabe bleibt aber die Gleiche.\n\nBitte drücken Sie die Leertaste, um den Block zu starten."
+# create text box
+instr_text_stim = visual.TextStim(win, 
+                                  text = instr_text, 
+                                  height = 0.5, # font height: 5° visual angle
+                                  font = "Bookman Old Style",
+                                  pos = (0, 0),
+                                  color = "black")
+
+# display the instructions on screen
+while True:
+    # keep background ivory
+    win.setColor(light_bg_col, colorSpace='rgb')
+    instr_text_stim.draw()
+    win.flip()
+    # end screen if participant presses space
+    if 'space' in event.getKeys():
+        break 
+
+ 
+### START VISUAL TASK BLOCK:
+
+### change background colour 
+# transition from ivory 
+# to medium grey 
+change_bg_colour(window = win, 
+                 start_rgb = light_bg_col,
+                 end_rgb = dark_bg_col, 
+                 seconds = 2)
+# Wait for a brief period of time so bg is set
+core.wait(0.8)
+# keep background grey
+win.setColor(dark_bg_col, colorSpace='rgb')
+win.flip()
+
+# clear buffer of all previously recorded key events:
+event.clearEvents()
+
+### prepare stimuli
+
+# get text for vis task main
+curr_text_nr = vis_task_text_nr
+curr_text = locals()[vis_task_text_nr]
+
+# compute RTs using participant's average reading speed / letter
+vis_task_durations = [len(word) * RT_per_letter for word in curr_text] # in ms
+# print(vis_task_durations)
+
+# use the same target_colour as in the training & generate 0-back colour list
+print("target colour for vis task main:", target_colour)
+curr_colours = create_0back_stimlist(target_colour = target_colour, nr_targets = 50, colour_codes = colours, nr_words = 300)
+
+# save position of targets as True/False list:
+curr_targets = [colour == target_colour for colour in curr_colours]
+
+
+### prepare flicker
+# hint: flicker_freq and frame_rate are set in the settings 
+# code component at the beginning of the experiment.
+
+# create flicker phase variable - start at phase = 0
+flicker_phase = 0
+# we also need the start time (let's set it as current time 
+# at this point in the script):
+#start_time = core.getTime()
+
+# CREATE CLOCKS: 
+my_block_clock = core.Clock()
+my_block_clock.reset() # start block clock
+start_time = my_block_clock.getTime() # get start time of block
+# also create trial clock
+my_trial_clock = core.Clock()
+
+### start block loop
+
+# create empty text stimulus 
+stim = visual.TextStim(win = win, 
+                       text = " ", 
+                       pos = (0,0), # center stimulus
+                       font = "Times New Roman",
+                       height = 1) # font height = 1° visual angle
+
+# create grey rectangle that masks the text if I set opacity to 1
+# --> changing the text opacity directly isn't working: https://discourse.psychopy.org/t/opacity-of-text-stimuli-is-not-updating/11152/7    
+stim_mask = visual.Rect(win = win,
+                        width = 20, # width = 20° visual angle
+                        height = 3, # height = 3° visual angle 
+                        pos = (0,0), # center stimulus 
+                        opacity = 0, # set opacity to 0 for a start
+                        fillColor = dark_bg_col,
+                        colorSpace = "rgb")
+
+stim.draw()
+stim_mask.draw()
+win.flip()
+
+# send block onset trigger
+send_trigger("vis_task_onset")
+core.wait(time_after_trigger)
+parallel.setData(0)
+core.wait(0.1) # wait 100 ms
+
+# loop words in current text
+for trial_idx, curr_word in enumerate(curr_text):
+    #print("current idx: " + str(trial_idx) + ", curr word:" + curr_word)
+    
+    ### prepare & show current word:
+    
+    # get current colour
+    curr_colour = curr_colours[trial_idx]
+    # check if it's a target
+    curr_target = curr_targets[trial_idx]
+    
+    # get duration for current word
+    curr_duration = vis_task_durations[trial_idx]
+    
+    # get trial number (start counting from 1, so add 1)
+    curr_trial_nr = trial_idx + 1
+
+    # set current word & colour as content of text stimulus
+    stim.color = curr_colour
+    stim.text = curr_word
+    
+    # Flicker option 1: use sine-wave (gradient) flicker
+    # create current opacity value to continue flickering the word
+    #frame_time = my_block_clock.getTime() # get current time point (in sec)
+    #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
+    #opacity = (flicker_intensity + 1) / 2
+
+    # Flicker option 2: use square-wave (on-off) flicker
+    frame_time = my_block_clock.getTime() # get current time point (in sec)
+    time_passed = frame_time - start_time # calculate time passed since start
+    cycle_duration = 1 / flicker_freq # calculate duration of one flicker cycle
+    cycle_passed = time_passed % cycle_duration # calculate time passed in current flicker cycle
+    if cycle_passed < cycle_duration / 2: # if in the first half of the cycle
+        opacity = 1 # set opacity to 1
+    else: # if in the second half of the cycle
+        opacity = 0 # set opacity to 0
+        
+    stim_mask.opacity = opacity
+    
+    # show word on screen & send trial onset trigger
+    stim.draw() # draw word on screen
+    stim_mask.draw() # draw mask on screen
+    trig_off = False # we haven't sent 0 to port yet   
+    win.callOnFlip(send_trigger, "trial_onset")
+
+    # start trial clock & record trial onset time
+    my_trial_clock.reset()
+    onset_time = my_trial_clock.getTime()
+
+    ### wait for key response until curr_duration is over: 
+
+    # create tracker for 0-back responses for the current trial:
+    previous_response = False
+
+    ### start recording responses
+    # start while loop that looks for responses
+    # --> end while loop only if duration for current word is over
+    while my_trial_clock.getTime() < (onset_time + curr_duration):  
+
+        # if it's time to turn off trigger, do so:
+        if my_trial_clock.getTime() <= onset_time + time_after_trigger and trig_off == False:
+            parallel.setData(0)
+            trig_off = True  
+
+        # in each iteration, draw word on screen
+        # --> flicker again
+
+        # Flicker option 1: use sine-wave (gradient) flicker
+        #frame_time = my_block_clock.getTime() 
+        #flicker_intensity = np.sin(2 * np.pi * flicker_freq * (frame_time - start_time) + flicker_phase)
+        #opacity = (flicker_intensity + 1) / 2
+
+        # Flicker option 2: use square-wave (on-off) flicker
+        frame_time = my_block_clock.getTime() 
+        time_passed = frame_time - start_time 
+        cycle_duration = 1 / flicker_freq
+        cycle_passed = time_passed % cycle_duration
+        if cycle_passed < cycle_duration / 2:
+            opacity = 1
+        else: 
+            opacity = 0
+            
+        stim_mask.opacity = opacity
+        
+        stim.draw()
+        stim_mask.draw()
+        win.flip()
+        
+        # check for key presses
+        keys = event.getKeys(['c', 'escape'])
+        
+        # if there are any key presses recorded:
+        for key in keys:
+            
+            # if participant pressed button "c" and hasn't already responded in the current trial
+            if key == 'c' and previous_response == False:
+                # get reaction time
+                # we measure reaction time from the onset of the current word, even if the target 
+                # was the word before (or occurred even earlier). 
+                # In such cases we can infer the actual reaction times from the df later.
+                # Reason why I don't use the last target as an onset: Doesn't take into 
+                # account that there might be false alarm responses.
+                curr_nback_RT = my_trial_clock.getTime() * 1000 # in ms
+                
+                # send trigger to indicate n-back response
+                send_trigger("response_target")
+                core.wait(time_after_trigger) # wait 10 ms
+                parallel.setData(0)
+                
+                # only get first target response, we don't care if they press the button more than once in this trial:
+                previous_response = True
+                #print("detected C key press -- 0-back RT: " + str(curr_nback_RT) + " ms") # * 1000 to convert s to ms
+            
+            # If esc is pressed, end the experiment:
+            elif key == 'escape':
+                et_abort_exp() # shut down eyetrigger and download incremental data
+                # close parallel port
+                core.wait(time_after_trigger)
+                parallel.setData(0)
+                core.wait(0.5)
+                core.quit()
+        
+    ### end trial
+    #print("end trial")
+    # stop display of current word & send trial offset trigger
+    win.callOnFlip(send_trigger, "trial_offset")
+    core.wait(time_after_trigger)
     parallel.setData(0)
     
     # check whether response was hit, miss, false alarm or correct rejection
@@ -3575,7 +4934,7 @@ for trial_idx, curr_word in enumerate(curr_text):
     thisExp.addData('target', curr_target)
     thisExp.addData('nback_response', curr_nback_response)
     thisExp.addData('nback_RT', curr_nback_RT) # in ms
-    thisExp.addData('duration', curr_duration * 1000) # *1000 to convert s to ms
+    thisExp.addData('duration', curr_duration) # in ms
     thisExp.addData('text_nr', curr_text_nr)
     thisExp.addData('trial_nr', curr_trial_nr)
     thisExp.addData('block_cond', 'None')
@@ -3597,11 +4956,9 @@ print("finished visual task block")
 
 # send trigger to indicate block offset
 send_trigger("block_offset")
-core.wait(0.01) # wait 10 ms
+core.wait(time_after_trigger) # wait 3 ms
 parallel.setData(0)
 core.wait(0.1) # wait 100 ms           
-# Send end of block trigger:
-core.wait(0.01) # wait 100 ms
 
 # change background colour from grey to ivory
 change_bg_colour(window = win, 
@@ -3615,14 +4972,447 @@ core.wait(0.5)
 win.setColor(light_bg_col, colorSpace='rgb')
 win.flip()
         
-# go to next block 
+# end routine
+#continueRoutine = False
+
+
+
+
+##########################################################
+#            Text Comprehension Questions - Q1           #
+##########################################################
+
+### Settings:
+# keep background ivory
+win.setColor(light_bg_col, colorSpace='rgb')
+win.flip()
+
+# clear buffer of all previously recorded key events:
+event.clearEvents()
+
+# get current text nr:
+curr_text_nr = vis_task_text_nr
+
+# load first question for current text & their respective answers
+Q1 = locals()[curr_text_nr + "_Q1"]
+Q1_answers = locals()[curr_text_nr + "_Q1_ans"]
+Q1_corr = locals()[curr_text_nr + "_Q1_corr"]
+
+# Define text positions and formatting
+question_pos = (0, 3)
+answer_xpos = -7 # move questions a bit to the left 
+answer_ypos = [ 0, -2, -4, -6] # set the y axis positions of all 4 answers
+
+# Create text stim for the question:
+question = visual.TextStim(win, 
+                           text = Q1, 
+                           pos = question_pos,
+                           color = "black",
+                           height = 0.5,
+                           font = "Bookman Old Style",
+                           anchorHoriz = 'center',
+                           alignText = 'center', 
+                           wrapWidth = 10)
+# create 1 text stim for each answer option:
+answers = [visual.TextStim(win, 
+                           text = Q1_answers[i], 
+                           pos = (answer_xpos, answer_ypos[i]), 
+                           color = "black", # set all to black as a default
+                           height = 0.5, 
+                           font = "Bookman Old Style",
+                           wrapWidth = 15,
+                           anchorHoriz = 'left', 
+                           alignText = 'center') for i in range(len(Q1_answers))]
+# set up instruction text
+instr_text = visual.TextStim(win, 
+                             text = "(Bitte benutzen Sie die Tasten 1, 2, 3 und 4 um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
+                             color = "grey",
+                             pos = (0, -10),
+                             wrapWidth = 20,
+                             height = 0.4,
+                             font = "Bookman Old Style")
+
+### Show all on screen until I set .autoDraw = False
+question.autoDraw = True
+instr_text.autoDraw = True
+for answer in answers:
+    answer.autoDraw = True
+win.flip()
+
+
+### Record key responses:
+Q1_chosen_ans = None
+
+while True:        
+    # if 1 was pressed...
+    if event.getKeys(['1']):
+        print('a')
+        # save Q1 answer as a 
+        Q1_chosen_ans = "a"
+        # set font colour of the first answer (answer a) to 
+        # green and the rest to black:
+        answers[0].setColor("green")
+        for answer in answers[1:]:
+            answer.setColor("black")
+            # draw updated stimulus:
+            win.flip()
+    # same procedure for all other answer options:
+    if event.getKeys(['2']):
+        print('b')
+        Q1_chosen_ans = "b"
+        # set font colour of the second answer (answer b) to 
+        # green and the rest to black:
+        answers[1].setColor("green")
+        for answer in [answers[0]] + answers[2:]:
+            answer.setColor("black")
+            # draw updated stimulus:
+            win.flip()
+    if event.getKeys(['3']):
+        print('c')
+        Q1_chosen_ans = "c"
+        # set font colour of the third answer (answer c) to 
+        # green and the rest to black:
+        answers[2].setColor("green")
+        for answer in answers[:2] + answers[3:]:
+            answer.setColor("black")
+        # draw updated stimulus:
+        win.flip()
+    if event.getKeys(['4']):
+        print('d')
+        Q1_chosen_ans = "d"
+        # set font colour of the fourth answer (answer d) to 
+        # green and the rest to black:
+        answers[3].setColor("green")
+        for answer in answers[:-1]:
+            answer.setColor("black")
+        # draw updated stimulus 
+        win.flip()
+    # if participant pressed "space", check whether they chose an answer.
+    # if yes, end this routine and go to next question, if not, wait for valid answer.
+    elif event.getKeys(['space']) and Q1_chosen_ans != None:
+        break
+
+# print chosen answer for Q1
+print("answer for Q1:" + str(Q1_chosen_ans))
+
+# check if answer was correct:
+if Q1_chosen_ans == Q1_corr: 
+    print("answer correct!")
+else: 
+    print("answer incorrect!")
+    
+# save data:
+thisExp.addData('question', 'Q1')
+thisExp.addData('chosen_ans', Q1_chosen_ans)
+thisExp.addData('ans_correct', Q1_chosen_ans == Q1_corr)
+thisExp.addData('text_nr', curr_text_nr)
+thisExp.addData('block_nr', exp_block_counter)
+thisExp.addData('block_name', "visual_task_main")
+thisExp.addData('block_kind', "visual_task_main")
+                
+# start a new row in the csv
+thisExp.nextEntry()
+
+### End Q1: Set .autoDraw = False to stop showing question & answers
+question.autoDraw = False
+instr_text.autoDraw = False
+for answer in answers:
+    answer.autoDraw = False
+
+# end current routine
+#continueRoutine = False
+##########################################################
+#            Text Comprehension Questions - Q2           #
+##########################################################
+
+### Settings:
+# keep background ivory
+win.setColor(light_bg_col, colorSpace='rgb')
+win.flip()
+
+# get current text nr:
+curr_text_nr = vis_task_text_nr
+
+# load second question for current text & their respective answers
+Q2 = locals()[curr_text_nr + "_Q2"]
+Q2_answers = locals()[curr_text_nr + "_Q2_ans"]
+Q2_corr = locals()[curr_text_nr + "_Q2_corr"]
+
+# Define text positions and formatting
+question_pos = (0, 3)
+answer_xpos = -7 # move questions a bit to the left 
+answer_ypos = [ 0, -2, -4, -6] # set the y axis positions of all 4 answers
+
+# Create text stim for the question:
+question = visual.TextStim(win, 
+                           text = Q2, 
+                           pos = question_pos,
+                           color = "black",
+                           height = 0.5,
+                           font = "Bookman Old Style",
+                           anchorHoriz = 'center',
+                           alignText = 'center', 
+                           wrapWidth = 10)
+# create 1 text stim for each answer option:
+answers = [visual.TextStim(win, 
+                           text = Q2_answers[i], 
+                           pos = (answer_xpos, answer_ypos[i]), 
+                           color = "black", # set all to black as a default
+                           height = 0.5, 
+                           font = "Bookman Old Style",
+                           wrapWidth = 15,
+                           anchorHoriz = 'left', 
+                           alignText = 'center') for i in range(len(Q1_answers))]
+# set up instruction text
+instr_text = visual.TextStim(win, 
+                             text = "(Bitte benutzen Sie die Tasten 1, 2, 3 und 4 um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
+                             color = "grey",
+                             pos = (0, -10),
+                             wrapWidth = 20,
+                             height = 0.4,
+                             font = "Bookman Old Style")
+### Show all on screen until I set .autoDraw = False
+question.autoDraw = True
+instr_text.autoDraw = True
+for answer in answers:
+    answer.autoDraw = True
+win.flip()
+
+
+### Record key responses:
+Q2_chosen_ans = None
+
+while True:        
+    # if 1 was pressed...
+    if event.getKeys(['1']):
+        print('a')
+        # save Q2 answer as a 
+        Q2_chosen_ans = "a"
+        # set font colour of the first answer (answer a) to 
+        # green and the rest to black:
+        answers[0].setColor("green")
+        for answer in answers[1:]:
+            answer.setColor("black")
+            # draw updated stimulus:
+            win.flip()
+    # same procedure for all other answer options:
+    if event.getKeys(['2']):
+        print('b')
+        Q2_chosen_ans = "b"
+        # set font colour of the second answer (answer b) to 
+        # green and the rest to black:
+        answers[1].setColor("green")
+        for answer in [answers[0]] + answers[2:]:
+            answer.setColor("black")
+            # draw updated stimulus:
+            win.flip()
+    if event.getKeys(['3']):
+        print('c')
+        Q2_chosen_ans = "c"
+        # set font colour of the third answer (answer c) to 
+        # green and the rest to black:
+        answers[2].setColor("green")
+        for answer in answers[:2] + answers[3:]:
+            answer.setColor("black")
+        # draw updated stimulus:
+        win.flip()
+    if event.getKeys(['4']):
+        print('d')
+        Q2_chosen_ans = "d"
+        # set font colour of the fourth answer (answer d) to 
+        # green and the rest to black:
+        answers[3].setColor("green")
+        for answer in answers[:-1]:
+            answer.setColor("black")
+        # draw updated stimulus 
+        win.flip()
+    # if participant pressed "space", check whether they chose an answer.
+    # if yes, end this routine and go to next question, if not, wait for valid answer.
+    elif event.getKeys(['space']) and Q2_chosen_ans != None:
+        break
+
+# print chosen answer for Q2
+print("answer for Q2:" + str(Q2_chosen_ans))
+
+# check if answer was correct:
+if Q2_chosen_ans == Q2_corr: 
+    print("answer correct!")
+else: 
+    print("answer incorrect!")
+    
+# save data:
+thisExp.addData('question', 'Q2')
+thisExp.addData('chosen_ans', Q2_chosen_ans)
+thisExp.addData('ans_correct', Q2_chosen_ans == Q2_corr)
+thisExp.addData('text_nr', curr_text_nr)
+thisExp.addData('block_nr', exp_block_counter)
+thisExp.addData('block_name', "visual_task_main")
+thisExp.addData('block_kind', "visual_task_main")
+                
+# start a new row in the csv
+thisExp.nextEntry()
+
+### End Q2: Set .autoDraw = False to stop showing question & answers
+question.autoDraw = False
+instr_text.autoDraw = False
+for answer in answers:
+    answer.autoDraw = False
+
+# end current routine
+#continueRoutine = False
+##########################################################
+#                 Text Difficulty Rating                 #
+##########################################################
+
+### Settings:
+# keep background ivory
+win.setColor(light_bg_col, colorSpace='rgb')
+win.flip()
+
+# get current text nr:
+curr_text_nr = vis_task_text_nr
+
+# create a keyboard object to check if key is currently pressed 
+# (not really possible with event.getKey())
+kb = keyboard.Keyboard()
+
+# set question texts, item names and labels:
+items = ["Wie anstrengend war es für Sie, dem Text zu folgen?", "Wie schwierig fanden Sie den Text inhaltlich?", "Wie verständlich war der Text für Sie?", "Wie sehr mussten Sie sich beim Lesen konzentrieren?", "Wie einfach fanden Sie die Formulierungen im Text?", "Wie interessant fanden Sie den Text?"]
+item_names = ["subj_reading_effort1", "subj_text_difficulty", "subj_text_incomprehensibility1", "subj_reading_effort2", "subj_text_incomprehensibility2", "subj_interest_in_text"]
+item_labels = [["gar nicht anstrengend", "sehr anstrengend"], ["sehr leicht", "sehr schwierig"], ["sehr verständlich", "gar nicht verständlich"], ["gar nicht", "sehr stark"], ["sehr einfach","sehr schwierig"], ["sehr langweilig","sehr interessant"]]
+
+# loop items
+for item_idx, curr_item in enumerate(items):
+    print("rating text difficulty – current item: " + item_names[item_idx])
+
+    # clear buffer of all previously recorded key events:
+    event.clearEvents()
+    
+    # get matching labels & name of current item
+    curr_item_labels = item_labels[item_idx]
+    print("item labels: ", curr_item_labels)
+    curr_item_name = item_names[item_idx]
+    
+    # set up slider
+    slider = visual.Slider(win = win,
+                           pos = (0, 0), # position of the slider (centered on screen)
+                           size = (10, 0.5), # size of the scale
+                           labels = curr_item_labels, # labels for the ticks
+                           ticks = [0, 100], # make ticks at 0 and 100
+                           units = "deg", # unit = viewing angle degrees
+                           color = "black", 
+                           fillColor = "green", 
+                           borderColor = "black", 
+                           granularity = 1, # scale step size
+                           labelHeight = 0.5, # font size of the labels I guess?
+                           font = "Bookman Old Style")
+    slider.markerPos = 50  # initial position of slider button
+
+    # set up question text
+    question_text = visual.TextStim(win, 
+                                    text = curr_item,
+                                    color = "black",
+                                    pos = (0, 2),
+                                    height = 0.6,
+                                    font = "Bookman Old Style")
+                                        
+    # set up instruction text
+    instr_text = visual.TextStim(win, 
+                                 text = "(Bitte benutzen Sie die Pfeiltasten um den Punkt zu bewegen. Mit der Leertaste können Sie Ihre Bewertung bestätigen.)",
+                                 color = "grey",
+                                 pos = (0,-3), 
+                                 height = 0.4,
+                                 font = "Bookman Old Style")
+    # show all on screen
+    question_text.draw()
+    instr_text.draw()
+    slider.draw()
+    win.flip()                              
+    core.wait(0.1)
+        
+    # check for key responses
+    print("set question & slider - awaiting key responses now!")
+    moved_slider = False
+        
+    while True:
+        # show stimuli on screen
+        question_text.draw()
+        instr_text.draw()
+        slider.draw()
+        win.flip()
+        
+        # check for key events
+        keys = event.getKeys()
+        # if there was a key response...
+        if keys:
+            # get the last key that was pressed
+            key = keys[-1]
+            
+            # if esc was pressed, end the experiment:
+            if key == "escape":
+                print("quitting experiment")
+                core.quit()
+
+            # if left arrow key was pressed, move slider button 1 unit to the left
+            elif key == "left":
+                # move slider button
+                slider.markerPos -= 1
+                
+                # keep in mind that participant moved the slider button
+                moved_slider = True
+                    
+                # update slider on screen
+                core.wait(0.1)
+                question_text.draw()
+                instr_text.draw()
+                slider.draw()
+                win.flip()
+
+            # if right arrow key is pressed, move slider button 1 unit to the right
+            elif key == "right":
+                
+                # move slider button
+                slider.markerPos += 1
+                
+                # keep in mind that participant moved the slider button
+                moved_slider = True
+                
+                # update slider on screen
+                core.wait(0.1)
+                question_text.draw()
+                instr_text.draw()
+                slider.draw()
+                win.flip()
+                print("moving slider button to the right")
+
+            # if space bar is pressed and participant moved slider, save rating and go to next item
+            elif key == "space" and moved_slider == True:
+                # get slider position aka rating
+                curr_rating = slider.markerPos
+                print("Participant rated " +  curr_item_name +  " as: ", curr_rating)
+                
+                # save data:
+                thisExp.addData('question', curr_item_name)
+                thisExp.addData('chosen_ans', curr_rating)
+                thisExp.addData('text_nr', curr_text_nr)                    
+                thisExp.addData('block_nr', exp_block_counter)
+                thisExp.addData('block_name', "visual_task_main")
+                thisExp.addData('block_kind', "visual_task_main")
+                # start a new row in the csv
+                thisExp.nextEntry()            
+                
+                # clear window for next item
+                win.flip()
+                # wait for 500 ms before drawing the next item on screen
+                core.wait(0.5)
+                break  # end the while loop
+
+# go to next block!
 exp_block_counter += 1
 continueRoutine = False
-
-
 # keep track of which components have finished
-vis_taskComponents = []
-for thisComponent in vis_taskComponents:
+vistask_mComponents = []
+for thisComponent in vistask_mComponents:
     thisComponent.tStart = None
     thisComponent.tStop = None
     thisComponent.tStartRefresh = None
@@ -3632,14 +5422,14 @@ for thisComponent in vis_taskComponents:
 # reset timers
 t = 0
 _timeToFirstFrame = win.getFutureFlipTime(clock="now")
-vis_taskClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
+vistask_mClock.reset(-_timeToFirstFrame)  # t0 is time of first possible flip
 frameN = -1
 
-# -------Run Routine "vis_task"-------
+# -------Run Routine "vistask_m"-------
 while continueRoutine:
     # get current time
-    t = vis_taskClock.getTime()
-    tThisFlip = win.getFutureFlipTime(clock=vis_taskClock)
+    t = vistask_mClock.getTime()
+    tThisFlip = win.getFutureFlipTime(clock=vistask_mClock)
     tThisFlipGlobal = win.getFutureFlipTime(clock=None)
     frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
     # update/draw components on each frame
@@ -3652,7 +5442,7 @@ while continueRoutine:
     if not continueRoutine:  # a component has requested a forced-end of Routine
         break
     continueRoutine = False  # will revert to True if at least one component still running
-    for thisComponent in vis_taskComponents:
+    for thisComponent in vistask_mComponents:
         if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
             continueRoutine = True
             break  # at least one component has not yet finished
@@ -3661,11 +5451,11 @@ while continueRoutine:
     if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
         win.flip()
 
-# -------Ending Routine "vis_task"-------
-for thisComponent in vis_taskComponents:
+# -------Ending Routine "vistask_m"-------
+for thisComponent in vistask_mComponents:
     if hasattr(thisComponent, "setAutoDraw"):
         thisComponent.setAutoDraw(False)
-# the Routine "vis_task" was not non-slip safe, so reset the non-slip timer
+# the Routine "vistask_m" was not non-slip safe, so reset the non-slip timer
 routineTimer.reset()
 
 # ------Prepare to start Routine "warning_1"-------
@@ -3742,13 +5532,24 @@ routineTimer.reset()
 # ------Prepare to start Routine "pred_tendency"-------
 continueRoutine = True
 # update component parameters for each repeat
+# TO DO: add block & trial clocks
+
 ### Settings for Prediction Tendency Task:
+
+# For testing this in google colab or so:
+# import numpy as np
+# from matplotlib import pyplot as plt
+
+# pick the right channels here: 
+# 7+8 are the in-ear headphone channels, so 5+6 (#34 as used in Sarah's CueCue) 
+# could be the loudspeakers?
+sound_device = "Analog (7+8) (RME Fireface UC), Windows DirectSound" # 7+8 are the output channels
 
 # for the sounds:
 tone_volume = 1 # use full volume and make sure the system volume is
                 # set to a value where the tones are played with 40dB
 tones = [440, 587, 782, 1043]  # Pure tone frequencies in Hz
-tone_duration = 0.1  # Duration of each pure tone in seconds (each lasted 100 ms)
+#tone_duration = 0.1  # Duration of each pure tone in seconds (each lasted 100 ms)
 tone_rate = 3  # Rate of pure tone presentation in Hz
 audio_sample_freq = 44100 # 44100 Hz --> audio sampling rate at the lab (according to Frauke)
 tones_iti = 1/3
@@ -3770,11 +5571,19 @@ tones_objects = {}
 for tone_idx, curr_freq in enumerate(tones):
     print("preparing sound object for tone", curr_freq, "- tone index:", tone_idx)
     
+    # how many samples do we need for a tone duration of 100 ms?
+    num_samples = int(audio_sample_freq * tone_duration)
+    
+    # build a time array: 
+    # build an array of length num_samples and divide it by the audio sampling frequency:
+    t = np.arange(0, num_samples) / audio_sample_freq
+    
+    # OLD: 
     # build a time array: you need the sound duration and the right sampling frequency for your device
     # 1 divided by the sampling rate = duration of a single sample in sec
-    tone_sample_len = 1/audio_sample_freq
-    t = np.arange(0, tone_duration, tone_sample_len)
-
+    #tone_sample_len = 1/audio_sample_freq
+    #t = np.arange(0, tone_duration, tone_sample_len)
+    
     # generate sine wave:
     sine_wave = np.sin(2*np.pi*curr_freq*t)
 
@@ -3809,14 +5618,24 @@ for tone_idx, curr_freq in enumerate(tones):
 
     print("----------------------")
 
+    # save the sine wave to a temporary audio file
+    curr_sound_filename = "sine_wave" + str(curr_freq) + ".wav"
+    sf.write(curr_sound_filename, sine_wave, audio_sample_freq)
+
+    # Create a Sound instance using the temporary audio file
+    sound = Sound(filename = curr_sound_filename, # the sound file (in .wav format)
+                  device   = sound_device, # portaudio device used for playback
+                  mul = threshold) # volume multiplier - use threshold we determined earlier in the hearing threshold test or default = 50 attentuation - 40 dB
+    
+    # OLD:
     # generate sound object for the sound file we built
-    sound = Sound(value = sine_wave,
-                  secs = tone_duration, # duration of sound in seconds
-                  sampleRate = audio_sample_freq,
-                  name = f"tone{tone_idx + 1}", # create a name for the sound for logging
-                  hamming = False, # don't apply filter, we did this before
-                  volume = tone_volume,
-                  loops = 0) # don't repeat sound, play only once
+    #sound = Sound(value = sine_wave,
+    #              secs = tone_duration, # duration of sound in seconds
+    #              sampleRate = audio_sample_freq,
+    #              name = f"tone{tone_idx + 1}", # create a name for the sound for logging
+    #              hamming = False, # don't apply filter, we did this before
+    #              volume = tone_volume,
+    #              loops = 0) # don't repeat sound, play only once
     
     # add the sound to the dict
     tones_objects[f"tone_{curr_freq}"] = sound
@@ -3824,12 +5643,9 @@ for tone_idx, curr_freq in enumerate(tones):
 print("finished preparing sound objects for prediction tendency task")
 
 # now you can access & play each sound by its name, like this:
-#now = ptb.GetSecs()
 #curr_tone = tones_objects["tone_440"]
-#curr_tone.play(when = now)  # play the sound immediately
-# send a trigger
-#core.wait(0.1) # wait 100 ms until the audio has finished
-#curr_tone.stop() # close the sound
+#curr_tone.play()
+
 
 # Get the trial sequences for both entropy conditions 
 # (both for 1500 tones aka trials)
@@ -3911,10 +5727,13 @@ while True:
         break # break while loop
 
 # send block onset trigger
-send_trigger("prediction_tendency_task_onset")
-core.wait(0.01) # wait 10 ms
-parallel.setData(0)
-core.wait(0.1) # wait 100 ms
+#send_trigger("prediction_tendency_task_onset")
+#core.wait(time_after_trigger) # wait 3 ms
+#parallel.setData(0)
+#core.wait(0.1) # wait 100 ms
+
+# CREATE TRIAL CLOCK:
+my_trial_clock = core.Clock()
 
 # loop over list first_sequence with all frequencies:
 for tone_idx, curr_freq in enumerate(task_order_stimuli):
@@ -3956,30 +5775,30 @@ for tone_idx, curr_freq in enumerate(task_order_stimuli):
     # set last_trial_cond as current condition, send block onset trigger and move on.
     if tone_idx == 0:
         last_trial_cond = str(task_order_trigger[tone_idx])
-        print("vis task - starting block of condition" + str(task_order_trigger[tone_idx]) + "now")
+        #print("vis task - starting block of condition" + str(task_order_trigger[tone_idx]) + "now")
         # current block's onset trigger
         send_trigger(str(task_order_trigger[tone_idx]) + "_onset")
-        core.wait(0.01) # wait 10 ms
+        core.wait(time_after_trigger) # wait 3 ms
         parallel.setData(0)
-        core.wait(0.01) # wait 10 ms
+        core.wait(time_after_trigger) # wait 3 ms
       
     # if it's not, check if the condition of the last trial is the same as the current one.
     # If yes, don't do anything, if not, send block offset trigger for the block before, 
     # send block onset trigger for the new one and 
     # update last_trial_cond to current (new) condition.
     elif tone_idx > 0 and last_trial_cond != str(task_order_trigger[tone_idx]):
-      print("vis task - starting block of condition" + str(task_order_trigger[tone_idx]) + "now")
+      #print("vis task - starting block of condition" + str(task_order_trigger[tone_idx]) + "now")
       # old block's offset trigger:
-      send_trigger(last_trial_cond + "_offset")
-      core.wait(0.01) # wait 10 ms
+      send_trigger("block_offset")
+      core.wait(time_after_trigger) # wait 3 ms
       parallel.setData(0)
-      core.wait(0.01) # wait 10 ms
+      core.wait(time_after_trigger) # wait 3 ms
       
       # current block's onset trigger
       send_trigger(str(task_order_trigger[tone_idx]) + "_onset")
-      core.wait(0.01) # wait 10 ms
+      core.wait(time_after_trigger) # wait 3 ms
       parallel.setData(0)
-      core.wait(0.01) # wait 10 ms
+      core.wait(time_after_trigger) # wait 3 ms
       
       # set new condition as last_trial_cond:
       last_trial_cond = str(task_order_trigger[tone_idx])
@@ -3988,28 +5807,23 @@ for tone_idx, curr_freq in enumerate(task_order_stimuli):
     ### RUN TRIAL:
     # get sound object for current frequency tone
     curr_tone = tones_objects[f"tone_{curr_freq}"]
-    now = ptb.GetSecs() # get current time stamp
-    curr_tone.play(when = now)  # play the sound immediately
     
     # send tone onset trigger
     send_trigger("freq_" + str(curr_freq) + "_onset")
-    core.wait(0.01) # wait 10 ms
-    parallel.setData(0)
-    # wait another 90 ms until the audio has finished (because we already 
-    # waited 10 ms to close the trigger, so wait 100 ms in total).
-    ptb.WaitSecs(0.09) # wait 90 ms
+    my_trial_clock.reset() # start trial clock
     
-    # close the sound, send tone offset trigger
-    curr_tone.stop() 
+    # play sound for 100 ms
+    # OLD: curr_tone.play(when = now)  # play the sound immediately
+    curr_tone.play()
+    
+    # send 0 trigger to EEG
+    parallel.setData(0)
+    
+    # wait a bit & send tone offset trigger:
+    core.wait(time_after_trigger) # wait 3 ms    
     send_trigger("freq_" + str(curr_freq) + "_offset")
-    core.wait(0.01) # wait 10 ms
+    core.wait(time_after_trigger) # wait again
     parallel.setData(0)
-    
-    # 1 3Hz cycle = 333.33 ms, so continue waiting until 333.33 ms have 
-    # passed since starting the tone before playing the next tone
-    time_passed = ptb.GetSecs() - now
-    #print("time passed since start of tone:", time_passed)
-    core.wait(0.33333 - time_passed)
     
     ### save information on current trial in output csv
     # (even if we don't record any behavioral data here)
@@ -4018,25 +5832,31 @@ for tone_idx, curr_freq in enumerate(task_order_stimuli):
     thisExp.addData('block_name', "prediction_tendency_task")
     thisExp.addData('block_kind', task_order_trigger[tone_idx])
     thisExp.addData('frequency', curr_freq)
-
+    
     # start a new row in the csv
     thisExp.nextEntry()
         
     # end this loop after 10 tones if testing mode is activated
     if expInfo['testing_mode'] == "yes":
-        if tone_idx == 10:
+        if tone_idx == 30:
             break
-    print("------ next tone ------ ")
+            
+    # 1 3Hz cycle = 333.33 ms, so continue waiting until 333.33 ms have 
+    # passed since starting the tone before playing the next tone
+    core.wait(0.33333 - my_trial_clock.getTime())
+    
+    #print("------ next tone ------ ")
 
 win.flip() # clear window (although it should be cleared)
 
+
 # Send end of block trigger:
-core.wait(0.01) # wait 100 ms
+#core.wait(time_after_trigger) # wait 3 ms
 # send block offset trigger
-send_trigger("block_offset")
-# wait for 100 ms before sending 0 trigger
-core.wait(0.01) 
-parallel.setData(0)
+#send_trigger("block_offset")
+# wait for 3 ms before sending 0 trigger
+#core.wait(time_after_trigger) 
+#parallel.setData(0)
 
 # If everything's finished, go to next routine
 print(" --- ENDING PREDICTION TENDENCY TASK NOW --- ")
