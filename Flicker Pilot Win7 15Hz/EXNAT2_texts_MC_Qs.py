@@ -222,3 +222,42 @@ text_09_Q2_corr = "d"
 text_09_Q3 = "Wie alt war Shakespeare, als das Unglück passierte?"
 text_09_Q3_ans = ["1) ca. 5 Jahre", "2) ca. 10 Jahre", "3) ca. 15 Jahre", "4) ca. 20 Jahre"]
 text_09_Q3_corr = "a"
+
+
+# Heavy Metal in Jordan
+#global text_10
+text_10 = ["Von","außen","ist","nichts","zu","sehen.","Nur","eine","weiße","Wand","und","eine","grüne","Tür","aus","Eisen.","Adnan","sperrt","die","Tür","auf:","\"Geht","einfach","die","Treppe","runter,","dann","seid","ihr","im","Probenraum\",","sagt","er.","Er","schließt","die","Tür","sorgfältig","hinter","sich","ab:","\"Vor","einiger","Zeit","war","jemand","vom","Geheimdienst","hier.","Seitdem","sind","wir","vorsichtiger","geworden.\"","Für","einen",
+"kurzen","Moment","ist","man","sich","nicht","sicher,","ob","es","als","Witz","gemeint","ist.","\"Wir","spielen","Heavy","Metal\",","sagt","Adnan.","\"Das","kann","in","unserem","Land","einen","Haufen","Ärger","bedeuten.\"","Denn","wer","in","Jordanien","laut","Heavy","Metal","hört,","kann","dafür","sogar","im","Gefängnis","landen.","Heavy","Metal","gibt","es","in","arabischen","Ländern","noch","nicht","sehr","lange:","Die","ersten","Konzerte","fanden",
+"in","den","neunziger","Jahren","statt,","begleitet","von","Ärger","mit","der","Polizei.","Bei","einer","Razzia","in","Ägypten","wurden","damals","rund","70","Jugendliche","verhaftet.","Die","Polizei","nahm","alles","mit,","was","ihnen","verdächtig","vorkam:","Poster,","CDs,","sogar","ein","schwarzes","T-Shirt","mit","Bugs-Bunny-Aufdruck.","In","Jordanien","gab","es","schon","länger","keine","Festnahmen","mehr.",
+"\"Aber","das","liegt","einfach","daran,","dass","sie","unsere","Konzerte","gleich","verbieten\",","sagt","Adnan.","\"Konzerte","sind","im","Moment","nur","im","Geheimen","möglich.\"","Doch","trotz","aller","Probleme","mit","Geheimdienst","und","Polizei","wächst","die","Metal-Szene","in","Jordanien.","Was","verboten","ist,","gewinnt","an","Reiz.","Allerdings","wächst","mit","der","Metal-Szene","auch","das","Misstrauen","der","Behörden.","Wer",
+"sich","dort","nach","den","Heavy-Metal-Fans","erkundigt,","bekommt","keine","Antworten.","Genauso","sieht","es","auch","bei","der","Polizei","aus:","Keiner","möchte","zuständig","sein.","\"Wir","haben","zwar","nichts","gegen","die","Musik,","aber","Satanismus","ist","verboten\",","sagt","schließlich","einer","der","Polizisten.","Der","Frage,","was","Heavy","Metal","und","Satanismus","miteinander","zu","tun","haben,","weicht","er","aus.","Adnan","hat","vor","einiger",
+"Zeit","versucht,","die","Polizei","zu","einem","Konzert","einzuladen.","Er","dachte,","wenn","die","Polizisten","mehr","über","sie","wüssten,","hätten","sie","auch","keine","Probleme", "mehr", "mit", "ihnen.", "Aber", "auf", "seinen", "Brief", "bekam", "er", "keine", "Antwort."]
+
+text_10_Q1 = "In welchem Land ist Heavy Metal verboten?"
+text_10_Q1_ans = ["1) Katar", "2) Jemen", "3) Jordanien", "4) Israel"]
+text_10_Q1_corr = "c"
+
+text_10_Q2 = "Wieso kommt es dort nicht mehr zu Festnahmen von Metal Fans?"
+text_10_Q2_ans = ["1) die Polizei schaut weg", "2) Metal-Bands dürfen nicht mehr auftreten", "3) Metal-Fans geben sich nicht mehr als solche zu erkennen", "4) der Staat fürchtet Demonstrationen "]
+text_10_Q2_corr = "b"
+
+text_10_Q3 = "Was wurde bei einer Razzia in Ägypten konfisziert?"
+text_10_Q3_ans = ["1) ein T-Shirt mit Scooby-Doo-Aufdruck", "2) ein T-Shirt mit Bugs-Bunny-Aufdruck", "3) ein T-Shirt mit Spongebob-Aufdruck", "4) ein T-Shirt mit Donald-Duck-Aufdruck"]
+text_10_Q3_corr = "b"
+
+
+# Text & Qs for the vis task training (I set this directly in the experiment for some reason):
+
+#curr_text_training = ['Einen', 'Augenblick', 'herrschte', 'totale', 'Stille.', 'Man', 'hörte', 'plötzlich', 'die', 'Wellen', 'rauschen', 'und', 'das', 'Radio', 'aus', 'dem', 'Salon', 'herüberjazzen,', 'man', 'vernahm', 'jeden', 'Schritt', 'vom', 'Promenadendeck', 'und', 'das', 'leise,', 'feine', 'Sausen', 'des', 'Winds,', 'der', 'durch', 'die', 'Fugen', 'der', 'Fenster', 'fuhr.', 'Keiner', 'von', 'uns', 'atmete,', 'es', 'war', 'zu', 'plötzlich', 'gekommen', 'und', 'wir', 'alle', 'noch', 'geradezu', 'erschrocken', 'über', 'das', 'Unwahrscheinliche,', 'dass', 'dieser', 'Unbekannte', 'dem', 'Weltmeister', 'in', 'einer', 'schon', 'halb', 'verlorenen', 'Partie', 'seinen', 'Willen', 'aufgezwungen', 'haben', 'sollte.', 'McConnor', 'lehnte', 'sich', 'mit', 'einem', 'Ruck', 'zurück,', 'der', 'zurückgehaltene', 'Atem', 'fuhr', 'ihm', 'hörbar', 'in', 'einem', 'beglückten', "\"Ah!\"", 'von', 'den', 'Lippen.', 'Ich', 'wiederum', 'beobachtete', 'Czentovic.', 'Schon', 'bei', 'den', 'letzten', 'Zügen', 'hatte', 'mir', 'geschienen,', 'als', 'ob', 'er', 'blässer', 'geworden', 'sei.', 'Aber', 'er','verstand', 'sich', 'gut', 'zusammenzuhalten.', 'Er', 'verharrte', 'in', 'seiner', 'scheinbar', 'gleichmütigen', 'Starre', 'und', 'fragte', 'nur', 'in', 'lässigster', 'Weise,', 'während', 'er', 'die', 'Figuren', 'mit', 'ruhiger', 'Hand', 'vom', 'Brette', 'schob:', "\"Wünschen", 'die', 'Herren', 'noch', 'eine', 'dritte', 'Partie?\"']
+
+#Q1 = "Welche Geräusche hören die Figuren aus dem benachbarten Salon kommen?"
+#Q1_answers = ["Musik aus einem Radio", "einen lauten Streit", "Kinderlachen", "einen bellenden Hund"]
+#Q1_corr = "a"
+
+#Q2 = "Was tun die Figuren am Anfang des Textes?"
+#Q2_answers = ["1) jubeln", "2) Jive tanzen", "3) den Atem anhalten", "4) Dart spielen"]
+#Q2_corr = "c"
+
+#Q3 = "Was fragt Czentovic die umstehenden Herren?"
+#Q3_answers = ["1) ob sie noch eine Partie spielen wollen", "2) ob sie Interesse an einer Runde Skat haben", "3) ob sie Feuer haben", "4) ob er sie auf einen Drink einladen darf"]
+#Q3_corr = "a"
