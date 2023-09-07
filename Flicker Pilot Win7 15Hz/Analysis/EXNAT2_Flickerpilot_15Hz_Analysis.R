@@ -107,9 +107,8 @@ for (i in 1:length(file_list)) {
   
   # PREPARE FILE FOR PREPROCESSING
   # Read in current file
-  subj_df <- read.csv(paste(path_data_folder, file_list[i], sep = ""), 
-                      sep = ",")
-
+  subj_df <- read.csv(paste(path_data_folder, file_list[i],sep = ""), sep = ",")
+  
   # get demographical data:
   id         <- unique(subj_df$participant) # individual code
   age        <- unique(subj_df$age) # age in years
@@ -118,9 +117,9 @@ for (i in 1:length(file_list)) {
   
   # print message
   message(paste(i, " - Reading in file ", file_list[i], ", participant ID: ", id, sep = ""))
-
+  
   # if it's by the non-German-speaking HiWis, set native_speaker to False:
-  if (id == "eg" | id == "at"){
+  if (id %in% c("eg", "at")){
     native_speaker <-  FALSE
   } else { 
     native_speaker <- TRUE
@@ -193,17 +192,18 @@ for (i in 1:length(file_list)) {
   # This way, I can control for tiredness effects.
   
   # loop block_names_numbered aka individual blocks
-  block_nr <-  1
-  subj_df$block_nr <- NA
-  blocks <- c("Reading_Baseline_main_1", "Reading_Baseline_main_2", "1back_dual_main_1", "1back_dual_main_2", "2back_dual_main_1", "2back_dual_main_2")
-  for (block in unique(subj_df$block_names_numbered)){
-    # if the current block name is one of the main blocks, add block number
-    if (block %in% blocks){
-      subj_df[which(subj_df$block_names_numbered == block), "block_nr"] <- block_nr
-      # go to next block
-      block_nr <-  block_nr + 1
-    }
-  }  
+  #block_nr <-  1
+  #subj_df$block_nr <- NA
+  #blocks <- c("Reading_Baseline_main_1", "Reading_Baseline_main_2", "1back_dual_main_1", "1back_dual_main_2", "2back_dual_main_1", "2back_dual_main_2")
+  #for (block in unique(subj_df$block_names_numbered)){
+  #  # if the current block name is one of the main blocks, add block number
+  #  if (block %in% blocks){
+  #    subj_df[which(subj_df$block_names_numbered == block), "block_nr"] <- block_nr
+  #    # go to next block
+  #    block_nr <-  block_nr + 1
+  #  }
+  #}
+  
   
   
   ###########################
@@ -367,20 +367,20 @@ for (i in 1:length(file_list)) {
   
   # Fix messed up block numbers:
   # Loop rows, if task_name changes, add 1 to block counter.
-  block_counter <- 1
-  subj_df$block_nr <- ""
-  # loop rows, but skip the first one
-  for (row_idx in 2:length(subj_df$ID)){
-    curr_row <- subj_df[row_idx, ]
-    # if it's the same text_nr as in the row before, 
-    # assign block counter as in the row before. Only do this for the main blocks though, I don't care about the rest for now:
-    if (curr_row$text_nr == subj_df[row_idx-1, ]$text_nr & curr_row$block_kind %in% c("visual_task", "Reading_Baseline_main", "1back_dual_main", "2back_dual_main")){
-      subj_df[row_idx, ]$block_nr <- block_counter 
-    } else if (curr_row$text_nr != subj_df[row_idx-1, ]$text_nr & curr_row$block_kind %in% c("visual_task", "Reading_Baseline_main", "1back_dual_main", "2back_dual_main")){
-      block_counter <- block_counter + 1
-      subj_df[row_idx, ]$block_nr <- block_counter 
-    }
-  }
+  #block_counter <- 1
+  #subj_df$block_nr <- ""
+  ## loop rows, but skip the first one
+  #for (row_idx in 2:length(subj_df$ID)){
+  #  curr_row <- subj_df[row_idx, ]
+  #  # if it's the same text_nr as in the row before, 
+  #  # assign block counter as in the row before. Only do this for the main blocks though, I don't care about the rest for now:
+  #  if (curr_row$text_nr == subj_df[row_idx-1, ]$text_nr & curr_row$block_kind %in% c("visual_task", "Reading_Baseline_main", "1back_dual_main", "2back_dual_main")){
+  #    subj_df[row_idx, ]$block_nr <- block_counter 
+  #  } else if (curr_row$text_nr != subj_df[row_idx-1, ]$text_nr & curr_row$block_kind %in% c("visual_task", "Reading_Baseline_main", "1back_dual_main", "2back_dual_main")){
+  #    block_counter <- block_counter + 1
+  #    subj_df[row_idx, ]$block_nr <- block_counter 
+  #  }
+  #}
   # The block numbers are still a bit odd but who cares.
   
   
@@ -463,8 +463,8 @@ for (i in 1:length(file_list)) {
   # Check the performance in the reading comprehension questions in the 2 baseline blocks:
   # If they don't have 3/3 in at least one of the blocks, exclude their data.
   
-  # We now get all question data:
-  Q_df <- subset(subj_df, chosen_ans != "")[,c("question", "chosen_ans", "ans_correct", "text_nr", "block_kind", "ID", "block_names_numbered", "flicker_on")]
+  # We now get all question data for the main blocks
+  Q_df <- subset(subj_df, chosen_ans != "" & block_kind %in% c("Reading_Baseline_main", "2back_dual_main", "1back_dual_main"))[,c("question", "chosen_ans", "ans_correct", "text_nr", "block_kind", "ID", "native_speaker", "block_nr", "flicker_on", "flicker_freq")]
   
   # Just look at the MC questions:
   # For now I don't really care about the answer, I only want to know if they chose the correct one or not.
@@ -475,13 +475,13 @@ for (i in 1:length(file_list)) {
   # get performance in Qs
   Q_df$nr_correct <- c(rep(NA, times = length(Q_df$ID)))
   
-  # for each block, count how many questions were answered correctly.
-  for (curr_block in unique(Q_df$block_names_numbered)){
-    curr_Q_df <- subset(Q_df, block_names_numbered == curr_block)
+  # for each main block, count how many questions were answered correctly.
+  for (curr_block in unique(Q_df$block_nr)){
+    curr_Q_df <- subset(Q_df, block_nr == curr_block)
     # count how many questions were answered correctly in the current block
     nr_correct <- length(subset(curr_Q_df, ans_correct == TRUE)$ans_correct)
     # append to Q_df & subj_df$Q_nr_correct
-    Q_df[which(Q_df$block_names_numbered == curr_block), ]$nr_correct <- nr_correct
+    Q_df[which(Q_df$block_nr == curr_block), ]$nr_correct <- nr_correct
   }
   
   # append Q_df to bigger df for all participants
@@ -664,6 +664,12 @@ df_text_data_clean <- subset(df_text_data_clean, excl_trial == FALSE)
 # plot again:
 #densityplot(df_text_data_clean$reading_speed_standardized)
 
+# The data are still not normally distributed if I divide them by n-back condition & block
+# --> Is this a problem for my linear mixed model?!
+#qqnorm(subset(df_text_data_clean, block_names_numbered == "1back_main_2")$reading_speed_standardized)
+#qqline(subset(df_text_data_clean, block_names_numbered == "1back_main_2")$reading_speed_standardized)
+
+
 
 # ---- PLOT STANDARDIZED READING SPEED x N-BACK x FLICKER ----
 
@@ -707,7 +713,8 @@ pirateplot(formula = reading_speed_standardized ~ Flicker * Condition,
 
 # The weird improvement in BL in the nd and hs datasets due to flicker is probably a Reihenfolgeeffekt 
 # (BL blocks were first both not flickered and then later on flickered by chance)
-
+# Ich lehne mich mal gefährlich weit aus dem Fenster (weil wegen N = 8 und 2 non-native speaker) und sage der Flicker macht 
+# nichts oder zumindest nicht viel mit den Lesezeiten. Das ist gut.
 
 
 
@@ -717,7 +724,7 @@ pirateplot(formula = reading_speed_standardized ~ Flicker * Condition,
 lmm_df <- subset(df_text_data_clean, !is.na(surprisal_60))
 
 # typecast values in block_kind to ordered factors with levels Reading_BL_main as Baseline, 1back_main and 2back_main:
-lmm_df$block_kind <- ordered(lmm_df$block_kind, levels = c("Reading_BL_main", "1back_dual_main", "2back_dual_main"))
+lmm_df$block_kind <- ordered(lmm_df$block_kind, levels = c("Reading_Baseline_main", "1back_dual_main", "2back_dual_main"))
 
 # create a Simple Coding scheme for the variable block_kind
 # https://stats.oarc.ucla.edu/r/library/r-library-contrast-coding-systems-for-categorical-variables/
@@ -759,7 +766,8 @@ lmm_df[paste0(non_ortho_cols, "_z")]   <- lapply(lmm_df[non_ortho_cols], scale, 
 
 for (i in c(1, 4, 12, 60)) {
   # set random seed to make sure they are all shuffled in a different way
-  # --> easiest way to make sure the seed is always different: Use i as seed
+  # --> easiest way to make sure the seed is always different between 
+  #     time scales but the same every time I read this script: Use i as seed
   set.seed(i)
   # shuffle the current timescale x & create new column called surprisal_x_z_scrambled:
   lmm_df[[paste0("surprisal_", i, "_z_scrambled")]] <- sample(lmm_df[[paste0("surprisal_", i, "_z")]])
@@ -798,7 +806,7 @@ model_all <- reading_speed_standardized ~ block_kind      + # fixed effect: n-ba
   (1 + flicker_on | ID) +         # subject-specific random slope: flicker by ID - participant might react differently to the flicker than other participants
   (1 + block_kind | ID) +         # subject-specific random slope: block_kind by ID - participant might perform differently in the tasks than other participants
   (1 + surprisal_1_z  | ID) +     # subject-specific random slope: surprisal on TS 1 by ID - participant might perform differently
-                                  # when surprisal is high vs when surprisal is low compared to other participants
+  # when surprisal is high vs when surprisal is low compared to other participants
   (1 + surprisal_4_z  | ID) + # subject-specific random slope: surprisal on TS 4 by ID
   (1 + surprisal_12_z | ID) + # subject-specific random slope: surprisal on TS 12 by ID
   (1 + surprisal_60_z | ID) + # subject-specific random slope: surprisal on TS 60 by ID
@@ -806,7 +814,7 @@ model_all <- reading_speed_standardized ~ block_kind      + # fixed effect: n-ba
   (1 + word_length_single_z | ID) # subject-specific random slope: word length by ID
 
 
-
+# also create formulas with scrambled time scales:
 
 model_TS1_intact <- reading_speed_standardized ~ block_kind      + # fixed effect: n-back condition
   flicker_on + # fixed effect: flicker on or off
@@ -846,7 +854,120 @@ model_TS1_intact <- reading_speed_standardized ~ block_kind      + # fixed effec
   (1 + word_length_single_z | ID) # subject-specific random slope: word length by ID
 
 
-# ----------- fit frequentist linear mixed model (lmer4) ----------
+model_TS4_intact <- reading_speed_standardized ~ block_kind      + # fixed effect: n-back condition
+  flicker_on + # fixed effect: flicker on or off
+  surprisal_1_z_scrambled   + # fixed effect: surprisal on TS 1
+  surprisal_4_z   + # fixed effect: surprisal on TS 4
+  surprisal_12_z_scrambled  + # fixed effect: surprisal on TS 12
+  surprisal_60_z_scrambled  + # fixed effect: surprisal on TS 60
+  native_speaker  + # fixed effect: native speaker or not --> some of my participants might read slower because they're not native speakers
+  word_frequency_z   + # fixed effect: word frequency
+  word_length_single_z +
+  reaction           + # nuisance regressor: people probably have longer RTs if they also reacted in the n-back task
+  block_nr           + # nuisance regressor: people might be a bit slower in the later blocks due to fatigue effects
+  trial_nr           + # nuisance regressor: people might be a bit slower at the end of each block due to fatigue
+  #                     effects or quicker than in the beginning because they got used to the task
+  # Interactions:
+  block_kind : flicker_on +     # interaction n-back condition x flicker on or off
+  block_kind : surprisal_1_z_scrambled  + # interaction n-back condition x surprisal on TS 1
+  block_kind : surprisal_4_z  + # interaction n-back condition x surprisal on TS 4
+  block_kind : surprisal_12_z_scrambled + # interaction n-back condition x surprisal on TS 12
+  block_kind : surprisal_60_z_scrambled + # interaction n-back condition x surprisal on TS 60
+  flicker_on:surprisal_1_z_scrambled +  # interaction: flicker on/off x surprisal_1_z
+  flicker_on:surprisal_4_z +  # interaction: flicker on/off x surprisal_4_z
+  flicker_on:surprisal_12_z_scrambled +  # interaction: flicker on/off x surprisal_12_z
+  flicker_on:surprisal_60_z_scrambled +  # interaction: flicker on/off x surprisal_60_z
+  # Random effects (aka variables that explain why some people deviate from the mean in my fixed effects conditions
+  (1 | ID) +                      # random effect: ID
+  (1 | flicker_freq) + 
+  (1 | text_nr) +                 # random effect: text nr: Text 1 could be different than text 2 and in a way, my texts are also just samples from the distribution of all texts I could have used
+  (1 + flicker_on | ID) +         # subject-specific random slope: flicker by ID - participant might react differently to the flicker than other participants
+  (1 + block_kind | ID) +         # subject-specific random slope: block_kind by ID - participant might perform differently in the tasks than other participants
+  (1 + surprisal_1_z_scrambled  | ID) +     # subject-specific random slope: surprisal on TS 1 by ID - participant might perform differently
+  # when surprisal is high vs when surprisal is low compared to other participants
+  (1 + surprisal_4_z  | ID) + # subject-specific random slope: surprisal on TS 4 by ID
+  (1 + surprisal_12_z_scrambled | ID) + # subject-specific random slope: surprisal on TS 12 by ID
+  (1 + surprisal_60_z_scrambled | ID) + # subject-specific random slope: surprisal on TS 60 by ID
+  (1 + word_frequency_z | ID) + # subject-specific random slope: word frequency by ID
+  (1 + word_length_single_z | ID) # subject-specific random slope: word length by ID
+
+
+model_TS12_intact <- reading_speed_standardized ~ block_kind      + # fixed effect: n-back condition
+  flicker_on + # fixed effect: flicker on or off
+  surprisal_1_z_scrambled   + # fixed effect: surprisal on TS 1
+  surprisal_4_z_scrambled   + # fixed effect: surprisal on TS 4
+  surprisal_12_z + # fixed effect: surprisal on TS 12
+  surprisal_60_z_scrambled  + # fixed effect: surprisal on TS 60
+  native_speaker  + # fixed effect: native speaker or not --> some of my participants might read slower because they're not native speakers
+  word_frequency_z   + # fixed effect: word frequency
+  word_length_single_z +
+  reaction           + # nuisance regressor: people probably have longer RTs if they also reacted in the n-back task
+  block_nr           + # nuisance regressor: people might be a bit slower in the later blocks due to fatigue effects
+  trial_nr           + # nuisance regressor: people might be a bit slower at the end of each block due to fatigue
+  #                     effects or quicker than in the beginning because they got used to the task
+  # Interactions:
+  block_kind : flicker_on +     # interaction n-back condition x flicker on or off
+  block_kind : surprisal_1_z_scrambled  + # interaction n-back condition x surprisal on TS 1
+  block_kind : surprisal_4_z_scrambled  + # interaction n-back condition x surprisal on TS 4
+  block_kind : surprisal_12_z + # interaction n-back condition x surprisal on TS 12
+  block_kind : surprisal_60_z_scrambled + # interaction n-back condition x surprisal on TS 60
+  flicker_on:surprisal_1_z_scrambled +  # interaction: flicker on/off x surprisal_1_z
+  flicker_on:surprisal_4_z_scrambled +  # interaction: flicker on/off x surprisal_4_z
+  flicker_on:surprisal_12_z +  # interaction: flicker on/off x surprisal_12_z
+  flicker_on:surprisal_60_z_scrambled +  # interaction: flicker on/off x surprisal_60_z
+  # Random effects (aka variables that explain why some people deviate from the mean in my fixed effects conditions
+  (1 | ID) +                      # random effect: ID
+  (1 | flicker_freq) + 
+  (1 | text_nr) +                 # random effect: text nr: Text 1 could be different than text 2 and in a way, my texts are also just samples from the distribution of all texts I could have used
+  (1 + flicker_on | ID) +         # subject-specific random slope: flicker by ID - participant might react differently to the flicker than other participants
+  (1 + block_kind | ID) +         # subject-specific random slope: block_kind by ID - participant might perform differently in the tasks than other participants
+  (1 + surprisal_1_z_scrambled  | ID) +     # subject-specific random slope: surprisal on TS 1 by ID - participant might perform differently
+  # when surprisal is high vs when surprisal is low compared to other participants
+  (1 + surprisal_4_z_scrambled  | ID) + # subject-specific random slope: surprisal on TS 4 by ID
+  (1 + surprisal_12_z | ID) + # subject-specific random slope: surprisal on TS 12 by ID
+  (1 + surprisal_60_z_scrambled | ID) + # subject-specific random slope: surprisal on TS 60 by ID
+  (1 + word_frequency_z | ID) + # subject-specific random slope: word frequency by ID
+  (1 + word_length_single_z | ID) # subject-specific random slope: word length by ID
+
+
+model_TS60_intact <- reading_speed_standardized ~ block_kind      + # fixed effect: n-back condition
+  flicker_on + # fixed effect: flicker on or off
+  surprisal_1_z_scrambled   + # fixed effect: surprisal on TS 1
+  surprisal_4_z_scrambled   + # fixed effect: surprisal on TS 4
+  surprisal_12_z_scrambled + # fixed effect: surprisal on TS 12
+  surprisal_60_z  + # fixed effect: surprisal on TS 60
+  native_speaker  + # fixed effect: native speaker or not --> some of my participants might read slower because they're not native speakers
+  word_frequency_z   + # fixed effect: word frequency
+  word_length_single_z +
+  reaction           + # nuisance regressor: people probably have longer RTs if they also reacted in the n-back task
+  block_nr           + # nuisance regressor: people might be a bit slower in the later blocks due to fatigue effects
+  trial_nr           + # nuisance regressor: people might be a bit slower at the end of each block due to fatigue
+  #                     effects or quicker than in the beginning because they got used to the task
+  # Interactions:
+  block_kind : flicker_on +     # interaction n-back condition x flicker on or off
+  block_kind : surprisal_1_z_scrambled  + # interaction n-back condition x surprisal on TS 1
+  block_kind : surprisal_4_z_scrambled  + # interaction n-back condition x surprisal on TS 4
+  block_kind : surprisal_12_z_scrambled + # interaction n-back condition x surprisal on TS 12
+  block_kind : surprisal_60_z + # interaction n-back condition x surprisal on TS 60
+  flicker_on:surprisal_1_z_scrambled +  # interaction: flicker on/off x surprisal_1_z
+  flicker_on:surprisal_4_z_scrambled +  # interaction: flicker on/off x surprisal_4_z
+  flicker_on:surprisal_12_z_scrambled +  # interaction: flicker on/off x surprisal_12_z
+  flicker_on:surprisal_60_z +  # interaction: flicker on/off x surprisal_60_z
+  # Random effects (aka variables that explain why some people deviate from the mean in my fixed effects conditions
+  (1 | ID) +                      # random effect: ID
+  (1 | flicker_freq) + 
+  (1 | text_nr) +                 # random effect: text nr: Text 1 could be different than text 2 and in a way, my texts are also just samples from the distribution of all texts I could have used
+  (1 + flicker_on | ID) +         # subject-specific random slope: flicker by ID - participant might react differently to the flicker than other participants
+  (1 + block_kind | ID) +         # subject-specific random slope: block_kind by ID - participant might perform differently in the tasks than other participants
+  (1 + surprisal_1_z_scrambled  | ID) +     # subject-specific random slope: surprisal on TS 1 by ID - participant might perform differently
+  # when surprisal is high vs when surprisal is low compared to other participants
+  (1 + surprisal_4_z_scrambled  | ID) + # subject-specific random slope: surprisal on TS 4 by ID
+  (1 + surprisal_12_z_scrambled | ID) + # subject-specific random slope: surprisal on TS 12 by ID
+  (1 + surprisal_60_z | ID) + # subject-specific random slope: surprisal on TS 60 by ID
+  (1 + word_frequency_z | ID) + # subject-specific random slope: word frequency by ID
+  (1 + word_length_single_z | ID) # subject-specific random slope: word length by ID
+
+# ----------- fit frequentist linear mixed models (lmer4) ----------
 
 # (this might take some time):
 mixed.lmer_all <- lmer(formula = model_all,  data = lmm_df)
@@ -867,161 +988,89 @@ Anova(mixed.lmer_all)
 # No flicker effects whatsoever, but a) tiny N and b) looks a bit like there's also an interaction of block x flicker.
 
 
-# Check scrambled time scales
+# also check models with scrambled time scales:
+mixed.lmer_TS1 <- lmer(formula = model_TS1_intact,  data = lmm_df)
+Anova(mixed.lmer_TS1)
+#summary(mixed.lmer_TS1)
 
-mixed.lmer_Ts1 <- lmer(formula = model_TS1_intact,  data = lmm_df)
-Anova(mixed.lmer_Ts1)
+mixed.lmer_TS4 <- lmer(formula = model_TS4_intact,  data = lmm_df)
+Anova(mixed.lmer_TS4)
+#summary(mixed.lmer_TS4)
 
+mixed.lmer_TS12 <- lmer(formula = model_TS12_intact,  data = lmm_df)
+Anova(mixed.lmer_TS12)
+#summary(mixed.lmer_TS12)
 
+mixed.lmer_TS60 <- lmer(formula = model_TS60_intact,  data = lmm_df)
+Anova(mixed.lmer_TS60)
+#summary(mixed.lmer_TS60)
 
+beep(sound = "mario")
 
 #####################
 
-### Check visual task performance:
+# Check how participants rated the difficulty of the flicker vs. non-flicker blocks
 
-# Idea: Compute time it took to respond for every target. 
-# If no response and a new target is shown, count as a miss. 
-# Also compare between training (with default speed 100 words/min) 
-# and main block (known text with their own speed).
-# --> not really comparable but will do for a rough estimate 
-# I guess because they knew all the texts anyway.
+# get ratings for subj_reading_effort1 and subj_text_difficulty, then 
+# get the mean of the 2 ratings for each block kind (1-back, 2-back, baseline).
 
-# only get data for visual task:
-df_vis_task <- subset(df_text_data, block_kind == "visual_task")
+df_difficulty <- subset(df_comprehension_Qs, question == "subj_text_difficulty" | question == "subj_reading_effort1")
 
-ID <- c() # participant ID
-duration <- c() # duration of response
-response_kind <- c() # hit or miss? 
+# get subj_reading_effort1 and subj_text_difficulty ratings and compute mean rating for each pair:
+df_difficulty <- aggregate(as.numeric(chosen_ans) ~ text_nr + block_kind + ID + native_speaker + flicker_freq + block_nr + flicker_on + nr_correct, df_difficulty, mean)
+names(df_difficulty)[length(names(df_difficulty))] <- "difficulty_rating"
 
-# I was really really dumb and forgot to save the data from the training.
-# But doesn't really matter, let's check the performance in the main block:
-
-# loop participants:
-for (curr_ID in unique(df_vis_task$ID)){
-  print(curr_ID)
-  
-  # get part of current participant's dataset where we have either the training or the main block of the vis task:
-  curr_dataset <- subset(df_vis_task, ID == curr_ID)
-  first_target_shown = F
-  participant_responded = F
-  
-  # loop rows in current dataset and check for targets and responses 
-  # (doesn't have to be in the same row though)
-  for (row_idx in 1:length(curr_dataset$ID)){
-    #print(row_idx)
-    # get current row
-    curr_row <- curr_dataset[row_idx, ]
-    
-    # check if there was a target:
-    if (curr_row$target == "True"){ 
-      print("---------------") 
-      
-      print("target!")
-      # reset target detection time because there's a new target
-      target_detection_time = 0
-      
-      # check if participant noticed last target:
-      
-      # MISS: New target, but participant still hasn't responded for the one before:
-      if (participant_responded == F){
-        print("participant didn't see previous target!") 
-        # save data:
-        ID <- c(ID, curr_ID)
-        response_kind <- c(response_kind, "miss")
-        duration <- c(duration, NA) # no reaction so RT is NA
-      }
-      
-      # if this was the first target, change first_target_shown to True:
-      if (first_target_shown == F){
-        first_target_shown = T
-      }
-      # reset response counter
-      participant_responded = F
-    }
-    
-    # HIT: if the participant reacted, add RT to target_detection_time and print target_detection_time
-    if (curr_row$reaction == T & first_target_shown == T & participant_responded == F){ 
-      print("response!")
-      target_detection_time = target_detection_time + as.vector(curr_row$duration)
-      print(target_detection_time)
-      participant_responded = T
-      # save data:
-      ID <- c(ID, curr_ID)
-      response_kind <- c(response_kind, "hit")
-      duration <- c(duration, target_detection_time)
-      
-      # if they didn't react, just add RT to target_detection_time and go to next trial
-    } else if (curr_row$reaction == F & first_target_shown == T) {
-      target_detection_time = target_detection_time + curr_row$duration
-      
-      # FALSE ALARM: if participant responded but has already responded for the current target
-    } else if (curr_row$reaction == T & first_target_shown == T & participant_responded == T) {
-      # save data:
-      ID <- c(ID, curr_ID)
-      response_kind <- c(response_kind, "false alarm")
-      duration <- c(duration, NA) # don't care about the false alarm RTs
-    }  
-  }
-}
-
-# create df:
-vis_task_responses_df <- as.data.frame(cbind(ID, response_kind, duration))
-vis_task_responses_df$duration <- as.numeric(vis_task_responses_df$duration)
-#View(vis_task_responses_df)  
+# sort by ID
+df_difficulty <- df_difficulty[order(df_difficulty$ID), ]
 
 
-# get rid of NAs
-plot_df <- na.omit(vis_task_responses_df)
+# prepare data for lmm
 
-# plot the raw durations from hit trials
-pirateplot(formula = duration ~ response_kind * ID,
-           data = plot_df,
-           theme = 1,
-           bean.b.o = 1,
-           inf.f.o = 0,
-           point.o = 1,
-           point.cex = 0.8,
-           main = paste("Raw RTs in the visual task (N = ", length(unique(plot_df$ID)), ")", sep = ""),
-           ylab = "RT in ms",
-           inf.method = "ci", # plot confidence interval as box around M
-           inf.p = 0.95, # use 95% for confidence interval
-           plot = T) # plot the plot
+# typecast values in block_kind to ordered factors with levels Reading_BL_main as Baseline, 1back_main and 2back_main:
+df_difficulty$block_kind <- ordered(df_difficulty$block_kind, levels = c("Reading_Baseline_main", "1back_dual_main", "2back_dual_main"))
 
-# check how many targets they missed
-for (curr_id in unique(vis_task_responses_df$ID)){
-  print(paste("Participant ID:", curr_id, sep = " "))
-  curr_dataset <- subset(vis_task_responses_df, ID == curr_id)
-  print(paste("# misses:", length(which(curr_dataset$response_kind == "miss") == T), sep = " "))
-  print(paste("# hits:", length(which(curr_dataset$response_kind == "hit") == T), sep = " "))
-  print(paste("# false alarms:", length(which(curr_dataset$response_kind == "false alarm") == T), sep = " "))
-  print("------------")
-}
+# create a Simple Coding scheme for the variable block_kind
+# https://stats.oarc.ucla.edu/r/library/r-library-contrast-coding-systems-for-categorical-variables/
+# creating the contrast matrix manually by modifying the dummy coding scheme
+c <- contr.treatment(3) # create dummy coding scheme
+my.coding <- matrix(rep(1/3, 6), ncol = 2) # make matrix with only 1/3 values
+# change values in dummy coding scheme to either -1/3 or 2/6 by
+# subtracting 1/3 from 0s and 1s in the dummy coding scheme
+my.simple <- c-my.coding
+# show new coding scheme
+#my.simple
 
-# Okay so seems like for some it's easy, for some it's not (or they didn't understand the task), 
-# but it's kinda difficult to compute d-primes without a measure of correct rejections 
-# because the trials are way too fast to analyse it all trial-wise.
+#assign the new coding scheme to lmm_df$block_kind
+contrasts(df_difficulty$block_kind) <- my.simple
 
-# Comparing the hits/miss/f.a. counts and the RT results in the plot, it looks like the 
-# people who have high hit rates and low miss/f.a. rates also have lower RTs than the 
-# other two. So I'd say they were confused by the task.
+# ----------- z-transform continuous variables for mixed models -----------
 
-# I don't even know if it matters if they suck at the task as long as they press the 
-# button sometimes so I get motor responses.
-# The only thing I can see is that there are quite a lot of false alarms from some participants, 
-# so maybe reduce the number of targets a bit so we don't get too many motor responses?
+# z-transform difficulty rating column:
+# --> set center to TRUE to subtract the sample mean from each value, set scale to TRUE to divide by standard deviation
+df_difficulty$difficulty_rating_z <- scale(df_difficulty$difficulty_rating,  center = TRUE, scale = TRUE)
 
 
-### Analyse comprehension Qs in flicker/no flicker blocks:
-# Important: the participants either knew none of the texts or all of them, so I guess 
-# this can be ignored.
+# put everything into a lmm:
+model_difficulty_ratings <- difficulty_rating ~ block_kind +
+  flicker_on + 
+  native_speaker +
+  block_nr +
+  text_nr +
+  # Interactions:
+  block_kind : flicker_on +
+  # Random effects:
+  (1 | ID) +                 
+  (1 | flicker_freq) + 
+  (1 | text_nr) +          
+  (1 + flicker_on | ID) +         
+  (1 + block_kind | ID)
 
-# Just quickly check how many correct answers we have in flicker / no flicker blocks:
-length(subset(df_comprehension_Qs, flicker_on == "False" & ans_correct == T)$ID)
-length(subset(df_comprehension_Qs, flicker_on == "True" & ans_correct == T)$ID)
-# 66 with Flicker off vs 62 with flicker on, so not a big difference I guess?
+mixed.lmer_difficulty_ratings <- lmer(formula = model_difficulty_ratings,  data = df_difficulty)
+Anova(mixed.lmer_difficulty_ratings)
+#summary(mixed.lmer_difficulty_ratings)
 
-
-
-
+# For N = 8: Looks like the difficulty rating depends on the cognitive load level 
+# and the native language of the reader, but not the text nr (which is good, means they 
+# have the same difficulty) nor the flicker (which is also good).
 
 
