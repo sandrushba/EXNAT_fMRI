@@ -1007,6 +1007,9 @@ Anova(mixed.lmer_TS60)
 
 beep(sound = "mario")
 
+# save environment in current wd:
+#save.image(file = 'EXNAT2_FlickerPilot_Analysis_REnvironment.RData')
+
 #####################
 
 # Check how participants rated the difficulty of the flicker vs. non-flicker blocks
@@ -1024,7 +1027,7 @@ names(df_difficulty)[length(names(df_difficulty))] <- "difficulty_rating"
 df_difficulty <- df_difficulty[order(df_difficulty$ID), ]
 
 
-# prepare data for lmm
+# prepare data for lmm:
 
 # typecast values in block_kind to ordered factors with levels Reading_BL_main as Baseline, 1back_main and 2back_main:
 df_difficulty$block_kind <- ordered(df_difficulty$block_kind, levels = c("Reading_Baseline_main", "1back_dual_main", "2back_dual_main"))
@@ -1043,8 +1046,6 @@ my.simple <- c-my.coding
 #assign the new coding scheme to lmm_df$block_kind
 contrasts(df_difficulty$block_kind) <- my.simple
 
-# ----------- z-transform continuous variables for mixed models -----------
-
 # z-transform difficulty rating column:
 # --> set center to TRUE to subtract the sample mean from each value, set scale to TRUE to divide by standard deviation
 df_difficulty$difficulty_rating_z <- scale(df_difficulty$difficulty_rating,  center = TRUE, scale = TRUE)
@@ -1052,25 +1053,28 @@ df_difficulty$difficulty_rating_z <- scale(df_difficulty$difficulty_rating,  cen
 
 # put everything into a lmm:
 model_difficulty_ratings <- difficulty_rating ~ block_kind +
-  flicker_on + 
-  native_speaker +
-  block_nr +
-  text_nr +
-  # Interactions:
-  block_kind : flicker_on +
-  # Random effects:
-  (1 | ID) +                 
-  (1 | flicker_freq) + 
-  (1 | text_nr) +          
-  (1 + flicker_on | ID) +         
-  (1 + block_kind | ID)
+                                                flicker_on + 
+                                                flicker_freq + 
+                                                native_speaker +
+                                                block_nr +
+                                                text_nr +
+                                                # Interactions:
+                                                block_kind : flicker_on +
+                                                # Random effects:
+                                                (1 | ID) +                 
+                                                (1 | flicker_freq) + 
+                                                (1 | text_nr) +          
+                                                (1 + flicker_on | ID) +         
+                                                (1 + block_kind | ID)
 
-mixed.lmer_difficulty_ratings <- lmer(formula = model_difficulty_ratings,  data = df_difficulty)
+mixed.lmer_difficulty_ratings <- lmer(formula = model_difficulty_ratings,  
+                                      data = df_difficulty)
 Anova(mixed.lmer_difficulty_ratings)
 #summary(mixed.lmer_difficulty_ratings)
 
-# For N = 8: Looks like the difficulty rating depends on the cognitive load level 
-# and the native language of the reader, but not the text nr (which is good, means they 
-# have the same difficulty) nor the flicker (which is also good).
+# For N = 8: Looks like the subjective difficulty ratings depend on 
+# the cognitive load level and the fluency of the reader, but not 
+# the text nr (which is good, means they have the same difficulty) 
+# nor the flicker (which is also good).
 
 
