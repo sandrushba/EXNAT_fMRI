@@ -1075,6 +1075,6 @@ Anova(mixed.lmer_difficulty_ratings)
 # For N = 8: Looks like the subjective difficulty ratings depend on 
 # the cognitive load level and the fluency of the reader, but not 
 # the text nr (which is good, means they have the same difficulty) 
-# nor the flicker (which is also good).
+# nor the flicker (which is also good, this means the flicker doesn't distract them a lot).
 
 
