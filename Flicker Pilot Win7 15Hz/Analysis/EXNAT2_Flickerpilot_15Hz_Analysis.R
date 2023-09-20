@@ -973,7 +973,7 @@ model_TS60_intact <- reading_speed_standardized ~ block_kind      + # fixed effe
 mixed.lmer_all <- lmer(formula = model_all,  data = lmm_df)
 
 # play super mario sound when this is finished
-beep(sound = "mario")
+#beep(sound = "mario")
 
 # compute Type II Wald Chi^2 test to check
 # which effects are significant:
