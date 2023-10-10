@@ -676,9 +676,10 @@ df_text_data_clean <- subset(df_text_data_clean, excl_trial == FALSE)
 # Maybe exclude non-native speakers?
 
 plot_df <- subset(df_text_data_clean, 
-                  reaction == F
-                  #& native_speaker == T
-) # exclude trials where you had a reaction & data by non-native speakers
+                  reaction == F # uncomment to exclude trials where we had an n-back reaction
+                  & flicker_freq == "12 Hz (but unstable)"# # "12 Hz (but unstable)" or "15 Hz"
+                  #& native_speaker == T # uncomment to exclude non-native speakers
+) 
 
 plot_df <- setNames(aggregate(plot_df$reading_speed_standardized,
                               by = list(plot_df$ID, plot_df$block_kind, plot_df$flicker_on),
@@ -713,8 +714,6 @@ pirateplot(formula = reading_speed_standardized ~ Flicker * Condition,
 
 # The weird improvement in BL in the nd and hs datasets due to flicker is probably a Reihenfolgeeffekt 
 # (BL blocks were first both not flickered and then later on flickered by chance)
-# Ich lehne mich mal gefährlich weit aus dem Fenster (weil wegen N = 8 und 2 non-native speaker) und sage der Flicker macht 
-# nichts oder zumindest nicht viel mit den Lesezeiten. Das ist gut.
 
 
 
@@ -902,37 +901,33 @@ model_TS12_intact <- reading_speed_standardized ~ block_kind + # fixed effect: n
                                                                     surprisal_1_z_scrambled + surprisal_4_z_scrambled + surprisal_12_z + surprisal_60_z_scrambled + 
                                                                     word_frequency_z+ word_length_single_z | ID) 
                                                 
-
 model_TS60_intact <- reading_speed_standardized ~ block_kind      + # fixed effect: n-back condition
-  flicker_on + # fixed effect: flicker on or off
-  surprisal_1_z_scrambled   + # fixed effect: surprisal on TS 1
-  surprisal_4_z_scrambled   + # fixed effect: surprisal on TS 4
-  surprisal_12_z_scrambled  + # fixed effect: surprisal on TS 12
-  surprisal_60_z  + # fixed effect: surprisal on TS 60
-  native_speaker  + # fixed effect: native speaker or not --> some of my participants might read slower because they're not native speakers
-  word_frequency_z   + # fixed effect: word frequency
-  word_length_single_z +
-  reaction           + # nuisance regressor: people probably have longer RTs if they also reacted in the n-back task
-  block_nr           + # nuisance regressor: people might be a bit slower in the later blocks due to fatigue effects
-  trial_nr           + # nuisance regressor: people might be a bit slower at the end of each block due to fatigue
-  #                     effects or quicker than in the beginning because they got used to the task
-  # Interactions:
-  block_kind : flicker_on +     # interaction n-back condition x flicker on or off
-  block_kind : surprisal_1_z_scrambled  + # interaction n-back condition x surprisal on TS 1
-  block_kind : surprisal_4_z_scrambled  + # interaction n-back condition x surprisal on TS 4
-  block_kind : surprisal_12_z_scrambled + # interaction n-back condition x surprisal on TS 12
-  block_kind : surprisal_60_z + # interaction n-back condition x surprisal on TS 60
-  flicker_on:surprisal_1_z_scrambled +  # interaction: flicker on/off x surprisal_1_z
-  flicker_on:surprisal_4_z_scrambled +  # interaction: flicker on/off x surprisal_4_z
-  flicker_on:surprisal_12_z_scrambled +  # interaction: flicker on/off x surprisal_12_z
-  flicker_on:surprisal_60_z +  # interaction: flicker on/off x surprisal_60_z
-  # Random effects (aka variables that explain why some people deviate from the mean in my fixed effects conditions
-  (1 | flicker_freq) + 
-  (1 | text_nr) +                 # random effect: text nr: Text 1 could be different than text 2 and in a way, my texts are also just samples from the distribution of all texts I could have used
-  (1 + flicker_on + block_kind + surprisal_1_z_scrambled + surprisal_4_z_scrambled + surprisal_12_z_scrambled + surprisal_60_z + word_frequency_z + word_length_single_z | ID) # subject-specific random slopes
-
-
-
+                                                  flicker_on + # fixed effect: flicker on or off
+                                                  flicker_freq +
+                                                  surprisal_1_z_scrambled   + # fixed effect: surprisal on TS 1
+                                                  surprisal_4_z_scrambled   + # fixed effect: surprisal on TS 4
+                                                  surprisal_12_z_scrambled  + # fixed effect: surprisal on TS 12
+                                                  surprisal_60_z  + # fixed effect: surprisal on TS 60
+                                                  native_speaker  + # fixed effect: native speaker or not --> some of my participants might read slower because they're not native speakers
+                                                  word_frequency_z   + # fixed effect: word frequency
+                                                  word_length_single_z +
+                                                  reaction           + # nuisance regressor: people probably have longer RTs if they also reacted in the n-back task
+                                                  block_nr           + # nuisance regressor: people might be a bit slower in the later blocks due to fatigue effects
+                                                  trial_nr           + # nuisance regressor: people might be a bit slower at the end of each block due to fatigue
+                                                  #                     effects or quicker than in the beginning because they got used to the task
+                                                  # Interactions:
+                                                  block_kind : flicker_on +     # interaction n-back condition x flicker on or off
+                                                  block_kind : surprisal_1_z_scrambled  + # interaction n-back condition x surprisal on TS 1
+                                                  block_kind : surprisal_4_z_scrambled  + # interaction n-back condition x surprisal on TS 4
+                                                  block_kind : surprisal_12_z_scrambled + # interaction n-back condition x surprisal on TS 12
+                                                  block_kind : surprisal_60_z + # interaction n-back condition x surprisal on TS 60
+                                                  flicker_on:surprisal_1_z_scrambled +  # interaction: flicker on/off x surprisal_1_z
+                                                  flicker_on:surprisal_4_z_scrambled +  # interaction: flicker on/off x surprisal_4_z
+                                                  flicker_on:surprisal_12_z_scrambled +  # interaction: flicker on/off x surprisal_12_z
+                                                  flicker_on:surprisal_60_z +  # interaction: flicker on/off x surprisal_60_z
+                                                  # Random effects (aka variables that explain why some people deviate from the mean in my fixed effects conditions
+                                                  (1 | text_nr) +                 # random effect: text nr: Text 1 could be different than text 2 and in a way, my texts are also just samples from the distribution of all texts I could have used
+                                                  (1 + flicker_on + block_kind + surprisal_1_z_scrambled + surprisal_4_z_scrambled + surprisal_12_z_scrambled + surprisal_60_z + word_frequency_z + word_length_single_z | ID) # subject-specific random slopes
 
 
 # ----------- fit frequentist linear mixed models (lmer4) ----------
@@ -1018,31 +1013,21 @@ contrasts(df_difficulty$block_kind) <- my.simple
 # --> set center to TRUE to subtract the sample mean from each value, set scale to TRUE to divide by standard deviation
 df_difficulty$difficulty_rating_z <- scale(df_difficulty$difficulty_rating,  center = TRUE, scale = TRUE)
 
-
 # put everything into a lmm:
-model_difficulty_ratings <- difficulty_rating ~ block_kind +
-                                                flicker_on + 
-                                                flicker_freq + 
-                                                native_speaker +
-                                                block_nr +
-                                                text_nr +
-                                                # Interactions:
-                                                block_kind : flicker_on +
-                                                # Random effects:
-                                                (1 | ID) +                 
-                                                (1 | flicker_freq) + 
-                                                (1 | text_nr) +          
-                                                (1 + flicker_on | ID) +         
-                                                (1 + block_kind | ID)
+model_difficulty_ratings <- difficulty_rating_z ~ block_kind +
+                                                  flicker_on + 
+                                                  flicker_freq + 
+                                                  native_speaker +
+                                                  block_nr +
+                                                  # Interactions:
+                                                  block_kind : flicker_on +
+                                                  # Random effects:
+                                                  (1 | text_nr) +
+                                                  (1 + flicker_on + block_kind | ID)
 
 mixed.lmer_difficulty_ratings <- lmer(formula = model_difficulty_ratings,  
                                       data = df_difficulty)
 Anova(mixed.lmer_difficulty_ratings)
 #summary(mixed.lmer_difficulty_ratings)
-
-# For N = 8: Looks like the subjective difficulty ratings depend on 
-# the cognitive load level and the fluency of the reader, but not 
-# the text nr (which is good, means they have the same difficulty) 
-# nor the flicker (which is also good, this means the flicker doesn't distract them a lot).
 
 
