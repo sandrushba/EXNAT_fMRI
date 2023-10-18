@@ -707,7 +707,7 @@ pirateplot(formula = reading_speed_standardized ~ Flicker * Condition,
            avg.line.col = c("darkseagreen4","darkseagreen4", "darkgoldenrod3", "darkgoldenrod3", "indianred3", "indianred3"), # avg line col
            main = paste("Standardized reading speed in each n-back & flicker condition (N = ", length(unique(plot_df$ID)), ")", sep = ""),
            ylab = "standardized reading speed",
-           ylim = c(-2, 2), # start y-lim at -2
+           #ylim = c(-2, 2), # start y-lim at -2
            inf.method = "ci", # plot confidence interval as box around M
            inf.p = 0.95, # use 95% for confidence interval
            plot = T) # plot the plot
@@ -802,9 +802,7 @@ model_all <- reading_speed_standardized ~ block_kind + # fixed effect: n-back co
                                           # Random effects (aka variables that explain why some people deviate from the mean in my fixed effects conditions
                                           (1 | text_nr) + # random effect: text nr
                                           # subject-specific random slopes:
-                                          (1 + flicker_on + block_kind + 
-                                             surprisal_1_z + surprisal_4_z + surprisal_12_z + surprisal_60_z + 
-                                             word_frequency_z + word_length_single_z | ID) 
+                                          (1 | ID) 
 
 
 # also create formulas with scrambled time scales:
@@ -835,9 +833,7 @@ model_TS1_intact <- reading_speed_standardized ~ block_kind + # fixed effect: n-
                                                  # Random effects (aka variables that explain why some people deviate from the mean in my fixed effects conditions
                                                  (1 | text_nr) + # random effect: text nr
                                                  # subject-specific random slopes:
-                                                 (1 + flicker_on + block_kind + 
-                                                      surprisal_1_z + surprisal_4_z_scrambled + surprisal_12_z_scrambled + surprisal_60_z_scrambled + 
-                                                      word_frequency_z+ word_length_single_z | ID) 
+                                                 (1 | ID) 
 
 model_TS4_intact <- reading_speed_standardized ~ block_kind + # fixed effect: n-back condition
                                                  flicker_on + # fixed effect: flicker on or off
@@ -866,9 +862,7 @@ model_TS4_intact <- reading_speed_standardized ~ block_kind + # fixed effect: n-
                                                  # Random effects (aka variables that explain why some people deviate from the mean in my fixed effects conditions
                                                  (1 | text_nr) + # random effect: text nr
                                                  # subject-specific random slopes:
-                                                 (1 + flicker_on + block_kind + 
-                                                      surprisal_1_z_scrambled + surprisal_4_z + surprisal_12_z_scrambled + surprisal_60_z_scrambled + 
-                                                      word_frequency_z+ word_length_single_z | ID) 
+                                                 (1 | ID) 
                                               
 model_TS12_intact <- reading_speed_standardized ~ block_kind + # fixed effect: n-back condition
                                                   flicker_on + # fixed effect: flicker on or off
@@ -897,9 +891,7 @@ model_TS12_intact <- reading_speed_standardized ~ block_kind + # fixed effect: n
                                                   # Random effects (aka variables that explain why some people deviate from the mean in my fixed effects conditions
                                                   (1 | text_nr) + # random effect: text nr
                                                   # subject-specific random slopes:
-                                                  (1 + flicker_on + block_kind + 
-                                                                    surprisal_1_z_scrambled + surprisal_4_z_scrambled + surprisal_12_z + surprisal_60_z_scrambled + 
-                                                                    word_frequency_z+ word_length_single_z | ID) 
+                                                  (1 | ID) 
                                                 
 model_TS60_intact <- reading_speed_standardized ~ block_kind      + # fixed effect: n-back condition
                                                   flicker_on + # fixed effect: flicker on or off
@@ -927,8 +919,7 @@ model_TS60_intact <- reading_speed_standardized ~ block_kind      + # fixed effe
                                                   flicker_on:surprisal_60_z +  # interaction: flicker on/off x surprisal_60_z
                                                   # Random effects (aka variables that explain why some people deviate from the mean in my fixed effects conditions
                                                   (1 | text_nr) +                 # random effect: text nr: Text 1 could be different than text 2 and in a way, my texts are also just samples from the distribution of all texts I could have used
-                                                  (1 + flicker_on + block_kind + surprisal_1_z_scrambled + surprisal_4_z_scrambled + surprisal_12_z_scrambled + surprisal_60_z + word_frequency_z + word_length_single_z | ID) # subject-specific random slopes
-
+                                                  (1 | ID) 
 
 # ----------- fit frequentist linear mixed models (lmer4) ----------
 
@@ -969,6 +960,18 @@ Anova(mixed.lmer_TS60)
 #summary(mixed.lmer_TS60)
 
 beep(sound = "mario")
+
+# check model output with FDR corrected p-values:
+tab_model(mixed.lmer_TS60, 
+          show.se = TRUE, 
+          show.stat = TRUE,
+          show.df = TRUE,
+          p.val = 'wald', 
+          p.adjust='fdr', 
+          #p.style='scientific', 
+          digits = 3, 
+          digits.p = 3)
+
 
 # save environment in current wd:
 #save.image(file = 'EXNAT2_FlickerPilot_Analysis_REnvironment.RData')
@@ -1023,7 +1026,7 @@ model_difficulty_ratings <- difficulty_rating_z ~ block_kind +
                                                   block_kind : flicker_on +
                                                   # Random effects:
                                                   (1 | text_nr) +
-                                                  (1 + flicker_on + block_kind | ID)
+                                                  (1 | ID)
 
 mixed.lmer_difficulty_ratings <- lmer(formula = model_difficulty_ratings,  
                                       data = df_difficulty)
