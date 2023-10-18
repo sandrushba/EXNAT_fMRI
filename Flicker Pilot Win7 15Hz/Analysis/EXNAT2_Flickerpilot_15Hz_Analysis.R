@@ -677,7 +677,7 @@ df_text_data_clean <- subset(df_text_data_clean, excl_trial == FALSE)
 
 plot_df <- subset(df_text_data_clean, 
                   reaction == F # uncomment to exclude trials where we had an n-back reaction
-                  & flicker_freq == "12 Hz (but unstable)"# # "12 Hz (but unstable)" or "15 Hz"
+                  #& flicker_freq == "12 Hz (but unstable)"# # "12 Hz (but unstable)" or "15 Hz"
                   #& native_speaker == T # uncomment to exclude non-native speakers
 ) 
 
