@@ -913,10 +913,10 @@ model_TS60_intact <- reading_speed_standardized ~ block_kind      + # fixed effe
                                                   block_kind : surprisal_4_z_scrambled  + # interaction n-back condition x surprisal on TS 4
                                                   block_kind : surprisal_12_z_scrambled + # interaction n-back condition x surprisal on TS 12
                                                   block_kind : surprisal_60_z + # interaction n-back condition x surprisal on TS 60
-                                                  flicker_on:surprisal_1_z_scrambled +  # interaction: flicker on/off x surprisal_1_z
-                                                  flicker_on:surprisal_4_z_scrambled +  # interaction: flicker on/off x surprisal_4_z
-                                                  flicker_on:surprisal_12_z_scrambled +  # interaction: flicker on/off x surprisal_12_z
-                                                  flicker_on:surprisal_60_z +  # interaction: flicker on/off x surprisal_60_z
+                                                  flicker_on : surprisal_1_z_scrambled +  # interaction: flicker on/off x surprisal_1_z
+                                                  flicker_on : surprisal_4_z_scrambled +  # interaction: flicker on/off x surprisal_4_z
+                                                  flicker_on : surprisal_12_z_scrambled +  # interaction: flicker on/off x surprisal_12_z
+                                                  flicker_on : surprisal_60_z +  # interaction: flicker on/off x surprisal_60_z
                                                   # Random effects (aka variables that explain why some people deviate from the mean in my fixed effects conditions
                                                   (1 | text_nr) +                 # random effect: text nr: Text 1 could be different than text 2 and in a way, my texts are also just samples from the distribution of all texts I could have used
                                                   (1 | ID) 
