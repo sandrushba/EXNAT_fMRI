@@ -242,7 +242,7 @@ for (i in 1:length(file_list)) {
 
 
 ## Calculate prediction strategy style score for each participant
-```{r calculate overall prediction strategy style score from AQ & SSQ subscale scores, echo = False}
+```{r calculate overall prediction strategy style score from AQ & SPQ subscale scores, echo = False}
 
 
 
