@@ -378,7 +378,7 @@ const study = lab.util.fromObject({
             }
           ],
           "help": "",
-          "name": "haben-sie-eine-horschwache"
+          "name": "hearing_impaired"
         },
         {
           "required": true,

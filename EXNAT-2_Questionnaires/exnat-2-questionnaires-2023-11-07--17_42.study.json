@@ -520,7 +520,8 @@
               "label": "Möchte ich nicht angeben."
             }
           ],
-          "help": ""
+          "help": "",
+          "name": "hearing_impaired"
         },
         {
           "required": true,
