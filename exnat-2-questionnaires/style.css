@@ -1,0 +1,11 @@
+/* Please define your custom styles here */
+
+.likert li {
+    float: left;
+    list-style-type: none;
+    margin: 0 0 3px 0;
+}
+
+:root {
+  --width-min-container: 600px;
+}

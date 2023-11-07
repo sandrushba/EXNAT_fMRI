@@ -1,0 +1,724 @@
+{
+  "components": {
+    "1": {
+      "id": "1",
+      "type": "lab.html.Page",
+      "items": [
+        {
+          "type": "text",
+          "title": "AQ-G",
+          "content": "Nun folgt ein letzter Persönlichkeitsfragebogen. <br>\nBitte geben Sie auch hier wieder an, ob Sie den Aussagen zustimmen oder nicht zustimmen. Antworten Sie bitte dabei so, wie es für Sie in den letzten Jahren im Allgemeinen zutrifft.\n<br><br>"
+        },
+        {
+          "required": true,
+          "type": "divider"
+        },
+        {
+          "required": true,
+          "type": "html",
+          "content": "  <!-- \n    \n    Table for all AQ Items\n\n      I divided the table into 2 parts so you don't have to scroll all the way up to see which answer radio button has which label if you happen to forget it.\n\n      Copyright:\n      Baron-Cohen, S., Wheelwright, S., Skinner, R., Martin, J., & Clubley, E. \n      AQ 50 – Autism Spectrum Quotient – Ages > 16\n      German Version probably (?) by Jürgen Kremer - Universitätsklinikum Essen\n      I got the form from here: \n      https://docs.autismresearchcentre.com/tests/AQ_Adult_German.pdf\n   -->\n\n\n\n<!DOCTYPE html>\n<html>\n<head>\n<style>\ntable {\n  font-family: Arial, sans-serif;\n  border-collapse: collapse;\n  width: 100%;\n  margin: auto;\n}\n\ntd, th {\n  border: 1px solid #dddddd;\n  text-align: left;\n  padding: 15px;\n}\n\ntr:nth-child(even) {\n  background-color: #ebf5f7;\n}\n</style>\n</head>\n<body>\n\n\n\n<table>\n  <tr>\n    <th> </th>\n    <th>Stimme zu</th>\n    <th>Stimme eher zu</th>\n    <th>Stimme eher nicht zu</th>\n    <th>Stimme nicht zu</th>\n  </tr>\n\n\n  <!-- Repeat the following code for each item -->\n  <tr>\n    <td>Risiken gehe ich gerne ein.</td>\n    <td><input type=\"radio\" name=\"AQ_E1\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_E1\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_E1\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_E1\" value=\"-2\"></td>\n  </tr>\n  <!-- end of item 1 -->\n\n    <tr>\n    <td>Brettspiele spiele ich gerne.</td>\n    <td><input type=\"radio\" name=\"AQ_E2\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_E2\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_E2\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_E2\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Ein Instrument spielen zu lernen, finde ich leicht.</td>\n    <td><input type=\"radio\" name=\"AQ_E3\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_E3\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_E3\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_E3\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Andere Kulturen faszinieren mich.</td>\n    <td><input type=\"radio\" name=\"AQ_E4\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_E4\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_E4\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_E4\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich mache Sachen lieber mit anderen als alleine.</td>\n    <td><input type=\"radio\" name=\"AQ_01\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_01\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_01\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_01\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich bevorzuge immer wieder dieselben Dinge, und Dinge immer wieder auf dieselbe Art und Weise zu machen.</td>\n    <td><input type=\"radio\" name=\"AQ_02\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_02\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_02\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_02\" value=\"-2\"></td>\n  </tr>\n\n    <tr>\n    <td>Wenn ich eine Idee habe, sehe ich davon sehr leicht ein auto-visualisiertes – imaginiertes – Bild.</td>\n    <td><input type=\"radio\" name=\"AQ_03\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_03\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_03\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_03\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>In Aufgaben vertiefe ich mich oft so sehr, dass mir alle anderen Dinge ringsherum nicht mehr bewusst sind.</td>\n    <td><input type=\"radio\" name=\"AQ_04\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_04\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_04\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_04\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich höre oft leise Geräusche, die andere nicht hören.</td>\n    <td><input type=\"radio\" name=\"AQ_05\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_05\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_05\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_05\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Nummernschilder, Zeichen oder Symbole erwecken meine Assoziationen.</td>\n    <td><input type=\"radio\" name=\"AQ_06\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_06\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_06\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_06\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Das, was ich sage oder tue, wird gelegentlich als unkonventionell oder indiskret wahrgenommen, obwohl es nicht so beabsichtigt war.</td>\n    <td><input type=\"radio\" name=\"AQ_07\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_07\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_07\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_07\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Bei Geschichten stelle ich mir leicht vor,\nwie die Charaktere darin aussehen könnten.</td>\n    <td><input type=\"radio\" name=\"AQ_08\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_08\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_08\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_08\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Uhrzeiten und Datumsangaben faszinieren mich.</td>\n    <td><input type=\"radio\" name=\"AQ_09\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_09\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_09\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_09\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>In einer Diskussion kann ich gleichzeitig verschiedenen Beiträgen folgen.</td>\n    <td><input type=\"radio\" name=\"AQ_10\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_10\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_10\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_10\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>In sozialen Situationen fühle ich mich wohl.</td>\n    <td><input type=\"radio\" name=\"AQ_11\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_11\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_11\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_11\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich nehme intensiv und öfters Details wahr als andere, weil ich Dinge von anderen Perspektiven aus wahrnehme.</td>\n    <td><input type=\"radio\" name=\"AQ_12\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_12\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_12\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_12\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich gehe lieber in eine Bibliothek als zu einer Party.</td>\n    <td><input type=\"radio\" name=\"AQ_13\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_13\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_13\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_13\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Es fällt mir leicht zu fantasieren, und Geschichten zu erfinden.</td>\n    <td><input type=\"radio\" name=\"AQ_14\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_14\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_14\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_14\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich interessiere mich mehr für meine Mitmenschen als für Gegenstände, Räume oder Landschaften.</td>\n    <td><input type=\"radio\" name=\"AQ_15\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_15\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_15\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_15\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Meine Neigungen entwickele ich aktiv, konstruktiv und zielorientiert, und bin glücklich, wenn dies möglich ist.</td>\n    <td><input type=\"radio\" name=\"AQ_16\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_16\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_16\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_16\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich genieße es, zu tratschen.</td>\n    <td><input type=\"radio\" name=\"AQ_17\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_17\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_17\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_17\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Wenn ich etwas vortrage, können mich andere kaum unter- brechen und es ist für das Publikum schwierig, mir zu folgen.</td>\n    <td><input type=\"radio\" name=\"AQ_18\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_18\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_18\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_18\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Zahlen, Tabellen und Grafiken faszinieren mich.</td>\n    <td><input type=\"radio\" name=\"AQ_19\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_19\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_19\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_19\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Bei der Literatur, bei Hörspielen oder im Theater ist es für mich schwierig, die Absichten der Charaktere zu erraten.</td>\n    <td><input type=\"radio\" name=\"AQ_20\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_20\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_20\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_20\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich bevorzuge Sachbücher anstelle von Romane.</td>\n    <td><input type=\"radio\" name=\"AQ_21\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_21\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_21\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_21\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Es ist für mich schwierig, neue Freundschaften zu schließen.</td>\n    <td><input type=\"radio\" name=\"AQ_22\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_22\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_22\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_22\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Mir fallen Regelmäßigkeiten an Sachen oder Zusammenhängen auf.</td>\n    <td><input type=\"radio\" name=\"AQ_23\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_23\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_23\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_23\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich gehe lieber in ein Theater als in ein Museum.</td>\n    <td><input type=\"radio\" name=\"AQ_24\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_24\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_24\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_24\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich bin flexibel, wenn sich mein gewohnter Tagesablauf verändert.</td>\n    <td><input type=\"radio\" name=\"AQ_25\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_25\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_25\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_25\" value=\"-2\"></td>\n  </tr>\n</table>\n\n<br><br><br>\n\n<table>\n  <tr>\n    <th> </th>\n    <th>Stimme zu</th>\n    <th>Stimme eher zu</th>\n    <th>Stimme eher nicht zu</th>\n    <th>Stimme nicht zu</th>\n  </tr>\n\n  <tr>\n    <td>Ich weiß oft nicht, wie ich eine Konversation aufrechterhalten soll.\n    </td>\n    <td><input type=\"radio\" name=\"AQ_26\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_26\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_26\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_26\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Zwischentöne – oder die eigentliche Botschaft – höre ich gut heraus; und kann gut „Zwischen den Zeilen lesen“.</td>\n    <td><input type=\"radio\" name=\"AQ_27\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_27\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_27\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_27\" value=\"-2\"></td>\n  </tr>\n\n    <tr>\n    <td>Ich konzentriere mich mehr auf das Gesamtbild als auf Details.</td>\n    <td><input type=\"radio\" name=\"AQ_28\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_28\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_28\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_28\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Telefon- und Kontonummern vergesse ich schnell.</td>\n    <td><input type=\"radio\" name=\"AQ_29\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_29\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_29\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_29\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Kleine Veränderungen bei dem Erscheinungsbild von Personen oder in wiederkehrenden Situationen, bemerke ich kaum.</td>\n    <td><input type=\"radio\" name=\"AQ_30\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_30\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_30\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_30\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Wenn ich mich unterhalte oder spiele, merke ich, wenn es anfängt, den anderen zu langweilen.</td>\n    <td><input type=\"radio\" name=\"AQ_31\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_31\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_31\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_31\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Es ist mir leicht, mehrere Sachen gleichzeitig zu tun.</td>\n    <td><input type=\"radio\" name=\"AQ_32\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_32\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_32\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_32\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Wenn ich mich unterhalte, weiß ich nicht genau, wer gerade an der Reihe ist, das Wort zu ergreifen.</td>\n    <td><input type=\"radio\" name=\"AQ_33\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_33\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_33\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_33\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich bin gerne spontan.</td>\n    <td><input type=\"radio\" name=\"AQ_34\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_34\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_34\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_34\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Bei einem Witz verstehe ich die Pointen oft als allerletzte/r.</td>\n    <td><input type=\"radio\" name=\"AQ_35\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_35\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_35\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_35\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Was jemand denkt oder fühlt, sehe ich an seinem Gesicht und Blick.</td>\n    <td><input type=\"radio\" name=\"AQ_36\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_36\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_36\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_36\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Wenn ich eine Pause mache oder unterbrochen werde, finde ich anschließend schnell wieder in eine angefangene Sache hinein.</td>\n    <td><input type=\"radio\" name=\"AQ_37\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_37\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_37\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_37\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Es macht mir Freude, mit anderen einfach so dahin-zu-plaudern.</td>\n    <td><input type=\"radio\" name=\"AQ_38\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_38\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_38\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_38\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich spreche immer über dieselben Dinge oder tue dieselben Dinge.\n    </td>\n    <td><input type=\"radio\" name=\"AQ_39\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_39\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_39\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_39\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Als ich jung war, spielte ich gerne Rollenspiele mit anderen Kindern.\n    </td>\n    <td><input type=\"radio\" name=\"AQ_40\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_40\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_40\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_40\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich sammele gerne Informationen und erforsche gerne Zusammenhänge in meinem Interessensgebiet.</td>\n    <td><input type=\"radio\" name=\"AQ_41\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_41\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_41\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_41\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Es ist für mich schwierig, mich in andere hineinzuversetzen.</td>\n    <td><input type=\"radio\" name=\"AQ_42\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_42\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_42\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_42\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich plane alle Sachen immer sehr gründlich und bereite mich eingehend auf Aktivitäten oder Situationen vor.</td>\n    <td><input type=\"radio\" name=\"AQ_43\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_43\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_43\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_43\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Soziale Ereignisse oder Anlässe genieße ich.</td>\n    <td><input type=\"radio\" name=\"AQ_44\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_44\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_44\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_44\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Die Absichten anderer zu erkennen oder voraus-zu-erahnen, ist für mich schwierig.</td>\n    <td><input type=\"radio\" name=\"AQ_45\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_45\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_45\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_45\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Situationen mit fremden Personen oder in unbekannten Räumen ängstigen mich.</td>\n    <td><input type=\"radio\" name=\"AQ_46\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_46\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_46\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_46\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich mache gerne neue Bekanntschaften.</td>\n    <td><input type=\"radio\" name=\"AQ_47\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_47\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_47\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_47\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich bin sehr diplomatisch.</td>\n    <td><input type=\"radio\" name=\"AQ_48\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_48\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_48\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_48\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>An Geburtstage erinnere ich mich ungenau.</td>\n    <td><input type=\"radio\" name=\"AQ_49\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_49\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_49\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_49\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Es ist mir leicht, Phantasie-Spiele zu spielen, bei denen man schauspielern soll.</td>\n    <td><input type=\"radio\" name=\"AQ_50\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"AQ_50\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"AQ_50\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"AQ_50\" value=\"-2\"></td>\n  </tr>\n</table>\n\n</body>\n</html>"
+        }
+      ],
+      "scrollTop": true,
+      "submitButtonText": "Weiter →",
+      "submitButtonPosition": "right",
+      "files": [],
+      "responses": [
+        {
+          "label": "",
+          "event": "",
+          "target": "",
+          "filter": ""
+        }
+      ],
+      "parameters": [
+        {
+          "name": "",
+          "value": "",
+          "type": "string"
+        }
+      ],
+      "messageHandlers": [
+        {
+          "title": "",
+          "message": "",
+          "code": ""
+        }
+      ],
+      "title": "AQ-G"
+    },
+    "3": {
+      "id": "3",
+      "type": "lab.html.Page",
+      "items": [
+        {
+          "type": "text",
+          "content": "Sie werden im Folgenden eine Reihe von Aussagen und Fragen zu persönlichen Meinungen, Erlebnissen und Verhaltensweisen finden. Bitte geben Sie zu jeder Aussage oder Frage an, ob Sie ihr zustimmen oder nicht zustimmen. Antworten Sie bitte dabei so, wie es für Sie in den letzten Jahren im Allgemeinen zutrifft.<br><br>",
+          "title": "SPQ-G"
+        },
+        {
+          "required": true,
+          "type": "html",
+          "content": "<!--     \n    Table for all 74 SPQ Items\n\n      I divided the table into 7 parts (10 items in each, 14 in the last one) so you don't have to scroll all the way up to see which answer radio button has which label if you happen to forget it.\n\n      © Copyright 1999 Klein, Andresen & Jahn // file d:\\agneuro\\spq-text.doc\n\n-->\n\n<!DOCTYPE html>\n<html>\n<head>\n<style>\ntable {\n  font-family: Arial, sans-serif;\n  border-collapse: collapse;\n  width: 100%;\n  margin: auto;\n}\n\ntd, th {\n  border: 1px solid #dddddd;\n  text-align: left;\n  padding: 15px;\n}\n\ntr:nth-child(even) {\n  background-color: #ebf5f7;\n}\n</style>\n</head>\n<body>\n\n\n<table>\n  <tr>\n    <th> </th>\n    <th>&nbsp;&nbsp;Ja&nbsp;&nbsp;</th>\n    <th>Nein</th>\n  </tr>\n  <!-- Repeat the following code for each item -->\n  <tr>\n    <td>Haben Sie manchmal das Gefühl, dass Dinge, die Sie im Fernsehen sehen oder in der Zeitung lesen, für Sie eine ganz besondere Bedeutung haben?\n    </td>\n    <td><input type=\"radio\" name=\"SPQ_01_RI\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_01_RI\" value=\"0\"></td>\n  </tr>\n  <!-- end of item 1 -->\n\n  <tr>\n    <td>Ich vermeide es manchmal, an Orte zu gehen, wo sich viele Menschen aufhalten, weil ich dort Angst bekomme.</td>\n    <td><input type=\"radio\" name=\"SPQ_02_SA\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_02_SA\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Haben Sie Erfahrungen mit dem Übersinnlichen gemacht?</td>\n    <td><input type=\"radio\" name=\"SPQ_03_MD\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_03_MD\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Haben Sie oftmals Gegenstände oder Schatten für Menschen gehalten, oder Geräusche für Stimmen?</td>\n    <td><input type=\"radio\" name=\"SPQ_04_UW\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_04_UW\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Andere Menschen halten mich für ein wenig seltsam.</td>\n    <td><input type=\"radio\" name=\"SPQ_05_EV\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_05_EV\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich bin wenig daran interessiert, andere Menschen kennenzulernen.</td>\n    <td><input type=\"radio\" name=\"SPQ_06_KEF\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_06_KEF\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Andere Leute finden es manchmal schwierig, zu verstehen, was ich sage.</td>\n    <td><input type=\"radio\" name=\"SPQ_07_US\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_07_US\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Die Leute finden mich manchmal unnahbar und distanziert.</td>\n    <td><input type=\"radio\" name=\"SPQ_08_EA\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_08_EA\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich bin sicher, dass man hinter meinem Rücken über mich redet.</td>\n    <td><input type=\"radio\" name=\"SPQ_09_AW\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_09_AW\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Wenn ich zum Essen oder ins Kino ausgehe, merke ich, daß mich die Leute beobachten.</td>\n    <td><input type=\"radio\" name=\"SPQ_10_RI\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_10_RI\" value=\"0\"></td>\n  </tr>\n</table>\n\n<br><br><br>\n\n<table>\n  <tr>\n    <th> </th>\n    <th>&nbsp;&nbsp;Ja&nbsp;&nbsp;</th>\n    <th>Nein</th>\n  </tr>\n\n\n  <tr>\n    <td>Ich werde sehr nervös, wenn ich höfliche Konversation machen muss.</td>\n    <td><input type=\"radio\" name=\"SPQ_11_SA\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_11_SA\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Glauben Sie an Gedankenübertragung?</td>\n    <td><input type=\"radio\" name=\"SPQ_12_MD\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_12_MD\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Haben Sie jemals gespürt, dass irgendeine Person oder Kraft um Sie herum ist, auch wenn niemand zu sehen ist?</td>\n    <td><input type=\"radio\" name=\"SPQ_13_UW\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_13_UW\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Die Leute machen manchmal Bemerkungen über mein ungewöhnliches Gehabe und meine eigentümlichen Gewohnheiten.</td>\n    <td><input type=\"radio\" name=\"SPQ_14_EV\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_14_EV\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich ziehe es vor, für mich allein zu bleiben.</td>\n    <td><input type=\"radio\" name=\"SPQ_15_KEF\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_15_KEF\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Wenn ich spreche, springe ich manchmal schnell von einem Thema zum anderen.</td>\n    <td><input type=\"radio\" name=\"SPQ_16_US\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_16_US\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich kann meine wahren Gefühle nicht gut durch meine Sprechweise und Mimik ausdrücken.</td>\n    <td><input type=\"radio\" name=\"SPQ_17_EA\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_17_EA\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Haben Sie oft das Gefühl, dass andere Leute es auf Sie abgesehen haben?</td>\n    <td><input type=\"radio\" name=\"SPQ_18_AW\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_18_AW\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Lassen manche Menschen Bemerkungen über Sie fallen, oder sagen sie Dinge mit einer doppelten Bedeutung?</td>\n    <td><input type=\"radio\" name=\"SPQ_19_RI\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_19_RI\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Werden Sie jemals nervös, wenn jemand hinter Ihnen geht?</td>\n    <td><input type=\"radio\" name=\"SPQ_20_SA\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_20_SA\" value=\"0\"></td>\n  </tr>\n</table>\n\n<br><br><br>\n\n<table>\n  <tr>\n    <th> </th>\n    <th>&nbsp;&nbsp;Ja&nbsp;&nbsp;</th>\n    <th>Nein</th>\n  </tr>\n\n\n  <tr>\n    <td>Sind Sie sich manchmal sicher, dass andere Menschen Ihre Gedanken lesen können?</td>\n    <td><input type=\"radio\" name=\"SPQ_21_MD\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_21_MD\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Wenn Sie einen Menschen anschauen oder sich selbst im Spiegel betrachten, haben Sie jemals beobachtet, daß sich das Gesicht vor ihren Augen verändert?</td>\n    <td><input type=\"radio\" name=\"SPQ_22_UW\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_22_UW\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Manchmal denken andere Leute, daß ich ein bißchen merkwürdig bin.</td>\n    <td><input type=\"radio\" name=\"SPQ_23_EV\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_23_EV\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>In Gegenwart anderer Menschen bin ich meistens ganz still.</td>\n    <td><input type=\"radio\" name=\"SPQ_24_KEF\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_24_KEF\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich vergesse manchmal, was ich gerade zu sagen versuche.</td>\n    <td><input type=\"radio\" name=\"SPQ_25_US\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_25_US\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich lache oder lächle selten.</td>\n    <td><input type=\"radio\" name=\"SPQ_26_EA\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_26_EA\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Machen Sie sich manchmal Sorgen darüber, ob Freunde oder Kollegen wirklich redlich und vertrauenswürdig sind ?</td>\n    <td><input type=\"radio\" name=\"SPQ_27_AW\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_27_AW\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Haben Sie jemals ein gewöhnliches Ereignis oder einen gewöhnlichen Gegenstand bemerkt, das oder der für Sie ein besonderes Zeichen darstellte?</td>\n    <td><input type=\"radio\" name=\"SPQ_28_RI\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_28_RI\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Wenn ich Menschen zum ersten Mal begegne, werde ich ängstlich.</td>\n    <td><input type=\"radio\" name=\"SPQ_29_SA\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_29_SA\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Glauben Sie an das Hellsehen?</td>\n    <td><input type=\"radio\" name=\"SPQ_30_MD\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_30_MD\" value=\"0\"></td>\n  </tr>\n</table>\n\n<br><br><br>\n\n<table>\n  <tr>\n    <th> </th>\n    <th>&nbsp;&nbsp;Ja&nbsp;&nbsp;</th>\n    <th>Nein</th>\n  </tr>\n\n    <tr>\n    <td>Ich höre oft eine Stimme meine Gedanken laut aussprechen.</td>\n    <td><input type=\"radio\" name=\"SPQ_31_UW\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_31_UW\" value=\"0\"></td>\n  </tr>\n\n    <tr>\n    <td>Manche Menschen denken, daß ich eine sehr wunderliche Person bin.</td>\n    <td><input type=\"radio\" name=\"SPQ_32_EV\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_32_EV\" value=\"0\"></td>\n  </tr>\n\n    <tr>\n    <td>Ich finde es schwierig, einen engen emotionalen Kontakt zu anderen Menschen zu haben.</td>\n    <td><input type=\"radio\" name=\"SPQ_33_KEF\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_33_KEF\" value=\"0\"></td>\n  </tr>\n\n    <tr>\n    <td>Beim Sprechen schweife ich oft zu sehr ab.</td>\n    <td><input type=\"radio\" name=\"SPQ_34_US\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_34_US\" value=\"0\"></td>\n  </tr>\n\n    <tr>\n    <td>Meine \"nicht-sprachliche\" Kommunikation (z.B. Nicken oder Lächeln im Gespräch) ist nicht sehr ausgeprägt.</td>\n    <td><input type=\"radio\" name=\"SPQ_35_EA\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_35_EA\" value=\"0\"></td>\n  </tr>\n\n    <tr>\n    <td>Ich spüre, dass ich selbst bei meinen Freunden auf der Hut sein muss.</td>\n    <td><input type=\"radio\" name=\"SPQ_36_AW\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_36_AW\" value=\"0\"></td>\n  </tr>\n\n    <tr>\n    <td>Sehen Sie manchmal besondere Bedeutungen in Anzeigen, Schaufenstern oder in der Art, wie Dinge um Sie herum angeordnet sind?</td>\n    <td><input type=\"radio\" name=\"SPQ_37_RI\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_37_RI\" value=\"0\"></td>\n  </tr>\n\n    <tr>\n    <td>Fühlen Sie sich oft angespannt, wenn Sie sich in einer Gruppe fremder Menschen befinden?</td>\n    <td><input type=\"radio\" name=\"SPQ_38_SA\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_38_SA\" value=\"0\"></td>\n  </tr>\n\n    <tr>\n    <td>Können andere Menschen Ihre Gefühle fühlen, auch wenn sie gar nicht anwesend sind?</td>\n    <td><input type=\"radio\" name=\"SPQ_39_MD\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_39_MD\" value=\"0\"></td>\n  </tr>\n\n    <tr>\n    <td>Haben Sie jemals Dinge gesehen, die für andere Menschen unsichtbar waren?</td>\n    <td><input type=\"radio\" name=\"SPQ_40_UW\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_40_UW\" value=\"0\"></td>\n  </tr>\n</table>\n\n<br><br><br>\n\n<table>\n  <tr>\n    <th> </th>\n    <th>&nbsp;&nbsp;Ja&nbsp;&nbsp;</th>\n    <th>Nein</th>\n  </tr>\n\n  <tr>\n    <td>Sind Sie der Meinung, dass es außerhalb Ihrer engsten Verwandtschaft niemanden gibt, dem Sie wirklich nahe stehen, oder daß es niemanden gibt, dem Sie vertrauen können oder mit dem Sie über persönliche Probleme reden können?</td>\n    <td><input type=\"radio\" name=\"SPQ_41_KEF\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_41_KEF\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Manche Menschen finden, dass ich im Gespräch etwas unbestimmt und schwer zu begreifen bin.</td>\n    <td><input type=\"radio\" name=\"SPQ_42_US\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_42_US\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Höflichkeiten und gesellige Gesten kann ich nicht gut erwidern.</td>\n    <td><input type=\"radio\" name=\"SPQ_43_EA\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_43_EA\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Erkennen Sie in dem, was andere sagen oder tun, oft versteckte Drohungen oder Demütigungen?</td>\n    <td><input type=\"radio\" name=\"SPQ_44_AW\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_44_AW\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Haben Sie während des Einkaufens das Gefühl, dass andere Menschen Notiz von Ihnen nehmen?</td>\n    <td><input type=\"radio\" name=\"SPQ_45_RI\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_45_RI\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Unter Menschen, die ich nicht näher kenne, fühle ich mich sehr unwohl.</td>\n    <td><input type=\"radio\" name=\"SPQ_46_SA\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_46_SA\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Hatten Sie bereits Erfahrungen mit Astrologie, Vorhersehen der Zukunft,UFOs, übersinnlicher Wahrnehmung oder dem Sechsten Sinn?</td>\n    <td><input type=\"radio\" name=\"SPQ_47_MD\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_47_MD\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Erscheinen alltägliche Gegenstände ungewöhnlich groß oder klein?</td>\n    <td><input type=\"radio\" name=\"SPQ_48_UW\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_48_UW\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Briefe an Freunde zu schreiben bringt mehr Schwierigkeiten als Gewinn.\n    </td>\n    <td><input type=\"radio\" name=\"SPQ_49_KEF\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_49_KEF\" value=\"0\"></td>\n  </tr>\n\n    <tr>\n    <td>Ich benutze Worte manchmal in einer unüblichen Weise.</td>\n    <td><input type=\"radio\" name=\"SPQ_50_US\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_50_US\" value=\"0\"></td>\n  </tr>\n</table>\n\n<br><br><br>\n\n<table>\n\n  <tr>\n    <th> </th>\n    <th>&nbsp;&nbsp;Ja&nbsp;&nbsp;</th>\n    <th>Nein</th>\n  </tr>\n\n  <tr>\n    <td>Wenn ich mich mit anderen unterhalte, neige ich dazu, den Blickkontakt zu vermeiden.</td>\n    <td><input type=\"radio\" name=\"SPQ_51_EA\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_51_EA\" value=\"0\"></td>\n  </tr>\n\n    <tr>\n    <td>Haben Sie die Erfahrung gemacht, dass es am besten ist, andere Leute nicht zu viel über Sie wissen zu lassen?</td>\n    <td><input type=\"radio\" name=\"SPQ_52_AW\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_52_AW\" value=\"0\"></td>\n  </tr>\n\n    <tr>\n    <td>Wenn Sie sehen, dass andere Menschen sich unterhalten, fragen Sie sich dann öfters, ob sie sich über Sie unterhalten?</td>\n    <td><input type=\"radio\" name=\"SPQ_53_RI\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_53_RI\" value=\"0\"></td>\n  </tr>\n\n    <tr>\n    <td>Ich würde mich sehr ängstlich fühlen, wenn ich vor einer großen Gruppe von Menschen eine Rede halten müßte.</td>\n    <td><input type=\"radio\" name=\"SPQ_54_SA\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_54_SA\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Haben Sie jemals das Gefühl gehabt, mit einer anderen Person mittels Gedankenübertragung zu kommunizieren?</td>\n    <td><input type=\"radio\" name=\"SPQ_55_MD\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_55_MD\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Wird Ihr Geruchssinn manchmal ungewöhnlich sensibel?</td>\n    <td><input type=\"radio\" name=\"SPQ_56_UW\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_56_UW\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Bei geselligen Ereignissen neige ich dazu, im Hintergrund zu bleiben.\n    </td>\n    <td><input type=\"radio\" name=\"SPQ_57_KEF\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_57_KEF\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Neigen Sie in einem Gespräch dazu, vom Thema abzukommen?</td>\n    <td><input type=\"radio\" name=\"SPQ_58_US\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_58_US\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich habe oft das Gefühl, dass andere es auf mich abgesehen haben.</td>\n    <td><input type=\"radio\" name=\"SPQ_59_AW\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_59_AW\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Haben Sie manchmal das Gefühl, dass andere Menschen Sie beobachten?</td>\n    <td><input type=\"radio\" name=\"SPQ_60_RI\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_60_RI\" value=\"0\"></td>\n  </tr>\n\n</table>\n\n<br><br><br>\n\n<table>\n\n  <tr>\n    <th> </th>\n    <th>&nbsp;&nbsp;Ja&nbsp;&nbsp;</th>\n    <th>Nein</th>\n  </tr>\n\n  <tr>\n    <td>Fühlen Sie sich jemals plötzlich von entfernten Geräuschen abgelenkt, die Sie normalerweise nicht wahrnehmen ?</td>\n    <td><input type=\"radio\" name=\"SPQ_61_UW\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_61_UW\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Enge Freunde zu haben bedeutet mir nicht viel.</td>\n    <td><input type=\"radio\" name=\"SPQ_62_KEF\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_62_KEF\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Haben Sie manchmal das Gefühl, dass die Leute über Sie reden?</td>\n    <td><input type=\"radio\" name=\"SPQ_63_RI\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_63_RI\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Sind Ihre Gedanken manchmal so stark, dass Sie sie fast hören können?</td>\n    <td><input type=\"radio\" name=\"SPQ_64_UW\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_64_UW\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Müssen Sie oft darauf acht geben, dass andere Sie nicht übervorteilen?</td>\n    <td><input type=\"radio\" name=\"SPQ_65_AW\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_65_AW\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Haben Sie das Gefühl, dass Sie mit anderen Menschen nicht \"warm\" werden können?</td>\n    <td><input type=\"radio\" name=\"SPQ_66_KEF\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_66_KEF\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich bin eine merkwürdige, ungewöhnliche Person.</td>\n    <td><input type=\"radio\" name=\"SPQ_67_EV\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_67_EV\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Meine Art zu reden ist weder ausdrucksvoll noch lebendig.</td>\n    <td><input type=\"radio\" name=\"SPQ_68_EA\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_68_EA\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich finde es schwierig, meine Gedanken anderen klar mitzuteilen.</td>\n    <td><input type=\"radio\" name=\"SPQ_69_US\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_69_US\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich habe ein paar exzentrische Gewohnheiten.</td>\n    <td><input type=\"radio\" name=\"SPQ_70_EV\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_70_EV\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Mir ist sehr unbehaglich zumute, wenn ich mit Leuten spreche, die ich nicht gut kenne.</td>\n    <td><input type=\"radio\" name=\"SPQ_71_SA\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_71_SA\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Die Leute sagen gelegentlich, dass das Gespräch mit mir verwirrend ist.</td>\n    <td><input type=\"radio\" name=\"SPQ_72_US\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_72_US\" value=\"0\"></td>\n  </tr>\n\n  <tr>\n    <td>Ich neige dazu, meine Gefühle für mich zu behalten.</td>\n    <td><input type=\"radio\" name=\"SPQ_73_EA\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_73_EA\" value=\"0\"></td>\n  </tr>\n\n    <tr>\n    <td>Manchmal starren mich die Leute wegen meines sonderbaren Auftretens an.</td>\n    <td><input type=\"radio\" name=\"SPQ_74_EV\" value=\"1\"required></td>\n    <td><input type=\"radio\" name=\"SPQ_74_EV\" value=\"0\"></td>\n  </tr>\n\n</table>\n\n</body>\n</html>"
+        }
+      ],
+      "scrollTop": true,
+      "submitButtonText": "Weiter →",
+      "submitButtonPosition": "right",
+      "files": [],
+      "responses": [
+        {
+          "label": "",
+          "event": "",
+          "target": "",
+          "filter": ""
+        }
+      ],
+      "parameters": [
+        {
+          "name": "",
+          "value": "",
+          "type": "string"
+        }
+      ],
+      "messageHandlers": [
+        {
+          "title": "",
+          "message": "",
+          "code": ""
+        }
+      ],
+      "title": "SPQ-G"
+    },
+    "6": {
+      "id": "6",
+      "type": "lab.html.Page",
+      "items": [
+        {
+          "type": "text",
+          "title": "Persönlichkeits-Fragebogen",
+          "content": ""
+        },
+        {
+          "required": true,
+          "type": "input",
+          "label": "Bitte geben Sie hier Ihren Versuchspersonen-Code ein.",
+          "help": "Der Code sieht in etwa so aus: part0001",
+          "name": "ID"
+        }
+      ],
+      "scrollTop": true,
+      "submitButtonText": "Fragebogen starten",
+      "submitButtonPosition": "right",
+      "files": [],
+      "responses": [
+        {
+          "label": "",
+          "event": "",
+          "target": "",
+          "filter": ""
+        }
+      ],
+      "parameters": [
+        {
+          "name": "",
+          "value": "",
+          "type": "string"
+        }
+      ],
+      "messageHandlers": [
+        {
+          "title": "",
+          "message": "",
+          "code": ""
+        }
+      ],
+      "title": "ID",
+      "_tab": "Content"
+    },
+    "7": {
+      "id": "7",
+      "type": "lab.html.Page",
+      "items": [
+        {
+          "type": "text",
+          "title": "",
+          "content": "Ende der Fragebögen, vielen Dank!\n<br>\nBitte klicken Sie auf \"Daten sichern\"."
+        }
+      ],
+      "scrollTop": true,
+      "submitButtonText": "Daten sichern →",
+      "submitButtonPosition": "right",
+      "files": [],
+      "responses": [
+        {
+          "label": "",
+          "event": "",
+          "target": "",
+          "filter": ""
+        }
+      ],
+      "parameters": [
+        {
+          "name": "",
+          "value": "",
+          "type": "string"
+        }
+      ],
+      "messageHandlers": [
+        {
+          "title": "",
+          "message": "",
+          "code": ""
+        }
+      ],
+      "title": "end"
+    },
+    "8": {
+      "id": "8",
+      "type": "lab.html.Page",
+      "items": [
+        {
+          "type": "text",
+          "content": "Bevor das eigentliche Experiment startet, brauchen wir einige Informationen von Ihnen. Im folgenden finden Sie daher einige Fragebögen. Bitte füllen Sie die Fragebögen nach bestem Wissen und Gewissen aus. \n<br><br>\nZur Erinnerung: Ihre Antworten werden nicht unter Ihrem Namen gespeichert, d.h. wir können bei der Analyse keine Rückschlüsse auf Ihre Person ziehen. ",
+          "title": "Willkommen"
+        }
+      ],
+      "scrollTop": true,
+      "submitButtonText": "zum ersten Fragebogen →",
+      "submitButtonPosition": "right",
+      "files": [],
+      "responses": [
+        {
+          "label": "",
+          "event": "",
+          "target": "",
+          "filter": ""
+        }
+      ],
+      "parameters": [
+        {
+          "name": "",
+          "value": "",
+          "type": "string"
+        }
+      ],
+      "messageHandlers": [
+        {
+          "title": "",
+          "message": "",
+          "code": ""
+        }
+      ],
+      "title": "welcome"
+    },
+    "9": {
+      "id": "9",
+      "type": "lab.html.Page",
+      "items": [
+        {
+          "type": "text",
+          "title": "Demographische Daten",
+          "content": "<br>Bevor das Experiment startet, benötige ich einige Informationen über Sie, um Ihre Ergebnisse später besser einordnen zu können. Bitte beantworten Sie hierzu die folgenden Fragen. <br><br>Bitte antworten Sie wahrheitsgemäß. Sollte Ihnen eine Frage unangenehm sein,  können Sie auch gern die Option \"Möchte ich nicht angeben.\" anklicken.<br><br>Zur Erinnerung: Ihre Daten werden anonymisiert gespeichert, d.h. ich kann keine Rückschlüsse auf einzelne Personen ziehen. <br><br><br>"
+        },
+        {
+          "required": true,
+          "type": "radio",
+          "label": "Welchem Gender fühlen Sie sich am ehesten zugehörig?",
+          "options": [
+            {
+              "label": "männlich",
+              "coding": "m"
+            },
+            {
+              "label": "weiblich",
+              "coding": "f"
+            },
+            {
+              "label": "divers",
+              "coding": "nb"
+            },
+            {
+              "label": "Möchte ich nicht angeben.",
+              "coding": "no_ans"
+            }
+          ],
+          "name": "gender",
+          "help": ""
+        },
+        {
+          "required": true,
+          "type": "input",
+          "label": "Wie alt sind Sie?",
+          "attributes": {
+            "type": "number",
+            "min": "18",
+            "max": "120",
+            "step": "1"
+          },
+          "name": "age"
+        },
+        {
+          "required": true,
+          "type": "radio",
+          "label": "Was ist Ihr höchster Bildungsabschluss?",
+          "options": [
+            {
+              "label": "kein Schulabschluss"
+            },
+            {
+              "label": "Hauptschulabschluss",
+              "coding": "school_hauptschule"
+            },
+            {
+              "label": "Realschulabschluss",
+              "coding": "school_realschule"
+            },
+            {
+              "label": "Fachhochschulreife / Abitur"
+            },
+            {
+              "label": "abgeschlossene Ausbildung",
+              "coding": "apprentice"
+            },
+            {
+              "label": "Bachelor/Master/Diplom/Staatsexamen",
+              "coding": "undergrad"
+            },
+            {
+              "label": "Dissertation",
+              "coding": "diss"
+            },
+            {
+              "label": "Habilitation",
+              "coding": "habil"
+            },
+            {
+              "label": "Möchte ich nicht angeben.",
+              "coding": "no_ans"
+            }
+          ],
+          "name": "education"
+        },
+        {
+          "required": true,
+          "type": "radio",
+          "label": "Ist Deutsch Ihre Muttersprache?",
+          "options": [
+            {
+              "label": "Ja",
+              "coding": "True"
+            },
+            {
+              "label": "Nein",
+              "coding": "False"
+            },
+            {
+              "label": "Möchte ich nicht angeben.",
+              "coding": "False"
+            }
+          ],
+          "name": "native_speaker"
+        },
+        {
+          "required": true,
+          "type": "radio",
+          "label": "Haben Sie eine Leseschwäche?",
+          "options": [
+            {
+              "label": "Ja",
+              "coding": "True"
+            },
+            {
+              "label": "Nein",
+              "coding": "False"
+            },
+            {
+              "label": "Möchte ich nicht angeben.",
+              "coding": "no_ans"
+            }
+          ],
+          "name": "reading_weakness"
+        },
+        {
+          "required": true,
+          "type": "radio",
+          "label": "Haben Sie eine Sehschwäche?",
+          "help": "Falls Sie eine Sehschwäche haben, aber gerade Kontaktlinsen tragen oder am Computer auch Sehhilfe alles gut lesen können, können Sie hier \"Nein\" anklicken.",
+          "name": "seeing_impaired",
+          "options": [
+            {
+              "label": "Ja",
+              "coding": "True"
+            },
+            {
+              "label": "Nein",
+              "coding": "False"
+            },
+            {
+              "label": "Möchte ich nicht angeben.",
+              "coding": "no_ans"
+            }
+          ]
+        },
+        {
+          "required": true,
+          "type": "radio",
+          "label": "Leiden Sie aktuell an einer psychologischen Erkrankung?",
+          "help": "Es geht vor allem um Erkrankungen, die Ihre Sprachverarbeitung beeinträchtigen, Sie müde machen und/oder Ihre Bewegungen beeinträchtigen. Hierzu gehören z.B. Schizophrenie, Depressionen und bipolare Störungen.",
+          "options": [
+            {
+              "label": "Ja",
+              "coding": "True"
+            },
+            {
+              "label": "Nein",
+              "coding": "False"
+            },
+            {
+              "label": "Möchte ich nicht angeben.",
+              "coding": "no_ans"
+            }
+          ],
+          "name": "psych_disorder"
+        },
+        {
+          "required": true,
+          "type": "radio",
+          "label": "Leiden Sie aktuell an einer neurologischen Störung?",
+          "help": "z.B. Alzheimer Demenz, Morbus Parkinson oder Essentieller Tremor",
+          "name": "neur_disorder",
+          "options": [
+            {
+              "label": "Ja",
+              "coding": "True"
+            },
+            {
+              "label": "Nein",
+              "coding": "False"
+            },
+            {
+              "label": "Möchte ich nicht angeben.",
+              "coding": "no_ans"
+            }
+          ]
+        },
+        {
+          "required": true,
+          "type": "radio",
+          "label": "Hatten Sie schon einmal einen Schlaganfall (Hirninfarkt oder Hirnblutung) oder einen Hirntumor?",
+          "options": [
+            {
+              "label": "Ja",
+              "coding": "True"
+            },
+            {
+              "label": "Nein",
+              "coding": "False"
+            },
+            {
+              "coding": "no_ans",
+              "label": "Möchte ich nicht angeben."
+            }
+          ],
+          "name": "stroke"
+        },
+        {
+          "required": true,
+          "type": "radio",
+          "label": "Nehmen Sie aktuell Medikamente ein, die Sie müde machen?",
+          "help": "Häufig müde machende Medikamente: einige Antidepressiva (bei Depressionen), Antidiabetika (bei Diabetes), Antihistaminika (bei Allergien), Beruhigungs- und Schlafmittel oder einige Erkältungmedikamente<br><br>\nErklärung: Wenn Sie sich benommen fühlen, wirkt sich das auch auf Ihre Ergebnisse in dieser Studie aus. ",
+          "options": [
+            {
+              "label": "Ja",
+              "coding": "True"
+            },
+            {
+              "label": "Nein",
+              "coding": "False"
+            },
+            {
+              "label": "Möchte ich nicht angeben.",
+              "coding": "no_ans"
+            }
+          ],
+          "name": "medicine"
+        },
+        {
+          "required": true,
+          "type": "radio",
+          "label": "Haben Sie aktuell oder in den letzten 4 Wochen Drogen genommen?",
+          "options": [
+            {
+              "label": "Ja",
+              "coding": "True"
+            },
+            {
+              "label": "Nein",
+              "coding": "False"
+            },
+            {
+              "label": "Möchte ich nicht angeben.",
+              "coding": "no_ans"
+            }
+          ],
+          "name": "drugs",
+          "help": "z.B. Cannabis, Amphetamine (Speed), Ecstasy, Heroin, Kokain, Methamphetamin (Crystal Meth) oder LSD<br><br>\nErklärung: Falls Sie aktuell oder in letzter Zeit Drogen konsumiert haben, kann das auch beeinflussen, wie Sie Reize verarbeiten. Das wiederum kann sich auf die Ergebnisse in dieser Studie auswirken."
+        },
+        {
+          "required": true,
+          "type": "radio",
+          "label": "Haben Sie vor Beginn dieser Testung Alkohol getrunken?",
+          "options": [
+            {
+              "label": "Ja",
+              "coding": "True"
+            },
+            {
+              "label": "Nein",
+              "coding": "False"
+            },
+            {
+              "label": "Möchte ich nicht angeben.",
+              "coding": "no_ans"
+            }
+          ],
+          "help": "Erklärung: Alkohol kann Ihre Reaktionsfähigkeit beeinträchtigen, was auch Ihre Ergebnisse in diesem Experiment beeinflussen kann. ",
+          "name": "alcohol"
+        },
+        {
+          "required": true,
+          "type": "radio",
+          "label": "Sind Sie eher links- oder rechtshändig?",
+          "options": [
+            {
+              "label": "rechthändig",
+              "coding": "r"
+            },
+            {
+              "coding": "l",
+              "label": "linkshändig"
+            }
+          ],
+          "name": "handedness"
+        },
+        {
+          "required": true,
+          "type": "radio",
+          "label": "Haben Sie eine Hörschwäche?",
+          "options": [
+            {
+              "label": "Ja",
+              "coding": "True"
+            },
+            {
+              "label": "Nein",
+              "coding": "False"
+            },
+            {
+              "coding": "no_ans",
+              "label": "Möchte ich nicht angeben."
+            }
+          ],
+          "help": ""
+        },
+        {
+          "required": true,
+          "type": "radio",
+          "label": "Tragen Sie eine Hörhilfe (Hörgerät oder Cochlear-Implantat)?",
+          "options": [
+            {
+              "label": "Ja",
+              "coding": "True"
+            },
+            {
+              "label": "Nein",
+              "coding": "False"
+            },
+            {
+              "coding": "no_ans",
+              "label": "Möchte ich nicht angeben."
+            }
+          ],
+          "name": "CI_or_hearing_aid"
+        }
+      ],
+      "scrollTop": true,
+      "submitButtonText": "Weiter →",
+      "submitButtonPosition": "right",
+      "files": [],
+      "responses": [
+        {
+          "label": "",
+          "event": "",
+          "target": "",
+          "filter": ""
+        }
+      ],
+      "parameters": [
+        {
+          "name": "",
+          "value": "",
+          "type": "string"
+        }
+      ],
+      "messageHandlers": [
+        {
+          "title": "",
+          "message": "",
+          "code": ""
+        }
+      ],
+      "title": "demographics"
+    },
+    "10": {
+      "id": "10",
+      "type": "lab.html.Page",
+      "items": [
+        {
+          "type": "text",
+          "content": "Vielen Dank! Die nächsten Fragebögen sind etwas längere Persönlichkeitsfragebögen. Bitte antworten Sie auch hier nach bestem Wissen und Gewissen. <br>Falls Sie eine Frage nicht ganz eindeutig formuliert finden, antworten Sie einfach so, wie Sie sie verstehen."
+        }
+      ],
+      "scrollTop": true,
+      "submitButtonText": "Weiter zu den Persönlichkeitsfragebögen →",
+      "submitButtonPosition": "right",
+      "files": [],
+      "responses": [
+        {
+          "label": "",
+          "event": "",
+          "target": "",
+          "filter": ""
+        }
+      ],
+      "parameters": [
+        {
+          "name": "",
+          "value": "",
+          "type": "string"
+        }
+      ],
+      "messageHandlers": [
+        {
+          "title": "",
+          "message": "",
+          "code": ""
+        }
+      ],
+      "title": "questionnaire_info"
+    },
+    "11": {
+      "id": "11",
+      "type": "lab.html.Page",
+      "items": [
+        {
+          "type": "text",
+          "title": "Edinburgh Handedness Inventory (EHI)",
+          "content": "Bitte geben Sie Ihre Handpräferenz bei der Ausübung folgender Tätigkeiten bzw. bei der Benutzung folgender Objekte an, indem Sie in der entsprechenden Spalte ein ‚+‘ schreiben. Bitte markieren Sie ‚++‘, wenn Ihre Präferenz so stark ist, dass Sie nie versuchen würden, die andere Hand zu benutzen, es sei denn, Sie würden dazu gezwungen. Wenn Sie einmal wirklich nicht wissen, welche Hand Sie eher benutzen, schreiben Sie ein ‚+‘ in beide Spalten. <br><br>\n\nEinige der aufgeführten Aktivitäten erfordern den Gebrauch beider Hände. In diesen Fällen ist in Klammern ein Teil der Aufgabe oder das Objekt angegeben, für das die Handpräferenz erfragt wird.\n\n<br><br>\nBitte versuchen Sie alle Fragen zu beantworten. Lassen Sie nur die Frage offen, bei denen Sie keinerlei Erfahrung haben."
+        },
+        {
+          "required": true,
+          "type": "html",
+          "content": " <!DOCTYPE html>\n<html>\n<head>\n<style>\ntable {\n  font-family: Arial, sans-serif;\n  border-collapse: collapse;\n  width: 100%;\n  margin: auto;\n}\n\ntd, th {\n  border: 1px solid #dddddd;\n  text-align: left;\n  padding: 15px;\n}\n\ntr:nth-child(even) {\n  background-color: #ebf5f7;\n}\n</style>\n</head>\n<body>\n\n\n\n<table>\n  <tr>\n    <th> </th>\n    <th>Linke Hand (++)</th>\n    <th>Linke Hand (+)</th>\n    <th>Rechte Hand (+)</th>\n    <th>Rechte Hand (++)</th>\n  </tr>\n\n\n  <!-- Repeat the following code for each item -->\n  <tr>\n    <td>Schreiben</td>\n    <td><input type=\"radio\" name=\"EHI_01\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"EHI_01\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"EHI_01\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"EHI_01\" value=\"-2\"></td>\n  </tr>\n  <!-- end of item 1 -->\n\n  <tr>\n    <td>Zeichnen</td>\n    <td><input type=\"radio\" name=\"EHI_02\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"EHI_02\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"EHI_02\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"EHI_02\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Werfen</td>\n    <td><input type=\"radio\" name=\"EHI_03\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"EHI_03\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"EHI_03\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"EHI_03\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Schere</td>\n    <td><input type=\"radio\" name=\"EHI_04\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"EHI_04\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"EHI_04\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"EHI_04\" value=\"-2\"></td>\n  </tr>\n\n    <tr>\n    <td>Zahnbürste</td>\n    <td><input type=\"radio\" name=\"EHI_05\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"EHI_05\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"EHI_05\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"EHI_05\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Messer (ohne Gabel)</td>\n    <td><input type=\"radio\" name=\"EHI_06\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"EHI_06\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"EHI_06\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"EHI_06\" value=\"-2\"></td>\n  </tr>\n\n  <tr>\n    <td>Löffel</td>\n    <td><input type=\"radio\" name=\"EHI_07\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"EHI_07\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"EHI_07\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"EHI_07\" value=\"-2\"></td>\n  </tr>\n\n\n  <tr>\n    <td>Besen (obere Hand)</td>\n    <td><input type=\"radio\" name=\"EHI_08\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"EHI_08\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"EHI_08\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"EHI_08\" value=\"-2\"></td>\n  </tr>\n\n    <tr>\n    <td>Streichholz anzünden</td>\n    <td><input type=\"radio\" name=\"EHI_09\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"EHI_09\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"EHI_09\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"EHI_09\" value=\"-2\"></td>\n  </tr>\n\n    <tr>\n    <td>Schachtel öffnen (Deckel)</td>\n    <td><input type=\"radio\" name=\"EHI_10\" value=\"2\"required></td>\n    <td><input type=\"radio\" name=\"EHI_10\" value=\"1\"></td>\n    <td><input type=\"radio\" name=\"EHI_10\" value=\"-1\"></td>\n    <td><input type=\"radio\" name=\"EHI_10\" value=\"-2\"></td>\n  </tr>"
+        }
+      ],
+      "scrollTop": true,
+      "submitButtonText": "Weiter →",
+      "submitButtonPosition": "right",
+      "files": [],
+      "responses": [
+        {
+          "label": "",
+          "event": "",
+          "target": "",
+          "filter": ""
+        }
+      ],
+      "parameters": [
+        {
+          "name": "",
+          "value": "",
+          "type": "string"
+        }
+      ],
+      "messageHandlers": [
+        {
+          "title": "",
+          "message": "",
+          "code": ""
+        }
+      ],
+      "title": "EHI (short)",
+      "_tab": "Behavior",
+      "skip": true
+    },
+    "root": {
+      "id": "root",
+      "title": "root",
+      "type": "lab.flow.Sequence",
+      "children": [
+        "6",
+        "8",
+        "9",
+        "11",
+        "10",
+        "3",
+        "1",
+        "7"
+      ],
+      "parameters": [],
+      "plugins": [
+        {
+          "type": "lab.plugins.Metadata"
+        }
+      ],
+      "metadata": {
+        "title": "EXNAT-2 Questionnaires",
+        "description": "- Participant ID\n- Demographics (Age, Gender, Handedness, Health-related Qs, Reading/Seeing/Listening Weaknesses)\n- SPQ-G (German Schizotypal Personality Questionnaire, 74 Items)\n- AQ-G (German Autism Spectrum Quotient Questionnaire, 50 Items)",
+        "repository": "",
+        "contributors": "Merle Schuckart"
+      }
+    }
+  },
+  "version": [
+    20,
+    2,
+    4
+  ],
+  "files": {
+    "files": {
+      "index.html": {
+        "content": "data:text/html,%3C!doctype%20html%3E%0A%3Chtml%3E%0A%3Chead%3E%0A%20%20%3Cmeta%20charset%3D%22utf-8%22%3E%0A%20%20%3Ctitle%3EExperiment%3C%2Ftitle%3E%0A%20%20%3C!--%20viewport%20setup%20--%3E%0A%20%20%3Cmeta%20name%3D%22viewport%22%20content%3D%22width%3Ddevice-width%2C%20initial-scale%3D1%22%3E%0A%20%20%3C!--%20lab.js%20library%20and%20experiment%20code%20--%3E%0A%20%20%24%7B%20header%20%7D%0A%3C%2Fhead%3E%0A%3Cbody%3E%0A%20%20%3C!--%20If%20you'd%20rather%20have%20a%20container%20with%20a%20fixed%20width%0A%20%20%20%20%20%20%20and%20variable%20height%2C%20try%20removing%20the%20fullscreen%20class%20below%20--%3E%0A%20%20%3Cdiv%20class%3D%22container%20fullscreen%22%20data-labjs-section%3D%22main%22%3E%0A%20%20%20%20%3Cmain%20class%3D%22content-vertical-center%20content-horizontal-center%22%3E%0A%20%20%20%20%20%20%3Cdiv%3E%0A%20%20%20%20%20%20%20%20%3Ch2%3ELoading%20Experiment%3C%2Fh2%3E%0A%20%20%20%20%20%20%20%20%3Cp%3EThe%20experiment%20is%20loading%20and%20should%20start%20in%20a%20few%20seconds%3C%2Fp%3E%0A%20%20%20%20%20%20%3C%2Fdiv%3E%0A%20%20%20%20%3C%2Fmain%3E%0A%20%20%3C%2Fdiv%3E%0A%3C%2Fbody%3E%0A%3C%2Fhtml%3E%0A",
+        "source": "library"
+      },
+      "style.css": {
+        "content": "data:text/css,%2F*%20Please%20define%20your%20custom%20styles%20here%20*%2F%0A%0A.likert%20li%20%7B%0A%20%20%20%20float%3A%20left%3B%0A%20%20%20%20list-style-type%3A%20none%3B%0A%20%20%20%20margin%3A%200%200%203px%200%3B%0A%7D%0A%0A%3Aroot%20%7B%0A%20%20--width-min-container%3A%20600px%3B%0A%7D",
+        "source": "library"
+      }
+    },
+    "bundledFiles": {
+      "lib/lab.js": {
+        "type": "application/javascript"
+      },
+      "lib/lab.js.map": {
+        "type": "text/plain"
+      },
+      "lib/lab.fallback.js": {
+        "type": "application/javascript"
+      },
+      "lib/lab.legacy.js": {
+        "type": "application/javascript"
+      },
+      "lib/lab.legacy.js.map": {
+        "type": "text/plain"
+      },
+      "lib/lab.css": {
+        "type": "text/css"
+      },
+      "lib/loading.svg": {
+        "type": "image/svg+xml"
+      }
+    }
+  }
+}
