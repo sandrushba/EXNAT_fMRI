@@ -399,6 +399,38 @@ const study = lab.util.fromObject({
             }
           ],
           "name": "CI_or_hearing_aid"
+        },
+        {
+          "required": true,
+          "type": "radio",
+          "label": "Haben Sie Tinnitus?",
+          "options": [
+            {
+              "label": "Ja",
+              "coding": "True"
+            },
+            {
+              "label": "Nein",
+              "coding": "False"
+            }
+          ],
+          "name": "tinnitus"
+        },
+        {
+          "required": true,
+          "type": "radio",
+          "label": "Haben Sie eine Farbsehschwäche?",
+          "options": [
+            {
+              "label": "Ja",
+              "coding": "True"
+            },
+            {
+              "label": "Nein",
+              "coding": "False"
+            }
+          ],
+          "name": "colour_vision_impaired"
         }
       ],
       "scrollTop": true,
