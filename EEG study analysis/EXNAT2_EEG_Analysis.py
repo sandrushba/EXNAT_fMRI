@@ -60,6 +60,8 @@ import pandas as pd
 !pip install mne
 import mne
 
+from mne.io import read_raw_eyelink
+
 import re # for regular expressions
 
 # for plotting
@@ -70,8 +72,8 @@ from matplotlib.colors import LinearSegmentedColormap #  for plotting bridging b
 # ----------------------------------------------------- # 
 
 # set path to data file here:
-#curr_data_path = "/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
-curr_data_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
+curr_data_path = "/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
+#curr_data_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
 
 # get list of files in data directory: 
 file_list = os.listdir(curr_data_path)
@@ -113,12 +115,13 @@ for curr_file in file_list:
     montage = mne.channels.make_standard_montage("standard_1020") # use 10_20 system as montage
     raw.set_montage(montage, verbose = False)
     
+    # plot montage:
+    raw.plot_sensors(show_names=True)
+    
     
     # TO DO: Set sensor location using data from this fancy digitizing device
     
-    
-    
-    
+
     
     """ Set triggers """
     
@@ -131,6 +134,7 @@ for curr_file in file_list:
     #    We recorded everything in one go, so there should be only 1 of those triggers if I'm correct. 
     # 2. There might be some annotations missing if we skipped the prediction tendency task, but this is fine.
     # 3. Currently the labels of the triggers are not very informative, so I'll have to change the labels.
+
 
     """ Delete 'New Segment/' Trigger """
     
@@ -247,18 +251,39 @@ for curr_file in file_list:
 
     # print annotations again to check if it worked:
     #print(set(raw.annotations.description))
+
+    """ Get Eyetracking Data: Read in ascii Dataset as MNE Raw Object"""
+    eyelink_raw = read_raw_eyelink(curr_data_path + "part_" + curr_id + "/" + curr_id + ".asc", 
+                                   create_annotations = ["blinks", "messages"], # mark blinks in the stream & add trigger messages
+                                   preload = True,
+                                   apply_offsets = True) # adjust onset time of the mne.Annotations created from exp. messages (= triggers)
+
+    # Check out info to see if everything looks fine:
+    eyelink_raw.info
+
+    # plot raw eyetracking data from pupil size channel of right eye 
+    # to see if everything's there and the triggers were recorded properly:
+    pupil_channel_idx = mne.pick_channels(eyelink_raw.ch_names, ["pupil_right"])
+    #eyelink_raw.plot(scalings = dict(eyegaze = 1e3), order = pupil_channel_idx)
+    
+    
+    """ Add Extracking Channels to EEG raw object """
+    
+    
+    
+    
     
     
     
     """ Choose Reference """
     # Apply reference (use common average for now because for some reason I didn't record my ref channel)
-    raw.set_eeg_reference(ref_channels = 'average', projection = True)
+    raw.set_eeg_reference(ref_channels = 'average')
     
     
     """ Look at Raw Data """
     # Filter & downsample the data for plotting (this is not applied to the actual data)
-    raw_resampled = raw.copy().resample(sfreq = 250)
-    raw_resampled.plot(n_channels = 63, duration = 1, scalings = 'auto', highpass = 2, lowpass = 12, filtorder = 4)
+    #raw_resampled = raw.copy().resample(sfreq = 250)
+    #raw_resampled.plot(n_channels = 63, duration = 1, scalings = 'auto', highpass = 2, lowpass = 12, filtorder = 4)
     
     
     
@@ -296,26 +321,138 @@ for curr_file in file_list:
     
     # if there are bridges, but not too many (let's say 3, 
     # that would be 6 affected electrodes at most), interpolate them: 
-    if len(bridged_idx) > 0 and < 3:
+    if len(bridged_idx) > 0 and len(bridged_idx) < 3:
         print("interpolating " + str(len(bridged_idx)) + " bridged electrodes!" )
         raw_interpolated_bridges = mne.preprocessing.interpolate_bridged_electrodes(raw_bridges.copy(), 
                                                                                     bridged_idx = bridged_idx)
+        # overwrite raw object with data with fixed channels
+        raw = raw_interpolated_bridges.copy()
     
     # if there are more than 3 bridges, exclude participant from further analysis and go to next one:
     elif len(bridged_idx) > 3:
-        print("Detected " + str(len(bridged_idx)) +  " electrode bridges for current participant! Excluding them from the analysis!")
+        print("Detected " + str(len(bridged_idx)) +  " electrode bridges for current participant! Excluding dataset from the analysis!")
         next
         
     # if there are no bridges, just keep the df as is
     elif len(bridged_idx) == 0:
-        print("no electrode bridging detected here :-)" )
-        raw_interpolated_bridges = raw_bridges.copy()
+        print("no electrode bridging detected here :-)" )        
+    
         
     
-    # overwrite raw object with data with fixed channels
-    raw = raw_interpolated_bridges.copy()
+    
+    """ ICA """
+    
+    # apply high-pass filter to get rid of slow drifts
+    raw = raw.filter(l_freq = 1.0, h_freq = None)
+
+    # --> get rid of ICs that represent motor artifacts like head & eye movements or blinks.
+
+    # Initialize ICA with a desired number of components
+    # How many components should I use here?!
+    ica = mne.preprocessing.ICA(n_components = 20,
+                                random_state = 42, # set seed
+                                method = "fastica")
+    
+    # Fit ICA to the raw data
+    ica.fit(raw)
+        
+    
+    # Exclude ICA components manually:
+        
+    # 1. inspect topoplots: Where do we have weird frontal activity?
+    # 2. inspect signal of all components and check where blinks or eye movements are visible.
+    # 3. inspect power spectrum: Where do we have a weird skewed spectrum, 50 Hz peaks or no (!) alpha? --> probably artifacts
+
+    excl_components = [] # collect indices of all components that should be excluded here
+    
+    # 1. Plot the ICA components as topoplots
+    ica.plot_components()
+    # ask user to set the components that should be excluded:
+    user_input_excl_components = input("Which components should be excluded? Please provide the corresponding indices separated by commas: ")
+    print("You told me to exclude the following components:" + user_input_excl_components)
+    # append chosen components to list of components we want to exclude:
+    excl_components = excl_components + list(map(int, user_input_excl_components.split(', ')))
     
     
+    # 2. Plot the time series of the components
+    ica.plot_sources(raw, show_scrollbars = True)
+    # ask user to set the components that should be excluded:
+    user_input_excl_components = input("Which components should be excluded? Please provide the corresponding indices separated by commas: ")
+    print("You told me to exclude the following components:" + user_input_excl_components)
+    # append chosen components to list of components we want to exclude:
+    excl_components = excl_components + list(map(int, user_input_excl_components.split(', ')))
+    
+    
+    # 3. Plot power spectrum of components
+    # Get the power spectrum of the first five ICA components
+    ica_sources = ica.get_sources(raw)  # extract ICA sources from raw data
+    ica_sources_data = ica_sources.get_data()  # get NumPy array of ICA sources
+    freqs, psds = mne.time_frequency.psd_array_welch(ica_sources_data, sfreq, fmin=1, fmax=80, n_fft=2048, window='hamming')
+    # Plot the power spectrum of the first five ICA components
+    for i in range(21):
+        fig, ax = plt.subplots()
+        ax.plot(psds, freqs[i])  # transpose psds[i] to match the shape of freqs
+        ax.set_xlabel('Frequency (Hz)')
+        ax.set_ylabel('Power')
+        ax.set_title('ICA component {}'.format(i+1))
+    # Show plot
+    plt.show()    
+    # ask user to set the components that should be excluded:
+    user_input_excl_components = input("Which components should be excluded? Please provide the corresponding indices separated by commas: ")
+    print("You told me to exclude the following components:" + user_input_excl_components)
+    # append chosen components to list of components we want to exclude:
+    excl_components = excl_components + list(map(int, user_input_excl_components.split(', ')))
+
+
+
+
+    # Exclude ICA components automatically if they have a high correlation with EOG events:
+
+    # Find & exclude ICA components that match EOG events from frontopolar electrodes.
+    
+    # set channels here that we can use to detect 
+    # electrooculogram (EOG) events aka blinks & eye movements
+    eog_channels = ["Fp1", "Fp2"] # we don't really have face electrodes, but I guess Fp1 & Fp2 works too
+        
+    #
+    eog_indices, eog_scores = ica.find_bads_eog(raw, 
+                                                ch_name = eog_channels, 
+                                                reject_by_annotation = False,
+                                                measure = "correlation",
+                                                threshold = .8)
+        
+    # The eog indices tell how much each ICA component 
+    # correlates with activity in the EOG channels.
+    # If the correlation is > .8 for some component, we exclude it.
+        
+        
+    # if we found some matches, visualise eog indices and exclude matching ICA components
+    if len(eog_indices) > 0:
+            
+        # visualise EOG indices (aka correlations of each ICA component with EOG activity)     
+        plt.figure(figsize = (12, 6))
+        plt.subplot(2, 1, 1)
+        plt.plot(eog_indices, marker = 'o', linestyle = '-', color = 'red')
+        plt.title('EOG Indices')
+        plt.xlabel('Index of ICA Component')
+        plt.ylabel('Correlation with EOG activity')
+        plt.grid(True)
+        
+        print("automatically identified " + len(eog_indices) + " components for exclusion.")
+    
+        # exclude all ICs that match the EOG artifacts from back transformation:
+        excl_components = excl_components + eog_indices
+
+
+
+    
+    # Exclude Components:
+    # remove all duplicated component indices from list of components that should be excluded:
+    excl_components = list(set(excl_components))
+    ica.exclude = excl_components  # Remove components 1, 3, and 5
+    # remove components from the EEG data
+    ica.apply(raw)
+
     
     """ Filtering """
     # --> 5 - 15 Hz for word onset ERPs?
@@ -332,36 +469,36 @@ for curr_file in file_list:
                                              fir_window ='hamming',
                                              verbose = None)
     
-    mne.viz.plot_filter(filter_params, raw.info["sfreq"])
+    #mne.viz.plot_filter(filter_params, raw.info["sfreq"])
 
     # Apply filter:
-    raw.filter(l_freq = 2,
-               h_freq = 30,
-               phase = 'zero', 
-               fir_window ='hamming',
-               verbose = None)
+    raw = raw.filter(l_freq = 2,
+                     h_freq = 30,
+                     phase = 'zero', 
+                     fir_window ='hamming',
+                     verbose = None)
 
 
     # plot PSD after filtering
     #raw.plot_psd(fmax = 50, average = True, spatial_colors = False)
 
 
-    """ Perform ICA """
-    # --> get rid of ICs that represent motor artifacts like head & eye movements or blinks.
 
-    # Initialize ICA with a desired number of components
-    # How many components should I use here?!
-    ica = mne.preprocessing.ICA(n_components = 20, 
-                                random_state = 97, 
-                                max_iter = 800)
+
+
+
+
+
+
+        
+        
     
-    # Fit ICA to the raw data
-    ica.fit(raw)
-    
-    # Plot the components to inspect for artifacts
-    #ica.plot_components()
-
-
+    """ 4.4 Select relevant channels """
+    #eeg_channel_picks = 
+    #raw.pick_channels(eeg_channel_picks)    
+        
+     
+        
     """ Epoching """
     
     """ --> cut data into blocks """
@@ -485,9 +622,9 @@ for curr_file in file_list:
     
     
         """ create events from annotations """
-    # use regex to look for strings beginning with t (I only need the trial starts)
-    # Also, round strings instead of truncating them so we get unique time values
-    curr_events, curr_event_ids = mne.events_from_annotations(curr_segment, {"trial_onset": 8})    
+        # use regex to look for strings beginning with t (I only need the trial starts)
+        # Also, round strings instead of truncating them so we get unique time values
+        curr_events, curr_event_ids = mne.events_from_annotations(curr_segment, {"trial_onset": 8})    
 
 
 
@@ -565,6 +702,34 @@ for curr_file in file_list:
     
     
     
+    
+    # Define epochs parameters
+event_id = {'Auditory/Left': 1, 'Auditory/Right': 2}
+tmin, tmax = -0.2, 0.5
+baseline = (None, 0)
+reject_criteria = dict(mag=4000e-15,     # 4000 fT
+                       grad=4000e-13,    # 4000 fT/cm
+                       eeg=150e-6,       # 150 µV
+                       eog=150e-6)       # 150 µV
+
+# Create epochs
+epochs = mne.Epochs(raw, events, event_id, tmin, tmax, baseline=baseline, reject=reject_criteria, preload=True)
+
+# Plot individual trials for manual inspection and rejection
+epochs.plot(n_epochs=5, n_channels=30, title='Manual Trial Inspection', scalings=dict(eeg=50e-6), reject_by_annotation=False)
+
+# After plotting, you can manually reject trials by clicking on them in the plot
+# and then pressing the 'D' key (to mark as bad) or 'G' key (to mark as good).
+
+# To get the list of rejected epochs
+rejected_epochs = epochs.drop_log
+
+# To get the cleaned epochs (epochs without rejected trials)
+clean_epochs = epochs.copy().drop(reject='manually')
+
+
+    
+    
     """ Exclude noisy trials """
     
     
@@ -599,6 +764,11 @@ print(set(eyelink_raw.annotations.description))
 #print(events_from_annot[30:80]) 
 
 eyelink_raw.plot(start=5, duration=5, order = pupil_channel_idx)
+
+
+
+
+
 
 
 
