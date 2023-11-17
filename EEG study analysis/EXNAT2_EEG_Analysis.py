@@ -355,8 +355,10 @@ for curr_file in file_list:
     
     # Fit ICA to the raw data
     ica.fit(raw)
-        
-    
+    # make computer remind you to check the ICA output:
+    os.system('say "queen go check your screen"')
+
+
     # Exclude ICA components manually:
         
     # 1. inspect topoplots: Where do we have weird frontal activity?
@@ -384,24 +386,28 @@ for curr_file in file_list:
     
     
     # 3. Plot power spectrum of components
+    user_input_excl_components = []
     # Get the power spectrum of the first five ICA components
     ica_sources = ica.get_sources(raw)  # extract ICA sources from raw data
     ica_sources_data = ica_sources.get_data()  # get NumPy array of ICA sources
-    freqs, psds = mne.time_frequency.psd_array_welch(ica_sources_data, sfreq, fmin=1, fmax=80, n_fft=2048, window='hamming')
-    # Plot the power spectrum of the first five ICA components
-    for i in range(21):
+    freqs, psds = mne.time_frequency.psd_array_welch(ica_sources_data, raw.info['sfreq'], fmin=1, fmax=80, n_fft=2048, window='hamming')
+    # Plot the power spectrum of all ICA components
+    for i in range(np.shape(ica_sources_data)[0]):
         fig, ax = plt.subplots()
         ax.plot(psds, freqs[i])  # transpose psds[i] to match the shape of freqs
         ax.set_xlabel('Frequency (Hz)')
         ax.set_ylabel('Power')
-        ax.set_title('ICA component {}'.format(i+1))
-    # Show plot
-    plt.show()    
-    # ask user to set the components that should be excluded:
-    user_input_excl_components = input("Which components should be excluded? Please provide the corresponding indices separated by commas: ")
-    print("You told me to exclude the following components:" + user_input_excl_components)
+        ax.set_title('ICA component {}'.format(i))
+        # Show plot
+        plt.show() 
+         # ask user to set the components that should be excluded:
+        user_input_excl_curr_component = input("Exclude this component? (y/n)")
+        if user_input_excl_curr_component == "y":
+            user_input_excl_components = user_input_excl_components + [i]
+    
+    print("You told me to exclude the following components: " + ', '.join(map(str, user_input_excl_components)))
     # append chosen components to list of components we want to exclude:
-    excl_components = excl_components + list(map(int, user_input_excl_components.split(', ')))
+    excl_components = excl_components + user_input_excl_components
 
 
 
@@ -448,6 +454,7 @@ for curr_file in file_list:
     
     # Exclude Components:
     # remove all duplicated component indices from list of components that should be excluded:
+    print("excluding the following components from data: " + ', '.join(map(str, excl_components)))
     excl_components = list(set(excl_components))
     ica.exclude = excl_components  # Remove components 1, 3, and 5
     # remove components from the EEG data
