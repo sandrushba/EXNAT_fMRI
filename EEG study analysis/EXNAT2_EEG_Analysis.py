@@ -72,8 +72,8 @@ from matplotlib.colors import LinearSegmentedColormap #  for plotting bridging b
 # ----------------------------------------------------- # 
 
 # set path to data file here:
-curr_data_path = "/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
-#curr_data_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
+#curr_data_path = "/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
+curr_data_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
 
 # get list of files in data directory: 
 file_list = os.listdir(curr_data_path)
@@ -94,11 +94,16 @@ for curr_file in file_list:
     curr_id = curr_file.replace("part_", "")
     print("reading in data for participant with ID", curr_id)
     
-
+    # skip pilot datasets
+    if curr_id == "eg": 
+        print("skipping test dataset")
+        continue
+    
+    
     """ create MNE raw object with raw EEG data + triggers + metadata """
     
     # read in the 3 EEG-related datasets
-    curr_vhdr_file = curr_data_path + "part_" + curr_id + "/EXNAT_part" + curr_id + "_1.vhdr"
+    curr_vhdr_file = curr_data_path + "part_" + curr_id + "/part" + curr_id + ".vhdr"
         
     # read in .eeg file with EEG data EEG data using MNE
     raw = mne.io.read_raw_brainvision(curr_vhdr_file, preload = True)
@@ -108,20 +113,131 @@ for curr_file in file_list:
     #print(raw.info)
     #print(raw.ch_names)
     
+    # We can't see the channel TP9, but that's fine.
+    # We used it as a reference channel during recording, so it should be completely flat.
+    # We can now add a completely flat channel to the channel list in case we want to re-reference later.
+    # I was a bit confused about the missing channel, but it's all described here: https://mne.tools/stable/auto_tutorials/preprocessing/55_setting_eeg_reference.html
+    raw = mne.add_reference_channels(raw, ref_channels = ["TP9"], copy = False)
+
+    # copy the raw data before the next step:
+    #raw_backup = raw.copy()
     
     
     """ Set Montage (aka Sensor Locations) """
     
-    montage = mne.channels.make_standard_montage("standard_1020") # use 10_20 system as montage
-    raw.set_montage(montage, verbose = False)
-    
-    # plot montage:
-    raw.plot_sensors(show_names=True)
+    # use basic 10_20 system as montage for all participants:
+    #montage = mne.channels.make_standard_montage("standard_1020") 
+    #raw.set_montage(montage, verbose = False)
     
     
-    # TO DO: Set sensor location using data from this fancy digitizing device
+    # use custom montage:
+        
+    # path to .elc file with participant's head shape points & sensor locations:
+    curr_elc_file = curr_data_path + "part_" + curr_id + "/part" + curr_id + ".elc"
+    
+    # extract information from .elc file
+    with open(curr_elc_file, 'r') as file:
+        lines = file.readlines()
+        
+    # get header info
+    header_info = lines[0:3]
+    
+    # Extract channel positions:
+    # get the raw lines containing information on each channel:
+    channel_lines = lines[3:3 + int(header_info[0].split('=')[1])]
+    # split strings if there's a '\t' in there:
+    channel_data = [line.strip().split('\t') for line in channel_lines]
+    # exclude strings containing just ":":
+    channel_data = [[item for item in line if ":" not in item] for line in channel_data]
+    
+    # MNE wants montage channel labels that are not completely in caps, so change them:
+    name_mapping = {'FP1': 'Fp1', 
+                    'FZ': 'Fz', 
+                    'PZ': 'Pz', 
+                    'OZ': 'Oz', 
+                    'CZ': 'Cz',
+                    'FP2': 'Fp2', 
+                    'AFZ': 'AFz',
+                    'FCZ': 'FCz', 
+                    'POZ': 'POz', 
+                    'CPZ': 'CPz'}
+
+    # update the channel labels in channel_data
+    for i, channel_info in enumerate(channel_data):
+        old_name = channel_info[0]
+        new_name = name_mapping.get(old_name, old_name)  # Use the new name if it exists, otherwise keep the old name
+        channel_data[i][0] = new_name
+    
+    # convert data into dictionary with Keys = channel names and values = 3D coordinates - array of shape (3,):
+    channel_dict = {line[0]: list(map(float, line[1:])) for line in channel_data}
+
+
+    # extract information on nasion position, 
+    # position of the left periauricular fiducial point 
+    # in shape (3,)
+    nasion_pos = channel_dict.get('Nasion')
+    lpa_pos = channel_dict.get('LeftEar')
+    rpa_pos = channel_dict.get('RightEar')
+
+    # remove the entries containing info on nasion, lpa and rpa from dict 
+    # as they aren't EEG channels.
+    channel_dict = {key: value for key, value in channel_dict.items() if key not in ['Nasion', 'LeftEar', 'RightEar']}
+    
+    
+    # extract head shape points, but create an array of shape (n_points, 3) 
+    # instead of a dict as they have no labels.
+
+    # get index of row containing header "HeadShapePoints":
+    head_shape_start = lines.index('HeadShapePoints\n')
+
+    # extract head shape points
+    head_shape_data = lines[head_shape_start +1 : ]
+
+    # Split the data into columns
+    head_shape_matrix = [list(map(float, line.split())) for line in head_shape_data]
+    
+    # convert to numpy array of shape (n_points, 3):
+    head_shape_array = np.array([list(map(float, point.split('\t'))) for point in head_shape_data], dtype=float)
+
+
+    custom_montage = mne.channels.make_dig_montage(ch_pos = channel_dict, 
+                                          nasion = nasion_pos,
+                                          lpa = lpa_pos,
+                                          rpa = rpa_pos,
+                                          hsp = head_shape_array,
+                                          hpi = None,
+                                          coord_frame = "unknown")
+                                          
+    
+    # Plot the 3D montage (hint: you can move it with your cursor)
+    #mne.viz.plot_montage(montage = custom_montage, 
+    #                     scale_factor = 20, 
+    #                     show_names = True, 
+    #                     kind = '3d', 
+    #                     show = True, 
+    #                     sphere = "auto", 
+    #                     axes = None, 
+    #                     verbose = None)
     
 
+    # Apply your custom montage to the raw object
+    raw.set_montage(custom_montage)
+
+    # Plot the sensors with the applied montage
+    #raw.plot_sensors(kind='3d', ch_type='eeg', show_names=True)
+
+
+
+    
+    # for source localisation (later): make a head sphere model
+    #sphere_model = make_sphere_model(info = raw.info, 
+    #                                 r0 = 'auto', 
+    #                                 head_radius = 'auto')
+        
+    
+    # copy the raw data before the next step:
+    raw_backup = raw.copy()
+    
     
     """ Set triggers """
     
@@ -231,7 +347,9 @@ for curr_file in file_list:
                    'random': 58,
                    'start_exp': 60,
                    'end_exp': 62,
-                   'trial_off': 64}
+                   'trial_off': 64, 
+                   'placeholder_1': 66, # look up what these mean
+                   'placeholder_2': 68} # look up what these mean
     
     
     # loop annotations in raw object:
@@ -267,7 +385,10 @@ for curr_file in file_list:
     #eyelink_raw.plot(scalings = dict(eyegaze = 1e3), order = pupil_channel_idx)
     
     
-    """ Add Extracking Channels to EEG raw object """
+    
+    """ Add Eyetracking Channels to EEG raw object """
+    
+    
     
     
     
@@ -276,7 +397,7 @@ for curr_file in file_list:
     
     
     """ Choose Reference """
-    # Apply reference (use common average for now because for some reason I didn't record my ref channel)
+    # Apply reference --> use common average because the MNE python documentation says that's better for source localisation (?)
     raw.set_eeg_reference(ref_channels = 'average')
     
     
