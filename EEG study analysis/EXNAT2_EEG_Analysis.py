@@ -128,7 +128,7 @@ for curr_file in file_list:
     # use basic 10_20 system as montage for all participants:
     #montage = mne.channels.make_standard_montage("standard_1020") 
     #raw.set_montage(montage, verbose = False)
-    
+    #montage.plot()
     
     # use custom montage:
         
@@ -236,8 +236,18 @@ for curr_file in file_list:
         
     
     # copy the raw data before the next step:
+        
     raw_backup = raw.copy()
     
+    
+    """ Pick channels """
+    
+    # reduce the data a bit:
+    #pick_channels = ["C1", "C3", "CP1", "CP3"] # use left central electrodes
+
+    #raw = raw_backup.pick(pick_channels)
+    #raw.ch_names
+    #raw.plot()
     
     """ Set triggers """
     
@@ -371,22 +381,25 @@ for curr_file in file_list:
     #print(set(raw.annotations.description))
 
     """ Get Eyetracking Data: Read in ascii Dataset as MNE Raw Object"""
-    eyelink_raw = read_raw_eyelink(curr_data_path + "part_" + curr_id + "/" + curr_id + ".asc", 
-                                   create_annotations = ["blinks", "messages"], # mark blinks in the stream & add trigger messages
-                                   preload = True,
-                                   apply_offsets = True) # adjust onset time of the mne.Annotations created from exp. messages (= triggers)
-
-    # Check out info to see if everything looks fine:
-    eyelink_raw.info
-
-    # plot raw eyetracking data from pupil size channel of right eye 
-    # to see if everything's there and the triggers were recorded properly:
-    pupil_channel_idx = mne.pick_channels(eyelink_raw.ch_names, ["pupil_right"])
-    #eyelink_raw.plot(scalings = dict(eyegaze = 1e3), order = pupil_channel_idx)
     
+    # we might not have eyetracking data for each participant:
+    try:
+        eyelink_raw = read_raw_eyelink(curr_data_path + "part_" + curr_id + "/" + curr_id + ".asc", 
+                                       create_annotations = ["blinks", "messages"], # mark blinks in the stream & add trigger messages
+                                       preload = True,
+                                       apply_offsets = True) # adjust onset time of the mne.Annotations created from exp. messages (= triggers)
     
+        # Check out info to see if everything looks fine:
+        eyelink_raw.info
     
-    """ Add Eyetracking Channels to EEG raw object """
+        # plot raw eyetracking data from pupil size channel of right eye 
+        # to see if everything's there and the triggers were recorded properly:
+        pupil_channel_idx = mne.pick_channels(eyelink_raw.ch_names, ["pupil_right"])
+        #eyelink_raw.plot(scalings = dict(eyegaze = 1e3), order = pupil_channel_idx)
+        
+        
+    
+        """ Add Eyetracking Channels to EEG raw object """
     
     
     
@@ -473,11 +486,12 @@ for curr_file in file_list:
     ica = mne.preprocessing.ICA(n_components = 20,
                                 random_state = 42, # set seed
                                 method = "fastica")
+        
     
     # Fit ICA to the raw data
     ica.fit(raw)
     # make computer remind you to check the ICA output:
-    os.system('say "queen go check your screen"')
+    os.system('say "hey queen go check your screen"')
 
 
     # Exclude ICA components manually:
@@ -629,6 +643,31 @@ for curr_file in file_list:
         
     """ Epoching """
     
+    # get trial onsets:    
+    curr_events, _ = mne.events_from_annotations(raw, event_id = {"trial_on": trigger_map["trial_on"]})
+
+    # convert to np array
+    events_array = np.array(curr_events)
+
+    
+    # cut epochs around those events:        
+    epochs = mne.Epochs(raw, 
+                        events = curr_events,
+                        event_id = trigger_map['trial_on'], 
+                        tmin = -0.2, 
+                        tmax = 0.7, 
+                        detrend = 1, # 1 = linear detrend --> performed before BL correction
+                        baseline = (-0.1, 0), 
+                        preload = True)
+    
+    epochs.plot_image(combine="mean", title = "Word-Onset ERP across conditions, left central electrodes, data only filtered to 2-30 Hz, no epochs or ICs rejected yet")
+    
+    
+    
+    
+    
+    
+    
     """ --> cut data into blocks """
     
     # Create Events from Annotations
@@ -706,6 +745,7 @@ for curr_file in file_list:
     # Check number of trials in one of the segments to see if we did everything correctly.
     
     # loop blocks
+    exclude_block_indices = []
     for i in range(0, len(main_block_names)):
 
         # get segment
@@ -716,24 +756,30 @@ for curr_file in file_list:
 
         print("number of trials in block " + main_block_names[i] + ": " + str(count_trials))
     
+        # check if current block has less than 300 trials aka was ended prematurely:
+        if count_trials < 300:
+            # exclude block at index i from lists "block_names" and "main_blocks_segments"
+            exclude_block_indices.append(i)
+            
         # Plot the data
         #segment_to_plot.plot()
 
-    # Works! :-)
     
+    # Exclude blocks with less than 300 trials:
+    main_block_names = [main_block_names[i] for i in range(len(main_block_names)) if i not in exclude_block_indices]
+    main_blocks_segments = [main_blocks_segments[i] for i in range(len(main_blocks_segments)) if i not in exclude_block_indices]
+
+
     
     """ --> cut blocks into trials """
-    # window: - 1000 to 2000 ms around stimulus onset
-    
+    # window: - 200 to 700 ms around stimulus onset
     
     # loop blocks again & cut epochs:
     epochs_list = []     
     for curr_segment, curr_block_name, curr_block_idx in zip(main_blocks_segments, main_block_names, range(0, len(main_block_names))):
         
-        # use "trial_on" as stimulus onset trigger:
-        events = mne.pick_events(segment, include = [trigger_map["trial_on"]])
-        
-        
+        print(curr_block_name)
+
         """ Cut Epochs & Apply Baseline Correction """
         # Concerning the BL Correction:
         # --> does it make sense to use a baseline period before stimulus onset, 
@@ -745,24 +791,29 @@ for curr_file in file_list:
         # Psychophysiology, 44(6), 927–935. doi:10.1111/j.1469-8986.2007.00593.x     
         # "[...] using the 100ms that preceded word onset as a baseline."
         # If they did it, I can do this, too. 
-        
-        curr_events = pass
-    
+            
     
         """ create events from annotations """
-        # use regex to look for strings beginning with t (I only need the trial starts)
-        # Also, round strings instead of truncating them so we get unique time values
-        curr_events, curr_event_ids = mne.events_from_annotations(curr_segment, {"trial_onset": 8})    
+        
+        # get timestamps for all "trial onset" events:
+        curr_events, _ = mne.events_from_annotations(curr_segment,event_id = {"trial_on": trigger_map["trial_on"]})
+        
+        curr_events = np.array(curr_events)
 
+        curr_events, _ = mne.events_from_annotations(curr_segment, event_id={"trial_on": trigger_map["trial_on"]})
 
+        # convert to np array
+        events_array = np.array(curr_events)
 
+        
+        # cut epochs around those events:        
         epochs = mne.Epochs(curr_segment, 
                             events = curr_events,
                             event_id = trigger_map['trial_on'], 
-                            tmin = -1, 
-                            tmax = 2, 
+                            tmin = -0.2, 
+                            tmax = 0.7, 
                             detrend = 1, # 1 = linear detrend --> performed before BL correction
-                            baseline = (-100, 0), 
+                            baseline = (-0.1, 0), 
                             preload = True)
         
         
@@ -774,6 +825,17 @@ for curr_file in file_list:
         epochs.resample(sfreq = 250)
         print(epochs.info)
     
+    
+        """ Sanity check: Create word-onset ERP for current block """
+        if curr_block_name == "BL_m_on":    
+            epochs.plot_image(combine="mean", title = "BL (single task)")
+        if curr_block_name == "1back_d_m_on":    
+            epochs.plot_image(combine="mean", title = "1-back (dual task)")
+        if curr_block_name == "2back_d_m_on":    
+            epochs.plot_image(combine="mean", title = "2-back (dual task)")
+        
+        
+        
     
         """ Add Metadata for Each Epoch """
         
@@ -829,69 +891,33 @@ for curr_file in file_list:
     
     
     
-    
-    
-    # Define epochs parameters
-event_id = {'Auditory/Left': 1, 'Auditory/Right': 2}
-tmin, tmax = -0.2, 0.5
-baseline = (None, 0)
-reject_criteria = dict(mag=4000e-15,     # 4000 fT
-                       grad=4000e-13,    # 4000 fT/cm
-                       eeg=150e-6,       # 150 µV
-                       eog=150e-6)       # 150 µV
-
-# Create epochs
-epochs = mne.Epochs(raw, events, event_id, tmin, tmax, baseline=baseline, reject=reject_criteria, preload=True)
-
-# Plot individual trials for manual inspection and rejection
-epochs.plot(n_epochs=5, n_channels=30, title='Manual Trial Inspection', scalings=dict(eeg=50e-6), reject_by_annotation=False)
-
-# After plotting, you can manually reject trials by clicking on them in the plot
-# and then pressing the 'D' key (to mark as bad) or 'G' key (to mark as good).
-
-# To get the list of rejected epochs
-rejected_epochs = epochs.drop_log
-
-# To get the cleaned epochs (epochs without rejected trials)
-clean_epochs = epochs.copy().drop(reject='manually')
-
 
     
     
     """ Exclude noisy trials """
     
+    # Plot individual trials for manual inspection and rejection
+    #epochs.plot(n_epochs=5, n_channels=30, title='Manual Trial Inspection', scalings=dict(eeg=50e-6), reject_by_annotation=False)
+    
+    # After plotting, you can manually reject trials by clicking on them in the plot
+    # and then pressing the 'D' key (to mark as bad) or 'G' key (to mark as good).
+    
+    # To get the list of rejected epochs
+    #rejected_epochs = epochs.drop_log
+    
+    # To get the cleaned epochs (epochs without rejected trials)
+    #clean_epochs = epochs.copy().drop(reject='manually')
+
     
  
     
-    """ Compute Word Onset ERPs """
+    """ Compute Word Onset ERPs across conditions """
     
     
 
 
 
 
-
-
-
-
-
-
-
-
-""" Find events """
-
-# print annotations we can construct events from:
-print(set(eyelink_raw.annotations.description))
-# --> I want "trial_offset" because the screen gradually changes 
-# from grey to white there, so maybe I can see a pupillary light reflex.
-
-
-(events_from_annot, event_dict) = mne.events_from_annotations(eyelink_raw, 
-                                                              event_id = trigger_map)
-#print(event_dict)
-#print(events_from_annot[30:80]) 
-
-eyelink_raw.plot(start=5, duration=5, order = pupil_channel_idx)
 
 
 
