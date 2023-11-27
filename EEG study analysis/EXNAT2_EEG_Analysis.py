@@ -430,12 +430,12 @@ for curr_file in file_list:
     # plot potential bridges in red on topoplot:
     bridged_idx, ed_matrix = ed_data
         
-    #mne.viz.plot_bridged_electrodes(raw_bridges.info,
-    #                                bridged_idx,
-    #                                ed_matrix,
-    #                                title = "Bridged Electrodes of Participant " + curr_id,
-    #                                topomap_args = dict(vlim = (None, 5)),
-    #                                )
+    mne.viz.plot_bridged_electrodes(raw_bridges.info,
+                                    bridged_idx,
+                                    ed_matrix,
+                                    title = "Bridged Electrodes of Participant " + curr_id,
+                                    topomap_args = dict(vlim = (None, 5)),
+                                    )
     
     
     """ Interpolate Bridged Electrodes or Exclude Data of Current Participant """
