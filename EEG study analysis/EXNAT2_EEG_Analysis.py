@@ -124,9 +124,9 @@ for curr_file in file_list:
     # re-reference using a common average reference. This might take a while:
     raw.set_eeg_reference(ref_channels = 'average')
         
-
-    # copy the raw data before the next step:
-    #raw_backup = raw.copy()
+    
+    # save backup of raw object in the data folder: 
+    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
     
     
     """ Set Montage (aka Sensor Locations) """
@@ -434,17 +434,20 @@ for curr_file in file_list:
     # How many components should I use here?!
     ica = mne.preprocessing.ICA(n_components = 20, # 
                                 random_state = 42, # set seed
-                                method = "fastica", # use Fast ICA
-                                n_jobs = 2) # speed up computation a bit
+                                max_iter = 800, 
+                                method="picard") # less memory-intensive method
+                                #method = "fastica") # use Fast ICA
+                                
         
     # Fit ICA to the raw data
     ica.fit(raw)
     # make computer remind you to check the ICA output:
     os.system('say "hey queen go check your screen"')
     
-    
-    # save backup again:
-
+    # save backups again:
+    raw.save((curr_data_path + "part_" + curr_id + "/backup_ica.fif"), overwrite = True)
+    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
+  
 
     # Exclude ICA components manually:
         
@@ -549,25 +552,22 @@ for curr_file in file_list:
 
     
     """ Filtering """
-    # --> 5 - 15 Hz for word onset ERPs?
     
-    # plot PSD before filtering:
+    # plot PSD before low-pass filtering:
     #raw.plot_psd(fmax = 50, average = True, spatial_colors = False)
     
     # Visualise filter parameters
     filter_params = mne.filter.create_filter(data = raw.get_data(),
                                              sfreq = raw.info["sfreq"],
-                                             l_freq = 2,
-                                             h_freq = 30,
+                                             h_freq = 15,
                                              phase = 'zero', 
                                              fir_window ='hamming',
                                              verbose = None)
     
     #mne.viz.plot_filter(filter_params, raw.info["sfreq"])
 
-    # Apply filter:
-    raw = raw.filter(l_freq = 2,
-                     h_freq = 30,
+    # Apply low-pass filter (we already applied a high-pass filter before):
+    raw = raw.filter(h_freq = 15,
                      phase = 'zero', 
                      fir_window ='hamming',
                      verbose = None)
