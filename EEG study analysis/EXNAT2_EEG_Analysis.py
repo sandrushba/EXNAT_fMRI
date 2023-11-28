@@ -244,7 +244,7 @@ for curr_file in file_list:
     
     # reduce the data a bit:
     #pick_channels = ["C1", "C3", "CP1", "CP3"] # use left central electrodes
-
+    #raw = raw.pick(pick_channels)
     #raw = raw_backup.pick(pick_channels)
     #raw.ch_names
     #raw.plot()
@@ -400,6 +400,7 @@ for curr_file in file_list:
         
     
         """ Add Eyetracking Channels to EEG raw object """
+    
     
     
     
