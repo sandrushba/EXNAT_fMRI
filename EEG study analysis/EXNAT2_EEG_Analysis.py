@@ -18,8 +18,8 @@ Version: November, 2023
 
 # This is how the EEG data were recorded in the lab:
 # sampling rate: 1000 Hz
-# nr of channels: 64
-# reference electrode: TP9
+# nr of channels: 64, one of which is the reference
+# reference electrode: TP9 --> channel not included in the raw data!
 # filter: DC-280 Hz
 
 # We used the BrainVision Recorder for recording the EEG.
@@ -80,7 +80,7 @@ file_list = os.listdir(curr_data_path)
 
 # Only get files that don't end with some file suffix like .py or .DS_Store, 
 # those are the folders for each participant.
-file_list = [item for item in file_list if ".py" not in item and ".DS_Store" not in item]
+file_list = [item for item in file_list if ".py" not in item and ".DS_Store" not in item and ".fif" not in item]
 
 
 # ----------------------------------------------------- # 
@@ -117,7 +117,13 @@ for curr_file in file_list:
     # We used it as a reference channel during recording, so it should be completely flat.
     # We can now add a completely flat channel to the channel list in case we want to re-reference later.
     # I was a bit confused about the missing channel, but it's all described here: https://mne.tools/stable/auto_tutorials/preprocessing/55_setting_eeg_reference.html
-    raw = mne.add_reference_channels(raw, ref_channels = ["TP9"], copy = False)
+    
+    # add TP9 reference channel (all zeros)
+    raw = mne.add_reference_channels(raw, ref_channels = ["TP9"])
+
+    # re-reference using a common average reference. This might take a while:
+    raw.set_eeg_reference(ref_channels = 'average')
+        
 
     # copy the raw data before the next step:
     #raw_backup = raw.copy()
@@ -234,32 +240,10 @@ for curr_file in file_list:
     #                                 r0 = 'auto', 
     #                                 head_radius = 'auto')
         
-    
-    # copy the raw data before the next step:
         
-    raw_backup = raw.copy()
-    
-    
-    """ Pick channels """
-    
-    # reduce the data a bit:
-    #pick_channels = ["C1", "C3", "CP1", "CP3"] # use left central electrodes
-    #raw = raw.pick(pick_channels)
-    #raw = raw_backup.pick(pick_channels)
-    #raw.ch_names
-    #raw.plot()
-    
-    """ Set triggers """
-    
-    # print annotations we can construct events from:
-    #print(set(raw.annotations.description))
-    
-    # There are 2 things that might be a bit weird here:
-    # 1. There is an additional trigger I did not set in the experiment called 'New Segment/'. 
-    #    I think it's created by the BrainVision Recorder everytime you start a recording, so you know where a new recording startet if you record multiple blocks.
-    #    We recorded everything in one go, so there should be only 1 of those triggers if I'm correct. 
-    # 2. There might be some annotations missing if we skipped the prediction tendency task, but this is fine.
-    # 3. Currently the labels of the triggers are not very informative, so I'll have to change the labels.
+    # save backup of raw object in the data folder: 
+    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
+
 
 
     """ Delete 'New Segment/' Trigger """
@@ -290,42 +274,10 @@ for curr_file in file_list:
     """ Change Trigger Labels """
     
     # Now change the labels of the remaining annotations. 
-    # The trigger map from the experiment looks like this:    
-    # trigger_map = {'block_onset': 2,
-    #                'response_target': 4,
-    #                'response_continue': 6,
-    #                'trial_onset': 8,
-    #                'click_training_onset': 10,
-    #                'Reading_Baseline_training_onset': 12,
-    #                'Reading_Baseline_main_onset': 14,
-    #                '1back_single_training1_onset': 16,
-    #                '1back_single_training2_onset': 18,
-    #                '1back_single_main_onset': 20,
-    #                '1back_dual_main_onset': 22,
-    #                '2back_single_training1_onset': 24,
-    #                '2back_single_training2_onset': 26,
-    #                '2back_single_main_onset': 28,
-    #                '2back_dual_main_onset': 30,
-    #                'prediction_tendency_task_onset': 32,
-    #                'visual_task_main_onset': 34,
-    #                'visual_task_training_onset': 36,
-    #                'block_offset': 38,
-    #                'freq_440_onset': 40,
-    #                'freq_440_offset': 42,
-    #                'freq_587_onset': 44,
-    #                'freq_587_offset': 46,
-    #                'freq_782_onset': 48,
-    #                'freq_782_offset': 50,
-    #                'freq_1043_onset': 52,
-    #                'freq_1043_offset': 54,
-    #                'ordered': 56,
-    #                'random': 58,
-    #                'start_experiment': 60,
-    #                'end_experiment': 62,
-    #                'trial_offset': 64}
     
     # Unfortunately, we can only use trigger labels up to a certain length, 
-    # so we have to shorten them a bit:
+    # so we have to shorten the labels from the original trigger map from the experiment
+    # a bit:
     trigger_map = {'block_on': 2,
                    'resp_target': 4,
                    'resp_continue': 6,
@@ -401,25 +353,13 @@ for curr_file in file_list:
     
         """ Add Eyetracking Channels to EEG raw object """
     
+
     
-    
-    
-    
-    
-    
-    
-    
-    
-    """ Choose Reference """
-    # Apply reference --> use common average because the MNE python documentation says that's better for source localisation (?)
-    raw.set_eeg_reference(ref_channels = 'average')
-    
-    
+
     """ Look at Raw Data """
     # Filter & downsample the data for plotting (this is not applied to the actual data)
     #raw_resampled = raw.copy().resample(sfreq = 250)
     #raw_resampled.plot(n_channels = 63, duration = 1, scalings = 'auto', highpass = 2, lowpass = 12, filtorder = 4)
-    
     
     
     """ Check If We Have EEG Electrodes That Formed Bridges Due to Too Much Gel """
@@ -435,21 +375,28 @@ for curr_file in file_list:
     # It's sufficient to use about 3 min of data to detect bridging, but we need a segment from the end of the 
     # recording where the gel is already set.
     
-    raw_bridges = raw.copy()
-    #montage = mne.channels.make_standard_montage("standard_1020") # use 10_20 system as montage
-    #raw_bridges.set_montage(montage, verbose=False)
     
-    ed_data = mne.preprocessing.compute_bridged_electrodes(raw)
+    # get the duration of the recording in seconds
+    total_duration = raw.times[-1]
+
+    # compute the start time stamp for the last 3 min
+    start_time_last_3_min = total_duration - 180  # 180 s = 3 min
+
+    # get the last 3 minutes of the recording
+    raw_bridges = raw.copy().crop(tmin = start_time_last_3_min, tmax = total_duration)
+    
+    # check which electrodes correlate highly:
+    ed_data = mne.preprocessing.compute_bridged_electrodes(raw_bridges)
 
     # plot potential bridges in red on topoplot:
     bridged_idx, ed_matrix = ed_data
-        
-    mne.viz.plot_bridged_electrodes(raw_bridges.info,
-                                    bridged_idx,
-                                    ed_matrix,
-                                    title = "Bridged Electrodes of Participant " + curr_id,
-                                    topomap_args = dict(vlim = (None, 5)),
-                                    )
+    
+    #mne.viz.plot_bridged_electrodes(raw_bridges.info,
+    #                                bridged_idx,
+    #                                ed_matrix,
+    #                                title = "Bridged Electrodes of Participant " + curr_id,
+    #                                topomap_args = dict(vlim = (None, 5)),
+    #                                )
     
     
     """ Interpolate Bridged Electrodes or Exclude Data of Current Participant """
@@ -478,21 +425,25 @@ for curr_file in file_list:
     """ ICA """
     
     # apply high-pass filter to get rid of slow drifts
-    raw = raw.filter(l_freq = 1.0, h_freq = None)
+    raw = raw.filter(l_freq = 0.5, h_freq = None)
 
-    # --> get rid of ICs that represent motor artifacts like head & eye movements or blinks.
+    # --> get rid of ICs that represent motor artifacts like 
+    # head & eye movements or blinks.
 
     # Initialize ICA with a desired number of components
     # How many components should I use here?!
-    ica = mne.preprocessing.ICA(n_components = 20,
+    ica = mne.preprocessing.ICA(n_components = 20, # 
                                 random_state = 42, # set seed
-                                method = "fastica")
+                                method = "fastica", # use Fast ICA
+                                n_jobs = 2) # speed up computation a bit
         
-    
     # Fit ICA to the raw data
     ica.fit(raw)
     # make computer remind you to check the ICA output:
     os.system('say "hey queen go check your screen"')
+    
+    
+    # save backup again:
 
 
     # Exclude ICA components manually:
