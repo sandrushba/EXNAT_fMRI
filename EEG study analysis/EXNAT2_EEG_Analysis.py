@@ -621,14 +621,12 @@ for curr_file in file_list:
     
     """ 4.4 Select relevant channels """
 
-    raw_occipital_channels = raw.copy().pick_channels(['O1', 'O2', 'Oz', 
-                                                       'POz', 'PO3', 'PO4', 'PO7', 'PO8', 
-                                                       'C1','CP1', 'C3', 'CP3', 
-                                                       'Cz', 'Pz', 
-                                                       'C2', 'CP2', 'C4', 'CP4'])
+    raw_selected_channels = raw.copy().pick_channels(['O1', 'O2', 'Oz', #'P07', 
+                                                       'C1','CP1', 'C3', 'CP3', 'C5','CP5','C6','CP6','Cz','C2', 'CP2', 'C4', 'CP4',
+                                                       'CPz', 'Pz', 'POz', 'PO3','P2','P6','P5','P1'])
 
     # check if it worked:
-    #raw_occipital_channels.ch_names
+    #raw_selected_channels.ch_names
     #raw.ch_names
         
      
@@ -636,7 +634,7 @@ for curr_file in file_list:
     """ Epoching """
     
     # get trial onsets:    
-    curr_events, _ = mne.events_from_annotations(raw, event_id = {"trial_on": trigger_map["trial_on"],
+    curr_events, _ = mne.events_from_annotations(raw_selected_channels, event_id = {"trial_on": trigger_map["trial_on"],
                                                                   "resp_continue": trigger_map["resp_continue"]})
 
     # convert to np array
@@ -644,7 +642,7 @@ for curr_file in file_list:
 
     
     # cut epochs around the response events:        
-    epochs = mne.Epochs(raw_occipital_channels, 
+    epochs = mne.Epochs(raw_selected_channels, 
                         events = curr_events,
                         event_id = trigger_map['resp_continue'], 
                         tmin = -0.2, 
@@ -658,16 +656,44 @@ for curr_file in file_list:
     # plot them:
     epochs.plot_image(
                       combine = None, 
-                      group_by = None,
-                      picks = ['O1', 'O2', 'Oz', 'POz', 'PO3', #'P07', 
-                               'C1','CP1', 'C3', 'CP3', 
-                               'Cz', 'Pz', 
-                               'C2', 'CP2', 'C4', 'CP4'],
+                      picks = ['O1', 'O2', 'Oz', #'P07', 
+                               'C1','CP1', 'C3', 'CP3', 'C5','CP5','C6','CP6','Cz','C2', 'CP2', 'C4', 'CP4',
+                               'CPz', 'Pz', 'POz', 'PO3','P2','P6','P5','P1'],
+                      group_by=dict(central_ROI = [3,4,5,6,7,8,9,10,11,12,13,14,15],
+                                    parietal_ROI = [16,17,18,19,20,21,22,23],
+                                    occipital_ROI = [0, 1, 2]),
                       title = "Reponse ERPs across conditions, occipital & central electrodes, data only filtered to 0.2-15 Hz, noisy epochs automatically rejected")
     
     
     
-    raw_occipital_channels.compute_psd(fmax=50).plot()
+    
+    # cut epochs around the word-onset events:        
+    epochs = mne.Epochs(raw_selected_channels, 
+                        events = curr_events,
+                        event_id = trigger_map['trial_on'], 
+                        tmin = -0.2, 
+                        tmax = 0.7,
+                        reject = dict(eeg = 40e-6#,      # unit: V (EEG channels)
+                                      #eog = 250e-6      # unit: V (EOG channels)
+                                      ),
+                        detrend = 1, # 1 = linear detrend --> performed before BL correction
+                        baseline = (-0.1, 0), 
+                        preload = True)
+    # plot them:
+    epochs.plot_image(
+                      combine = "mean", 
+                      picks = ['O1', 'O2', 'Oz', #'P07', 
+                               'C1','CP1','C3', 'CP3', 'C5','CP5','C6','CP6','Cz','C2', 'CP2', 'C4', 'CP4',
+                               'CPz', 'Pz','POz', 'PO3','P2','P6','P5','P1'],
+                      group_by=dict(central_ROI = [3,4,5,6,7,8,9,10,11,12,13,14,15],
+                                    parietal_ROI = [16,17,18,19,20,21,22,23],
+                                    occipital_ROI = [0, 1, 2]),
+                      title = "Word-Onset ERPs across conditions, occipital & central electrodes, data only filtered to 0.2-15 Hz, noisy epochs automatically rejected")
+    
+    
+    
+    
+    raw_selected_channels.compute_psd(fmax=50).plot()
     
     
     
