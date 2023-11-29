@@ -332,7 +332,12 @@ for curr_file in file_list:
     # print annotations again to check if it worked:
     #print(set(raw.annotations.description))
 
-    """ Get Eyetracking Data: Read in ascii Dataset as MNE Raw Object"""
+
+    # save backup of raw object in the data folder: 
+    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
+
+
+    """ Get Eyetracking Data: Read in ascii Dataset as MNE Raw Object """
     
     # we might not have eyetracking data for each participant:
     try:
@@ -349,9 +354,7 @@ for curr_file in file_list:
         pupil_channel_idx = mne.pick_channels(eyelink_raw.ch_names, ["pupil_right"])
         #eyelink_raw.plot(scalings = dict(eyegaze = 1e3), order = pupil_channel_idx)
         
-        
-    
-        """ Add Eyetracking Channels to EEG raw object """
+
     
 
     
@@ -391,12 +394,12 @@ for curr_file in file_list:
     # plot potential bridges in red on topoplot:
     bridged_idx, ed_matrix = ed_data
     
-    #mne.viz.plot_bridged_electrodes(raw_bridges.info,
-    #                                bridged_idx,
-    #                                ed_matrix,
-    #                                title = "Bridged Electrodes of Participant " + curr_id,
-    #                                topomap_args = dict(vlim = (None, 5)),
-    #                                )
+    mne.viz.plot_bridged_electrodes(raw_bridges.info,
+                                    bridged_idx,
+                                    ed_matrix,
+                                    title = "Bridged Electrodes of Participant " + curr_id,
+                                    topomap_args = dict(vlim = (None, 5)),
+                                    )
     
     
     """ Interpolate Bridged Electrodes or Exclude Data of Current Participant """
@@ -419,14 +422,43 @@ for curr_file in file_list:
     elif len(bridged_idx) == 0:
         print("no electrode bridging detected here :-)" )        
     
-        
+    
+    # save backup of raw object in the data folder: 
+    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
+
+    
+
+
+
+    """ High-Pass Filter to get rid of slow drifts"""
+    
+    raw = raw.filter(l_freq = 0.2, 
+                     h_freq = None)
     
     
+    # --> this needs to happen before the ICA!
+    #raw = raw.filter(l_freq = 1, 
+    #                 h_freq = None)
+    
+    # save backup of raw object in the data folder: 
+    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
+
+
+
+
+
+
+
+
+
+
+
+
     """ ICA """
     
-    # apply high-pass filter to get rid of slow drifts
-    raw = raw.filter(l_freq = 0.5, h_freq = None)
-
+    # in case the script crashed here again during testing: read in .fif with the raw object:
+    #raw = mne.io.read_raw_fif(curr_data_path + "part_" + curr_id + "/backup_raw.fif", preload=True)
+    
     # --> get rid of ICs that represent motor artifacts like 
     # head & eye movements or blinks.
 
@@ -434,20 +466,22 @@ for curr_file in file_list:
     # How many components should I use here?!
     ica = mne.preprocessing.ICA(n_components = 20, # 
                                 random_state = 42, # set seed
-                                max_iter = 800, 
-                                method="picard") # less memory-intensive method
-                                #method = "fastica") # use Fast ICA
+                                #method="picard") # less memory-intensive method
+                                method = "fastica") # use Fast ICA
                                 
         
     # Fit ICA to the raw data
     ica.fit(raw)
-    # make computer remind you to check the ICA output:
+    
+    # this takes a while, so make computer remind me to check the ICA output:
     os.system('say "hey queen go check your screen"')
     
     # save backups again:
     raw.save((curr_data_path + "part_" + curr_id + "/backup_ica.fif"), overwrite = True)
     raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
   
+    
+
 
     # Exclude ICA components manually:
         
@@ -550,6 +584,15 @@ for curr_file in file_list:
     # remove components from the EEG data
     ica.apply(raw)
 
+
+
+
+
+
+
+
+
+
     
     """ Filtering """
     
@@ -557,66 +600,74 @@ for curr_file in file_list:
     #raw.plot_psd(fmax = 50, average = True, spatial_colors = False)
     
     # Visualise filter parameters
-    filter_params = mne.filter.create_filter(data = raw.get_data(),
-                                             sfreq = raw.info["sfreq"],
-                                             h_freq = 15,
-                                             phase = 'zero', 
-                                             fir_window ='hamming',
-                                             verbose = None)
-    
+    #filter_params = mne.filter.create_filter(data = raw.get_data(),
+    #                                         sfreq = raw.info["sfreq"],
+    #                                         h_freq = 15,
+    #                                         l_freq = None, 
+    #                                         phase = 'zero', 
+    #                                         fir_window ='hamming',
+    #                                         verbose = None)
     #mne.viz.plot_filter(filter_params, raw.info["sfreq"])
 
     # Apply low-pass filter (we already applied a high-pass filter before):
     raw = raw.filter(h_freq = 15,
-                     phase = 'zero', 
-                     fir_window ='hamming',
+                     l_freq = None,
                      verbose = None)
 
 
     # plot PSD after filtering
     #raw.plot_psd(fmax = 50, average = True, spatial_colors = False)
 
-
-
-
-
-
-
-
-
-        
-        
     
     """ 4.4 Select relevant channels """
-    #eeg_channel_picks = 
-    #raw.pick_channels(eeg_channel_picks)    
+
+    raw_occipital_channels = raw.copy().pick_channels(['O1', 'O2', 'Oz', 
+                                                       'POz', 'PO3', 'PO4', 'PO7', 'PO8', 
+                                                       'C1','CP1', 'C3', 'CP3', 
+                                                       'Cz', 'Pz', 
+                                                       'C2', 'CP2', 'C4', 'CP4'])
+
+    # check if it worked:
+    #raw_occipital_channels.ch_names
+    #raw.ch_names
         
      
         
     """ Epoching """
     
     # get trial onsets:    
-    curr_events, _ = mne.events_from_annotations(raw, event_id = {"trial_on": trigger_map["trial_on"]})
+    curr_events, _ = mne.events_from_annotations(raw, event_id = {"trial_on": trigger_map["trial_on"],
+                                                                  "resp_continue": trigger_map["resp_continue"]})
 
     # convert to np array
     events_array = np.array(curr_events)
 
     
-    # cut epochs around those events:        
-    epochs = mne.Epochs(raw, 
+    # cut epochs around the response events:        
+    epochs = mne.Epochs(raw_occipital_channels, 
                         events = curr_events,
-                        event_id = trigger_map['trial_on'], 
+                        event_id = trigger_map['resp_continue'], 
                         tmin = -0.2, 
-                        tmax = 0.7, 
+                        tmax = 0.7,
+                        reject = dict(eeg = 40e-6#,      # unit: V (EEG channels)
+                                      #eog = 250e-6      # unit: V (EOG channels)
+                                      ),
                         detrend = 1, # 1 = linear detrend --> performed before BL correction
                         baseline = (-0.1, 0), 
                         preload = True)
+    # plot them:
+    epochs.plot_image(
+                      combine = None, 
+                      group_by = None,
+                      picks = ['O1', 'O2', 'Oz', 'POz', 'PO3', #'P07', 
+                               'C1','CP1', 'C3', 'CP3', 
+                               'Cz', 'Pz', 
+                               'C2', 'CP2', 'C4', 'CP4'],
+                      title = "Reponse ERPs across conditions, occipital & central electrodes, data only filtered to 0.2-15 Hz, noisy epochs automatically rejected")
     
-    epochs.plot_image(combine="mean", title = "Word-Onset ERP across conditions, left central electrodes, data only filtered to 2-30 Hz, no epochs or ICs rejected yet")
     
     
-    
-    
+    raw_occipital_channels.compute_psd(fmax=50).plot()
     
     
     
