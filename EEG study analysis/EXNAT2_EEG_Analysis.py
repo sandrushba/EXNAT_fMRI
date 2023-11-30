@@ -63,6 +63,7 @@ Version: November, 2023
 # ----------------------------------------------------- # 
 
 """ Import Packages """
+ 
 
 # for setting paths:
 import os
@@ -94,6 +95,7 @@ import re # for regular expressions
 # for plotting
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap #  for plotting bridging between electrodes
+
 
 
 # ----------------------------------------------------- # 
@@ -678,15 +680,10 @@ for curr_file in file_list:
 
 
     """ High-Pass Filter to get rid of slow drifts"""
-    
-    raw = raw.filter(l_freq = 0.2, 
+    # Important: This step has to happen before the ICA. 
+    raw = raw.filter(l_freq = 0.1, 
                      h_freq = None)
-    
-    
-    # --> this needs to happen before the ICA!
-    #raw = raw.filter(l_freq = 1, 
-    #                 h_freq = None)
-    
+        
     # save backup of raw object in the data folder: 
     raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
 
@@ -708,78 +705,71 @@ for curr_file in file_list:
     
     # --> get rid of ICs that represent motor artifacts like 
     # head & eye movements or blinks.
+    
+    # my data is huge, so I'll create a copy of my dataset, then I'll downsample it, filter it so 
+    # we exclude high-frequency noise and slow drifts, and then I'll only use about 10 minutes or so of 
+    # those preprocessed data to initialize the ICA. Afterwards, I'll fit this to my raw whole dataset. 
+    # Hopefully this is less memory-intensive than using the whole dataset for everything.
+    
+    # filter & downsample data
+    raw_ica = raw.copy().filter(h_freq = 70, l_freq = None).resample(sfreq = 200)
+
+    # extract 10 min segment from the end:
+        
+    # get duration of the original data in seconds
+    total_duration_seconds = raw_ica.times[-1]
+
+    # calculate at which time point our 10 min segment starts
+    start_time_point = total_duration_seconds - (10 * 60) # 10 min * 60 s = duration of segment in seconds
+
+    # extract the last 10 minutes of the dataset
+    raw_ica = raw_ica.copy().crop(tmin = start_time_point, tmax = total_duration_seconds)
+
 
     # Initialize ICA with a desired number of components
     # How many components should I use here?!
+
     ica = mne.preprocessing.ICA(n_components = 20, # 
                                 random_state = 42, # set seed
                                 #method="picard") # less memory-intensive method
                                 method = "fastica") # use Fast ICA
                                 
         
-    # Fit ICA to the raw data
-    ica.fit(raw)
+    # Fit ICA to the segment we prepared before to extract 20 ICs:
+    ica.fit(raw_ica)
     
-    # this takes a while, so make computer remind me to check the ICA output:
-    os.system('say "hey queen go check your screen"')
-    
-    # save backups again:
-    raw.save((curr_data_path + "part_" + curr_id + "/backup_ica.fif"), overwrite = True)
-    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
-  
-    
-
 
     # Exclude ICA components manually:
-        
-    # 1. inspect topoplots: Where do we have weird frontal activity?
-    # 2. inspect signal of all components and check where blinks or eye movements are visible.
-    # 3. inspect power spectrum: Where do we have a weird skewed spectrum, 50 Hz peaks or no (!) alpha? --> probably artifacts
 
-    excl_components = [] # collect indices of all components that should be excluded here
-    
-    # 1. Plot the ICA components as topoplots
-    ica.plot_components()
-    # ask user to set the components that should be excluded:
-    user_input_excl_components = input("Which components should be excluded? Please provide the corresponding indices separated by commas: ")
-    print("You told me to exclude the following components:" + user_input_excl_components)
-    # append chosen components to list of components we want to exclude:
-    excl_components = excl_components + list(map(int, user_input_excl_components.split(', ')))
-    
-    
-    # 2. Plot the time series of the components
-    ica.plot_sources(raw, show_scrollbars = True)
-    # ask user to set the components that should be excluded:
-    user_input_excl_components = input("Which components should be excluded? Please provide the corresponding indices separated by commas: ")
-    print("You told me to exclude the following components:" + user_input_excl_components)
-    # append chosen components to list of components we want to exclude:
-    excl_components = excl_components + list(map(int, user_input_excl_components.split(', ')))
-    
-    
-    # 3. Plot power spectrum of components
-    user_input_excl_components = []
-    # Get the power spectrum of the first five ICA components
-    ica_sources = ica.get_sources(raw)  # extract ICA sources from raw data
+    ''' IMPORTANT! 
+    # please make sure to activate inline plotting in the preferences 
+    # or the following part will get confusing!
+    '''
+        
+    # loop ICs, plot PSD for each of them and ask whether to exclude them or not
+    # 1. inspect topoplots: Where do we have weird frontal activity?
+    # 2. inspect time series signal and check where blinks or eye movements are visible.
+    # 3. inspect power spectrum: Where do we have a weird skewed spectrum, 50 Hz peaks or no (!) alpha? 
+
+    # get number of ICs:
+    ica_sources = ica.get_sources(raw_ica)  # extract ICA sources from raw data
     ica_sources_data = ica_sources.get_data()  # get NumPy array of ICA sources
-    freqs, psds = mne.time_frequency.psd_array_welch(ica_sources_data, raw.info['sfreq'], fmin=1, fmax=80, n_fft=2048, window='hamming')
-    # Plot the power spectrum of all ICA components
-    for i in range(np.shape(ica_sources_data)[0]):
-        fig, ax = plt.subplots()
-        ax.plot(psds, freqs[i])  # transpose psds[i] to match the shape of freqs
-        ax.set_xlabel('Frequency (Hz)')
-        ax.set_ylabel('Power')
-        ax.set_title('ICA component {}'.format(i))
-        # Show plot
-        plt.show() 
-         # ask user to set the components that should be excluded:
+    n_components = ica_sources_data.shape[0]
+
+    # placeholder for components that should be excluded:
+    excl_components = []
+    
+    # loop components and plot them:
+    for component_idx in range(n_components):
+        
+        ica.plot_properties(raw_ica, picks = [component_idx], show = True)
+
+        # ask user if current component should be excluded:
         user_input_excl_curr_component = input("Exclude this component? (y/n)")
         if user_input_excl_curr_component == "y":
-            user_input_excl_components = user_input_excl_components + [i]
+            excl_components = excl_components + [component_idx]
     
-    print("You told me to exclude the following components: " + ', '.join(map(str, user_input_excl_components)))
-    # append chosen components to list of components we want to exclude:
-    excl_components = excl_components + user_input_excl_components
-
+    print("You told me to exclude the following components: " + ', '.join(map(str, excl_components)))
 
 
 
@@ -792,7 +782,7 @@ for curr_file in file_list:
     eog_channels = ["Fp1", "Fp2"] # we don't really have face electrodes, but I guess Fp1 & Fp2 works too
         
     #
-    eog_indices, eog_scores = ica.find_bads_eog(raw, 
+    eog_indices, eog_scores = ica.find_bads_eog(raw_ica, 
                                                 ch_name = eog_channels, 
                                                 reject_by_annotation = False,
                                                 measure = "correlation",
@@ -806,18 +796,7 @@ for curr_file in file_list:
     # if we found some matches, visualise eog indices and exclude matching ICA components
     if len(eog_indices) > 0:
             
-        # visualise EOG indices (aka correlations of each ICA component with EOG activity)     
-        plt.figure(figsize = (12, 6))
-        plt.subplot(2, 1, 1)
-        plt.plot(eog_indices, marker = 'o', linestyle = '-', color = 'red')
-        plt.title('EOG Indices')
-        plt.xlabel('Index of ICA Component')
-        plt.ylabel('Correlation with EOG activity')
-        plt.grid(True)
-        
-        print("automatically identified " + len(eog_indices) + " components for exclusion.")
-    
-        # exclude all ICs that match the EOG artifacts from back transformation:
+        # exclude all ICs that match the EOG artifacts:
         excl_components = excl_components + eog_indices
 
 
@@ -826,23 +805,35 @@ for curr_file in file_list:
     # Exclude Components:
     # remove all duplicated component indices from list of components that should be excluded:
     print("excluding the following components from data: " + ', '.join(map(str, excl_components)))
+    
+    # only get unique component indices:
     excl_components = list(set(excl_components))
+    
+    # This is how it looks if we exclude the components that were saved in excl_components
+    ica.plot_overlay(raw_ica, exclude=[0, 1, 2, 3], picks="eeg")
+    
     ica.exclude = excl_components  # Remove components 1, 3, and 5
-    # remove components from the EEG data
+    # remove components from the EEG data, but this time apply it to 
+    # the whole dataset and not just the segment we used for fitting the ICA
     ica.apply(raw)
 
-
-
-
-
-
-
-
-
+    # save backups again:
+    raw.save((curr_data_path + "part_" + curr_id + "/backup_ica.fif"), overwrite = True)
+    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
+  
+    # save information on which components we excluded 
+  
+    
+    # free up some memory by deleting objects from the variable environment:
+    del raw_ica, eog_scores, eog_indices, component_idx, eog_channels, 
+    ica_sources, ica_sources_data, n_components, 
+    start_time_point, total_duration_seconds, 
+    excl_components, user_input_excl_curr_component
 
     
-    """ Filtering """
-    
+
+
+    """ Filtering """    
     # plot PSD before low-pass filtering:
     #raw.plot_psd(fmax = 50, average = True, spatial_colors = False)
     
@@ -863,7 +854,7 @@ for curr_file in file_list:
 
 
     # plot PSD after filtering
-    #raw.plot_psd(fmax = 50, average = True, spatial_colors = False)
+    #raw.plot_psd(fmax = 40, average = True, spatial_colors = False)
 
     
     """ 4.4 Select relevant channels """
