@@ -139,14 +139,38 @@ for curr_file in file_list:
     
     # read in the 3 EEG-related datasets
     curr_vhdr_file = curr_data_path + "part_" + curr_id + "/part" + curr_id + ".vhdr"
+    
+    
+    #curr_vhdr_file = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/part_0002/Clicktrains0003.vhdr"
         
+    
     # read in .eeg file with EEG data EEG data using MNE
     raw = mne.io.read_raw_brainvision(curr_vhdr_file, preload = True)
     
     # Print information about the Raw object: Now you can check if all looks 
-    # as intended or if channels are missing for example.
+    # as intended or if channels or triggers are missing for example.
     #print(raw.info)
     #print(raw.ch_names)
+    #print(raw.annotations.description)
+    
+    """ Sanity check: Do we have a discernable alpha-peak? """
+    # I don't know if this makes sense because I have no resting state recording, 
+    # but maybe we can see an alpha peak anyway.
+    raw_occipital = raw.copy().pick(['O1', 'Oz', 'O2', 'PO7', 'PO3', 'POz', 'PO4', 'PO8'])
+    raw_occipital.filter(l_freq = 1, h_freq = 80)
+    raw_occipital.compute_psd(fmin = 0, fmax = 80).plot()
+    
+    # No alpha-peak and what should be a 1/f distribution looks odd. 
+    # It looks a bit like the power is too low between 5 and 15 Hz or so.
+    # If I compare it to Malte's data, it looks really shitty, so I guess 
+    # there's something wrong with the recording.
+    
+    
+    
+    
+
+
+    """ Choose reference """
     
     # We can't see the channel TP9, but that's fine.
     # We used it as a reference channel during recording, so it should be completely flat.
