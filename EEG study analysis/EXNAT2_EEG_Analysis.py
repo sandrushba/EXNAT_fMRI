@@ -101,8 +101,8 @@ from matplotlib.colors import LinearSegmentedColormap #  for plotting bridging b
 # ----------------------------------------------------- # 
 
 # set path to data file here:
-#curr_data_path = "/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
-curr_data_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
+curr_data_path = "/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
+#curr_data_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
 
 # get list of files in data directory: 
 file_list = os.listdir(curr_data_path)
@@ -136,11 +136,11 @@ for curr_file in file_list:
     
     
     """ create MNE raw object with raw EEG data + triggers + metadata """
-    
     # read in the 3 EEG-related datasets
     curr_vhdr_file = curr_data_path + "part_" + curr_id + "/part" + curr_id + ".vhdr"
     
-    
+    # to check the analysis with Malte's data:
+    #curr_vhdr_file = "/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/part_0003/Clicktrains0003.vhdr"
     #curr_vhdr_file = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/part_0002/Clicktrains0003.vhdr"
         
     
@@ -153,6 +153,24 @@ for curr_file in file_list:
     #print(raw.ch_names)
     #print(raw.annotations.description)
     
+    
+    """ Choose reference """
+    # We can't see the channel TP9, but that's fine.
+    # We used it as a reference channel during recording, so it should be completely flat.
+    # We can now add a completely flat channel to the channel list in case we want to re-reference later.
+    # I was a bit confused about the missing channel, but it's all described here: https://mne.tools/stable/auto_tutorials/preprocessing/55_setting_eeg_reference.html
+    
+    # add TP9 reference channel (all zeros)
+    raw = mne.add_reference_channels(raw, ref_channels = ["TP9"])
+
+    # re-reference using a common average reference. This might take a while:
+    raw.set_eeg_reference(ref_channels = 'average')
+        
+    
+    # save backup of raw object in the data folder: 
+    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
+    
+
     """ Sanity check: Do we have a discernable alpha-peak? """
     # I don't know if this makes sense because I have no resting state recording, 
     # but maybe we can see an alpha peak anyway.
@@ -164,14 +182,9 @@ for curr_file in file_list:
     # It looks a bit like the power is too low between 5 and 15 Hz or so.
     # If I compare it to Malte's data, it looks really shitty, so I guess 
     # there's something wrong with the recording.
-    
-    
-    
-    
 
 
-    """ Choose reference """
-    
+    """ Choose reference """    
     # We can't see the channel TP9, but that's fine.
     # We used it as a reference channel during recording, so it should be completely flat.
     # We can now add a completely flat channel to the channel list in case we want to re-reference later.
