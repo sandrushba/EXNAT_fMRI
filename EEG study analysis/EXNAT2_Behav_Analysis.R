@@ -164,26 +164,41 @@ for (i in 1:length(file_list)) {
   
   # Idea: Create counters for BL, 1-back and 2-back main blocks, loop rows, 
   #       if a new block starts, update counter and add new block label.
+  # Keep in mind that we have more than 300 trials in each block because we also need labels for the question rows.
+  
+  
   
   # first, just copy the "old" block names
   subj_df$block_names_numbered <- subj_df$block_kind
   
-  BL_counter = 0
-  oneback_counter = 0
-  twoback_counter = 0
-  curr_block_counter = 0 # count trials of current block
+  BL_counter <- 0
+  oneback_counter <- 0
+  twoback_counter <- 0
+  curr_bl_trials <- 0 # count trials of current block
+  previous_block_kind <- NA
   
   for (curr_row_idx in 1:length(subj_df$block_names_numbered)){
+    
     #print(curr_bl_name)
     curr_block_name <- subj_df$block_names_numbered[curr_row_idx]
+    
     if (curr_block_name == "Reading_Baseline_main"){
       
       print("BL")
       print(curr_bl_name)
-      if curr_block_counter == 301
+      
+      # if it's the end of the block:
+      if curr_bl_trials == 300){
+        # add 1 to BL block counter
+        BL_counter <- BL_counter + 1
+      } else if (curr_bl_trials == 301){
+       # reset curr_block_counter to 1:
+        curr_bl_trials <- 0
+      }
+      
     } else if (curr_block_name == "1back_dual_main"){
       print("1back_dual_main")
-    } else if (curr_block_name == "1back_dual_main"){
+    } else if (curr_block_name == "2back_dual_main"){
       print("2back_dual_main")
   }
   
