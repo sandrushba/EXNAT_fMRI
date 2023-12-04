@@ -157,6 +157,39 @@ for (i in 1:length(file_list)) {
   
   ### ADD NUMBERED BLOCK NAMES ####
   
+  
+  
+  
+  # TO DO: We don't have 2, but 3 blocks for each condition. Fix this: 
+  
+  # Idea: Create counters for BL, 1-back and 2-back main blocks, loop rows, 
+  #       if a new block starts, update counter and add new block label.
+  
+  # first, just copy the "old" block names
+  subj_df$block_names_numbered <- subj_df$block_kind
+  
+  BL_counter = 0
+  oneback_counter = 0
+  twoback_counter = 0
+  curr_block_counter = 0 # count trials of current block
+  
+  for (curr_row_idx in 1:length(subj_df$block_names_numbered)){
+    #print(curr_bl_name)
+    curr_block_name <- subj_df$block_names_numbered[curr_row_idx]
+    if (curr_block_name == "Reading_Baseline_main"){
+      
+      print("BL")
+      print(curr_bl_name)
+      if curr_block_counter == 301
+    } else if (curr_block_name == "1back_dual_main"){
+      print("1back_dual_main")
+    } else if (curr_block_name == "1back_dual_main"){
+      print("2back_dual_main")
+  }
+  
+  
+  
+  
   # We have each main block twice, but I would like to exclude outliers by block and not by condition.
   # Reason: Reading times in second block might be slightly different than in first block, so don't mix them up.
   
@@ -173,30 +206,9 @@ for (i in 1:length(file_list)) {
     subj_df[which(subj_df$block_names_numbered == change_block_name), ]$block_names_numbered <- paste(change_block_name,"_2", sep = "")
   }
   
-  # Also add block number aka position of the block in the experiment.
-  # This way, I can control for tiredness effects.
-  
-  # loop block_names_numbered aka individual blocks
-  #block_nr <-  1
-  #subj_df$block_nr <- NA
-  #blocks <- c("Reading_Baseline_main_1", "Reading_Baseline_main_2", "1back_dual_main_1", "1back_dual_main_2", "2back_dual_main_1", "2back_dual_main_2")
-  #for (block in unique(subj_df$block_names_numbered)){
-  #  # if the current block name is one of the main blocks, add block number
-  #  if (block %in% blocks){
-  #    subj_df[which(subj_df$block_names_numbered == block), "block_nr"] <- block_nr
-  #    # go to next block
-  #    block_nr <-  block_nr + 1
-  #  }
-  #}
-  
-  
-  
   ###########################
   
   ### COMPUTE READING SPEED ####
-  
-  # append column with log-transformed reading times
-  #subj_df$duration_log <- log(subj_df$duration)
   
   # append reading speed column (words / 100 s as in Lea's thesis)
   # reading speed = 100 seconds * 100 ms/s * reading time
