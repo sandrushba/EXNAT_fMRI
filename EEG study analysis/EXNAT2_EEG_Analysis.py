@@ -101,8 +101,8 @@ from matplotlib.colors import LinearSegmentedColormap #  for plotting bridging b
 # ----------------------------------------------------- # 
 
 # set path to data file here:
-curr_data_path = "/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
-#curr_data_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
+#curr_data_path = "/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
+curr_data_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
 
 # get list of files in data directory: 
 file_list = os.listdir(curr_data_path)
@@ -139,7 +139,7 @@ for curr_file in file_list:
     # read in the 3 EEG-related datasets
     curr_vhdr_file = curr_data_path + "part_" + curr_id + "/part" + curr_id + ".vhdr"
     
-    # to check the analysis with Malte's data:
+    # to check the analysis with a Clicktrains dataset:
     #curr_vhdr_file = "/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/part_0003/Clicktrains0003.vhdr"
     #curr_vhdr_file = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/part_0002/Clicktrains0003.vhdr"
         
@@ -166,40 +166,21 @@ for curr_file in file_list:
     # re-reference using a common average reference. This might take a while:
     raw.set_eeg_reference(ref_channels = 'average')
         
-    
-    # save backup of raw object in the data folder: 
-    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
-    
 
     """ Sanity check: Do we have a discernable alpha-peak? """
     # I don't know if this makes sense because I have no resting state recording, 
     # but maybe we can see an alpha peak anyway.
-    raw_occipital = raw.copy().pick(['O1', 'Oz', 'O2', 'PO7', 'PO3', 'POz', 'PO4', 'PO8'])
-    raw_occipital.filter(l_freq = 1, h_freq = 80)
-    raw_occipital.compute_psd(fmin = 0, fmax = 80).plot()
+    #raw_occipital = raw.copy().pick(['O1', 'Oz', 'O2', 'PO7', 'PO3', 'POz', 'PO4', 'PO8'])
+    #raw_occipital.filter(l_freq = 1, h_freq = 80)
+    #raw_occipital.compute_psd(fmin = 0, fmax = 80).plot()
     
     # No alpha-peak and what should be a 1/f distribution looks odd. 
     # It looks a bit like the power is too low between 5 and 15 Hz or so.
     # If I compare it to Malte's data, it looks really shitty, so I guess 
     # there's something wrong with the recording.
-
-
-    """ Choose reference """    
-    # We can't see the channel TP9, but that's fine.
-    # We used it as a reference channel during recording, so it should be completely flat.
-    # We can now add a completely flat channel to the channel list in case we want to re-reference later.
-    # I was a bit confused about the missing channel, but it's all described here: https://mne.tools/stable/auto_tutorials/preprocessing/55_setting_eeg_reference.html
     
-    # add TP9 reference channel (all zeros)
-    raw = mne.add_reference_channels(raw, ref_channels = ["TP9"])
+    # also shouldnt there be a 15 Hz peak because of the 15 Hz flicker
 
-    # re-reference using a common average reference. This might take a while:
-    raw.set_eeg_reference(ref_channels = 'average')
-        
-    
-    # save backup of raw object in the data folder: 
-    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
-    
     
     """ Set Montage (aka Sensor Locations) """
     
@@ -317,26 +298,25 @@ for curr_file in file_list:
     raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
 
 
-
     """ Delete 'New Segment/' Trigger """
     
     # So first, check how often the weird additional trigger occurs and delete it from the annotations.
-    new_segment_count = sum(1 for trigger in raw.annotations.description if 'New Segment/' in trigger)
+    #new_segment_count = sum(1 for trigger in raw.annotations.description if 'New Segment/' in trigger)
     # just a sanity check to see if my code works properly: For trial onsets, we should have way more triggers:
     #new_segment_count = sum(1 for trigger in raw.annotations.description if 'Stimulus/S  8' in trigger)
     #print(new_segment_count)
     # As you can see, the trigger occurs only once, so I'm probably right and we can exclude it. 
-    annotations = [trigger for trigger in raw.annotations.description if 'New Segment/' not in trigger]
+    #annotations = [trigger for trigger in raw.annotations.description if 'New Segment/' not in trigger]
     #Check if it's gone:
     #print('New Segment/' in annotations)
     
     # build a new annotations object without the weird 'New Segment/' trigger
-    new_annotations = mne.Annotations(onset = raw.annotations.onset[raw.annotations.description != 'New Segment/'],
-                                      duration = raw.annotations.duration[raw.annotations.description != 'New Segment/'],
-                                      description = annotations)
+    #new_annotations = mne.Annotations(onset = raw.annotations.onset[raw.annotations.description != 'New Segment/'],
+    #                                  duration = raw.annotations.duration[raw.annotations.description != 'New Segment/'],
+    #                                  description = annotations)
 
     # assign new annotations object to the raw object
-    raw.set_annotations(new_annotations)
+    #raw.set_annotations(new_annotations)
     
     # check if the weird trigger is still there:
     #print(set(raw.annotations.description))
@@ -390,16 +370,18 @@ for curr_file in file_list:
     for old_annotation in set(raw.annotations.description):
         #print(old_annotation)
         
-        # use regex to extract the number of the trigger & convert it to int:
-        trigger_value = int(re.findall(r'\d+', old_annotation)[0])
-        #print(trigger_value)
-        
-        # find correct trigger label for the trigger value we extracted:
-        trigger_label = list(trigger_map.keys())[list(trigger_map.values()).index(trigger_value)] 
-        #print(trigger_label)
-        
-        # change label in the annotations:
-        raw.annotations.description[raw.annotations.description == old_annotation] = trigger_label
+        # if the current annotation is not the weird first "new segment" trigger:
+        if old_annotation != 'New Segment/':
+            # use regex to extract the number of the trigger & convert it to int:
+            trigger_value = int(re.findall(r'\d+', old_annotation)[0])
+            #print(trigger_value)
+            
+            # find correct trigger label for the trigger value we extracted:
+            trigger_label = list(trigger_map.keys())[list(trigger_map.values()).index(trigger_value)] 
+            #print(trigger_label)
+            
+            # change label in the annotations:
+            raw.annotations.description[raw.annotations.description == old_annotation] = trigger_label
 
     # print annotations again to check if it worked:
     #print(set(raw.annotations.description))
@@ -410,10 +392,10 @@ for curr_file in file_list:
 
 
     """ Get Eyetracking Data: Read in ascii Dataset as MNE Raw Object """
-    
+
     # check if there's an ascii file for the current participant - those are the eyetracking data
-    ascii_file = [file for file in curr_participant_file_list if file.endswith(".asc")]
     curr_participant_file_list = os.listdir(curr_data_path + "part_" + curr_id + "/")
+    ascii_file = [file for file in curr_participant_file_list if file.endswith(".asc")]
 
     # if there is one, read in eyetracking data:
     if len(ascii_file) == 1:
@@ -637,7 +619,7 @@ for curr_file in file_list:
     
     # if we don't have eyetracking data, we have to find EOG events using 
     # frontal electrodes instead of the pupil data
-    elif len(ascii_file) == 1:
+    elif len(ascii_file) == 0:
         pass
 
 
@@ -712,8 +694,6 @@ for curr_file in file_list:
     # save backup of raw object in the data folder: 
     raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
 
-    
-
 
 
     """ High-Pass Filter to get rid of slow drifts"""
@@ -722,23 +702,14 @@ for curr_file in file_list:
                      h_freq = None)
         
     # save backup of raw object in the data folder: 
-    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
-
-
-
-
-
-
-
-
-
+    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw_filtered.fif"), overwrite = True)
 
 
 
     """ ICA """
     
     # in case the script crashed here again during testing: read in .fif with the raw object:
-    #raw = mne.io.read_raw_fif(curr_data_path + "part_" + curr_id + "/backup_raw.fif", preload=True)
+    #raw = mne.io.read_raw_fif(curr_data_path + "part_" + curr_id + "/backup_raw_filtered.fif", preload=True)
     
     # --> get rid of ICs that represent motor artifacts like 
     # head & eye movements or blinks.
@@ -750,18 +721,6 @@ for curr_file in file_list:
     
     # filter & downsample data
     raw_ica = raw.copy().filter(h_freq = 70, l_freq = None).resample(sfreq = 200)
-
-    # extract 10 min segment from the end:
-        
-    # get duration of the original data in seconds
-    total_duration_seconds = raw_ica.times[-1]
-
-    # calculate at which time point our 10 min segment starts
-    start_time_point = total_duration_seconds - (10 * 60) # 10 min * 60 s = duration of segment in seconds
-
-    # extract the last 10 minutes of the dataset
-    raw_ica = raw_ica.copy().crop(tmin = start_time_point, tmax = total_duration_seconds)
-
 
     # Initialize ICA with a desired number of components
     # How many components should I use here?!
@@ -779,8 +738,11 @@ for curr_file in file_list:
     # Exclude ICA components manually:
 
     ''' IMPORTANT! 
-    # please make sure to activate inline plotting in the preferences 
-    # or the following part will get confusing!
+    Please make sure to activate inline plotting in the preferences 
+    or the following part will get confusing!
+    
+    If you're using Spyder, click 
+    preferences --> iPython Console --> Graphics --> Graphics backend --> Inline
     '''
         
     # loop ICs, plot PSD for each of them and ask whether to exclude them or not
@@ -798,17 +760,32 @@ for curr_file in file_list:
     
     # loop components and plot them:
     for component_idx in range(n_components):
-        
+       
         ica.plot_properties(raw_ica, picks = [component_idx], show = True)
 
         # ask user if current component should be excluded:
         user_input_excl_curr_component = input("Exclude this component? (y/n)")
+        
+        # if they said yes, exclude component:
         if user_input_excl_curr_component == "y":
             excl_components = excl_components + [component_idx]
-    
+            
+        # if they said no, show them time series and ask again:
+        elif user_input_excl_curr_component == "n":
+            # plot time series:
+            ica.plot_sources(raw_ica, picks = [component_idx], show_scrollbars=False, show = True)
+            # ask user if they want to exclude the component
+            user_input_excl_curr_component = input("Exclude this component? (y/n)")
+            # if they changed their mind and say yes now, 
+            # mark component for exclusion:
+            if user_input_excl_curr_component == "y":
+                excl_components = excl_components + [component_idx]
+
     print("You told me to exclude the following components: " + ', '.join(map(str, excl_components)))
 
-
+    # save info on which components we excluded:
+    curr_participant_info_dict = {'ID': curr_id, 'ica components excluded manually': excl_components}   
+    
 
     # Exclude ICA components automatically if they have a high correlation with EOG events:
 
@@ -828,35 +805,33 @@ for curr_file in file_list:
     # The eog indices tell how much each ICA component 
     # correlates with activity in the EOG channels.
     # If the correlation is > .8 for some component, we exclude it.
-        
-        
+           
     # if we found some matches, visualise eog indices and exclude matching ICA components
     if len(eog_indices) > 0:
             
-        # exclude all ICs that match the EOG artifacts:
+        # mark all ICs for exclusion that match the EOG artifacts:
+        curr_participant_info_dict['ica components excluded automatically'] = eog_indices
         excl_components = excl_components + eog_indices
 
 
-
-    
     # Exclude Components:
     # remove all duplicated component indices from list of components that should be excluded:
-    print("excluding the following components from data: " + ', '.join(map(str, excl_components)))
+    print("excluding the following components from data: " + ', '.join(map(str, set(excl_components))))
     
     # only get unique component indices:
     excl_components = list(set(excl_components))
     
     # This is how it looks if we exclude the components that were saved in excl_components
-    ica.plot_overlay(raw_ica, exclude=[0, 1, 2, 3], picks="eeg")
-    
-    ica.exclude = excl_components  # Remove components 1, 3, and 5
+    #ica.plot_overlay(raw_ica, exclude = excl_components, picks = "eeg")
+
+    ica.exclude = excl_components  # Remove components we marked for exclusion
     # remove components from the EEG data, but this time apply it to 
     # the whole dataset and not just the segment we used for fitting the ICA
     ica.apply(raw)
 
     # save backups again:
-    raw.save((curr_data_path + "part_" + curr_id + "/backup_ica.fif"), overwrite = True)
-    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
+    ica.save((curr_data_path + "part_" + curr_id + "/backup_ica.fif"), overwrite = True)
+    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw_ica.fif"), overwrite = True)
   
     # save information on which components we excluded 
   
@@ -864,15 +839,12 @@ for curr_file in file_list:
     # free up some memory by deleting objects from the variable environment:
     del raw_ica, eog_scores, eog_indices, component_idx, eog_channels, 
     ica_sources, ica_sources_data, n_components, 
-    start_time_point, total_duration_seconds, 
     excl_components, user_input_excl_curr_component
 
     
-
-
     """ Filtering """    
     # plot PSD before low-pass filtering:
-    #raw.plot_psd(fmax = 50, average = True, spatial_colors = False)
+    #raw.plot_psd(fmax = 80, average = True, spatial_colors = False)
     
     # Visualise filter parameters
     #filter_params = mne.filter.create_filter(data = raw.get_data(),
@@ -885,13 +857,16 @@ for curr_file in file_list:
     #mne.viz.plot_filter(filter_params, raw.info["sfreq"])
 
     # Apply low-pass filter (we already applied a high-pass filter before):
-    raw = raw.filter(h_freq = 15,
+    raw = raw.filter(h_freq = 30,
                      l_freq = None,
                      verbose = None)
 
 
     # plot PSD after filtering
     #raw.plot_psd(fmax = 40, average = True, spatial_colors = False)
+
+    # save data again
+    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw_ica_filtered.fif"), overwrite = True)
 
     
     """ 4.4 Select relevant channels """
@@ -917,7 +892,7 @@ for curr_file in file_list:
 
     
     # cut epochs around the response events:        
-    epochs = mne.Epochs(raw_selected_channels, 
+    response_epochs = mne.Epochs(raw_selected_channels, 
                         events = curr_events,
                         event_id = trigger_map['resp_continue'], 
                         tmin = -0.2, 
@@ -929,46 +904,56 @@ for curr_file in file_list:
                         baseline = (-0.1, 0), 
                         preload = True)
     # plot them:
-    epochs.plot_image(
-                      combine = None, 
-                      picks = ['O1', 'O2', 'Oz', #'P07', 
-                               'C1','CP1', 'C3', 'CP3', 'C5','CP5','C6','CP6','Cz','C2', 'CP2', 'C4', 'CP4',
-                               'CPz', 'Pz', 'POz', 'PO3','P2','P6','P5','P1'],
-                      group_by=dict(central_ROI = [3,4,5,6,7,8,9,10,11,12,13,14,15],
-                                    parietal_ROI = [16,17,18,19,20,21,22,23],
-                                    occipital_ROI = [0, 1, 2]),
-                      title = "Reponse ERPs across conditions, occipital & central electrodes, data only filtered to 0.2-15 Hz, noisy epochs automatically rejected")
+    response_epochs.plot_image(combine = "mean", 
+                               picks = ['O1', 'O2', 'Oz'],
+                               title = "Word-Onset ERPs across conditions, occipital electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
     
-    
+    response_epochs.plot_image(combine = "mean", 
+                               picks = ['C1','C3','C5','C6','Cz','C2', 'C4'],
+                               title = "Word-Onset ERPs across conditions, central electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
+        
+    response_epochs.plot_image(combine = "mean", 
+                               picks = ['P2','P6','P5','P1'],
+                               title = "Word-Onset ERPs across conditions, parietal electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
+        
     
     
     # cut epochs around the word-onset events:        
-    epochs = mne.Epochs(raw_selected_channels, 
-                        events = curr_events,
-                        event_id = trigger_map['trial_on'], 
-                        tmin = -0.2, 
-                        tmax = 0.7,
-                        reject = dict(eeg = 40e-6#,      # unit: V (EEG channels)
-                                      #eog = 250e-6      # unit: V (EOG channels)
-                                      ),
-                        detrend = 1, # 1 = linear detrend --> performed before BL correction
-                        baseline = (-0.1, 0), 
-                        preload = True)
+    word_onset_epochs = mne.Epochs(raw_selected_channels, 
+                                   events = curr_events,
+                                   event_id = trigger_map['trial_on'], 
+                                   tmin = -0.2, 
+                                   tmax = 0.7,
+                                   reject = dict(eeg = 40e-6#,      # unit: V (EEG channels)
+                                                 #eog = 250e-6      # unit: V (EOG channels)
+                                                 ),
+                                   detrend = 1, # 1 = linear detrend --> performed before BL correction
+                                   baseline = (-0.1, 0), 
+                                   preload = True)
     # plot them:
-    epochs.plot_image(
-                      combine = "mean", 
-                      picks = ['O1', 'O2', 'Oz', #'P07', 
-                               'C1','CP1','C3', 'CP3', 'C5','CP5','C6','CP6','Cz','C2', 'CP2', 'C4', 'CP4',
-                               'CPz', 'Pz','POz', 'PO3','P2','P6','P5','P1'],
-                      group_by=dict(central_ROI = [3,4,5,6,7,8,9,10,11,12,13,14,15],
-                                    parietal_ROI = [16,17,18,19,20,21,22,23],
-                                    occipital_ROI = [0, 1, 2]),
-                      title = "Word-Onset ERPs across conditions, occipital & central electrodes, data only filtered to 0.2-15 Hz, noisy epochs automatically rejected")
+    word_onset_epochs.plot_image(combine = "mean", 
+                                 picks = ['O1', 'O2', 'Oz'],
+                                 title = "Word-Onset ERPs across conditions, occipital electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
+    
+    word_onset_epochs.plot_image(combine = "mean", 
+                                 picks = ['C1','C3', 'C5','C6','Cz','C2','C4'],
+                                 title = "Word-Onset ERPs across conditions, central electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
+        
+    word_onset_epochs.plot_image(combine = "mean", 
+                                 picks = ['P2','P6','P5','P1'],
+                                 title = "Word-Onset ERPs across conditions, parietal electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
+        
+    
+    # plot global field power:
+    # The global field power is the standard deviation of the values of all channels at each time point. So basically you reduce your data a bit and instead of plotting 
+    # normal ERPs using multiple channels or averaging over them, you plot 1 graph with the standard deviation.
+    word_onset_epochs.plot_image(combine = "gfp")
     
     
     
     
-    raw_selected_channels.compute_psd(fmax=50).plot()
+    
+    
     
     
     
