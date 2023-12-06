@@ -985,8 +985,7 @@ for curr_file in file_list:
     evoked.plot(picks = ['O1', 'O2', 'Oz', 'POz', 'PO3'], gfp=True, spatial_colors = True)
     #evoked.plot_image(picks=['O1', 'O2', 'Oz'])
     # evoked.plot_joint(picks = ['O1', 'O2', 'Oz'])
-    
-    
+    # evoked.plot_psd(picks = ['O1', 'O2', 'Oz', 'POz', 'PO3'], fmax = 80)
     
 
     """ --> cut data into blocks """
