@@ -166,20 +166,38 @@ for curr_file in file_list:
     # re-reference using a common average reference. This might take a while:
     raw.set_eeg_reference(ref_channels = 'average')
         
+    
+    """ Sanity check 1: Does my signal have roughly the same mean amplitude as other datasets? """
+    # Explanation: My ERPs look super shallow, they are mostly somewhere between -1 and 1 Hz, so that's a bit odd.
+    # Idea: Check if my raw signal also looks shallow.
+    
+    
+    # get raw data from all channels
+    data, times = raw[:, :]
+    
+    # calculate mean and SD across all channels and time points
+    mean_data = np.mean(data, axis=0)
+    std_data = np.std(data, axis=0)
 
-    """ Sanity check: Do we have a discernable alpha-peak? """
-    # I don't know if this makes sense because I have no resting state recording, 
-    # but maybe we can see an alpha peak anyway.
-    #raw_occipital = raw.copy().pick(['O1', 'Oz', 'O2', 'PO7', 'PO3', 'POz', 'PO4', 'PO8'])
-    #raw_occipital.filter(l_freq = 1, h_freq = 80)
-    #raw_occipital.compute_psd(fmin = 0, fmax = 80).plot()
+    
+
+    """ Sanity check 2: Do we have a discernable alpha-peak? """
+    # I don't know if this makes sense because I have no resting state recording 
+    # and there's a lot of visual stimulation in my experiment, 
+    # so maybe there's even a lot of alpha suppression.
+    # But maybe I'm wrong and we can see an alpha peak anyway.
+    raw_occipital = raw.copy().pick(['O1', 'Oz', 'O2', 'PO7', 'PO3', 'POz', 'PO4', 'PO8'])
+    raw_occipital.filter(l_freq = 1, h_freq = 80)
+    raw_occipital.compute_psd(fmin = 0, fmax = 80).plot()
     
     # No alpha-peak and what should be a 1/f distribution looks odd. 
     # It looks a bit like the power is too low between 5 and 15 Hz or so.
     # If I compare it to Malte's data, it looks really shitty, so I guess 
-    # there's something wrong with the recording.
+    # there's either something wrong with the recording (maybe because of the ref?) 
+    # or it's just the alpha suppression.
     
-    # also shouldnt there be a 15 Hz peak because of the 15 Hz flicker
+    # Also shouldn't there be a 15 Hz peak because of the 15 Hz visual flicker?
+
 
     
     """ Set Montage (aka Sensor Locations) """
@@ -743,6 +761,10 @@ for curr_file in file_list:
     
     If you're using Spyder, click 
     preferences --> iPython Console --> Graphics --> Graphics backend --> Inline
+    
+    After this, in the "Options" menu in the plot pane (not in the Preferences!), 
+    you de-activate "mute inline plotting".
+    
     '''
         
     # loop ICs, plot PSD for each of them and ask whether to exclude them or not
@@ -757,7 +779,7 @@ for curr_file in file_list:
 
     # placeholder for components that should be excluded:
     excl_components = []
-    
+
     # loop components and plot them:
     for component_idx in range(n_components):
        
@@ -895,8 +917,8 @@ for curr_file in file_list:
     response_epochs = mne.Epochs(raw_selected_channels, 
                         events = curr_events,
                         event_id = trigger_map['resp_continue'], 
-                        tmin = -0.2, 
-                        tmax = 0.7,
+                        tmin = -1, 
+                        tmax = 1,
                         reject = dict(eeg = 40e-6#,      # unit: V (EEG channels)
                                       #eog = 250e-6      # unit: V (EOG channels)
                                       ),
@@ -904,18 +926,27 @@ for curr_file in file_list:
                         baseline = (-0.1, 0), 
                         preload = True)
     # plot them:
-    response_epochs.plot_image(combine = "mean", 
-                               picks = ['O1', 'O2', 'Oz'],
-                               title = "Word-Onset ERPs across conditions, occipital electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
+    #response_epochs.plot_image(combine = "mean", 
+    #                           picks = ['O1', 'O2', 'Oz'],
+    #                           title = "Word-Onset ERPs across conditions, occipital electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
     
-    response_epochs.plot_image(combine = "mean", 
-                               picks = ['C1','C3','C5','C6','Cz','C2', 'C4'],
-                               title = "Word-Onset ERPs across conditions, central electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
+    #response_epochs.plot_image(combine = "mean", 
+    #                           picks = ['C1','C3','C5','C6','Cz','C2', 'C4'],
+    #                           title = "Word-Onset ERPs across conditions, central electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
         
-    response_epochs.plot_image(combine = "mean", 
-                               picks = ['P2','P6','P5','P1'],
-                               title = "Word-Onset ERPs across conditions, parietal electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
+    #response_epochs.plot_image(combine = "mean", 
+    #                           picks = ['P2','P6','P5','P1'],
+    #                           title = "Word-Onset ERPs across conditions, parietal electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
         
+    # get average of epochs data -> evoked potentials
+    evoked = response_epochs.average()
+    # plot the evoked potentials, seperated by channel, and add global field power to the plot
+    evoked.plot(picks = ['C1','CP1', 
+                         'Cz','C2', 'CP2', 
+                         'CPz', 'Pz', 'P2','P1'], gfp=True, spatial_colors = False)
+    #evoked.plot_image(picks=['O1', 'O2', 'Oz'])
+    # evoked.plot_joint(picks = ['O1', 'O2', 'Oz'])
+    
     
     
     # cut epochs around the word-onset events:        
@@ -923,7 +954,7 @@ for curr_file in file_list:
                                    events = curr_events,
                                    event_id = trigger_map['trial_on'], 
                                    tmin = -0.2, 
-                                   tmax = 0.7,
+                                   tmax = 1,
                                    reject = dict(eeg = 40e-6#,      # unit: V (EEG channels)
                                                  #eog = 250e-6      # unit: V (EOG channels)
                                                  ),
@@ -931,32 +962,33 @@ for curr_file in file_list:
                                    baseline = (-0.1, 0), 
                                    preload = True)
     # plot them:
-    word_onset_epochs.plot_image(combine = "mean", 
-                                 picks = ['O1', 'O2', 'Oz'],
-                                 title = "Word-Onset ERPs across conditions, occipital electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
+    #word_onset_epochs.plot_image(combine = "mean", 
+    #                             picks = ['O1', 'O2', 'Oz'],
+    #                             title = "Word-Onset ERPs across conditions, occipital electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
     
-    word_onset_epochs.plot_image(combine = "mean", 
-                                 picks = ['C1','C3', 'C5','C6','Cz','C2','C4'],
-                                 title = "Word-Onset ERPs across conditions, central electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
+    #word_onset_epochs.plot_image(combine = "mean", 
+    #                             picks = ['C1','C3', 'C5','C6','Cz','C2','C4'],
+    #                             title = "Word-Onset ERPs across conditions, central electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
         
-    word_onset_epochs.plot_image(combine = "mean", 
-                                 picks = ['P2','P6','P5','P1'],
-                                 title = "Word-Onset ERPs across conditions, parietal electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
+    #word_onset_epochs.plot_image(combine = "mean", 
+    #                             picks = ['P2','P6','P5','P1'],
+    #                             title = "Word-Onset ERPs across conditions, parietal electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
         
     
     # plot global field power:
     # The global field power is the standard deviation of the values of all channels at each time point. So basically you reduce your data a bit and instead of plotting 
     # normal ERPs using multiple channels or averaging over them, you plot 1 graph with the standard deviation.
-    word_onset_epochs.plot_image(combine = "gfp")
+    
+    # get average of epochs data -> evoked potentials
+    evoked = word_onset_epochs.average()
+    # plot the evoked potentials, seperated by channel, and add global field power to the plot
+    evoked.plot(picks = ['O1', 'O2', 'Oz', 'POz', 'PO3'], gfp=True, spatial_colors = True)
+    #evoked.plot_image(picks=['O1', 'O2', 'Oz'])
+    # evoked.plot_joint(picks = ['O1', 'O2', 'Oz'])
     
     
     
-    
-    
-    
-    
-    
-    
+
     """ --> cut data into blocks """
     
     # Create Events from Annotations
