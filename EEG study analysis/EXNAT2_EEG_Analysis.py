@@ -1092,7 +1092,7 @@ for curr_file in file_list:
 
     
     """ --> cut blocks into trials """
-    # window: - 200 to 700 ms around stimulus onset
+    # window: - 1 to 1s around stimulus onset
     
     # loop blocks again & cut epochs:
     epochs_list = []     
@@ -1126,12 +1126,12 @@ for curr_file in file_list:
         events_array = np.array(curr_events)
 
         
-        # cut epochs around those events:        
+        # cut epochs around word-onset events:        
         epochs = mne.Epochs(curr_segment, 
                             events = curr_events,
                             event_id = trigger_map['trial_on'], 
-                            tmin = -0.2, 
-                            tmax = 0.7, 
+                            tmin = -1, 
+                            tmax = 1, 
                             detrend = 1, # 1 = linear detrend --> performed before BL correction
                             baseline = (-0.1, 0), 
                             preload = True)
