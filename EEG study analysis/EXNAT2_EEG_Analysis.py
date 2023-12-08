@@ -16,6 +16,14 @@ Version: November, 2023
 
 """ General information / random stuff that's maybe good to know: """
 
+# Concerning the behavioural data: 
+
+# For the TRFs, we need information on each trial's word, surprisal scores, word length, and so on, 
+# so make sure to run the R script first in which we save one df with experimental data for each participant.
+# This script can only work if you have these information in each participant's data folder.    
+
+# -----------------
+
 # Concerning the EEG data: 
     
 # sampling rate: 1000 Hz
@@ -128,6 +136,30 @@ for curr_file in file_list:
         print("skipping test dataset")
         continue
     
+
+    """ load current participant's experimental data """
+    # For the TRFs, we need information on words, word frequencie, word lengths, 
+    # word surprisal scores on all 4 time scales, and so on for each trial.
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     
     """ create MNE raw object containing eyetracking data + triggers + metadata """    
