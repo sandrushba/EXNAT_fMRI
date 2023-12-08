@@ -109,8 +109,8 @@ from matplotlib.colors import LinearSegmentedColormap #  for plotting bridging b
 # ----------------------------------------------------- # 
 
 # set path to data file here:
-#curr_data_path = "/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
-curr_data_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
+curr_data_path = "/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
+#curr_data_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
 
 # get list of files in data directory: 
 file_list = os.listdir(curr_data_path)
@@ -205,11 +205,11 @@ for curr_file in file_list:
     
     
     # get raw data from all channels
-    data, times = raw[:, :]
+    #data, times = raw[:, :]
     
     # calculate mean and SD across all channels and time points
-    mean_data = np.mean(data, axis=0)
-    std_data = np.std(data, axis=0)
+    #mean_data = np.mean(data, axis=0)
+    #std_data = np.std(data, axis=0)
 
     
 
@@ -1162,7 +1162,7 @@ for curr_file in file_list:
         epochs = mne.Epochs(curr_segment, 
                             events = curr_events,
                             event_id = trigger_map['trial_on'], 
-                            tmin = -1, 
+                            tmin = -0.2, 
                             tmax = 1, 
                             detrend = 1, # 1 = linear detrend --> performed before BL correction
                             baseline = (-0.1, 0), 
@@ -1179,14 +1179,15 @@ for curr_file in file_list:
     
     
         """ Sanity check: Create word-onset ERP for current block """
-        if curr_block_name == "BL_m_on":    
-            epochs.plot_image(combine="mean", title = "BL (single task)")
-        if curr_block_name == "1back_d_m_on":    
-            epochs.plot_image(combine="mean", title = "1-back (dual task)")
-        if curr_block_name == "2back_d_m_on":    
-            epochs.plot_image(combine="mean", title = "2-back (dual task)")
-        
-        
+        #epochs.plot_image(combine="mean", title = curr_block_name)
+        # get average of epochs data -> evoked potentials
+        evoked = epochs.average()
+        # plot the evoked potentials, seperated by channel, and add global field power to the plot
+        print("plot for block " + curr_block_name)
+        evoked.plot(picks = ['O1', 'O2', 'Oz'], gfp=True, spatial_colors = False, window_title = curr_block_name)
+        #evoked.plot_image(picks=['O1', 'O2', 'Oz'])
+        # evoked.plot_joint(picks = ['O1', 'O2', 'Oz'])
+    
         
     
         """ Add Metadata for Each Epoch """
