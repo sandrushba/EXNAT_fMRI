@@ -706,7 +706,7 @@ for (i in 1:length(file_list)) {
   
   # save current participant's data in their folder:
   write.csv(subj_df,
-            file = paste(path_data_folder, file_list[i], "/", file_list[i], "behav_data.csv", sep = ""), 
+            file = paste(path_data_folder, file_list[i], "/", file_list[i], "_behav_data.csv", sep = ""), 
             row.names = FALSE)
   
   ###########################
