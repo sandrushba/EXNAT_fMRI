@@ -76,7 +76,7 @@ current_path = rstudioapi::getActiveDocumentContext()$path
 # set it as our wd
 setwd(dirname(current_path))
 # print it just to make sure it's correct:
-print(getwd())
+#print(getwd())
 
 
 # import get_dprime() function from another script I built
@@ -91,7 +91,7 @@ path_data_folder <- "Data/"
 file_list <- list.files(path = path_data_folder)
 
 # Placeholders df for demographics, questions & text data
-df_demogr           <- data.frame()
+df_demogr_all           <- data.frame()
 df_text_data        <- data.frame()
 df_comprehension_Qs <- data.frame()
 
@@ -115,7 +115,7 @@ for (i in 1:length(file_list)) {
   subj_quest_df <- read.csv(paste(path_data_folder, file_list[i], "/", curr_files[idx_questionnaire_file], sep = ""), sep = ",")
   
   # get demographical data from the questionnaire df:
-  id             <- subset(subj_quest_df, sender == "id")$ID # individual code
+  id             <- subset(subj_quest_df, sender == "ID")$ID # individual code
   message(paste(i, " - Reading in file of participant with ID: ", id, sep = ""))
   
   age            <- subset(subj_quest_df, sender == "demographics")$age # age in years
@@ -157,19 +157,17 @@ for (i in 1:length(file_list)) {
   
 
   # append them to df_demogr:
-  df_demogr <- as.data.frame(rbind(df_demogr,
-                                   cbind(id, age, gender,
-                                         handedness, native_speaker,
-                                         drugs, alcohol, education, medicine,
-                                         neur_disorder, stroke, psych_disorder,
-                                         reading_weakness, seeing_impaired, colour_vision_impaired,
-                                         hearing_impaired, CI_or_hearing_aid,
-                                         AQ_SS, AQ_AS, AQ_AD, AQ_C, AQ_I, AQ_all,
-                                         SQP_RI, SQP_SA, SQP_MD, SQP_UW, SQP_EV, 
-                                         SQP_KEF, SQP_US, SQP_EA, SQP_AW, SPQ_all,
-                                         flicker_freq, excl)))
+  df_demogr <- as.data.frame(cbind(id, age, gender,
+                                   handedness, native_speaker,
+                                   drugs, alcohol, education, medicine,
+                                   neur_disorder, stroke, psych_disorder,
+                                   reading_weakness, seeing_impaired, colour_vision_impaired,
+                                   hearing_impaired, CI_or_hearing_aid,
+                                   AQ_SS, AQ_AS, AQ_AD, AQ_C, AQ_I, AQ_all,
+                                   SQP_RI, SQP_SA, SQP_MD, SQP_UW, SQP_EV, 
+                                   SQP_KEF, SQP_US, SQP_EA, SQP_AW, SPQ_all,
+                                   flicker_freq, excl))
   
-
   ### SPQ: 
   # From the Original Questionnaire: "Alle mit „Ja“ beantworteten Items werden mit 1 verrechnet. 
   #                                   Der Gesamtwert ist die Summe aller Subskalenwerte."
@@ -189,7 +187,7 @@ for (i in 1:length(file_list)) {
                   "AW")  #Argwohn / Wahnähnliche Vorstellungen
   
   for (curr_subscale in SPQ_scales){
-    print(curr_subscale)
+    #print(curr_subscale)
     # get names of all columns that end with the current sub scale name
     curr_columns <- as.vector(names(subj_quest_df)[grep("AW", names(subj_quest_df))])
     # get subset of df where columns have these names:
@@ -200,7 +198,7 @@ for (i in 1:length(file_list)) {
     
     # now count how many times participant answered "yes" (label = 1)
     curr_subscale_score <- sum(curr_columns)
-    print(curr_subscale_score)
+    #print(curr_subscale_score)
     
     # put subscale score into demographics df:
     df_demogr[paste("SQP_", curr_subscale, sep = "")] <- as.numeric(curr_subscale_score)
@@ -282,6 +280,8 @@ for (i in 1:length(file_list)) {
   # get overall AQ score: 
   df_demogr$AQ_all <- sum(AQ_df[ ,])
   
+  # add current participant's data to df with data of all participants:
+  df_demogr_all <- as.data.frame(rbind(df_demogr_all, df_demogr))
   
   # remove helper variables to keep things tidy
   rm (age, gender, handedness, native_speaker,
@@ -300,6 +300,9 @@ for (i in 1:length(file_list)) {
   
   # GET RAW TEXT & N-BACK DATA
   
+  # save raw df for later
+  subj_df_raw <- subj_df
+  
   # get rid of some unimportant columns:
   subj_df <- subj_df[ ,  c("colour", "target", "nback_response", "nback_RT", "duration", 
                            "text_nr", "trial_nr", "word",
@@ -309,7 +312,10 @@ for (i in 1:length(file_list)) {
                            "participant", "age", "handedness", "gender", 
                            "meas_hearing", "skip_prediction_tendency")]
   
-  
+  # delete weird empty rows (I think they sometimes occur after the dual task blocks, 
+  # but it doesn't seem like something is missing.)
+  subj_df <- subset(subj_df, !is.na(block_nr))
+
   # name column "block_name" "block_kind" and "participant" "ID" so it matches the EXNAT-1 variables
   names(subj_df)[which(names(subj_df) == "block_name")] <- "block_kind"
   names(subj_df)[which(names(subj_df) == "participant")] <- "ID"
@@ -318,10 +324,7 @@ for (i in 1:length(file_list)) {
   subj_df$excl <- FALSE
 
   # get rid of reading baseline training (that was just a practice block for the participants)
-  subj_df <- subset(subj_df, block_kind != "Reading_Baseline_training")
-  
-  # save raw df for later
-  subj_df_raw <- subj_df
+  #subj_df <- subset(subj_df, block_kind != "Reading_Baseline_training")
   
   ###########################
   
@@ -342,55 +345,66 @@ for (i in 1:length(file_list)) {
   # first, just copy the "old" block names
   subj_df$block_names_numbered <- subj_df$block_kind
   
-  BL_counter <- 0
+  BL_counter <- 1
   oneback_counter <- 0
   twoback_counter <- 0
-  curr_bl_trials <- 0 # count trials of current block
-  previous_block_kind <- NA
+  previous_block_counter <- NA
+  curr_block_trials <- 1 # count trials of current block
   
+
   for (curr_row_idx in 1:length(subj_df$block_names_numbered)){
-    
+  
     #print(curr_bl_name)
     curr_block_name <- subj_df$block_names_numbered[curr_row_idx]
     
+    # For BL: 
     if (curr_block_name == "Reading_Baseline_main"){
-      
-      print("BL")
-      print(curr_bl_name)
-      
-      # if it's the end of the block:
-      if curr_bl_trials == 300){
-        # add 1 to BL block counter
+      # if we already counted more than 300 trials and it's 
+      # the first trial again, reset trial counter and add 1 to block counter:
+      if (curr_block_trials > 300 & !is.na(subj_df$trial_nr[curr_row_idx]) & subj_df$trial_nr[curr_row_idx] == 1){
+        curr_block_trials <- 1
         BL_counter <- BL_counter + 1
-      } else if (curr_bl_trials == 301){
-       # reset curr_block_counter to 1:
-        curr_bl_trials <- 0
+        #print(paste(curr_block_name, "_", BL_counter, sep = "") )
       }
+      # rename block: 
+      subj_df$block_names_numbered[curr_row_idx] <- paste(curr_block_name, "_", BL_counter, sep = "") 
+      # go to next trial: 
+      curr_block_trials <- curr_block_trials + 1
+    
       
+    # FOR 1-back:
     } else if (curr_block_name == "1back_dual_main"){
-      print("1back_dual_main")
+      # if we already counted more than 300 trials and it's 
+      # the first trial again, reset trial counter and add 1 to block counter:
+      if (curr_block_trials > 300 & !is.na(subj_df$trial_nr[curr_row_idx]) & subj_df$trial_nr[curr_row_idx] == 1){
+        curr_block_trials <- 1
+        oneback_counter <- oneback_counter + 1
+        #print(paste(curr_block_name, "_", oneback_counter, sep = "") )
+      }
+      # rename block: 
+      subj_df$block_names_numbered[curr_row_idx] <- paste(curr_block_name, "_", oneback_counter, sep = "") 
+      # go to next trial: 
+      curr_block_trials <- curr_block_trials + 1
+    
+    # FOR 2-back:
     } else if (curr_block_name == "2back_dual_main"){
-      print("2back_dual_main")
+      # if we already counted more than 300 trials and it's 
+      # the first trial again, reset trial counter and add 1 to block counter:
+      if (curr_block_trials > 300 & !is.na(subj_df$trial_nr[curr_row_idx]) & subj_df$trial_nr[curr_row_idx] == 1){
+        curr_block_trials <- 1
+        twoback_counter <- twoback_counter + 1
+        #print(paste(curr_block_name, "_", twoback_counter, sep = "") )
+      }
+      # rename block: 
+      subj_df$block_names_numbered[curr_row_idx] <- paste(curr_block_name, "_", twoback_counter, sep = "") 
+      # go to next trial: 
+      curr_block_trials <- curr_block_trials + 1
+    }  
   }
   
+  # check if it worked:
+  #print(unique(subj_df$block_names_numbered))
   
-  
-  
-  # We have each main block twice, but I would like to exclude outliers by block and not by condition.
-  # Reason: Reading times in second block might be slightly different than in first block, so don't mix them up.
-  
-  # first, just copy the "old" block names
-  subj_df$block_names_numbered <- subj_df$block_kind
-  
-  # Get all 1-back blocks and call the first 300 trials "1back_dual_main_1". Call the remaining 300 trials "1back_dual_main_1".
-  # Do this for Reading BL & 2-back main, too. The single-task blocks don't have to be changed because they're only presented once.
-  change_blocknames <- c("Reading_Baseline_main", "1back_dual_main", "2back_dual_main")
-  
-  for (change_block_name in change_blocknames){
-    # get the first 309 rows (each block has 300 trials so the first 300 trials = 1st block + 9 question rows).
-    subj_df[which(subj_df$block_names_numbered == change_block_name), ]$block_names_numbered[c(1:309)] <- paste(change_block_name,"_1", sep = "")
-    subj_df[which(subj_df$block_names_numbered == change_block_name), ]$block_names_numbered <- paste(change_block_name,"_2", sep = "")
-  }
   
   ###########################
   
@@ -547,26 +561,6 @@ for (i in 1:length(file_list)) {
   }
   
   
-  
-  # Fix messed up block numbers:
-  # Loop rows, if task_name changes, add 1 to block counter.
-  #block_counter <- 1
-  #subj_df$block_nr <- ""
-  ## loop rows, but skip the first one
-  #for (row_idx in 2:length(subj_df$ID)){
-  #  curr_row <- subj_df[row_idx, ]
-  #  # if it's the same text_nr as in the row before, 
-  #  # assign block counter as in the row before. Only do this for the main blocks though, I don't care about the rest for now:
-  #  if (curr_row$text_nr == subj_df[row_idx-1, ]$text_nr & curr_row$block_kind %in% c("visual_task", "Reading_Baseline_main", "1back_dual_main", "2back_dual_main")){
-  #    subj_df[row_idx, ]$block_nr <- block_counter 
-  #  } else if (curr_row$text_nr != subj_df[row_idx-1, ]$text_nr & curr_row$block_kind %in% c("visual_task", "Reading_Baseline_main", "1back_dual_main", "2back_dual_main")){
-  #    block_counter <- block_counter + 1
-  #    subj_df[row_idx, ]$block_nr <- block_counter 
-  #  }
-  #}
-  # The block numbers are still a bit odd but who cares.
-  
-  
   ### WORD FREQUENCIES & SURPRISAL SCORES ####
   
   # Include word frequencies & surprisal scores for each word
@@ -579,21 +573,18 @@ for (i in 1:length(file_list)) {
   
   # get word frequency & surprisal scores for each word
   # load word freq df
-  word_freqs_df = read.csv("word_frequencies/Word_freqs.csv", sep = ";", header=TRUE)[2:4]
+  word_freqs_df = read.csv(paste(getwd(), "/word frequencies/Word_freqs.csv", sep = ""), sep = ";", header=TRUE)[2:4]
   
   # load surprisal scores / similarity scores df with TS = context chunk size
-  surprisal_df = read.csv("surprisal_scores/surprisal_scores_masked_context.csv", sep = ",", header = TRUE)
-  
+  surprisal_df = read.csv(paste(getwd(),"/surprisal scores/surprisal_scores_masked_context.csv", sep = ""), sep = ",", header = TRUE)
+
   # loop individual texts
   for (curr_text_nr in unique(subj_df$text_nr)){
-    
+
     # in some blocks we don't have texts, so skip those
-    # skip BL training as well
-    if (curr_text_nr != "" & !is.na(curr_text_nr) & curr_text_nr != "reading_bl_training_text" & curr_text_nr != "None"){
-      
-      
-      print(curr_text_nr) # uncomment this if you'd like to show the texts each participant read
-      
+    # skip BL training & vistask training as well
+    if (curr_text_nr != "" & !is.na(curr_text_nr) & curr_text_nr != "None" & curr_text_nr != "reading_bl_training_text" & curr_text_nr != "vis_task_training"){
+
       # get word frequencies for current text nr
       curr_word_freqs <- subset(word_freqs_df, text_nr == curr_text_nr)$word_frequency
       
@@ -602,53 +593,40 @@ for (i in 1:length(file_list)) {
       
       # find out where in the subj_df text the text is located and add the word frequencies there. 
       # Take only the first 300 rows because the rest are the questions' rows.
-      # If the text occurs twice in the df, that's because it was shown again in the visual task block, so 
-      # add the word frequencies twice there.
-      if (length(subj_df[which(subj_df$text_nr == curr_text_nr),]$word) > 400){
-        print("block was repeated for vis task")
-        # loop block numbers and assign word frequencies to the words in both blocks
-        curr_block_nrs = as.vector(na.exclude(unique(subset(subj_df, text_nr == curr_text_nr)$block_nr)))
-        for (block_nr in curr_block_nrs){
-          # add word frequencies:
-          subj_df[which(subj_df$text_nr == curr_text_nr & subj_df$block_nr == block_nr),]$word_frequency[0:300] <- curr_word_freqs
-          # add surprisal scores:
-          curr_row <- which(subj_df$text_nr == curr_text_nr & subj_df$block_nr == block_nr & subj_df$word != "")
-          subj_df[curr_row, c("surprisal_1", "surprisal_4",
-                              "surprisal_12", "surprisal_60")]  <- curr_surprisals[c("surprisal_1", "surprisal_4",
-                                                                                     "surprisal_12",  "surprisal_60")]
-        }
-        # if the block was only shown once:
-      } else {
-        print("block was only shown once")
-        # assign word frequencies only once
-        subj_df[which(subj_df$text_nr == curr_text_nr),]$word_frequency[0:300] <- curr_word_freqs
-        # add surprisal scores:
-        curr_row <- which(subj_df$text_nr == curr_text_nr & subj_df$word != "")
-        subj_df[curr_row, c("surprisal_1", "surprisal_4",
-                            "surprisal_12", "surprisal_60")]  <- curr_surprisals[c("surprisal_1", "surprisal_4",
-                                                                                   "surprisal_12",  "surprisal_60")]
-      }
-      print("---------------------")
+
+      # assign word frequencies only once
+      subj_df[which(subj_df$text_nr == curr_text_nr),]$word_frequency[0:300] <- curr_word_freqs
+      # add surprisal scores:
+      curr_row <- which(subj_df$text_nr == curr_text_nr & subj_df$word != "")
+      subj_df[curr_row, c("surprisal_1", "surprisal_4",
+                          "surprisal_12", "surprisal_60")]  <- curr_surprisals[c("surprisal_1", "surprisal_4",
+                                                                                 "surprisal_12",  "surprisal_60")]
     }
-    
-    
   }# END loop texts 
   
   
   ### GET SURPRISAL SCORES OF PREVIOUS WORD ####
   # --> skipped this part from the EXNAT-1 analysis
   
+  # TO DO: ADD THIS PART!
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   ###########################
   # GET PERFORMANCE MEASURES:
   
   ### COMPREHENSION QUESTION PERFORMANCE ####
-  # Check the performance in the reading comprehension questions in the 2 baseline blocks:
-  # If they don't have 3/3 in at least one of the blocks, exclude their data.
-  
+
   # We now get all question data for the main blocks
-  Q_df <- subset(subj_df, chosen_ans != "" & block_kind %in% c("Reading_Baseline_main", "2back_dual_main", "1back_dual_main"))[,c("question", "chosen_ans", "ans_correct", "text_nr", "block_kind", "ID", "native_speaker", "block_nr", "flicker_on", "flicker_freq")]
-  
+  Q_df <- subset(subj_df, chosen_ans != "" & block_kind %in% c("Reading_Baseline_main", "2back_dual_main", "1back_dual_main"))[,c("question", "chosen_ans", "ans_correct", "text_nr", "block_kind", "ID", "block_nr")]
+
   # Just look at the MC questions:
   # For now I don't really care about the answer, I only want to know if they chose the correct one or not.
   
@@ -669,6 +647,12 @@ for (i in 1:length(file_list)) {
   
   # append Q_df to bigger df for all participants
   df_comprehension_Qs <- as.data.frame(rbind(df_comprehension_Qs, Q_df))
+  
+  # save in participant's folder:
+  write.csv(df_comprehension_Qs,
+            file = paste(path_data_folder, file_list[i], "/", file_list[i], "_df_comprehension_Qs.csv", sep = ""), 
+            row.names = FALSE)
+
   
   
   ### N-BACK PERFORMANCE ####
@@ -720,9 +704,10 @@ for (i in 1:length(file_list)) {
   
   ###########################
   
-  # get rid of all rows where flicker_freq is NA
-  # (they shouldn't be there actually, there's some kind of weird error in my script I guess)
-  subj_df <- subset(subj_df, !is.na(flicker_freq))
+  # save current participant's data in their folder:
+  write.csv(subj_df,
+            file = paste(path_data_folder, file_list[i], "/", file_list[i], "behav_data.csv", sep = ""), 
+            row.names = FALSE)
   
   ###########################
   
@@ -733,10 +718,6 @@ for (i in 1:length(file_list)) {
   subj_df$excl_participant <- FALSE
   
   
-  ### EXCLUDE PARTICIPANTS ####
-  # Skipped this because I was sitting right next to them and everything worked as intended.
-  
-  
   # append subj_df chunk to df_text_data where we collect the data of all participants
   df_text_data <- as.data.frame(rbind(df_text_data, subj_df))
   message("------------------------")
@@ -744,27 +725,21 @@ for (i in 1:length(file_list)) {
 }# END LOOP PARTICIPANTS
 
 # clean up!
-rm(list=ls()[! ls() %in% c("df_text_data", "df_demogr", "df_comprehension_Qs", "word_freqs_df", "surprisal_df", "blocks")])
+rm(list=ls()[! ls() %in% c("df_text_data", "df_demogr_all", "df_comprehension_Qs", "word_freqs_df")])
 
 # save preprocessed data for further analysis:
-#write.csv(df_text_data,       file = "/Users/merleschuckart/Desktop/EXNAT1 data/preproc_data/preproc_data.csv")
-#write.csv(df_text_data_clean, file = "/Users/merleschuckart/Desktop/EXNAT1 data/preproc_data/preproc_data_clean.csv")
-#write.csv(df_demogr,          file = "/Users/merleschuckart/Desktop/EXNAT1 data/preproc_data/preproc_demogr_data.csv")
-
-
-
+#write.csv(df_text_data, file = paste(getwd(), "/Data/preproc_behav_data_all.csv", sep = ""), row.names = FALSE)
+#write.csv(df_demogr_all, file = paste(getwd(), "Data/preproc_demogr_data_all.csv", sep = ""), row.names = FALSE)
 
 ###########################
 
 
 
-# -----------------------------------
-
 # Bring the AQ and SPQ subscale scores together & 
 # calculate prediction strategy style score for each participant
 
 # get all subscale values
-subscale_data <- df_demogr[,c("AQ_SS", "AQ_AS", "AQ_AD", "AQ_C", "AQ_I",
+subscale_data <- df_demogr_all[,c("AQ_SS", "AQ_AS", "AQ_AD", "AQ_C", "AQ_I",
                               "SQP_RI","SQP_SA", "SQP_MD", "SQP_UW", "SQP_EV", 
                               "SQP_KEF", "SQP_US", "SQP_EA", "SQP_AW") ]
 
@@ -785,11 +760,7 @@ df_demogr$PC2 <- subscale_data %*% PC2
 
 
 
-
-
-
-
-
+# TO DO:
 
 
 
