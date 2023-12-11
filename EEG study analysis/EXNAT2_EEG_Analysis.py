@@ -141,25 +141,8 @@ for curr_file in file_list:
     # For the TRFs, we need information on words, word frequencie, word lengths, 
     # word surprisal scores on all 4 time scales, and so on for each trial.
 
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    behav_data = pd.read_csv(curr_data_path + "part_" + curr_id + "/part_" + curr_id + "_behav_data.csv")
+ 
 
     
     """ create MNE raw object containing eyetracking data + triggers + metadata """    
@@ -758,6 +741,9 @@ for curr_file in file_list:
 
     """ ICA """
     
+    # For replicating my lab meeting pilot result plots: I excluded ICs 0,1,2,3,4 for part_0001 and part_0002
+    
+    
     # in case the script crashed here again during testing: read in .fif with the raw object:
     #raw = mne.io.read_raw_fif(curr_data_path + "part_" + curr_id + "/backup_raw_filtered.fif", preload=True)
     
@@ -949,7 +935,7 @@ for curr_file in file_list:
     response_epochs = mne.Epochs(raw_selected_channels, 
                         events = curr_events,
                         event_id = trigger_map['resp_continue'], 
-                        tmin = -1, 
+                        tmin = -0.5, 
                         tmax = 1,
                         reject = dict(eeg = 40e-6#,      # unit: V (EEG channels)
                                       #eog = 250e-6      # unit: V (EOG channels)
@@ -973,9 +959,12 @@ for curr_file in file_list:
     # get average of epochs data -> evoked potentials
     evoked = response_epochs.average()
     # plot the evoked potentials, seperated by channel, and add global field power to the plot
-    evoked.plot(picks = ['C1','CP1', 
-                         'Cz','C2', 'CP2', 
-                         'CPz', 'Pz', 'P2','P1'], gfp=True, spatial_colors = False)
+    evoked.plot(picks = ['C1','CP1',
+                         'Cz','CPz',
+                         'C2', 'CP2', 
+                         'C4', 'CP4'], 
+                gfp=True, 
+                spatial_colors = False)
     #evoked.plot_image(picks=['O1', 'O2', 'Oz'])
     # evoked.plot_joint(picks = ['O1', 'O2', 'Oz'])
     
@@ -994,9 +983,9 @@ for curr_file in file_list:
                                    baseline = (-0.1, 0), 
                                    preload = True)
     # plot them:
-    #word_onset_epochs.plot_image(combine = "mean", 
-    #                             picks = ['O1', 'O2', 'Oz'],
-    #                             title = "Word-Onset ERPs across conditions, occipital electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
+    word_onset_epochs.plot_image(combine = "mean", 
+                                 picks = ['O1', 'O2', 'Oz'],
+                                 title = "Word-Onset ERPs across conditions, occipital electrodes, filtered to 0.1 - 30 Hz, bad ICs excluded, noisy epochs rejected")
     
     #word_onset_epochs.plot_image(combine = "mean", 
     #                             picks = ['C1','C3', 'C5','C6','Cz','C2','C4'],
@@ -1014,14 +1003,14 @@ for curr_file in file_list:
     # get average of epochs data -> evoked potentials
     evoked = word_onset_epochs.average()
     # plot the evoked potentials, seperated by channel, and add global field power to the plot
-    evoked.plot(picks = ['O1', 'O2', 'Oz', 'POz', 'PO3'], gfp=True, spatial_colors = True)
+    evoked.plot(picks = ['O1', 'O2', 'Oz'], gfp=True, spatial_colors = False) # 'POz', 'PO3', 'PO2', 'O1', 'O2', 'Oz'
     #evoked.plot_image(picks=['O1', 'O2', 'Oz'])
     # evoked.plot_joint(picks = ['O1', 'O2', 'Oz'])
     # evoked.plot_psd(picks = ['O1', 'O2', 'Oz', 'POz', 'PO3'], fmax = 80)
     
 
     """ --> cut data into blocks """
-    
+    £
     # Create Events from Annotations
     events, event_id = mne.events_from_annotations(raw, event_id = trigger_map)
     #print(event_id)
