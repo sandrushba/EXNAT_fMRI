@@ -98,7 +98,7 @@ df_comprehension_Qs <- data.frame()
 # Loop files in my file list aka directory
 for (i in 1:length(file_list)) {
  
-
+ 
   # PREPARE FILE FOR PREPROCESSING
   
   # get names of csv files for current participant: There should be one file containing the experimental 
@@ -115,7 +115,7 @@ for (i in 1:length(file_list)) {
   subj_quest_df <- read.csv(paste(path_data_folder, file_list[i], "/", curr_files[idx_questionnaire_file], sep = ""), sep = ",")
   
   # get demographical data from the questionnaire df:
-  id             <- subset(subj_quest_df, sender == "ID")$ID # individual code
+  id             <- subset(subj_quest_df, sender == "id")$ID # individual code
   message(paste(i, " - Reading in file of participant with ID: ", id, sep = ""))
   
   age            <- subset(subj_quest_df, sender == "demographics")$age # age in years
@@ -137,19 +137,26 @@ for (i in 1:length(file_list)) {
   flicker_freq   <-  "15 Hz" # we only used a 15 Hz flicker
   excl           <- FALSE # Should participant be excluded from further analysis? Default: No.
 
+  # Calculate AQ - SPQ Continuum Scores for all participants:
+  AQ_SS   <- NA
+  AQ_AS   <- NA
+  AQ_AD   <- NA
+  AQ_C    <- NA
+  AQ_I    <- NA
+  AQ_all  <- NA
+  SQP_RI  <- NA
+  SQP_SA  <- NA
+  SQP_MD  <- NA
+  SQP_UW  <- NA 
+  SQP_EV  <- NA
+  SQP_KEF <- NA
+  SQP_US  <- NA
+  SQP_EA  <- NA
+  SQP_AW  <- NA
+  SPQ_all <- NA
   
-  
-  # Add Subscale Scores for AQ & SPQ here!
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  # append to demographics df
+
+  # append them to df_demogr:
   df_demogr <- as.data.frame(rbind(df_demogr,
                                    cbind(id, age, gender,
                                          handedness, native_speaker,
@@ -157,7 +164,124 @@ for (i in 1:length(file_list)) {
                                          neur_disorder, stroke, psych_disorder,
                                          reading_weakness, seeing_impaired, colour_vision_impaired,
                                          hearing_impaired, CI_or_hearing_aid,
+                                         AQ_SS, AQ_AS, AQ_AD, AQ_C, AQ_I, AQ_all,
+                                         SQP_RI, SQP_SA, SQP_MD, SQP_UW, SQP_EV, 
+                                         SQP_KEF, SQP_US, SQP_EA, SQP_AW, SPQ_all,
                                          flicker_freq, excl)))
+  
+
+  ### SPQ: 
+  # From the Original Questionnaire: "Alle mit „Ja“ beantworteten Items werden mit 1 verrechnet. 
+  #                                   Der Gesamtwert ist die Summe aller Subskalenwerte."
+  # So basically all items where participant answered "yes" is counted as 1, "no" is counted as 0. 
+  # If you get the sum for each of the scales, you have the sub scale score
+  
+  # Loop scales in SPQ and count sub scales scores
+  
+  SPQ_scales <- c("RI",  # Referenzideen (counterintuitively, RI ≠ Rihanna here)
+                  "SA",  # (exzessive) soziale Angst
+                  "MD",  # Ungwöhnliche Glaubensinhalte / Magisches Denken
+                  "UW",  # Ungewöhnliche Wahrnehmungen
+                  "EV",  # Ungewöhnliches oder exzentrisches Verhalten
+                  "KEF", # Keine engen Freunde
+                  "US",  # Ungewöhnliche Sprache
+                  "EA",  # Eingeschränkter Affekt
+                  "AW")  #Argwohn / Wahnähnliche Vorstellungen
+  
+  for (curr_subscale in SPQ_scales){
+    print(curr_subscale)
+    # get names of all columns that end with the current sub scale name
+    curr_columns <- as.vector(names(subj_quest_df)[grep("AW", names(subj_quest_df))])
+    # get subset of df where columns have these names:
+    curr_columns <- subj_quest_df[curr_columns]
+    
+    # get only the row where we have values:
+    curr_columns <- curr_columns[which(subj_quest_df$sender == "SPQ-G"), ]
+    
+    # now count how many times participant answered "yes" (label = 1)
+    curr_subscale_score <- sum(curr_columns)
+    print(curr_subscale_score)
+    
+    # put subscale score into demographics df:
+    df_demogr[paste("SQP_", curr_subscale, sep = "")] <- as.numeric(curr_subscale_score)
+    
+  } 
+  
+  # also assign overall score:
+  df_demogr$SPQ_all <- sum(subj_quest_df[which(subj_quest_df$sender == "SPQ-G"), 
+                                    as.vector(names(subj_quest_df)[grep("SPQ", names(subj_quest_df))])])
+  
+  
+
+  ### Autism-Spectrum Quotient (AQ)
+  
+  #Baron-Cohen, S., Wheelwright, S., Skinner, R., Martin, J., & Clubley, E. (2001). 
+  # The autism-spectrum quotient (AQ): Evidence from asperger syndrome/high-functioning autism, 
+  # males and females, scientists and mathematicians. Journal of autism and developmental disorders, 31(1), 5-17.
+  
+  # First, we have to recode some of the item scores:
+  # Recode all positive values to 1, recode all negative values to 0:
+  
+  AQ_df <- subj_quest_df[which(subj_quest_df$sender == "AQ-G"), as.vector(names(subj_quest_df)[grep("AQ", names(subj_quest_df))])]
+  AQ_df[1,] <- ifelse(as.vector(unlist(AQ_df)) > 0, 1, 0)
+  
+  
+  # Now we have to change the polarity of some of the items. 
+  
+  # The scores 1 and 0 for the following items can stay as they are: 
+  # 2, 4, 5, 6, 7, 9, 12, 13, 16, 18, 19, 20, 21, 22, 23, 26, 33, 35, 39, 41, 42, 43, 45 und 46 
+  
+  # The scores 1 and 0 for the following items have to be reversed to 0 and 1: 
+  # 1, 3, 8, 10, 11, 14, 15, 17, 24, 25, 27, 28, 29, 30, 31, 32, 34, 36, 37, 38, 40, 44, 47, 48, 49 und 50 
+  
+  reverse_indices <- c(1, 3, 8, 10, 11, 14, 15, 17, 24, 25, 27, 28, 29, 
+                       30, 31, 32, 34, 36, 37, 38, 40, 44, 47, 48, 49, 50)
+  
+  # reverse the values for the items I specified above
+  AQ_df[1, reverse_indices] <- ifelse(AQ_df[1, reverse_indices] == 0, 1, 0)
+  
+  # Now we're all set for counting the subscale scores. 
+  
+  # The AQ-50 has 5 subscales. 
+  # It's a bit difficult to find them as most sites only report how to get & interpret 
+  # the overall score, but I found a key here and the scales make sense 
+  # to me if I look at the corresponding items: 
+  #     https://novopsych.com.au/assessments/diagnosis/autism-spectrum-quotient/
+  
+  # Social skill:        items 01,11,13,15,22,36,44,45,47,48
+  # Attention switching: items 02,04,10,16,25,32,34,37,43,46
+  # Attention to detail: items 05,06,09,12,19,23,28,29,30,49
+  # Communication:       items 07,17,18,26,27,31,33,35,38,39
+  # Imagination:         items 03,08,14,20,21,24,40,41,42,50
+  
+  df_demogr$AQ_SS <- sum(AQ_df[ , c("AQ_01", "AQ_11", "AQ_13", 
+                                    "AQ_15", "AQ_22", "AQ_36", 
+                                    "AQ_44", "AQ_45", "AQ_47", 
+                                    "AQ_48")])
+  
+  df_demogr$AQ_AS <- sum(AQ_df[ , c("AQ_02", "AQ_04", "AQ_10",
+                                    "AQ_16", "AQ_25","AQ_32",
+                                    "AQ_34","AQ_37","AQ_43",
+                                    "AQ_46")])
+  
+  df_demogr$AQ_AD <- sum(AQ_df[ , c("AQ_05","AQ_06","AQ_09",
+                                    "AQ_12","AQ_19","AQ_23",
+                                    "AQ_28","AQ_29","AQ_30",
+                                    "AQ_49")])
+  
+  df_demogr$AQ_C <- sum(AQ_df[ , c("AQ_07","AQ_17","AQ_18",
+                                   "AQ_26","AQ_27","AQ_31",
+                                   "AQ_33","AQ_35","AQ_38",
+                                   "AQ_39")])
+  
+  df_demogr$AQ_I <- sum(AQ_df[ , c("AQ_03","AQ_08","AQ_14",
+                                   "AQ_20","AQ_21","AQ_24",
+                                   "AQ_40","AQ_41","AQ_42",
+                                   "AQ_50")])
+  
+  # get overall AQ score: 
+  df_demogr$AQ_all <- sum(AQ_df[ ,])
+  
   
   # remove helper variables to keep things tidy
   rm (age, gender, handedness, native_speaker,
@@ -166,6 +290,11 @@ for (i in 1:length(file_list)) {
       reading_weakness, seeing_impaired, colour_vision_impaired,
       hearing_impaired, CI_or_hearing_aid,
       flicker_freq, excl)
+  
+  # save backup of demographics df in current participant's folder
+  write.csv(df_demogr, paste(path_data_folder, file_list[i], "/", file_list[i], "_demographics.csv", sep = ""), row.names = FALSE)
+  #--> update this later with info on excluded trials & stuff
+  
   
   ###########################
   
@@ -198,16 +327,17 @@ for (i in 1:length(file_list)) {
   
   ### ADD NUMBERED BLOCK NAMES ####
   
+  # Problem: 
+  # In some cases, 3 blocks of the same kind could just directly follow each other, so 
+  # there's no way to tell them apart. If we want to compute d-primes by block, though, 
+  # it would be nice if they had unique names and I wouldn't have to build 
+  # something from the block numbers and block conditions.
   
-  
-  
-  # TO DO: We don't have 2, but 3 blocks for each condition. Fix this: 
-  
-  # Idea: Create counters for BL, 1-back and 2-back main blocks, loop rows, 
-  #       if a new block starts, update counter and add new block label.
-  # Keep in mind that we have more than 300 trials in each block because we also need labels for the question rows.
-  
-  
+  # Idea: 
+  # Create counters for BL, 1-back and 2-back main blocks, loop rows, 
+  # if a new block starts, update counter and add new block label.
+  # Keep in mind that we have more than 300 trials in each block 
+  # because we also need labels for the question rows.
   
   # first, just copy the "old" block names
   subj_df$block_names_numbered <- subj_df$block_kind
@@ -626,134 +756,6 @@ rm(list=ls()[! ls() %in% c("df_text_data", "df_demogr", "df_comprehension_Qs", "
 
 ###########################
 
-# Calculate AQ - SPQ Continuum Scores for all participants:
-
-
-# build some placeholders for the AQ and SPQ subscale scores
-AQ_all <- NA
-AQ_SS  <- NA
-AQ_AS  <- NA
-AQ_AD  <- NA
-AQ_C   <- NA
-AQ_I   <- NA
-
-# append them to df_demogr:
-df_demogr <- as.data.frame(cbind(AQ_all, AQ_SS, AQ_AS, AQ_AD, AQ_C, AQ_I))
-
-# -----------------------------
-
-# SPQ: 
-# From the Original Questionnaire: "Alle mit „Ja“ beantworteten Items werden mit 1 verrechnet. 
-#                                   Der Gesamtwert ist die Summe aller Subskalenwerte."
-# So basically all items where participant answered "yes" is counted as 1, "no" is counted as 0. 
-# If you get the sum for each of the scales, you have the sub scale score
-
-# Loop scales in SPQ and count sub scales scores
-
-SPQ_scales <- c("RI",  # Referenzideen (counterintuitively, RI ≠ Rihanna here)
-                "SA",  # (exzessive) soziale Angst
-                "MD",  # Ungwöhnliche Glaubensinhalte / Magisches Denken
-                "UW",  # Ungewöhnliche Wahrnehmungen
-                "EV",  # Ungewöhnliches oder exzentrisches Verhalten
-                "KEF", # Keine engen Freunde
-                "US",  # Ungewöhnliche Sprache
-                "EA",  # Eingeschränkter Affekt
-                "AW")  #Argwohn / Wahnähnliche Vorstellungen
-
-for (curr_subscale in SPQ_scales){
-  print(curr_subscale)
-  # get names of all columns that end with the current sub scale name
-  curr_columns <- as.vector(names(input_df)[grep("AW", names(input_df))])
-  # get subset of df where columns have these names:
-  curr_columns <- input_df[curr_columns]
-  
-  # get only the row where we have values:
-  curr_columns <- curr_columns[which(input_df$sender == "SPQ-G"), ]
-  
-  # now count how many times participant answered "yes" (label = 1)
-  curr_subscale_score <- sum(curr_columns)
-  print(curr_subscale_score)
-  
-  # put subscale score into demographics df:
-  df_demogr[paste("SQP_", curr_subscale, sep = "")] <- as.numeric(curr_subscale_score)
-  
-} 
-
-# also assign overall score:
-df_demogr$SPQ_all <- sum(input_df[which(input_df$sender == "SPQ-G"), 
-                                  as.vector(names(input_df)[grep("SPQ", names(input_df))])])
-
-
-# -----------------------------
-
-### Autism-Spectrum Quotient (AQ)
-
-#Baron-Cohen, S., Wheelwright, S., Skinner, R., Martin, J., & Clubley, E. (2001). 
-# The autism-spectrum quotient (AQ): Evidence from asperger syndrome/high-functioning autism, 
-# males and females, scientists and mathematicians. Journal of autism and developmental disorders, 31(1), 5-17.
-
-# First, we have to recode some of the item scores:
-# Recode all positive values to 1, recode all negative values to 0:
-
-AQ_df <- input_df[which(input_df$sender == "AQ-G"), as.vector(names(input_df)[grep("AQ", names(input_df))])]
-AQ_df[1,] <- ifelse(as.vector(unlist(AQ_df)) > 0, 1, 0)
-
-
-# Now we have to change the polarity of some of the items. 
-
-# The scores 1 and 0 for the following items can stay as they are: 
-# 2, 4, 5, 6, 7, 9, 12, 13, 16, 18, 19, 20, 21, 22, 23, 26, 33, 35, 39, 41, 42, 43, 45 und 46 
-
-# The scores 1 and 0 for the following items have to be reversed to 0 and 1: 
-# 1, 3, 8, 10, 11, 14, 15, 17, 24, 25, 27, 28, 29, 30, 31, 32, 34, 36, 37, 38, 40, 44, 47, 48, 49 und 50 
-
-reverse_indices <- c(1, 3, 8, 10, 11, 14, 15, 17, 24, 25, 27, 28, 29, 
-                     30, 31, 32, 34, 36, 37, 38, 40, 44, 47, 48, 49, 50)
-
-# reverse the values for the items I specified above
-AQ_df[1, reverse_indices] <- ifelse(AQ_df[1, reverse_indices] == 0, 1, 0)
-
-# Now we're all set for counting the subscale scores. 
-
-# The AQ-50 has 5 subscales. 
-# It's a bit difficult to find them as most sites only report how to get & interpret 
-# the overall score, but I found a key here and the scales make sense 
-# to me if I look at the corresponding items: 
-#     https://novopsych.com.au/assessments/diagnosis/autism-spectrum-quotient/
-
-# Social skill:        items 01,11,13,15,22,36,44,45,47,48
-# Attention switching: items 02,04,10,16,25,32,34,37,43,46
-# Attention to detail: items 05,06,09,12,19,23,28,29,30,49
-# Communication:       items 07,17,18,26,27,31,33,35,38,39
-# Imagination:         items 03,08,14,20,21,24,40,41,42,50
-
-df_demogr$AQ_SS <- sum(AQ_df[ , c("AQ_01", "AQ_11", "AQ_13", 
-                                  "AQ_15", "AQ_22", "AQ_36", 
-                                  "AQ_44", "AQ_45", "AQ_47", 
-                                  "AQ_48")])
-
-df_demogr$AQ_AS <- sum(AQ_df[ , c("AQ_02", "AQ_04", "AQ_10",
-                                  "AQ_16", "AQ_25","AQ_32",
-                                  "AQ_34","AQ_37","AQ_43",
-                                  "AQ_46")])
-
-df_demogr$AQ_AD <- sum(AQ_df[ , c("AQ_05","AQ_06","AQ_09",
-                                  "AQ_12","AQ_19","AQ_23",
-                                  "AQ_28","AQ_29","AQ_30",
-                                  "AQ_49")])
-
-df_demogr$AQ_C <- sum(AQ_df[ , c("AQ_07","AQ_17","AQ_18",
-                                 "AQ_26","AQ_27","AQ_31",
-                                 "AQ_33","AQ_35","AQ_38",
-                                 "AQ_39")])
-
-df_demogr$AQ_I <- sum(AQ_df[ , c("AQ_03","AQ_08","AQ_14",
-                                 "AQ_20","AQ_21","AQ_24",
-                                 "AQ_40","AQ_41","AQ_42",
-                                 "AQ_50")])
-
-# get overall AQ score: 
-df_demogr$AQ_all <- sum(AQ_df[ ,])
 
 
 # -----------------------------------
