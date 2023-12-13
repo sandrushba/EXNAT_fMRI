@@ -75,7 +75,6 @@ Version: November, 2023
 
 # for setting paths:
 import os
-#os.chdir('/Volumes/MERLE 1/EXNAT-2/EEG_study_EXNAT2/EXNAT-2 Win7 Experiment EYELINK/Analysis/')
 
 import sys
 
@@ -109,8 +108,8 @@ from matplotlib.colors import LinearSegmentedColormap #  for plotting bridging b
 # ----------------------------------------------------- # 
 
 # set path to data file here:
-curr_data_path = "/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
-#curr_data_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
+#curr_data_path = "/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
+curr_data_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
 
 # get list of files in data directory: 
 file_list = os.listdir(curr_data_path)
@@ -201,9 +200,9 @@ for curr_file in file_list:
     # and there's a lot of visual stimulation in my experiment, 
     # so maybe there's even a lot of alpha suppression.
     # But maybe I'm wrong and we can see an alpha peak anyway.
-    raw_occipital = raw.copy().pick(['O1', 'Oz', 'O2', 'PO7', 'PO3', 'POz', 'PO4', 'PO8'])
-    raw_occipital.filter(l_freq = 1, h_freq = 80)
-    raw_occipital.compute_psd(fmin = 0, fmax = 80).plot()
+    #raw_occipital = raw.copy().pick(['O1', 'Oz', 'O2', 'PO7', 'PO3', 'POz', 'PO4', 'PO8'])
+    #raw_occipital.filter(l_freq = 1, h_freq = 80)
+    #raw_occipital.compute_psd(fmin = 0, fmax = 80).plot()
     
     # No alpha-peak and what should be a 1/f distribution looks odd. 
     # It looks a bit like the power is too low between 5 and 15 Hz or so.
@@ -422,6 +421,7 @@ for curr_file in file_list:
 
     # save backup of raw object in the data folder: 
     raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
+
 
 
     """ Get Eyetracking Data: Read in ascii Dataset as MNE Raw Object """
@@ -918,9 +918,104 @@ for curr_file in file_list:
     # check if it worked:
     #raw_selected_channels.ch_names
     #raw.ch_names
-        
+    
+    # free up some memory 
+   # del raw
      
-        
+   
+    
+   """ Add custom channels with info on independent variables for TRFs """
+             
+    
+   # 1. stimulus onsets array:
+       # each stimulus (in the reading task blocks: stimulus = word) onset is a pulse of amplitude = 1
+   
+   # 2. word length array:
+       # pulse at each word onset with amplitude = word length
+       
+   # 3. word surprisal on TS 1:
+       # pulse at each word onset with amplitude = word surprisal on TS 1
+       
+   # 4. word surprisal on TS 4:
+       # pulse at each word onset with amplitude = word surprisal on TS 4
+       
+   # 5. word surprisal on TS 12:
+       # pulse at each word onset with amplitude = word surprisal on TS 12
+       
+   # 6. word surprisal on TS 60:
+       # pulse at each word onset with amplitude = word surprisal on TS 60
+       
+   # --> add more variables here?
+   
+   # -------------------
+       
+   # For 1.: stimulus onsets
+       
+   # Build something that could be an EEG channel, but set all values to 0. 
+   # Extract time stamps with word onsets from the annotations 
+   # and set values at those time points to 1. 
+       
+   # get sampling frequency and number of samples from the EEG raw object:
+   sfreq = raw_selected_channels.info['sfreq']
+   n_samples = raw_selected_channels.n_times
+   # create array where all values are 0:
+   stim_onsets = np.zeros(n_samples)
+   # get time stamps for stimulus onset events:
+   stim_onset_times = raw_selected_channels.annotations.onset[raw_selected_channels.annotations.description == "trial_on"]
+   # important: there are now also non-word stimuli in there, so maybe exclude some of them later
+   # set values in stim_onsets to 1 at the time stamps we extracted:
+   stim_onsets[np.round(stim_onset_times * sfreq).astype(int)] = 1
+ 
+    
+   # plot a sample of EEG data and the new channel
+   raw_selected_channels.plot(duration = 2)
+    
+   
+    # Define the time range (last 10 minutes)
+    start_time = raw_selected_channels.times[-1] - 600  # 600 seconds = 10 minutes
+    end_time = raw_selected_channels.times[-1]
+    
+    # Get the indices corresponding to the time range
+    start_index = np.argmax(raw_selected_channels.times >= start_time)
+    end_index = np.argmax(raw_selected_channels.times >= end_time)
+
+
+   # Plot EEG data
+    fig, ax1 = plt.subplots()
+    ax1.plot(raw_selected_channels.times[start_index:end_index], 
+             raw_selected_channels.get_data()[0, start_index:end_index], 
+             color='blue', 
+             label='EEG Data')
+    ax1.set_xlabel('Time (s)')
+    ax1.set_ylabel('EEG Amplitude (uV)', color='blue')
+    ax1.tick_params('y', colors='blue')
+    
+    # Create a second y-axis for the custom array
+    ax2 = ax1.twinx()
+    ax2.plot(raw_selected_channels.times[start_index:end_index], 
+             stim_onsets[start_index:end_index], 
+             color='red', 
+             label='Stim Onsets', 
+             linestyle='--', alpha=0.5)
+    ax2.set_ylabel('Stimulus Onsets', color='red')
+    ax2.tick_params('y', colors='red')
+    
+    # Add triggers from annotations in green
+    triggers = raw_selected_channels.annotations.onset[(raw_selected_channels.annotations.description == 'trial_on')]
+    for trigger in triggers:
+        ax1.axvline(trigger, color='green', linestyle='- -', linewidth=1, alpha=1, label='Trigger')
+    
+    plt.title('Combined Plot of EEG Data and Stimulus Onset Array')
+    plt.show()
+    
+   
+    
+   
+    
+   
+    
+   
+     
     """ Epoching """
     
     # get trial onsets:    
@@ -1010,7 +1105,7 @@ for curr_file in file_list:
     
 
     """ --> cut data into blocks """
-    £
+
     # Create Events from Annotations
     events, event_id = mne.events_from_annotations(raw, event_id = trigger_map)
     #print(event_id)
@@ -1177,7 +1272,11 @@ for curr_file in file_list:
         #evoked.plot_image(picks=['O1', 'O2', 'Oz'])
         # evoked.plot_joint(picks = ['O1', 'O2', 'Oz'])
     
+    
+    
+    
         
+    
     
         """ Add Metadata for Each Epoch """
         

@@ -98,7 +98,6 @@ df_comprehension_Qs <- data.frame()
 # Loop files in my file list aka directory
 for (i in 1:length(file_list)) {
  
- 
   # PREPARE FILE FOR PREPROCESSING
   
   # get names of csv files for current participant: There should be one file containing the experimental 
