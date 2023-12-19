@@ -57,6 +57,10 @@ Version: November, 2023
 # regular EDFs but in a weird Eyelink format. So they have to 
 # be converted to .asc format using Eyelink's EDFConverter app.
 # Make sure you did that for all files you want to analyse here.    
+# You can find the EDF Converter App in the Eyelink 
+# Developer's Kit / API in the SR Research Forum: 
+# https://www.sr-research.com/support/thread-13.html
+# You have to register on the website to be able to download the app.
 
 # For some participants, the eyetracking data file might be missing, e.g. 
 # if there were problems with contact lenses or glasses.
@@ -103,13 +107,17 @@ import re # for regular expressions
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap #  for plotting bridging between electrodes
 
+# for TRFs:
+from eelbrain import *
+# hint: pip installing it didn't work for me, but you can also install it in the Anaconda Navigator:
+# https://github.com/christianbrodbeck/Eelbrain/wiki/Installing#through-a-command-line
 
 
 # ----------------------------------------------------- # 
 
 # set path to data file here:
-#curr_data_path = "/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
-curr_data_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
+curr_data_path = "/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
+#curr_data_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
 
 # get list of files in data directory: 
 file_list = os.listdir(curr_data_path)
@@ -435,14 +443,14 @@ for curr_file in file_list:
     
         """ Eyetracking data """
         
-    
+        
         eyelink_raw = read_raw_eyelink(curr_data_path + "part_" + curr_id + "/" + ascii_file[0], 
                                        create_annotations = ["blinks", "messages"], # mark blinks in the stream & add trigger messages
                                        preload = True,
                                        apply_offsets = True) # adjust onset time of the mne.Annotations created from exp. messages (= triggers)
     
         # Check out info to see if everything looks fine:
-        eyelink_raw.info
+        #print(eyelink_raw.info)
     
         # plot raw eyetracking data from pupil size channel of right eye 
         # to see if everything's there and the triggers were recorded properly:
@@ -451,106 +459,13 @@ for curr_file in file_list:
         
         
         """ Check quality of calibration: """
-        cals = read_eyelink_calibration(curr_data_path + "part_" + curr_id + "/" + curr_id + ".asc")
-        print(f"number of calibrations: {len(cals)}")
-        first_cal = cals[0]  # let's access the first (and only in this case) calibration
-        print(first_cal)
+        #cals = read_eyelink_calibration(curr_data_path + "part_" + curr_id + "/part" + curr_id + ".asc")
+        #print(f"number of calibrations: {len(cals)}")
+        #first_cal = cals[0]  # let's access the first (and only in this case) calibration
+        #print(first_cal)
         # plot calibrations to check quality:
         # first_cal.plot()
     
-    
-        """ Interpolate missing data in blink periods """
-        
-        # plot raw eyetracking data from pupil size channel of right eye 
-        # to see if everything's there and the triggers were recorded properly:
-        pupil_channel_idx = mne.pick_channels(eyelink_raw.ch_names, ["pupil_right"])
-        #eyelink_raw.plot(scalings = dict(eyegaze = 1e3), order = pupil_channel_idx)
-        
-        # There are blinks in our data, so sometimes pupil dilation = 0. 
-        # We don't want to throw away data here, so interpolate the missing bits.
-        # We'll use 0.05 = 50 ms before and 0.2 = 200 ms after the blink as the interpolation 
-        # window, so that the noisy data surrounding the blink is also interpolated
-        mne.preprocessing.eyetracking.interpolate_blinks(eyelink_raw, buffer = (0.05, 0.2))
-        
-        # plot again: 
-        #eyelink_raw.plot(scalings = dict(eyegaze = 1e3), order = pupil_channel_idx)
-        
-    
-    
-        """ Control for potential influence of eye movements on pupil size """
-        
-        # From Frauke's paper: https://doi.org/10.1523/JNEUROSCI.2181-22.2023
-        
-        # "To control for the potential influence of eye
-        # movement-related changes, the x-coordinates and y-coordinates
-        # were regressed out of the pupil data (multiple linear regression; Fink
-        # et al., 2021), and the resultant residual pupil size time course was
-        # used for all further analyses."
-        
-        # I'll do the same here:
-        # 1. get eye movement data (recorded as x and y coordinates)
-        # 3. run multiple linear regression using x and y coordinates as predictors
-        # 4. calculate residual pupil size and use that for further analysis
-        
-        
-        # Prepare predictor variables (x-coordinates and y-coordinates)
-        # --> find the channel names by running this: eyelink_raw.ch_names
-        x_coords = eyelink_raw.get_data(picks="xpos_right")
-        y_coords = eyelink_raw.get_data(picks="ypos_right")
-        pupil_size = eyelink_raw.get_data(picks="pupil_right")
-        
-        # Reshape for regression (make them column vectors)
-        x_coords = x_coords.reshape(-1, 1)
-        y_coords = y_coords.reshape(-1, 1)
-        pupil_data = pupil_size.reshape(-1, 1)
-        
-        
-        # Get rid of NaN values by imputing them 
-        # (mean imputation --> replace missing values using the mean along each column)
-        imputer = SimpleImputer(strategy="mean")
-        x_coords_imputed = imputer.fit_transform(x_coords)
-        y_coords_imputed = imputer.fit_transform(y_coords)
-        pupil_data_imputed = imputer.fit_transform(pupil_data)
-        
-        # Fit regression model
-        reg_model = LinearRegression()
-        reg_model.fit(np.hstack((x_coords_imputed, y_coords_imputed)), pupil_data_imputed)
-        
-        # Step 4: Calculate residual pupil size
-        predicted_pupil_size = reg_model.predict(np.hstack((x_coords_imputed, y_coords_imputed)))
-        residual_pupil_size = pupil_data - predicted_pupil_size
-        
-        
-        # Add to raw object as new channel
-        new_channel_data = residual_pupil_size.T
-        
-        # create info for channel:
-        new_channel_info = mne.create_info(
-            ch_names=["residual_pupil_size"],
-            sfreq=eyelink_raw.info["sfreq"],
-            ch_types=["pupil"],
-        )
-        new_channel_info["line_freq"] = eyelink_raw.info["line_freq"]
-        new_channel_info["subject_info"] = eyelink_raw.info["subject_info"]
-        with new_channel_info._unlock():
-            new_channel_info["lowpass"] = eyelink_raw.info["lowpass"]
-            new_channel_info["highpass"] = eyelink_raw.info["highpass"]
-            
-        # put together to raw object
-        new_channel_raw = mne.io.RawArray(
-            data = new_channel_data,
-            info = new_channel_info,
-            first_samp = eyelink_raw.first_samp,
-        )
-        
-        # concatenate raw objects
-        eyelink_raw.add_channels([new_channel_raw])
-        
-        # plot the new data and compare with original pupil size data:
-        #eyelink_raw.plot(scalings = dict(eyegaze = 1e3), order = mne.pick_channels(eyelink_raw.ch_names, ["pupil_right", "residual_pupil_size"]))
-        
-        
-        
         
         """ Change trigger labels """
         # The cool thing about the eyetracker is that we can send strings as triggers, so I don't have to 
@@ -571,26 +486,27 @@ for curr_file in file_list:
         
         # shorten some of the labels so they fit the EEG data
         eyelink_eeg_trigger_map = {'': '', 
-                                   'blink': 'blink',
-                                   'start_experiment': 'start_exp', 
+                                   'BAD_blink': 'BAD_blink',
+                                   'start_experiment': 'start_exp',
                                    'click_training_onset': 'click_t_on', 
                                    'trial_onset': 'trial_on',
-                                   'response_continue': 'resp_continue', 
+                                   'response_continue': 'resp_continue',
                                    'response_target': 'resp_target', 
                                    'trial_offset': 'trial_off', 
                                    'block_offset': 'block_off',
                                    'Reading_Baseline_training_onset': 'BL_t_on', 
-                                   'Reading_Baseline_main_onset': 'BL_m_on', 
-                                   '1back_single_training1_onset': '1back_t1_on', 
+                                   'Reading_Baseline_main_onset': 'BL_m_on',
+                                   '1back_single_training1_onset': '1back_t1_on',
                                    '1back_single_training2_onset': '1back_t2_on',
                                    '1back_single_main_onset': '1back_s_m_on',
                                    '1back_dual_main_onset': '1back_d_m_on',
                                    '2back_single_training1_onset': '2back_t1_on', 
                                    '2back_single_training2_onset': '2back_t2_on',
                                    '2back_single_main_onset': '2back_s_m_on', 
-                                   '2back_dual_main_onset':'2back_d_m_on',
+                                   '2back_dual_main_onset': '2back_d_m_on',
                                    'visual_task_main_onset': 'vtask_main_on', 
-                                   'visual_task_training_onset': 'vtask_t_on',
+                                   'visual_task_main_onset': 'vtask_main_on',
+                                   'visual_task_training_onset': 'vtask_t_on', 
                                    'pt_task_on': 'pt_task_on',
                                    '440_on': '440_on',
                                    '440_off': '440_off',
@@ -602,8 +518,8 @@ for curr_file in file_list:
                                    '1043_off': '1043_off',
                                    'ordered': 'ordered',
                                    'random': 'random',
-                                   'placeholder_1': 'placeholder_1', # look up what these mean
-                                   'placeholder_2': 'placeholder_2', # look up what these mean
+                                   'eyetracking_baseline': 'eyetracking_baseline',
+                                   'test_trigger': 'test_trigger',
                                    'end_experiment': 'end_exp' 
                                   }
     
@@ -611,7 +527,7 @@ for curr_file in file_list:
         # loop annotations in raw object:
         for trigger_key in set(eyelink_raw.annotations.description):
 
-            #print(trigger_key)
+            print(trigger_key)
             # find correct trigger label for the old trigger:
             trigger_label = list(eyelink_eeg_trigger_map.values())[list(eyelink_eeg_trigger_map.keys()).index(trigger_key)] 
             #print(trigger_label)
@@ -624,29 +540,51 @@ for curr_file in file_list:
     
     
         #""" Align EEG & Eyetracking Data """
-        # extract common events from EEG and eyetracking data        
-        #et_events = mne.find_events(eyelink_raw)
-        #eeg_events = mne.find_events(raw)
+        # extract shared triggers from EEG and eyetracking data        
+        eyetracking_events, _ = mne.events_from_annotations(eyelink_raw, event_id = {"click_t_on": trigger_map["click_t_on"], "BL_t_on": trigger_map["BL_t_on"]})        
+        
+        # in the eeg events, we get 2 events for both start_exp and end_exp as we test all triggers at the start of the experiment. 
+        # So maybe ignore the first "start_exp" and "end_exp" triggers here:
+        eeg_start_event, _ = mne.events_from_annotations(raw, event_id = {"BL_t_on": trigger_map["BL_t_on"]})
+        eeg_end_event, _   = mne.events_from_annotations(raw, event_id = {"click_t_on": trigger_map["click_t_on"]})
+        eeg_events = np.vstack((eeg_start_event[1], eeg_end_event[1]))
 
         # Convert event onsets from samples to seconds
-        #et_events = et_events[:, 0] / raw_et.info["sfreq"]
-        #eeg_flash_times = eeg_events[:, 0] / raw_eeg.info["sfreq"]
+        eyetracking_events = eyetracking_events[:, 0] / eyelink_raw.info["sfreq"]
+        eeg_events = eeg_events[:, 0] / raw.info["sfreq"]
+        
         # Align the data
-        #mne.preprocessing.realign_raw(
-        #    raw_et, raw_eeg, et_flash_times, eeg_flash_times, verbose="error"
-        #)
+        mne.preprocessing.realign_raw(raw = raw, 
+                                      other = eyelink_raw, 
+                                      t_raw = eeg_events, 
+                                      t_other = eyetracking_events, 
+                                      verbose="error")
+        
+        #  Aligning the data doesn't work because the time array of the EEG is slightly longer than the Eyetracking one. 
+        # The EEG triggers are always sent before the eyetracker triggers, so I guess the time it takes to send the trigger 
+        # is basically added to the eyetracking trigger.
+        
+        # Example: If trigger 1 is sent at 20 ms after experiment onset to the eeg and right afterwards to the the eyetracker. 
+        # If sending the eyetracking trigger takes a few ms, this delay should basically affect the timing of the rest of the script, 
+        # which should be fine as long as the stimuli are also delayed. With each trigger to the eyetracker, we add a few ms to the delay,
+        # which is also fine.
+        # However, at the end of the experiment, we send the last trigger to the eyetracker, which means this delay only affects the 
+        # timing of the eyetracking trigger. 
+        # So all in all, the trigger timestamps of the eyetracker and the EEG never match 100%, but 
+        
+        
+        # I think the script has to wait until the trigger to the eyetracker is sent, so the 1 ms delay should be passed on, 
+        # so the next EEG trigger is also sent with a 1 ms delay.So basically the delays add up, but both EEG and eyetracker should be affected equally, except for 
+        
         # Add EEG channels to the eye-tracking raw object
-        #raw_et.add_channels([raw_eeg], force_update_info=True)
-        #del raw_eeg  # free up some memory
-        
+        raw.add_channels([eyelink_raw], force_update_info=True)
 
-        
         
                 
         
         
     
-    
+
     
     
     
@@ -797,7 +735,8 @@ for curr_file in file_list:
 
     # placeholder for components that should be excluded:
     excl_components = []
-
+    #excl_components = [0,1,2,3,4] # just for testing
+    
     # loop components and plot them:
     for component_idx in range(n_components):
        
@@ -945,10 +884,17 @@ for curr_file in file_list:
    # 6. word surprisal on TS 60:
        # pulse at each word onset with amplitude = word surprisal on TS 60
        
-   # --> add more variables here?
+   # --> add more variables here? Reactions? Colours?
    
    # -------------------
        
+   # Prepare EEG signal for TRF:
+   eeg_data = raw_selected_channels.get_data()
+   time = raw_selected_channels.times
+   sensor = raw_selected_channels.ch_names
+   eeg = NDVar(eeg_data, (time, sensor), name='EEG', info={'unit': 'µV'})
+    
+   
    # For 1.: stimulus onsets
        
    # Build something that could be an EEG channel, but set all values to 0. 
