@@ -505,7 +505,6 @@ for curr_file in file_list:
                                    '2back_single_main_onset': '2back_s_m_on', 
                                    '2back_dual_main_onset': '2back_d_m_on',
                                    'visual_task_main_onset': 'vtask_main_on', 
-                                   'visual_task_main_onset': 'vtask_main_on',
                                    'visual_task_training_onset': 'vtask_t_on', 
                                    'pt_task_on': 'pt_task_on',
                                    '440_on': '440_on',
@@ -527,7 +526,7 @@ for curr_file in file_list:
         # loop annotations in raw object:
         for trigger_key in set(eyelink_raw.annotations.description):
 
-            print(trigger_key)
+            #print(trigger_key)
             # find correct trigger label for the old trigger:
             trigger_label = list(eyelink_eeg_trigger_map.values())[list(eyelink_eeg_trigger_map.keys()).index(trigger_key)] 
             #print(trigger_label)
@@ -540,18 +539,159 @@ for curr_file in file_list:
     
     
         #""" Align EEG & Eyetracking Data """
-        # extract shared triggers from EEG and eyetracking data        
-        eyetracking_events, _ = mne.events_from_annotations(eyelink_raw, event_id = {"click_t_on": trigger_map["click_t_on"], "BL_t_on": trigger_map["BL_t_on"]})        
         
-        # in the eeg events, we get 2 events for both start_exp and end_exp as we test all triggers at the start of the experiment. 
-        # So maybe ignore the first "start_exp" and "end_exp" triggers here:
-        eeg_start_event, _ = mne.events_from_annotations(raw, event_id = {"BL_t_on": trigger_map["BL_t_on"]})
-        eeg_end_event, _   = mne.events_from_annotations(raw, event_id = {"click_t_on": trigger_map["click_t_on"]})
-        eeg_events = np.vstack((eeg_start_event[1], eeg_end_event[1]))
+    
+        # remove first part from EEG data where we test triggers:
+      
+        # get all triggers + their time stamps
+        all_triggers = list(zip(raw.annotations.description, raw.annotations.onset))
+        #print(all_triggers[0:36])
+        
+        # filter triggers so you only get start_exp triggers (this trigger should occur twice)
+        start_exp_triggers = [(trigger, timestamp) for trigger, timestamp in all_triggers if trigger == 'start_exp']
 
+        # check if there are 2 "start_exp" triggers:
+        if len(start_exp_triggers) == 2:
+            
+            # get time stamp of the 2. occurrence of 'start_exp'
+            exp_start_ts = start_exp_triggers[1][1]
+        
+            # crop the raw data right before (aka 10 ms before) this time stamp. 
+            # This is where the experiment actually starts:
+            raw.crop(tmin = exp_start_ts - 0.01)
+
+        # sanity check: There should be only 1 "start_exp" trigger now. 
+        #all_triggers = list(zip(raw.annotations.description, raw.annotations.onset))
+        #print(all_triggers[0:10])
+        #start_exp_triggers = [(trigger, timestamp) for trigger, timestamp in all_triggers if trigger == 'start_exp']
+        #print(start_exp_triggers)
+        
+        
+        # Correct EEG time stamps:
+        # We start the EEG before the eyetracker, because the Eyetracker is started when the experiment is already running.
+        # So we need to subtract the Onset time of the first EEG trigger that's also in the eyetracking data ("start_exp") 
+        # from all eeg trigger time stamps.
+        
+        eeg_onset = list(zip(raw.annotations.description, raw.annotations.onset))  
+        eeg_onset = [(trigger, timestamp) for trigger, timestamp in eeg_onset if trigger == 'start_exp']
+        
+        # make sure there's really only one onset trigger and correct all trigger time stamps in the EEG raw object
+        if len(eeg_trial_on_triggers) == 1:
+            
+            # FIX THIS:
+            #raw.annotations.onset = raw.annotations.onset - eeg_onset[0]
+            
+           
+            
+            
+            
+            
+        
+        # get all triggers + their time stamps again:
+        all_triggers = list(zip(raw.annotations.description, raw.annotations.onset))
+        eeg_trial_on_triggers = [(trigger, timestamp) for trigger, timestamp in all_triggers if trigger == 'trial_on']
+        all_triggers = list(zip(eyelink_raw.annotations.description, eyelink_raw.annotations.onset))
+        eyelink_trial_on_triggers = [(trigger, timestamp) for trigger, timestamp in all_triggers if trigger == 'trial_on']
+
+
+        eeg_timestamps = [timestamp for _, timestamp in eeg_trial_on_triggers]
+        eyelink_timestamps = [timestamp for _, timestamp in eyelink_trial_on_triggers]
+        
+        # Create a scatter plot with transparency
+        plt.scatter(eeg_timestamps, [1.1] * len(eeg_timestamps), label='EEG Trials', marker='o', color='blue', alpha=1, s = 0.005)
+        plt.scatter(eyelink_timestamps, [1.2] * len(eyelink_timestamps), label='Eyelink Trials', marker='o', color='red', alpha=1, s = 0.005)
+        
+        # Set labels and legend
+        plt.xlabel('Timestamps (seconds)')
+        plt.yticks([1,2], ['Trials'])
+        plt.legend()
+        
+        # Show the plot
+        plt.show()
+
+
+
+        # compare the onsets of the last 1000 trials (where everything seemed to work with the triggers)
+        delay = [x - y for x, y in zip(eeg_timestamps[-1000:], eyelink_timestamps[-1000:])]
+
+        trigger = range(len(delay))
+        
+        # Plotting the time series
+        plt.plot(trigger, delay, marker='.', color='black')
+        
+        # Adding labels and title
+        plt.xlabel('trigger')
+        plt.ylabel('Delay in ms')
+        plt.title('Delay: Eyetracking - EEG Triggers')
+        
+        # Show the plot
+        plt.show()
+
+        # okay so there's about 100 ms between triggers and the eyetracking ones are always first. There's something really odd going on here.
+
+        # something's wrong with the trial onset triggers in the n-back single task blocks and the click training.
+        # As there are some triggers in the n-back single task blocks, but none in the click training where you could only press space, 
+        # I assume there's a problem whenever the participant didn't press c and only pressed space.
+        # I think they are pressing space before the onset trigger is set to 0 again and then the block offset trigger is sent already.
+
+        # If you check the "trial_off" triggers, you can see that there's even less. So there's definitely something odd here.
+
+        # I think sometimes there's not enough time to "turn off" a trigger, so basically the 0-trigger is never sent. 
+        # Maybe I should activate this in the trigger function.
+        
+        # I just don'
+
+
+
+
+
+
+
+
+        # extract shared triggers from EEG and eyetracking data        
+        eyetracking_events, _ = mne.events_from_annotations(eyelink_raw, event_id = {'start_exp': trigger_map['start_exp'],
+                                                                                     'click_t_on': trigger_map['click_t_on'], 
+                                                                                     'trial_on': trigger_map['trial_on'],
+                                                                                     'resp_continue': trigger_map['resp_continue'],
+                                                                                     'resp_target': trigger_map['resp_target'], 
+                                                                                     'trial_off': trigger_map['trial_off'], 
+                                                                                     'block_off': trigger_map['block_off'],
+                                                                                     'BL_t_on': trigger_map['BL_t_on'], 
+                                                                                     'BL_m_on': trigger_map['BL_m_on'],
+                                                                                     '1back_t1_on': trigger_map['1back_t1_on'],
+                                                                                     '1back_t2_on': trigger_map['1back_t2_on'],
+                                                                                     '1back_s_m_on': trigger_map['1back_s_m_on'],
+                                                                                     '1back_d_m_on': trigger_map['1back_d_m_on'],
+                                                                                     '2back_t1_on': trigger_map['2back_t1_on'], 
+                                                                                     '2back_t2_on': trigger_map['2back_t2_on'],
+                                                                                     '2back_s_m_on': trigger_map['2back_s_m_on'], 
+                                                                                     '2back_d_m_on': trigger_map['2back_d_m_on'],
+                                                                                     'vtask_main_on': trigger_map['vtask_main_on'],
+                                                                                     'vtask_t_on': trigger_map['vtask_t_on'], 
+                                                                                     'pt_task_on': trigger_map['pt_task_on'],
+                                                                                     '440_on': trigger_map['440_on'],
+                                                                                     '440_off': trigger_map['440_off'],
+                                                                                     '587_on': trigger_map['587_on'],
+                                                                                     '587_off': trigger_map['587_off'],
+                                                                                     '782_on': trigger_map['782_on'],
+                                                                                     '782_off': trigger_map['782_off'],
+                                                                                     '1043_on': trigger_map['1043_on'],
+                                                                                     '1043_off': trigger_map['1043_off'],
+                                                                                     'ordered': trigger_map['ordered'],
+                                                                                     'random': trigger_map['random'],
+                                                                                     'end_exp': trigger_map['end_exp'] 
+                                                                                     }) 
+        
+        eyetracking_events, _ = mne.events_from_annotations(eyelink_raw, event_id = {'trial_on': trigger_map['trial_on']}) 
+        eeg_events, _ = mne.events_from_annotations(raw, event_id = {'trial_on': trigger_map['trial_on']})       
+        
+                
         # Convert event onsets from samples to seconds
         eyetracking_events = eyetracking_events[:, 0] / eyelink_raw.info["sfreq"]
-        eeg_events = eeg_events[:, 0] / raw.info["sfreq"]
+        eeg_events         = eeg_events[:, 0]         / raw.info["sfreq"]
+        
+        len(eeg_events)
+        len(eyetracking_events)
         
         # Align the data
         mne.preprocessing.realign_raw(raw = raw, 
@@ -559,7 +699,9 @@ for curr_file in file_list:
                                       t_raw = eeg_events, 
                                       t_other = eyetracking_events, 
                                       verbose="error")
-        
+
+
+
         #  Aligning the data doesn't work because the time array of the EEG is slightly longer than the Eyetracking one. 
         # The EEG triggers are always sent before the eyetracker triggers, so I guess the time it takes to send the trigger 
         # is basically added to the eyetracking trigger.
@@ -593,8 +735,6 @@ for curr_file in file_list:
     elif len(ascii_file) == 0:
         pass
 
-
-    
 
     
 
