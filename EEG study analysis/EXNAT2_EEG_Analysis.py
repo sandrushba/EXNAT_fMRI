@@ -108,7 +108,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap #  for plotting bridging between electrodes
 
 # for TRFs:
-from eelbrain import *
+#from eelbrain import *
 # hint: pip installing it didn't work for me, but you can also install it in the Anaconda Navigator:
 # https://github.com/christianbrodbeck/Eelbrain/wiki/Installing#through-a-command-line
 
@@ -133,16 +133,18 @@ file_list = [item for item in file_list if ".py" not in item and ".DS_Store" not
 # loop folders & read in data for each participant.
 
 for curr_file in file_list: 
-    
-    # get ID of current participant
-    curr_id = curr_file.replace("part_", "")
-    print("reading in data for participant with ID", curr_id)
-    
-    # skip pilot datasets
-    if curr_id == "eg": 
+
+    # you can add more pilot dataset names here if you want to skip them:
+    if curr_file in ["part_eg"]: 
         print("skipping test dataset")
         continue
+
     
+    # get ID of current participant: some have ID part_0001, some look like part0001, so only get the last 4 digits.
+    curr_id = curr_file[-4:]
+    print("reading in data for participant with ID", curr_id)
+
+
 
     """ load current participant's experimental data """
     # For the TRFs, we need information on words, word frequencie, word lengths, 
@@ -155,8 +157,7 @@ for curr_file in file_list:
     """ create MNE raw object containing eyetracking data + triggers + metadata """    
     
     """ EEG """
-    
-    
+        
     """ create MNE raw object with raw EEG data + triggers + metadata """
     # read in the 3 EEG-related datasets
     curr_vhdr_file = curr_data_path + "part_" + curr_id + "/part" + curr_id + ".vhdr"
@@ -538,6 +539,7 @@ for curr_file in file_list:
         #print(set(eyelink_raw.annotations.description))
     
     
+    
         #""" Align EEG & Eyetracking Data """
         
     
@@ -582,62 +584,75 @@ for curr_file in file_list:
         # EEG: ('start_exp', 104.323)
         # Eyetracker: ('start_exp', 5.04)
         
-        # You can also see the shift if you plot the trial_onset times:
+        
+        # Plot the shift between EEG triggers and Eyetracker triggers: 
         
         # get all triggers + their time stamps again:
         #all_triggers = list(zip(raw.annotations.description, raw.annotations.onset))
         #eeg_trial_on_triggers = [(trigger, timestamp) for trigger, timestamp in all_triggers if trigger == 'trial_on']
         #all_triggers = list(zip(eyelink_raw.annotations.description, eyelink_raw.annotations.onset))
         #eyelink_trial_on_triggers = [(trigger, timestamp) for trigger, timestamp in all_triggers if trigger == 'trial_on']
-
         #eeg_timestamps = [timestamp for _, timestamp in eeg_trial_on_triggers]
         #eyelink_timestamps = [timestamp for _, timestamp in eyelink_trial_on_triggers]
-        
         # Create a scatter plot with transparency
         #plt.scatter(eeg_timestamps, [1.1] * len(eeg_timestamps), label='EEG Trials', marker='o', color='blue', alpha=1, s = 0.005)
         #plt.scatter(eyelink_timestamps, [1.2] * len(eyelink_timestamps), label='Eyelink Trials', marker='o', color='red', alpha=1, s = 0.005)
-        
         # Set labels and legend
         #plt.xlabel('Timestamps (seconds)')
         #plt.yticks([1,2], ['Trials'])
         #plt.legend()
-        
         # Show the plot
         #plt.show()
-
-        # This happens because the EEG recording started earlier than the eyetracker one as mentioned before.
-        # However, it would be nice if we could align the data so the time stamps match:
-
-        eeg_onset = list(zip(raw.annotations.description, raw.annotations.onset))  
-        eeg_onset = [(trigger, timestamp) for trigger, timestamp in eeg_onset if trigger in ['start_exp', 'vtask_t_on']]
-        eeg_onsets = [onset for description, onset in eeg_onset]
-
+        # There's a shift between the EEG & ET triggers. 
+        # This happens a) because the EEG recording started earlier than the eyetracker one, 
+        # and b) because we might have a slight clock drift between the two devices.
+        
+        
+        # However, it would be nice if we could align the data so the time stamps match.
+        
+        
+        
+        
+        """ Check if we have enough Eyetracking Data """
+        
         eye_onset = list(zip(eyelink_raw.annotations.description, eyelink_raw.annotations.onset))  
-        eye_onset = [(trigger, timestamp) for trigger, timestamp in eye_onset if trigger in ['start_exp', 'vtask_t_on']]
-        eye_onsets = [onset for description, onset in eye_onset]
+        
+        # check if there's an end_experiment trigger in the signal. If there isn't, 
+        # the Eyetracker probably didn't record properly. If there is, we can try to further analyse the data:
+        eye_end = [(trigger, timestamp) for trigger, timestamp in eye_onset if trigger == 'end_exp']
+        if eye_end != []:
 
-        # Align the data -> doesn't work
-        #mne.preprocessing.realign_raw(raw = raw, 
-        #                              other = eyelink_raw, 
-        #                              t_raw = eeg_onsets, 
-        #                              t_other = eye_onsets, 
-        #                              verbose="error")
-        
-        # Estimate the clock drift (in seconds): 
-        # eeg time between start and end, and eyetracker time between start and end:
-        total_clock_drift = (eeg_onsets[1] - eeg_onsets[0]) - (eye_onsets[1] - eye_onsets[0])
-        
-        
-        # crop EEG & Eyetracker signals so both recordings start at the start_exp trigger at onset time = 0:
+            # get experiment and visual task training onset triggers
+            eye_onset = [(trigger, timestamp) for trigger, timestamp in eye_onset if trigger in ['start_exp', 'vtask_t_on']]
+            eye_onsets = [onset for description, onset in eye_onset]
+    
+            eeg_onset = list(zip(raw.annotations.description, raw.annotations.onset))  
+            eeg_onset = [(trigger, timestamp) for trigger, timestamp in eeg_onset if trigger in ['start_exp', 'vtask_t_on']]
+            eeg_onsets = [onset for description, onset in eeg_onset]
+
+    
+            # Align the data -> doesn't work
+            #mne.preprocessing.realign_raw(raw = raw, 
+            #                              other = eyelink_raw, 
+            #                              t_raw = eeg_onsets, 
+            #                              t_other = eye_onsets, 
+            #                              verbose="error")
+            
+            # Estimate the clock drift (in seconds): 
+            # eeg time between start and end, and eyetracker time between start and end:
+            total_clock_drift = (eeg_onsets[1] - eeg_onsets[0]) - (eye_onsets[1] - eye_onsets[0])
             
             
+            # crop EEG & Eyetracker signals so both recordings start at the start_exp trigger at onset time = 0:
+                
+                
+                
+            # adjust time stamps based on clock drift.
+            # --> how much does it drift per sample on average? Subtract that from the time stamps of the longer signal.
+                
+                
+            # also make sure the streams have the same amount of samples between start & end
             
-        # adjust time stamps based on clock drift.
-        # --> how much does it drift per sample on average? Subtract that from the time stamps of the longer signal.
-            
-            
-        # also make sure the streams have the same amount of samples between start & end
-        
         
 
 
@@ -758,7 +773,7 @@ for curr_file in file_list:
         # so the next EEG trigger is also sent with a 1 ms delay.So basically the delays add up, but both EEG and eyetracker should be affected equally, except for 
         
         # Add EEG channels to the eye-tracking raw object
-        raw.add_channels([eyelink_raw], force_update_info=True)
+        #raw.add_channels([eyelink_raw], force_update_info=True)
 
         
                 
