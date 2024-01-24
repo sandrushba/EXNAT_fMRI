@@ -143,12 +143,12 @@
         {
           "type": "text",
           "title": "",
-          "content": "Ende der Fragebögen, vielen Dank!\n<br>\nBitte klicken Sie auf \"Daten sichern\"."
+          "content": "Ende der Fragebögen, vielen Dank!\n<br>\nBitte klicken Sie auf \"Download Data\"."
         }
       ],
       "scrollTop": true,
       "submitButtonText": "Daten sichern →",
-      "submitButtonPosition": "right",
+      "submitButtonPosition": "hidden",
       "files": [],
       "responses": [
         {
@@ -172,7 +172,9 @@
           "code": ""
         }
       ],
-      "title": "end"
+      "title": "end",
+      "_tab": "Content",
+      "timeout": "200"
     },
     "8": {
       "id": "8",
