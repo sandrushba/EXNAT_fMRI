@@ -144,15 +144,6 @@ for curr_file in file_list:
     curr_id = curr_file[-4:]
     print("reading in data for participant with ID", curr_id)
 
-
-
-    """ load current participant's experimental data """
-    # For the TRFs, we need information on words, word frequencie, word lengths, 
-    # word surprisal scores on all 4 time scales, and so on for each trial.
-
-    behav_data = pd.read_csv(curr_data_path + "part_" + curr_id + "/part_" + curr_id + "_behav_data.csv")
- 
-
     
     """ create MNE raw object containing eyetracking data + triggers + metadata """    
     
@@ -1512,24 +1503,30 @@ for curr_file in file_list:
     
         """ Add Metadata for Each Epoch in the Current Block """
         
-        # The metadata for each epoch have to be extracted from the csv with the behavioural data.
+        # For the TRFs, we need information on words, word frequencie, word lengths, 
+        # word surprisal scores on all 4 time scales, and so on for each trial.
+        # So basically for each epoch, we need those information as metadata. 
+        # We have to extract them from the csv with the behavioural data:
+        
+        behav_data = pd.read_csv(curr_data_path + "part" + curr_id + "/part_" + curr_id + "_behav_data.csv")
+        
+        curr_id = None
+        curr_age = None
+        curr_AQ_SPQ = None
         
         
-        
-        
-        
-        # We need to create a pandas dataframe where each row 
-        # contains the metadata for one epoch.
-        
-        # So create empty df, loop epochs and add metadata to the df:
-        epochs_metadata = pd.DataFrame(columns = ["block_nr", "block_name", "task_kind", 
+        # Now create a pandas dataframe where each row 
+        # contains the metadata for one epoch:
+    
+        epochs_metadata = pd.DataFrame(columns = ["ID", "age", "AQ_SPQ_score",
+                                                  "block_nr", "block_name", "task_kind", 
                                                   "trial_nr", "text_nr",
                                                   "word", "word_frequency", "word_length", 
                                                   "word_surprisal_T1", "word_surprisal_T4", 
                                                   "word_surprisal_T12", "word_surprisal_T60", 
                                                   "nback_reaction", "nback_response"])
         
-        # loop epochs
+        # loop epochs, get metadata & add to metadata df:
         for i, epoch in enumerate(epochs):
             
             
@@ -1559,7 +1556,7 @@ for curr_file in file_list:
                 
           
             # add information on the stimulus material. 
-            # We get these information from the csv with the behavioural data.    
+            # Reminder: We get these information from the csv with the behavioural data.    
             curr_word = None
             curr_word_length = None
             curr_word_freq = None
@@ -1581,20 +1578,23 @@ for curr_file in file_list:
 
             # add metadata to the df
             epochs_metadata = epochs_metadata.concat([epochs_metadata, 
-                                                      pd.DataFrame({"block_nr": curr_block_idx,
-                                                      "block_name": curr_block_name,
-                                                      "task_kind": curr_task_kind, 
-                                                      "trial_nr": i,
-                                                      "text_nr": curr_text_nr,
-                                                      "word": curr_word,
-                                                      "word_frequency": curr_word_freq,
-                                                      "word_length": curr_word_length,
-                                                      "word_surprisal_T1": curr_word_surprisal_T1,
-                                                      "word_surprisal_T4": curr_word_surprisal_T4,
-                                                      "word_surprisal_T12": curr_word_surprisal_T12,
-                                                      "word_surprisal_T60": curr_word_surprisal_T60,
-                                                      "nback_reaction": curr_nback_reaction})], 
-                                                     ignore_index = True)
+                                                      pd.DataFrame({"ID" = curr_id, 
+                                                                    "age" = curr_age,
+                                                                    "AQ_SPQ_score": curr_AQ_SPQ, 
+                                                                    "block_nr": curr_block_idx,
+                                                                    "block_name": curr_block_name,
+                                                                    "task_kind": curr_task_kind, 
+                                                                    "trial_nr": i,
+                                                                    "text_nr": curr_text_nr,
+                                                                    "word": curr_word,
+                                                                    "word_frequency": curr_word_freq,
+                                                                    "word_length": curr_word_length,
+                                                                    "word_surprisal_T1": curr_word_surprisal_T1,
+                                                                    "word_surprisal_T4": curr_word_surprisal_T4,
+                                                                    "word_surprisal_T12": curr_word_surprisal_T12,
+                                                                    "word_surprisal_T60": curr_word_surprisal_T60,
+                                                                    "nback_reaction": curr_nback_reaction})], 
+                                                         ignore_index = True)
 
 
 
