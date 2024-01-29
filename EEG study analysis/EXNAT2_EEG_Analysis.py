@@ -107,17 +107,17 @@ import re # for regular expressions
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap #  for plotting bridging between electrodes
 
-# for TRFs:
-#from eelbrain import *
-# hint: pip installing it didn't work for me, but you can also install it in the Anaconda Navigator:
-# https://github.com/christianbrodbeck/Eelbrain/wiki/Installing#through-a-command-line
+# for TRFs: import eelbrain (this can do boosting algorithm)
+# --> make sure it's pip installed 
+!pip install eelbrain
+from eelbrain import *
 
 
 # ----------------------------------------------------- # 
 
 # set path to data file here:
-curr_data_path = "/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
-#curr_data_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
+#curr_data_path = "/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
+curr_data_path = "/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/"
 
 # get list of files in data directory: 
 file_list = os.listdir(curr_data_path)
@@ -160,7 +160,7 @@ for curr_file in file_list:
         
     """ create MNE raw object with raw EEG data + triggers + metadata """
     # read in the 3 EEG-related datasets
-    curr_vhdr_file = curr_data_path + "part_" + curr_id + "/part" + curr_id + ".vhdr"
+    curr_vhdr_file = curr_data_path + "part" + curr_id + "/part" + curr_id + ".vhdr"
     
     # to check the analysis with a Clicktrains dataset:
     #curr_vhdr_file = "/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/part_0003/Clicktrains0003.vhdr"
@@ -233,7 +233,7 @@ for curr_file in file_list:
     # use custom montage:
         
     # path to .elc file with participant's head shape points & sensor locations:
-    curr_elc_file = curr_data_path + "part_" + curr_id + "/part" + curr_id + ".elc"
+    curr_elc_file = curr_data_path + "part" + curr_id + "/part" + curr_id + ".elc"
     
     # extract information from .elc file
     with open(curr_elc_file, 'r') as file:
@@ -310,23 +310,18 @@ for curr_file in file_list:
                                           
     
     # Plot the 3D montage (hint: you can move it with your cursor)
-    #mne.viz.plot_montage(montage = custom_montage, 
-    #                     scale_factor = 20, 
-    #                     show_names = True, 
-    #                     kind = '3d', 
-    #                     show = True, 
-    #                     sphere = "auto", 
-    #                     axes = None, 
-    #                     verbose = None)
+    mne.viz.plot_montage(montage = custom_montage, 
+                         scale_factor = 20, 
+                         show_names = True, 
+                         kind = '3d', 
+                         show = True, 
+                         sphere = "auto", 
+                         axes = None, 
+                         verbose = None)
     
 
     # Apply your custom montage to the raw object
     raw.set_montage(custom_montage)
-
-    # Plot the sensors with the applied montage
-    #raw.plot_sensors(kind='3d', ch_type='eeg', show_names=True)
-
-
 
     
     # for source localisation (later): make a head sphere model
@@ -336,7 +331,7 @@ for curr_file in file_list:
         
         
     # save backup of raw object in the data folder: 
-    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
+    raw.save((curr_data_path + "part" + curr_id + "/backup_raw.fif"), overwrite = True)
 
 
     """ Delete 'New Segment/' Trigger """
@@ -410,33 +405,33 @@ for curr_file in file_list:
     # loop annotations in raw object:
     for old_annotation in set(raw.annotations.description):
         #print(old_annotation)
-        
+
         # if the current annotation is not the weird first "new segment" trigger:
         if old_annotation != 'New Segment/':
             # use regex to extract the number of the trigger & convert it to int:
             trigger_value = int(re.findall(r'\d+', old_annotation)[0])
-            #print(trigger_value)
+            print(trigger_value)
             
             # find correct trigger label for the trigger value we extracted:
             trigger_label = list(trigger_map.keys())[list(trigger_map.values()).index(trigger_value)] 
-            #print(trigger_label)
+            print(trigger_label)
             
             # change label in the annotations:
             raw.annotations.description[raw.annotations.description == old_annotation] = trigger_label
 
     # print annotations again to check if it worked:
-    #print(set(raw.annotations.description))
+    print(set(raw.annotations.description))
 
 
     # save backup of raw object in the data folder: 
-    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
+    raw.save((curr_data_path + "part" + curr_id + "/backup_raw.fif"), overwrite = True)
 
 
 
     """ Get Eyetracking Data: Read in ascii Dataset as MNE Raw Object """
 
     # check if there's an ascii file for the current participant - those are the eyetracking data
-    curr_participant_file_list = os.listdir(curr_data_path + "part_" + curr_id + "/")
+    curr_participant_file_list = os.listdir(curr_data_path + "part" + curr_id + "/")
     ascii_file = [file for file in curr_participant_file_list if file.endswith(".asc")]
 
     # if there is one, read in eyetracking data:
@@ -448,9 +443,8 @@ for curr_file in file_list:
         #                               preload = True,
         #                               apply_offsets = True)
         
-        eyelink_raw = read_raw_eyelink(curr_data_path + "part_" + curr_id + "/" + ascii_file[0], 
+        eyelink_raw = read_raw_eyelink(curr_data_path + "part" + curr_id + "/" + ascii_file[0], 
                                        create_annotations = ["blinks", "messages"], # mark blinks in the stream & add trigger messages
-                                       preload = True,
                                        apply_offsets = True) # adjust onset time of the mne.Annotations created from exp. messages (= triggers)
     
         # Check out info to see if everything looks fine:
