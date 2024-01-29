@@ -483,7 +483,41 @@ for curr_file in file_list:
         # But the important triggers (trial onsets & block onsets) are there, which is nice.
         
         # shorten some of the labels so they fit the EEG data
-        eyelink_eeg_trigger_map = {'': '', 
+        eyelink_eeg_trigger_map = {'2': 'block_on',
+                                   '4': 'resp_target',
+                                   '6': 'resp_continue',
+                                   '8': 'trial_on',
+                                   '10': 'click_t_on',
+                                   '12': 'BL_t_on',
+                                   '14': 'BL_m_on',
+                                   '16': '1back_t1_on',
+                                   '18': '1back_t2_on',
+                                   '20': '1back_s_m_on',
+                                   '22': '1back_d_m_on',
+                                   '24': '2back_t1_on',
+                                   '26': '2back_t2_on',
+                                   '28': '2back_s_m_on',
+                                   '30': '2back_d_m_on',
+                                   '32': 'pt_task_on',
+                                   '34': 'vtask_main_on',
+                                   '36': 'vtask_t_on',
+                                   '38': 'block_off',
+                                   '40': '440_on',
+                                   '42': '440_off',
+                                   '44': '587_on',
+                                   '46': '587_off',
+                                   '48': '782_on',
+                                   '50': '782_off',
+                                   '52': '1043_on',
+                                   '54': '1043_off',
+                                   '56': 'ordered',
+                                   '58': 'random',
+                                   '60': 'start_exp',
+                                   '62': 'end_exp',
+                                   '64': 'trial_off', 
+                                   '66': 'placeholder_1', # look up what these mean
+                                   '68': 'placeholder_2', # look up what these mean
+                                   '': '', 
                                    'BAD_blink': 'BAD_blink',
                                    'start_experiment': 'start_exp',
                                    'click_training_onset': 'click_t_on', 
@@ -524,10 +558,10 @@ for curr_file in file_list:
         # loop annotations in raw object:
         for trigger_key in set(eyelink_raw.annotations.description):
 
-            #print(trigger_key)
+            print(trigger_key)
             # find correct trigger label for the old trigger:
             trigger_label = list(eyelink_eeg_trigger_map.values())[list(eyelink_eeg_trigger_map.keys()).index(trigger_key)] 
-            #print(trigger_label)
+            print(trigger_label)
             
             # change label in the annotations:
             eyelink_raw.annotations.description[eyelink_raw.annotations.description == trigger_key] = trigger_label
@@ -544,7 +578,7 @@ for curr_file in file_list:
         # so the EEG stream should be longer although both streams are recorded with a sampling rate of 1000 Hz. 
         
         # sanity check: How many samples are in each stream? EEG should have more. 
-        print("Sanity check: There are more eeg samples than eyetracker samples: ", str(raw.n_times > eyelink_raw.n_times))
+        print("Sanity check: There are more eeg samples than eyetracker samples (should be True): ", str(raw.n_times > eyelink_raw.n_times))
         
         # At the start of the experiment, to check if the recording works and all triggers arrive properly,
         # we test the EEG triggers but we don't send these test triggers to the eyetracker as we can't see them in the Viewer anyways.
@@ -614,7 +648,6 @@ for curr_file in file_list:
         deviation = np.abs(np.array(eeg_shifted_timestamps) - np.array(eyelink_shifted_timestamps))
         
         plt.figure(figsize=(10, 6))
-        
         plt.scatter(range(len(deviation)), deviation, label='Deviation: EEG - Eyetracker Triggers', marker='.', color = "darkred", s = 20)
         plt.xlabel('Trial Index')
         plt.ylabel('Deviation (seconds)')
@@ -624,14 +657,21 @@ for curr_file in file_list:
 
 
 
+
+        # Adjust EEG & Eyetracking data onsets.
         
         
+
+
         
         # However, it would be nice if we could align the data so the time stamps match.
         
         
         
         
+
+
+
     
         
         """ Check if we have enough Eyetracking Data """
@@ -879,7 +919,7 @@ for curr_file in file_list:
     
     
     # save backup of raw object in the data folder: 
-    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw.fif"), overwrite = True)
+    raw.save((curr_data_path + "part" + curr_id + "/backup_raw.fif"), overwrite = True)
 
 
 
@@ -889,7 +929,7 @@ for curr_file in file_list:
                      h_freq = None)
         
     # save backup of raw object in the data folder: 
-    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw_filtered.fif"), overwrite = True)
+    raw.save((curr_data_path + "part" + curr_id + "/backup_raw_filtered.fif"), overwrite = True)
 
 
 
@@ -979,7 +1019,7 @@ for curr_file in file_list:
     print("You told me to exclude the following components: " + ', '.join(map(str, excl_components)))
 
     # save info on which components we excluded:
-    curr_participant_info_dict = {'ID': curr_id, 'ica components excluded manually': excl_components}   
+      curr_participant_info_dict = {'ID': curr_id, 'ica components excluded manually': excl_components}   
     
 
     # Exclude ICA components automatically if they have a high correlation with EOG events:
@@ -1025,8 +1065,8 @@ for curr_file in file_list:
     ica.apply(raw)
 
     # save backups again:
-    ica.save((curr_data_path + "part_" + curr_id + "/backup_ica.fif"), overwrite = True)
-    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw_ica.fif"), overwrite = True)
+    ica.save((curr_data_path + "part" + curr_id + "/backup_ica.fif"), overwrite = True)
+    raw.save((curr_data_path + "part" + curr_id + "/backup_raw_ica.fif"), overwrite = True)
   
     # save information on which components we excluded 
   
@@ -1039,7 +1079,7 @@ for curr_file in file_list:
     
     """ Filtering """    
     # plot PSD before low-pass filtering:
-    #raw.plot_psd(fmax = 80, average = True, spatial_colors = False)
+    raw.plot_psd(fmax = 80, average = True, spatial_colors = False)
     
     # Visualise filter parameters
     #filter_params = mne.filter.create_filter(data = raw.get_data(),
@@ -1058,10 +1098,10 @@ for curr_file in file_list:
 
 
     # plot PSD after filtering
-    #raw.plot_psd(fmax = 40, average = True, spatial_colors = False)
+    raw.plot_psd(fmax = 40, average = True, spatial_colors = False)
 
     # save data again
-    raw.save((curr_data_path + "part_" + curr_id + "/backup_raw_ica_filtered.fif"), overwrite = True)
+    raw.save((curr_data_path + "part" + curr_id + "/backup_raw_ica_filtered.fif"), overwrite = True)
 
     
     """ 4.4 Select relevant channels """
@@ -1075,7 +1115,7 @@ for curr_file in file_list:
     #raw.ch_names
     
     # free up some memory 
-   # del raw
+    # del raw
      
    
     
@@ -1105,11 +1145,44 @@ for curr_file in file_list:
    # -------------------
        
    # Prepare EEG signal for TRF:
-   eeg_data = raw_selected_channels.get_data()
-   time = raw_selected_channels.times
-   sensor = raw_selected_channels.ch_names
-   eeg = NDVar(eeg_data, (time, sensor), name='EEG', info={'unit': 'µV'})
-    
+       
+   # convert our MNE raw object to an NDVar eelbrain object
+   eeg = load.mne.raw_ndvar(raw_selected_channels)
+   
+
+
+
+   # construct a time vector for the TRF:
+   time = UTS.from_int(first = 0, # index of first sample = 0
+                       last = raw_selected_channels.n_times, # index of last sample = number of samples
+                       sfreq = raw_selected_channels.info['sfreq']) # sampling frequency of EEG
+
+
+   # Create arrays representing word onsets, stimulus properties like surprisal, 
+   # word lengths or frequencies.
+      
+   # first build a vector representing word onsets. 
+   # create a vector of the same length as "time" containing only 0s
+   stimulus_wordonset   = NDVar(np.zeros(len(time)), time, name='word_onset')
+   # find indices of all word onset triggers and make word onsets have a value of 1:
+
+   # find onset times of events with the name 'trial_on'
+   word_onset_events = raw_selected_channels.annotations.onset[raw_selected_channels.annotations.description == 'trial_on']
+     
+   # we now have find the indices of word onset triggers in the time vector of the raw object:
+   word_onset_indices = np.searchsorted(raw_selected_channels.times, word_onset_events)
+
+   # set the corresponding values in the stimulus_wordonset vector to 1
+   stimulus_wordonset.x[word_onset_indices] = 1
+
+   # plot EEG data and stimulus word onset channel
+
+
+
+
+
+
+
    
    # For 1.: stimulus onsets
        
@@ -1133,42 +1206,42 @@ for curr_file in file_list:
    raw_selected_channels.plot(duration = 2)
     
    
-    # Define the time range (last 10 minutes)
-    start_time = raw_selected_channels.times[-1] - 600  # 600 seconds = 10 minutes
-    end_time = raw_selected_channels.times[-1]
+   # Define the time range (last 10 minutes)
+   start_time = raw_selected_channels.times[-1] - 600  # 600 seconds = 10 minutes
+   end_time = raw_selected_channels.times[-1]
     
-    # Get the indices corresponding to the time range
-    start_index = np.argmax(raw_selected_channels.times >= start_time)
-    end_index = np.argmax(raw_selected_channels.times >= end_time)
+   # Get the indices corresponding to the time range
+   start_index = np.argmax(raw_selected_channels.times >= start_time)
+   end_index = np.argmax(raw_selected_channels.times >= end_time)
 
 
    # Plot EEG data
-    fig, ax1 = plt.subplots()
-    ax1.plot(raw_selected_channels.times[start_index:end_index], 
+   fig, ax1 = plt.subplots()
+   ax1.plot(raw_selected_channels.times[start_index:end_index], 
              raw_selected_channels.get_data()[0, start_index:end_index], 
              color='blue', 
              label='EEG Data')
-    ax1.set_xlabel('Time (s)')
-    ax1.set_ylabel('EEG Amplitude (uV)', color='blue')
-    ax1.tick_params('y', colors='blue')
+   ax1.set_xlabel('Time (s)')
+   ax1.set_ylabel('EEG Amplitude (uV)', color='blue')
+   ax1.tick_params('y', colors='blue')
     
-    # Create a second y-axis for the custom array
-    ax2 = ax1.twinx()
-    ax2.plot(raw_selected_channels.times[start_index:end_index], 
-             stim_onsets[start_index:end_index], 
+   # Create a second y-axis for the custom array
+   ax2 = ax1.twinx()
+   ax2.plot(raw_selected_channels.times[start_index:end_index], 
+            stim_onsets[start_index:end_index], 
              color='red', 
              label='Stim Onsets', 
              linestyle='--', alpha=0.5)
-    ax2.set_ylabel('Stimulus Onsets', color='red')
-    ax2.tick_params('y', colors='red')
+   ax2.set_ylabel('Stimulus Onsets', color='red')
+   ax2.tick_params('y', colors='red')
     
-    # Add triggers from annotations in green
-    triggers = raw_selected_channels.annotations.onset[(raw_selected_channels.annotations.description == 'trial_on')]
-    for trigger in triggers:
+   # Add triggers from annotations in green
+   triggers = raw_selected_channels.annotations.onset[(raw_selected_channels.annotations.description == 'trial_on')]
+   for trigger in triggers:
         ax1.axvline(trigger, color='green', linestyle='- -', linewidth=1, alpha=1, label='Trigger')
     
-    plt.title('Combined Plot of EEG Data and Stimulus Onset Array')
-    plt.show()
+   plt.title('Combined Plot of EEG Data and Stimulus Onset Array')
+   plt.show()
     
    
     
@@ -1260,11 +1333,14 @@ for curr_file in file_list:
     # get average of epochs data -> evoked potentials
     evoked = word_onset_epochs.average()
     # plot the evoked potentials, seperated by channel, and add global field power to the plot
-    evoked.plot(picks = ['O1', 'O2', 'Oz'], gfp=True, spatial_colors = False) # 'POz', 'PO3', 'PO2', 'O1', 'O2', 'Oz'
+    evoked.plot(picks = ['O1', 'O2', 'Oz'], gfp = True, spatial_colors = False)
     #evoked.plot_image(picks=['O1', 'O2', 'Oz'])
-    # evoked.plot_joint(picks = ['O1', 'O2', 'Oz'])
-    # evoked.plot_psd(picks = ['O1', 'O2', 'Oz', 'POz', 'PO3'], fmax = 80)
+    #evoked.plot_joint(picks = ['O1', 'O2', 'Oz'])
+    #evoked.plot_psd(picks = ['O1', 'O2', 'Oz', 'POz', 'PO3'], fmax = 80)
     
+
+
+
 
     """ --> cut data into blocks """
 
@@ -1342,27 +1418,30 @@ for curr_file in file_list:
     # Sanity check: 
     # Check number of trials in one of the segments to see if we did everything correctly.
     
-    # loop blocks
+    
+    
+    
+    
+    # Check if we have any incomplete blocks:
+
     exclude_block_indices = []
+    
+    # loop main block names
     for i in range(0, len(main_block_names)):
 
-        # get segment
+        # get segment for current block
         segment_to_plot = main_blocks_segments[i]
 
-        # count the number of 'trial_on' triggers
+        # count the number of 'trial_on' triggers in the segment: should be 300
         count_trials = sum(1 for trigger in segment_to_plot.annotations.description if 'trial_on' in trigger)
-
         print("number of trials in block " + main_block_names[i] + ": " + str(count_trials))
     
         # check if current block has less than 300 trials aka was ended prematurely:
         if count_trials < 300:
             # exclude block at index i from lists "block_names" and "main_blocks_segments"
             exclude_block_indices.append(i)
-            
-        # Plot the data
-        #segment_to_plot.plot()
-
-    
+        
+   
     # Exclude blocks with less than 300 trials:
     main_block_names = [main_block_names[i] for i in range(len(main_block_names)) if i not in exclude_block_indices]
     main_blocks_segments = [main_blocks_segments[i] for i in range(len(main_blocks_segments)) if i not in exclude_block_indices]
@@ -1373,7 +1452,8 @@ for curr_file in file_list:
     # window: - 1 to 1s around stimulus onset
     
     # loop blocks again & cut epochs:
-    epochs_list = []     
+    epochs_list = []  
+    
     for curr_segment, curr_block_name, curr_block_idx in zip(main_blocks_segments, main_block_names, range(0, len(main_block_names))):
         
         print(curr_block_name)
@@ -1395,14 +1475,8 @@ for curr_file in file_list:
         
         # get timestamps for all "trial onset" events:
         curr_events, _ = mne.events_from_annotations(curr_segment,event_id = {"trial_on": trigger_map["trial_on"]})
-        
+        # transform into numpy array:
         curr_events = np.array(curr_events)
-
-        curr_events, _ = mne.events_from_annotations(curr_segment, event_id={"trial_on": trigger_map["trial_on"]})
-
-        # convert to np array
-        events_array = np.array(curr_events)
-
         
         # cut epochs around word-onset events:        
         epochs = mne.Epochs(curr_segment, 
@@ -1422,71 +1496,111 @@ for curr_file in file_list:
         # downsample the data a bit so it's easier to work with:
         epochs.resample(sfreq = 250)
         print(epochs.info)
-    
+        
     
         """ Sanity check: Create word-onset ERP for current block """
         #epochs.plot_image(combine="mean", title = curr_block_name)
         # get average of epochs data -> evoked potentials
-        evoked = epochs.average()
+        #evoked = epochs.average()
         # plot the evoked potentials, seperated by channel, and add global field power to the plot
-        print("plot for block " + curr_block_name)
-        evoked.plot(picks = ['O1', 'O2', 'Oz'], gfp=True, spatial_colors = False, window_title = curr_block_name)
-        #evoked.plot_image(picks=['O1', 'O2', 'Oz'])
-        # evoked.plot_joint(picks = ['O1', 'O2', 'Oz'])
+        #print("plot for block " + curr_block_name)
+        #evoked.plot(picks = ['O1', 'O2', 'Oz'], 
+        #            gfp = True, 
+        #            spatial_colors = False, 
+        #            window_title = curr_block_name)
     
     
-    
-    
+        """ Add Metadata for Each Epoch in the Current Block """
         
-    
-    
-        """ Add Metadata for Each Epoch """
+        # The metadata for each epoch have to be extracted from the csv with the behavioural data.
+        
+        
+        
+        
+        
+        # We need to create a pandas dataframe where each row 
+        # contains the metadata for one epoch.
+        
+        # So create empty df, loop epochs and add metadata to the df:
+        epochs_metadata = pd.DataFrame(columns = ["block_nr", "block_name", "task_kind", 
+                                                  "trial_nr", "text_nr",
+                                                  "word", "word_frequency", "word_length", 
+                                                  "word_surprisal_T1", "word_surprisal_T4", 
+                                                  "word_surprisal_T12", "word_surprisal_T60", 
+                                                  "nback_reaction", "nback_response"])
         
         # loop epochs
         for i, epoch in enumerate(epochs):
             
-            epoch.info['trial_nr'] = i # trial nr
-            epoch.info['block_nr'] = curr_block_idx # block nr
             
-            # assign block name
-            epoch.info['block_name'] = curr_block_name
-            
+            # assign block name            
             # extract a few information from the block name:
                 
             # if we have a BL block, it can only be a single-task:
             if curr_block_name[0] == "B":
-                epoch.info['cognitive_load'] = "BL"
-                epoch.info['task_kind'] = "single_task"
+                curr_cognitive_load = "BL"
+                curr_task_kind = "single_task"
             
             # if we have a 1-back block, check if it's single or dual task:
             elif curr_block_name[0] == "1":
-                epoch.info['cognitive_load'] = "1back"
+                curr_cognitive_load = "1back"
                 if curr_block_name[6] == "d":
-                    epoch.info['task_kind'] = "dual_task"
-                else: epoch.info['task_kind'] = "single_task"
+                    curr_task_kind = "dual_task"
+                else: 
+                    curr_task_kind = "single_task"
                 
             # if we have a 2-back block, check if it's single or dual task:
             elif curr_block_name[0] == "2":
-                epoch.info['cognitive_load'] = "2back"
+                curr_cognitive_load = "2back"
                 if curr_block_name[6] == "d":
-                    epoch.info['task_kind'] = "dual_task"
-                else: epoch.info['task_kind'] = "single_task"
+                    curr_task_kind = "dual_task"
+                else: 
+                    curr_task_kind = "single_task"
                 
           
-            # add information on the stimulus material:    
-            epoch.info['word'] = None
+            # add information on the stimulus material. 
+            # We get these information from the csv with the behavioural data.    
+            curr_word = None
+            curr_word_length = None
+            curr_word_freq = None
             
-            epoch.info['surprisal_1'] = None
-            epoch.info['surprisal_4'] = None
-            epoch.info['surprisal_12'] = None
-            epoch.info['surprisal_60'] = None
+            curr_surprisal_T1 = None
+            curr_surprisal_T4 = None
+            curr_surprisal_T12 = None
+            curr_surprisal_T60 = None
+        
+            curr_nback_reaction = None
+            curr_nback_response = None
             
-            epoch.info['word_length'] = None
-            epoch.info['reaction'] = None
-            epoch.info['word_freq'] = None
+            
 
-            
 
+
+            # TO DO: 
+
+
+            # add metadata to the df
+            epochs_metadata = epochs_metadata.concat([epochs_metadata, 
+                                                      pd.DataFrame({"block_nr": curr_block_idx,
+                                                      "block_name": curr_block_name,
+                                                      "task_kind": curr_task_kind, 
+                                                      "trial_nr": i,
+                                                      "text_nr": curr_text_nr,
+                                                      "word": curr_word,
+                                                      "word_frequency": curr_word_freq,
+                                                      "word_length": curr_word_length,
+                                                      "word_surprisal_T1": curr_word_surprisal_T1,
+                                                      "word_surprisal_T4": curr_word_surprisal_T4,
+                                                      "word_surprisal_T12": curr_word_surprisal_T12,
+                                                      "word_surprisal_T60": curr_word_surprisal_T60,
+                                                      "nback_reaction": curr_nback_reaction})], 
+                                                     ignore_index = True)
+
+
+
+        # append metadata df to epochs object
+        epochs.metadata = epochs_metadata
+        
         # If epochs object is ready, append to list for all epochs:
         epochs_list.append(epochs)
     
