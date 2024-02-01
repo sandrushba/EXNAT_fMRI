@@ -124,7 +124,7 @@ file_list = os.listdir(curr_data_path)
 
 # Only get files that don't end with some file suffix like .py or .DS_Store, 
 # those are the folders for each participant.
-file_list = [item for item in file_list if ".py" not in item and ".DS_Store" not in item and ".fif" not in item]
+file_list = [item for item in file_list if ".py" not in item and ".DS_Store" not in item and ".fif" not in item and "PILOT" not in item]
 
 
 # ----------------------------------------------------- # 
@@ -135,7 +135,7 @@ file_list = [item for item in file_list if ".py" not in item and ".DS_Store" not
 for curr_file in file_list: 
 
     # you can add more pilot dataset names here if you want to skip them:
-    if curr_file in ["part_eg", "part_0001", "part_0002", "part_0003", "part_0005"]: 
+    if curr_file in ["parteg", "part0001", "part0002", "part0003", "part0005"]: 
         print("skipping test / excluded dataset")
         continue
 
@@ -1010,7 +1010,7 @@ for curr_file in file_list:
     print("You told me to exclude the following components: " + ', '.join(map(str, excl_components)))
 
     # save info on which components we excluded:
-      curr_participant_info_dict = {'ID': curr_id, 'ica components excluded manually': excl_components}   
+    curr_participant_info_dict = {'ID': curr_id, 'ica components excluded manually': excl_components}   
     
 
     # Exclude ICA components automatically if they have a high correlation with EOG events:
@@ -1048,7 +1048,7 @@ for curr_file in file_list:
     excl_components = list(set(excl_components))
     
     # This is how it looks if we exclude the components that were saved in excl_components
-    #ica.plot_overlay(raw_ica, exclude = excl_components, picks = "eeg")
+    ica.plot_overlay(raw_ica, exclude = excl_components, picks = "eeg")
 
     ica.exclude = excl_components  # Remove components we marked for exclusion
     # remove components from the EEG data, but this time apply it to 
@@ -1070,7 +1070,7 @@ for curr_file in file_list:
     
     """ Filtering """    
     # plot PSD before low-pass filtering:
-    raw.plot_psd(fmax = 80, average = True, spatial_colors = False)
+    #raw.plot_psd(fmax = 80, average = True, spatial_colors = False)
     
     # Visualise filter parameters
     #filter_params = mne.filter.create_filter(data = raw.get_data(),
@@ -1089,7 +1089,7 @@ for curr_file in file_list:
 
 
     # plot PSD after filtering
-    raw.plot_psd(fmax = 40, average = True, spatial_colors = False)
+    #raw.plot_psd(fmax = 40, average = True, spatial_colors = False)
 
     # save data again
     raw.save((curr_data_path + "part" + curr_id + "/backup_raw_ica_filtered.fif"), overwrite = True)
