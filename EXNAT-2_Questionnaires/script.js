@@ -121,7 +121,8 @@ const study = lab.util.fromObject({
           "label": "Was ist Ihr höchster Bildungsabschluss?",
           "options": [
             {
-              "label": "kein Schulabschluss"
+              "label": "kein Schulabschluss",
+              "coding": "none"
             },
             {
               "label": "Hauptschulabschluss",
@@ -132,7 +133,8 @@ const study = lab.util.fromObject({
               "coding": "school_realschule"
             },
             {
-              "label": "Fachhochschulreife \u002F Abitur"
+              "label": "Fachhochschulreife \u002F Abitur",
+              "coding": "school_abitur"
             },
             {
               "label": "abgeschlossene Ausbildung",
@@ -552,19 +554,20 @@ const study = lab.util.fromObject({
         {
           "type": "text",
           "title": "",
-          "content": "Ende der Fragebögen, vielen Dank!\n\u003Cbr\u003E\nBitte klicken Sie auf \"Daten sichern\"."
+          "content": "Ende der Fragebögen, vielen Dank!\n\u003Cbr\u003E\nBitte klicken Sie auf \"Download Data\"."
         }
       ],
       "scrollTop": true,
       "submitButtonText": "Daten sichern →",
-      "submitButtonPosition": "right",
+      "submitButtonPosition": "hidden",
       "files": {},
       "responses": {
         "": ""
       },
       "parameters": {},
       "messageHandlers": {},
-      "title": "end"
+      "title": "end",
+      "timeout": "200"
     }
   ]
 })

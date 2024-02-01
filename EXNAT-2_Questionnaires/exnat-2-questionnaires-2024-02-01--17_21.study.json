@@ -266,7 +266,8 @@
           "label": "Was ist Ihr höchster Bildungsabschluss?",
           "options": [
             {
-              "label": "kein Schulabschluss"
+              "label": "kein Schulabschluss",
+              "coding": "none"
             },
             {
               "label": "Hauptschulabschluss",
@@ -277,7 +278,8 @@
               "coding": "school_realschule"
             },
             {
-              "label": "Fachhochschulreife / Abitur"
+              "label": "Fachhochschulreife / Abitur",
+              "coding": "school_abitur"
             },
             {
               "label": "abgeschlossene Ausbildung",
