@@ -649,9 +649,15 @@ for curr_file in file_list:
 
 
 
-        # Adjust EEG & Eyetracking data onsets.
+
+        # TO DO: 
+
+        # Align EEG & Eyetracking data:
         
-        
+        mne.preprocessing.realign_raw(raw, eyelink_raw,
+                                      t_raw = , 
+                                      t_other = , 
+                                      verbose = None)
 
 
         
