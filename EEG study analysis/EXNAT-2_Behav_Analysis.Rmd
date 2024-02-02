@@ -331,16 +331,6 @@ for (i in 1:length(file_list)) {
       hearing_impaired, CI_or_hearing_aid,
       flicker_freq, excl)
   
-  # save backup of demographics df in current participant's folder
-  write.csv(df_demogr, paste(path_data_folder, 
-                             file_list[i], "/", 
-                             file_list[i], 
-                             "_demographics.csv", 
-                             sep = ""), 
-            row.names = FALSE)
-  #--> update this later with info on excluded trials & stuff
-  
-  
   ###########################
   
   # GET RAW TEXT & N-BACK DATA
@@ -353,7 +343,6 @@ for (i in 1:length(file_list)) {
                            "text_nr", "trial_nr", "word",
                            "block_nr", "block_name", "block_kind", "block_cond",
                            "question", "chosen_ans", "ans_correct",             
-                           "vistask_RT_per_letter", "vistask_target", 
                            "participant", "age", "handedness", "gender", 
                            "meas_hearing", "skip_prediction_tendency")]
   
@@ -634,6 +623,18 @@ for (i in 1:length(file_list)) {
                           sep = ",", 
                           header = TRUE)
 
+  # Explanation: I computed the scores in Python using a German GPT-2 model. 
+  #              For each text you can select a context chunk of x words (e.g. 5 words)
+  #              and predict the next word. For each possible continuation of your context, 
+  #              you get probabilities. If you get the probability for the actual word 
+  #              and compute the negative log of it, you have the surprisal score for your 
+  #              word on time scale x (e.g. 5 words = TS 5). The time scales are all highly 
+  #              correlated, which might be due to the fact that each time scale also includes 
+  #              context information from all lower timescales, so it's like a Russian doll situation.
+  #              To deal with this problem, we masked all words that were already processed 
+  #              in lower time scales, so each time scale only uses the "new" parts of the input chunk.
+  
+  
   # loop individual texts
   for (curr_text_nr in unique(subj_df$text_nr)){
 
@@ -701,19 +702,16 @@ for (i in 1:length(file_list)) {
   # append Q_df to bigger df for all participants
   df_comprehension_Qs <- as.data.frame(rbind(df_comprehension_Qs, Q_df))
   
-  # save in participant's folder:
-  write.csv(df_comprehension_Qs,
-            file = paste(path_data_folder, file_list[i], "/", file_list[i], "_df_comprehension_Qs.csv", sep = ""), 
-            row.names = FALSE)
 
-  
   
   ### N-BACK PERFORMANCE ####
   
   # check n-back performance in each block:
   # --> important: don't check by condition, but by block here!
-  nback_block_names = c("1back_single_training1", "1back_single_training2", "1back_single_main", "1back_dual_main_1","1back_dual_main_2",
-                        "2back_single_training1", "2back_single_training2", "2back_single_main", "2back_dual_main_1", "2back_dual_main_2")
+  nback_block_names = c("1back_single_training1", "1back_single_training2", 
+                        "1back_single_main", "1back_dual_main_1", "1back_dual_main_2",
+                        "2back_single_training1", "2back_single_training2", 
+                        "2back_single_main", "2back_dual_main_1", "2back_dual_main_2")
   
   # append empty d-prime column to df:
   subj_df$dprime <- c(rep(NA, times = length(subj_df$word)))
@@ -754,32 +752,36 @@ for (i in 1:length(file_list)) {
       } # END if loop - check if there are still enough trials left
     } # END if loop - check for block name in df
   }# END loop - compute d-primes
-  
-  ###########################
-  
-  # save current participant's data in their folder:
-  write.csv(subj_df,
-            file = paste(path_data_folder, file_list[i], "/", file_list[i], "_behav_data.csv", sep = ""), 
-            row.names = FALSE)
-  
-  ###########################
-  
-  ### MARK PARTICIPANTS / TRIALS FOR EXCLUSION:
-  
+
+
   # append "empty" exclude trial / exclude participant columns to df
   subj_df$excl_trial       <- FALSE
   subj_df$excl_participant <- FALSE
+
   
+  ###########################
+  # SAVE DATA 
   
   # append subj_df chunk to df_text_data where we collect the data of all participants
   df_text_data <- as.data.frame(rbind(df_text_data, subj_df))
 
-  
-
-  # save current participant's df in their data folder:
+  # save current participant's dfs in their data folder:
   write.csv(subj_df, 
             paste(path_data_folder, file_list[i], "/", file_list[i], "_behav_data.csv", sep = ""),
             row.names = FALSE)
+  
+  write.csv(df_comprehension_Qs,
+            file = paste(path_data_folder, file_list[i], "/", file_list[i], "_df_comprehension_Qs.csv", sep = ""), 
+            row.names = FALSE)
+
+  write.csv(df_demogr, paste(path_data_folder, file_list[i], "/", file_list[i], "_demographics.csv", sep = ""), 
+            row.names = FALSE)
+  #--> update this later with info on excluded trials & stuff
+  
+  # clear subj_df, df_comprehension_Qs & df_demogr
+  subj_df             <- data.frame()
+  df_comprehension_Qs <- data.frame()
+  df_demogr           <- data.frame()
   
   message("------------------------")  
 }
