@@ -31,10 +31,11 @@ import pandas as pd # for doing stuff with data frames
 """ Read in dataset """
 
 # set working directory
-os.chdir("/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/word frequencies")
+#os.chdir("/Users/merleschuckart/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/word frequencies")
+os.chdir("/Users/merle/Github/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/word frequencies")
 
 # read in dataset from wd
-word_freq_data = pd.read_csv("Word_freqs.csv", sep = ",")
+word_freq_data = pd.read_csv("Word_freqs.csv", sep = ";", index_col = None)
 
 """ Loop words, get frequency for each """ 
 for row_idx in range(0, len(word_freq_data)):
@@ -47,7 +48,7 @@ for row_idx in range(0, len(word_freq_data)):
                                                                minimum = 0.0)
 
 """ overwrite old csv with edited df """
-# Done, export as csv (replace the old one in the folder
+# Done, export as csv (replace the old one in the folder)
 word_freq_data.to_csv(path_or_buf="Word_freqs.csv", 
-                 sep=';', na_rep='', header=True, storage_options=None)
+                      sep=';', na_rep='', header=True, storage_options=None)
 

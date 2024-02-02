@@ -135,11 +135,15 @@ for (i in 1:length(file_list)) {
   # also set the path to the csv file that contains the questionnaire data:
   questionnaire_data <- paste(path_data_folder, file_list[i], "/", file_list[i], ".csv", sep = "")
   
-  # Read in files for current participant:
+  # If no files with behavioural data are found, go to the next iteration:
+  if (length(exp_data) == 0) {
+      next
+  }
+  
+  # if all is fine, though, read in files for current participant:
   subj_df       <- read.csv(paste(path_data_folder, file_list[i], "/", exp_data, sep = ""), sep = ",")
   subj_quest_df <- read.csv(questionnaire_data, sep = ",")
-  
-  
+
   # get demographical data from the questionnaire df:
   id             <- subset(subj_quest_df, sender == "ID")$ID # individual code
   message(paste(i, " - Reading in file of participant with ID: ", id, sep = ""))
@@ -255,7 +259,8 @@ for (i in 1:length(file_list)) {
   # First, we have to recode some of the item scores:
   # Recode all positive values to 1, recode all negative values to 0:
   
-  AQ_df <- subj_quest_df[which(subj_quest_df$sender == "AQ-G"), as.vector(names(subj_quest_df)[grep("AQ", names(subj_quest_df))])]
+  AQ_df <- subj_quest_df[which(subj_quest_df$sender == "AQ-G"), 
+                         as.vector(names(subj_quest_df)[grep("AQ", names(subj_quest_df))])]
   AQ_df[1,] <- ifelse(as.vector(unlist(AQ_df)) > 0, 1, 0)
   
   
@@ -327,17 +332,13 @@ for (i in 1:length(file_list)) {
       flicker_freq, excl)
   
   # save backup of demographics df in current participant's folder
-  write.csv(df_demogr, paste(path_data_folder, file_list[i], "/", file_list[i], "_demographics.csv", sep = ""), row.names = FALSE)
+  write.csv(df_demogr, paste(path_data_folder, 
+                             file_list[i], "/", 
+                             file_list[i], 
+                             "_demographics.csv", 
+                             sep = ""), 
+            row.names = FALSE)
   #--> update this later with info on excluded trials & stuff
-  
-
-  
-  
-  # TO DO: Check if this works.
-  # Also save the dataframe of the single participant in their 
-  # folder so I can access it later in the EEG analysis.
-  
-  
   
   
   ###########################
@@ -616,27 +617,32 @@ for (i in 1:length(file_list)) {
   subj_df[, col_names] <- 0
   
   
-  
-  
-  
-  
-  # TO DO: Change paths so they work with the here package.
-  
-  
-  
   # get word frequency & surprisal scores for each word
   # load word freq df
-  word_freqs_df = read.csv(paste(getwd(), "/word frequencies/Word_freqs.csv", sep = ""), sep = ";", header=TRUE)[2:4]
-  
+  word_freqs_df = read.csv(here::here("word frequencies/Word_freqs.csv"), 
+                           sep = ";", 
+                           header = TRUE)[2:4]
+  # Explanation: We compute the word frequencies using another
+  #              script which is called "calculate_word_frequencies.py".
+  #              You can find it in the word frequencies folder in the Analysis folder.
+  #              --> word frequencies were taken from this python package:
+  #              Speer, R., Chin, J., Lin, A., Jewett, S., & Nathan, L. (2018, October 3).
+  #              LuminosoInsight/wordfreq: v2.2. Zenodo. https://doi.org/10.5281/zenodo.1443582
+
   # load surprisal scores / similarity scores df with TS = context chunk size
-  surprisal_df = read.csv(paste(getwd(),"/surprisal scores/surprisal_scores_masked_context.csv", sep = ""), sep = ",", header = TRUE)
+  surprisal_df = read.csv(here::here("surprisal scores/surprisal_scores_masked_context.csv"), 
+                          sep = ",", 
+                          header = TRUE)
 
   # loop individual texts
   for (curr_text_nr in unique(subj_df$text_nr)){
 
     # in some blocks we don't have texts, so skip those
     # skip BL training & vistask training as well
-    if (curr_text_nr != "" & !is.na(curr_text_nr) & curr_text_nr != "None" & curr_text_nr != "reading_bl_training_text" & curr_text_nr != "vis_task_training"){
+    if (curr_text_nr != "" & !is.na(curr_text_nr) & 
+        curr_text_nr != "None" & 
+        curr_text_nr != "reading_bl_training_text" & 
+        curr_text_nr != "vis_task_training"){
 
       # get word frequencies for current text nr
       curr_word_freqs <- subset(word_freqs_df, text_nr == curr_text_nr)$word_frequency
@@ -664,7 +670,15 @@ for (i in 1:length(file_list)) {
   ### COMPREHENSION QUESTION PERFORMANCE ####
 
   # We now get all question data for the main blocks
-  Q_df <- subset(subj_df, chosen_ans != "" & block_kind %in% c("Reading_Baseline_main", "2back_dual_main", "1back_dual_main"))[,c("question", "chosen_ans", "ans_correct", "text_nr", "block_kind", "ID", "block_nr")]
+  Q_df <- subset(subj_df, chosen_ans != "" & block_kind %in% c("Reading_Baseline_main", 
+                                                               "2back_dual_main", 
+                                                               "1back_dual_main"))[,c("question", 
+                                                                                      "chosen_ans", 
+                                                                                      "ans_correct", 
+                                                                                      "text_nr", 
+                                                                                      "block_kind", 
+                                                                                      "ID", 
+                                                                                      "block_nr")]
 
   # Just look at the MC questions:
   # For now I don't really care about the answer, I only want to know if they chose the correct one or not.
@@ -771,4 +785,5 @@ for (i in 1:length(file_list)) {
 }
 ```
   
-# IMPORTANT: DO WE NEED TO DEFINE OUTLIER TRIALS SO WE DON'T EVEN LOOK AT THEM IN THE EEG DATA OR IS THIS IRRELEVANT FOR THE TRF?
+# IMPORTANT: DO WE NEED TO DEFINE OUTLIER TRIALS SO WE DON'T 
+# EVEN LOOK AT THEM IN THE EEG DATA OR IS THIS IRRELEVANT FOR THE TRF?
