@@ -74,8 +74,8 @@ Version: November, 2023
 
 # ----------------------------------------------------- # 
 
-""" Import Packages """
- 
+
+""" Import Packages """ 
 
 # for setting paths:
 import os
@@ -108,8 +108,12 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap #  for plotting bridging between electrodes
 
 # for TRFs: import eelbrain (this can do boosting algorithm)
-# --> make sure it's pip installed 
+# --> make sure eelbrain and its dependencies are all pip installed 
 !pip install eelbrain
+! pip install nibabel
+! pip install wxPython
+! pip install colormath
+! pip install pymatreader
 from eelbrain import *
 
 
@@ -176,43 +180,9 @@ for curr_file in file_list:
     
     # add TP9 reference channel (all zeros)
     raw = mne.add_reference_channels(raw, ref_channels = ["TP9"])
-
     # re-reference using a common average reference. This might take a while:
     raw.set_eeg_reference(ref_channels = 'average')
-        
-    
-    """ Sanity check 1: Does my signal have roughly the same mean amplitude as other datasets? """
-    # Explanation: My ERPs look super shallow, they are mostly somewhere between -1 and 1 Hz, so that's a bit odd.
-    # Idea: Check if my raw signal also looks shallow.
-    
-    
-    # get raw data from all channels
-    #data, times = raw[:, :]
-    
-    # calculate mean and SD across all channels and time points
-    #mean_data = np.mean(data, axis=0)
-    #std_data = np.std(data, axis=0)
-
-    
-
-    """ Sanity check 2: Do we have a discernable alpha-peak? """
-    # I don't know if this makes sense because I have no resting state recording 
-    # and there's a lot of visual stimulation in my experiment, 
-    # so maybe there's even a lot of alpha suppression.
-    # But maybe I'm wrong and we can see an alpha peak anyway.
-    #raw_occipital = raw.copy().pick(['O1', 'Oz', 'O2', 'PO7', 'PO3', 'POz', 'PO4', 'PO8'])
-    #raw_occipital.filter(l_freq = 1, h_freq = 80)
-    #raw_occipital.compute_psd(fmin = 0, fmax = 80).plot()
-    
-    # No alpha-peak and what should be a 1/f distribution looks odd. 
-    # It looks a bit like the power is too low between 5 and 15 Hz or so.
-    # If I compare it to Malte's data, it looks really shitty, so I guess 
-    # there's either something wrong with the recording (maybe because of the ref?) 
-    # or it's just the alpha suppression.
-    
-    # Also shouldn't there be a 15 Hz peak because of the 15 Hz visual flicker?
-
-
+      
     
     """ Set Montage (aka Sensor Locations) """
     
@@ -324,36 +294,8 @@ for curr_file in file_list:
     # save backup of raw object in the data folder: 
     raw.save((curr_data_path + "part" + curr_id + "/backup_raw.fif"), overwrite = True)
 
-
-    """ Delete 'New Segment/' Trigger """
-    
-    # So first, check how often the weird additional trigger occurs and delete it from the annotations.
-    #new_segment_count = sum(1 for trigger in raw.annotations.description if 'New Segment/' in trigger)
-    # just a sanity check to see if my code works properly: For trial onsets, we should have way more triggers:
-    #new_segment_count = sum(1 for trigger in raw.annotations.description if 'Stimulus/S  8' in trigger)
-    #print(new_segment_count)
-    # As you can see, the trigger occurs only once, so I'm probably right and we can exclude it. 
-    #annotations = [trigger for trigger in raw.annotations.description if 'New Segment/' not in trigger]
-    #Check if it's gone:
-    #print('New Segment/' in annotations)
-    
-    # build a new annotations object without the weird 'New Segment/' trigger
-    #new_annotations = mne.Annotations(onset = raw.annotations.onset[raw.annotations.description != 'New Segment/'],
-    #                                  duration = raw.annotations.duration[raw.annotations.description != 'New Segment/'],
-    #                                  description = annotations)
-
-    # assign new annotations object to the raw object
-    #raw.set_annotations(new_annotations)
-    
-    # check if the weird trigger is still there:
-    #print(set(raw.annotations.description))
-    # Doesn't seem to be the case so let's hope I did everything correctly.
-    
     
     """ Change Trigger Labels """
-    
-    # Now change the labels of the remaining annotations. 
-    
     # Unfortunately, we can only use trigger labels up to a certain length, 
     # so we have to shorten the labels from the original trigger map from the experiment
     # a bit:
@@ -401,17 +343,17 @@ for curr_file in file_list:
         if old_annotation != 'New Segment/':
             # use regex to extract the number of the trigger & convert it to int:
             trigger_value = int(re.findall(r'\d+', old_annotation)[0])
-            print(trigger_value)
+            #print(trigger_value)
             
             # find correct trigger label for the trigger value we extracted:
             trigger_label = list(trigger_map.keys())[list(trigger_map.values()).index(trigger_value)] 
-            print(trigger_label)
+            #print(trigger_label)
             
             # change label in the annotations:
             raw.annotations.description[raw.annotations.description == old_annotation] = trigger_label
 
     # print annotations again to check if it worked:
-    print(set(raw.annotations.description))
+    #print(set(raw.annotations.description))
 
 
     # save backup of raw object in the data folder: 
@@ -1143,6 +1085,77 @@ for curr_file in file_list:
        
    # Prepare EEG signal for TRF:
        
+   # get behavioural data from PsychoPy csv:
+   behav_data = pd.read_csv(curr_data_path + "part" + curr_id + "/part" + curr_id + "_behav_data.csv")
+          
+   # IDEA: loop triggers and find corresponding entry for trial_on triggers in behav_data. Add time stamp of trial_on trigger there.
+
+   # add empty column to df where we can store the time stamps: 
+    
+   behav_data['trial_onset_timestamps'] = ''
+
+   # get list of all triggers and their time stamps:
+   all_triggers = list(zip(raw_selected_channels.annotations.description, raw_selected_channels.annotations.onset))
+
+   # get rid of all test triggers: 
+   # get index of second "start_exp" trigger
+   start_trigger_ixd = [index for index, (description, onset) in enumerate(all_triggers) if description == "start_exp"][1]
+
+   del_indices = list(range(start_trigger_ixd))
+        
+   # delete annotations by their indices
+   raw.annotations.delete(del_indices)
+    
+   # check if it worked: Now we should see "start_exp", "BL_t_on", "trial_on", "resp_continue", "trial_on",... as the first triggers.
+   all_triggers = list(zip(raw.annotations.description, raw.annotations.onset))
+   #print(all_eeg_triggers[0:10])
+     
+        
+
+   # use counter for block index:
+   curr_block_idx = 0
+   curr_trial_idx = 1
+   
+   # get all block indices & trial numbers from the behav df:
+   all_block_indices = list(set(behav_data['block_nr']))
+   all_block_trial_numbers = list(behav_data.groupby('block_nr')['trial_nr'].max()) # group trial nr by block and get the highest trial number from each block
+
+   # loop triggers
+   for curr_trigger_label, curr_trigger_ts in all_triggers:
+
+        if curr_trigger_label in ['trial_on','440_on','587_on','587_off',
+                                    '782_on','782_off','1043_on','1043_off']:
+            
+            # find corresponding row with the same trial and block index 
+            # in the behavioural data df:
+            curr_row_idx = behav_data[(behav_data['trial_nr'] == curr_trial_idx) & 
+                                      (behav_data['block_nr'] == all_block_indices[curr_block_idx])].index[0]
+            
+
+            # add time stamp of current trigger to the current row: 
+            behav_data.loc[curr_row_idx, "trial_onset_timestamps"] = curr_trigger_ts
+              
+            # TO DO: check if the previous trigger was a "continue" response - if yes, add its time stamp to the correct column, too.
+
+            
+            # TO DO: check if the next trigger is an "n-back target" response - if yes, add its time stamp to the correct column, too.
+            
+            
+            
+            # go to next trial if there still is one, or reset trial counter & add 1 to block counter if there isn't:
+            if curr_trial_idx == all_block_trial_numbers[curr_block_idx]:
+                curr_trial_idx = 1
+                curr_block_idx += 1
+            elif curr_trial_idx < all_block_trial_numbers[curr_block_idx]:
+                curr_trial_idx += 1
+    
+
+
+                
+    
+   
+    
+   
    # convert our MNE raw object to an NDVar eelbrain object
    eeg = load.mne.raw_ndvar(raw_selected_channels)
    
