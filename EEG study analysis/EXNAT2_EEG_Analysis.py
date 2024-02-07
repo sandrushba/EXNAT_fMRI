@@ -1121,7 +1121,8 @@ for curr_file in file_list:
    all_block_trial_numbers = list(behav_data.groupby('block_nr')['trial_nr'].max()) # group trial nr by block and get the highest trial number from each block
 
    # loop triggers
-   for curr_trigger_label, curr_trigger_ts in all_triggers:
+   for index, (curr_trigger_label, curr_trigger_ts) in enumerate(all_triggers):
+
 
         if curr_trigger_label in ['trial_on','440_on','587_on','587_off',
                                     '782_on','782_off','1043_on','1043_off']:
