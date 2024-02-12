@@ -1059,31 +1059,7 @@ for curr_file in file_list:
    
     
    """ Add custom channels with info on independent variables for TRFs """
-             
-    
-   # 1. stimulus onsets array:
-       # each stimulus (in the reading task blocks: stimulus = word) onset is a pulse of amplitude = 1
-   
-   # 2. word length array:
-       # pulse at each word onset with amplitude = word length
-       
-   # 3. word surprisal on TS 1:
-       # pulse at each word onset with amplitude = word surprisal on TS 1
-       
-   # 4. word surprisal on TS 4:
-       # pulse at each word onset with amplitude = word surprisal on TS 4
-       
-   # 5. word surprisal on TS 12:
-       # pulse at each word onset with amplitude = word surprisal on TS 12
-       
-   # 6. word surprisal on TS 60:
-       # pulse at each word onset with amplitude = word surprisal on TS 60
-       
-   # --> add more variables here? Reactions? Colours?
-   
-   # -------------------
-       
-   # Prepare EEG signal for TRF:
+
        
    # get behavioural data from PsychoPy csv:
    behav_data = pd.read_csv(curr_data_path + "part" + curr_id + "/part" + curr_id + "_behav_data.csv")
@@ -1091,8 +1067,7 @@ for curr_file in file_list:
    # IDEA: loop triggers and find corresponding entry for trial_on triggers in behav_data. Add time stamp of trial_on trigger there.
 
    # add empty column to df where we can store the time stamps: 
-    
-   behav_data['trial_onset_timestamps'] = ''
+   behav_data["trial_onset_timestamps"] = ''
 
    # get list of all triggers and their time stamps:
    all_triggers = list(zip(raw_selected_channels.annotations.description, raw_selected_channels.annotations.onset))
@@ -1117,32 +1092,26 @@ for curr_file in file_list:
    curr_trial_idx = 1
    
    # get all block indices & trial numbers from the behav df:
-   all_block_indices = list(set(behav_data['block_nr']))
-   all_block_trial_numbers = list(behav_data.groupby('block_nr')['trial_nr'].max()) # group trial nr by block and get the highest trial number from each block
+   all_block_indices = list(set(behav_data["block_nr"]))
+   all_block_trial_numbers = list(behav_data.groupby("block_nr")["trial_nr"].max()) # group trial nr by block and get the highest trial number from each block
 
    # loop triggers
    for index, (curr_trigger_label, curr_trigger_ts) in enumerate(all_triggers):
 
 
-        if curr_trigger_label in ['trial_on','440_on','587_on','587_off',
-                                    '782_on','782_off','1043_on','1043_off']:
+        if curr_trigger_label in ["trial_on","440_on","587_on","587_off",
+                                  "782_on","782_off","1043_on","1043_off"]:
             
             # find corresponding row with the same trial and block index 
             # in the behavioural data df:
-            curr_row_idx = behav_data[(behav_data['trial_nr'] == curr_trial_idx) & 
-                                      (behav_data['block_nr'] == all_block_indices[curr_block_idx])].index[0]
+            curr_row_idx = behav_data[(behav_data["trial_nr"] == curr_trial_idx) & 
+                                      (behav_data["block_nr"] == all_block_indices[curr_block_idx])].index[0]
             
 
             # add time stamp of current trigger to the current row: 
             behav_data.loc[curr_row_idx, "trial_onset_timestamps"] = curr_trigger_ts
               
-            # TO DO: check if the previous trigger was a "continue" response - if yes, add its time stamp to the correct column, too.
 
-            
-            # TO DO: check if the next trigger is an "n-back target" response - if yes, add its time stamp to the correct column, too.
-            
-            
-            
             # go to next trial if there still is one, or reset trial counter & add 1 to block counter if there isn't:
             if curr_trial_idx == all_block_trial_numbers[curr_block_idx]:
                 curr_trial_idx = 1
@@ -1150,42 +1119,106 @@ for curr_file in file_list:
             elif curr_trial_idx < all_block_trial_numbers[curr_block_idx]:
                 curr_trial_idx += 1
     
-
-
-                
-    
-   
-    
+       
    
    # convert our MNE raw object to an NDVar eelbrain object
    eeg = load.mne.raw_ndvar(raw_selected_channels)
    
-
-
+   
 
    # construct a time vector for the TRF:
    time = UTS.from_int(first = 0, # index of first sample = 0
-                       last = raw_selected_channels.n_times, # index of last sample = number of samples
-                       sfreq = raw_selected_channels.info['sfreq']) # sampling frequency of EEG
-
+                       last = raw_selected_channels.n_times - 1, # index of last sample = number of samples - 1 (because we start counting at 0)
+                       sfreq = raw_selected_channels.info["sfreq"]) # sampling frequency of EEG
 
    # Create arrays representing word onsets, stimulus properties like surprisal, 
    # word lengths or frequencies.
-      
-   # first build a vector representing word onsets. 
-   # create a vector of the same length as "time" containing only 0s
-   stimulus_wordonset   = NDVar(np.zeros(len(time)), time, name='word_onset')
-   # find indices of all word onset triggers and make word onsets have a value of 1:
+           
+   # First, create vectors of the same length as "time" containing only 0s. 
+   # Do this for each predictor variable that could have an effect on the neural response:
+   stimulus_word               = NDVar(np.zeros(len(time)), time, name = "word")
+   stimulus_wordfreq           = NDVar(np.zeros(len(time)), time, name = "word_frequency")
+   stimulus_wordlength         = NDVar(np.zeros(len(time)), time, name = "word_length")
+   stimulus_wordsurprisal_TS1  = NDVar(np.zeros(len(time)), time, name = "word_surprisal_TS1")
+   stimulus_wordsurprisal_TS4  = NDVar(np.zeros(len(time)), time, name = "word_surprisal_TS4")
+   stimulus_wordsurprisal_TS12 = NDVar(np.zeros(len(time)), time, name = "word_surprisal_TS12")
+   stimulus_wordsurprisal_TS60 = NDVar(np.zeros(len(time)), time, name = "word_surprisal_TS60")
+   stimulus_nback              = NDVar(np.zeros(len(time)), time, name = "stimulus_nback")
+   
+   # TO DO:
+   stimulus_motor_reaction     = NDVar(np.zeros(len(time)), time, name = "motor_response")
+   stimulus_colour             = NDVar(np.zeros(len(time)), time, name = "colour")
+   
+   
+   # Loop "trial_onset_timestamps" column in behav data:
+   for curr_row_idx, trial_onset_timestamp in enumerate(behav_data["trial_onset_timestamps"]):
+       
+       # if there is a time stamp because some kind of stimulus was shown, 
+       # check what happened and edit TRF predictor arrays accordingly.
+       if trial_onset_timestamp != "":
 
-   # find onset times of events with the name 'trial_on'
-   word_onset_events = raw_selected_channels.annotations.onset[raw_selected_channels.annotations.description == 'trial_on']
-     
-   # we now have find the indices of word onset triggers in the time vector of the raw object:
-   word_onset_indices = np.searchsorted(raw_selected_channels.times, word_onset_events)
+           
 
-   # set the corresponding values in the stimulus_wordonset vector to 1
-   stimulus_wordonset.x[word_onset_indices] = 1
+           # if current row is a trial where a word was presented...
+           if isinstance(behav_data.loc[curr_row_idx, "word"], str):
+    
+               # WORD (yes or no) 
+               #... mark value in stimulus_word as 1:
+               # change value at current time stamp to 1 in stimulus_word
+               stimulus_word[trial_onset_timestamp] = 1
+           
+               # WORD LENGTH (continuous):
+               # set value in stimulus_length to the word length instead of 0:
+               stimulus_wordlength[trial_onset_timestamp] = behav_data.loc[curr_row_idx, "word_length_single"]
+           
+               # WORD SURPRISAL ON TS 1 - TS 60 (continuous values)
+               if isinstance(behav_data.loc[curr_row_idx, "surprisal_1"], float) and not np.isnan(behav_data.loc[curr_row_idx, "surprisal_1"]):
+                   stimulus_wordsurprisal_TS1[trial_onset_timestamp]  = behav_data.loc[curr_row_idx, "surprisal_1"]
+               if isinstance(behav_data.loc[curr_row_idx, "surprisal_4"], float) and not np.isnan(behav_data.loc[curr_row_idx, "surprisal_4"]):
+                   stimulus_wordsurprisal_TS4[trial_onset_timestamp]  = behav_data.loc[curr_row_idx, "surprisal_4"]
+               if isinstance(behav_data.loc[curr_row_idx, "surprisal_12"], float) and not np.isnan(behav_data.loc[curr_row_idx, "surprisal_12"]):
+                   stimulus_wordsurprisal_TS12[trial_onset_timestamp] = behav_data.loc[curr_row_idx, "surprisal_12"]
+               if isinstance(behav_data.loc[curr_row_idx, "surprisal_60"], float) and not np.isnan(behav_data.loc[curr_row_idx, "surprisal_60"]):
+                   stimulus_wordsurprisal_TS60[trial_onset_timestamp] = behav_data.loc[curr_row_idx, "surprisal_60"]
+                  
+               # WORD FREQUENCY (continuous values)
+               stimulus_wordfreq[trial_onset_timestamp] = behav_data.loc[curr_row_idx, "word_frequency"]
+                  
+            
+               # N-BACK STIMULUS (DUAL-TASK; yes or no)
+               # if it wasn't a reading only block, change single_nback_onset to 1
+               if behav_data.loc[curr_row_idx, "block_kind"] not in ["Reading_Baseline_main", "Reading_Baseline_training"]:
+                   stimulus_nback[trial_onset_timestamp] = 1
+           
+            
+           # N-BACK STIMULUS (SINGLE-TASK; yes or no)
+           # if there is no word shown & current block is a single task block, change single_nback_onset to 1
+           elif not isinstance(behav_data.loc[curr_row_idx, "word"], str) and behav_data.loc[curr_row_idx, "block_kind"] in ["click_training", "1back_single_training1", "1back_single_training2", "2back_single_training1", "2back_single_training2", "1back_single_main", "2back_single_main"]:
+               stimulus_nback[trial_onset_timestamp] = 1
+    
 
+   # Plot all predictor arrays:
+   plot_args = dict(ncol = 1, axh = 1, w = 10, frame = 't', legend = False, colors = 'r')
+   plot.UTS([stimulus_word, stimulus_wordlength, stimulus_wordfreq, 
+              stimulus_wordsurprisal_TS1, stimulus_wordsurprisal_TS4, 
+              stimulus_wordsurprisal_TS12,stimulus_wordsurprisal_TS60, 
+              stimulus_nback], 
+             ylabel = ["Word Onset y/n", "Word Length", "Word Frequency", 
+                       "Word Surprisal TS1", "Word Surprisal TS4", "Word Surprisal TS12", "Word Surprisal TS60",
+                       "n-back_Task y/n"], **plot_args)
+          
+   
+   # Actually fit TRF now, using the predictor arrays we built before, and using the boosting algorithm.
+   TRF_result = boosting(eeg, # eeg signal to predict
+                  [stimulus_word, stimulus_wordsurprisal_TS1, stimulus_nback], # list of predictor arrays
+                  0.000, 0.500, # time window: use -1s to +2s around stimulus onset (which stimulus onset though?!)
+                  basis = 0.100, # use basis of 100 ms Hamming windows
+                  partitions = 4) # use 4 partitionings of the data for cross-validation based early stopping
+   
+   TRF_plot = plot.TopoButterfly(TRF_result.h_scaled, w = 6, h = 2)
+   TRF_plot.set_time(.260) # plot topoplot at a certain time point (e.g. 260 ms post stimulus)
+   
+   
    # plot EEG data and stimulus word onset channel
 
 
