@@ -1199,13 +1199,14 @@ for curr_file in file_list:
 
    # Plot all predictor arrays:
    plot_args = dict(ncol = 1, axh = 1, w = 10, frame = 't', legend = False, colors = 'r')
-   plot.UTS([stimulus_word, stimulus_wordlength, stimulus_wordfreq, 
+   plot.UTS([stimulus_word, stimulus_wordfreq, stimulus_nback], 
+             ylabel = ["Word Onset y/n", "Word Frequency", "n-back_Task y/n"], **plot_args)
+   
+   plot.UTS([stimulus_wordlength, 
               stimulus_wordsurprisal_TS1, stimulus_wordsurprisal_TS4, 
-              stimulus_wordsurprisal_TS12,stimulus_wordsurprisal_TS60, 
-              stimulus_nback], 
-             ylabel = ["Word Onset y/n", "Word Length", "Word Frequency", 
-                       "Word Surprisal TS1", "Word Surprisal TS4", "Word Surprisal TS12", "Word Surprisal TS60",
-                       "n-back_Task y/n"], **plot_args)
+              stimulus_wordsurprisal_TS12,stimulus_wordsurprisal_TS60], 
+             ylabel = ["Word Length", "Word Surprisal TS1", "Word Surprisal TS4", "Word Surprisal TS12", "Word Surprisal TS60"], **plot_args)
+   
           
    
    # Actually fit TRF now, using the predictor arrays we built before, and using the boosting algorithm.
