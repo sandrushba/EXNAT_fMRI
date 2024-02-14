@@ -1261,8 +1261,8 @@ for curr_file in file_list:
    
    # Actually fit TRF now, using the predictor arrays we built before, and using the boosting algorithm.
    TRF_result = boosting(eeg, # eeg signal to predict
-                  [stimulus_word, stimulus_wordsurprisal_TS1, stimulus_nback], # list of predictor arrays
-                  0.000, 0.500, # time window: use -1s to +2s around stimulus onset (which stimulus onset though?!)
+                  [stimulus_word, stimulus_wordfreq], # list of predictor arrays
+                  -1, 2, # time window: use -1s to +2s around stimulus onset (which stimulus onset though?!)
                   basis = 0.100, # use basis of 100 ms Hamming windows
                   partitions = 4) # use 4 partitionings of the data for cross-validation based early stopping
    
