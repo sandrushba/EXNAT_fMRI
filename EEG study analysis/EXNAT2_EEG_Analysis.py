@@ -659,22 +659,26 @@ for curr_file in file_list:
 
         # Align EEG & Eyetracking data:
         mne.preprocessing.realign_raw(raw, eyelink_raw,
-                                      t_raw = pass, 
-                                      t_other = pass, 
+                                      t_raw = eeg_shifted_timestamps, 
+                                      t_other = eyelink_shifted_timestamps, 
                                       verbose = None)
-
-
-
-    
-
-
-        # Add EEG channels to the eye-tracking raw object
-        #raw.add_channels([eyelink_raw], force_update_info=True)
-
+        # add eyetracking channels to the eeg raw object:
+        raw.add_channels([eyelink_raw], force_update_info = True)
         
+        #del eyelink_raw
                 
         
         
+        # Define a few channel groups of interest and plot the data
+        #frontal = ["E19", "E11", "E4", "E12", "E5"]
+        #occipital = ["E61", "E62", "E78", "E67", "E72", "E77"]
+        #pupil = ["pupil_right"]
+        # picks must be numeric (not string) when passed to `raw.plot(..., order=)`
+        #picks_idx = mne.pick_channels(
+        #    raw_et.ch_names, frontal + occipital + pupil, ordered=True
+        #)
+        #raw_et.plot(events=et_events, event_id=event_dict, event_color="g", order=picks_idx)
+                
     
 
     
