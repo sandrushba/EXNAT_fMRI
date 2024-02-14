@@ -1136,7 +1136,6 @@ for curr_file in file_list:
    # add empty column to df where we can store the time stamps: 
    behav_data["trial_onset_timestamps"] = ''
         
-
    # use counter for block index:
    curr_block_idx = 0
    curr_trial_idx = 1
@@ -1145,6 +1144,10 @@ for curr_file in file_list:
    all_block_indices = list(set(behav_data["block_nr"]))
    all_block_trial_numbers = list(behav_data.groupby("block_nr")["trial_nr"].max()) # group trial nr by block and get the highest trial number from each block
 
+   # get triggers & their onset time stamps:
+   all_triggers = list(zip(raw.annotations.description, 
+                           raw.annotations.onset))
+   
    # loop triggers
    for index, (curr_trigger_label, curr_trigger_ts) in enumerate(all_triggers):
 
@@ -1172,10 +1175,13 @@ for curr_file in file_list:
        
    
    # convert our MNE raw object to an NDVar eelbrain object
-   eeg = load.mne.raw_ndvar(raw_selected_channels)
+   # only use a subset of the data:
+   raw_TRF_data = raw.copy().pick_channels(['O1', 'O2', 'Oz'])
    
+   # convert data to Eelbrain's NDVAR format:
+   eeg = load.mne.raw_ndvar(raw_TRF_data)
+        
    
-
    # construct a time vector for the TRF:
    time = UTS.from_int(first = 0, # index of first sample = 0
                        last = raw_selected_channels.n_times - 1, # index of last sample = number of samples - 1 (because we start counting at 0)
@@ -1258,95 +1264,21 @@ for curr_file in file_list:
              ylabel = ["Word Length", "Word Surprisal TS1", "Word Surprisal TS4", "Word Surprisal TS12", "Word Surprisal TS60"], **plot_args)
    
           
-   
    # Actually fit TRF now, using the predictor arrays we built before, and using the boosting algorithm.
    TRF_result = boosting(eeg, # eeg signal to predict
-                  [stimulus_word, stimulus_wordfreq], # list of predictor arrays
-                  -1, 2, # time window: use -1s to +2s around stimulus onset (which stimulus onset though?!)
-                  basis = 0.100, # use basis of 100 ms Hamming windows
-                  partitions = 4) # use 4 partitionings of the data for cross-validation based early stopping
-   
-   TRF_plot = plot.TopoButterfly(TRF_result.h_scaled, w = 6, h = 2)
+                         [stimulus_wordlength, stimulus_wordfreq], # list of predictor arrays
+                         scale_data = "inplace", # scale eeg data & predictors
+                         -500, 2) # time window: use -1s to +2s around stimulus onset (which stimulus onset though?!)
+
+   TRF_plot = plot.TopoButterfly(TRF_result.h_scaled, w = 10, h = 2)
    TRF_plot.set_time(.260) # plot topoplot at a certain time point (e.g. 260 ms post stimulus)
    
-   
-   # plot EEG data and stimulus word onset channel
-
-
-
-
-
-
-
-   
-   # For 1.: stimulus onsets
-       
-   # Build something that could be an EEG channel, but set all values to 0. 
-   # Extract time stamps with word onsets from the annotations 
-   # and set values at those time points to 1. 
-       
-   # get sampling frequency and number of samples from the EEG raw object:
-   sfreq = raw_selected_channels.info['sfreq']
-   n_samples = raw_selected_channels.n_times
-   # create array where all values are 0:
-   stim_onsets = np.zeros(n_samples)
-   # get time stamps for stimulus onset events:
-   stim_onset_times = raw_selected_channels.annotations.onset[raw_selected_channels.annotations.description == "trial_on"]
-   # important: there are now also non-word stimuli in there, so maybe exclude some of them later
-   # set values in stim_onsets to 1 at the time stamps we extracted:
-   stim_onsets[np.round(stim_onset_times * sfreq).astype(int)] = 1
- 
-    
-   # plot a sample of EEG data and the new channel
-   raw_selected_channels.plot(duration = 2)
-    
-   
-   # Define the time range (last 10 minutes)
-   start_time = raw_selected_channels.times[-1] - 600  # 600 seconds = 10 minutes
-   end_time = raw_selected_channels.times[-1]
-    
-   # Get the indices corresponding to the time range
-   start_index = np.argmax(raw_selected_channels.times >= start_time)
-   end_index = np.argmax(raw_selected_channels.times >= end_time)
-
-
-   # Plot EEG data
-   fig, ax1 = plt.subplots()
-   ax1.plot(raw_selected_channels.times[start_index:end_index], 
-             raw_selected_channels.get_data()[0, start_index:end_index], 
-             color='blue', 
-             label='EEG Data')
-   ax1.set_xlabel('Time (s)')
-   ax1.set_ylabel('EEG Amplitude (uV)', color='blue')
-   ax1.tick_params('y', colors='blue')
-    
-   # Create a second y-axis for the custom array
-   ax2 = ax1.twinx()
-   ax2.plot(raw_selected_channels.times[start_index:end_index], 
-            stim_onsets[start_index:end_index], 
-             color='red', 
-             label='Stim Onsets', 
-             linestyle='--', alpha=0.5)
-   ax2.set_ylabel('Stimulus Onsets', color='red')
-   ax2.tick_params('y', colors='red')
-    
-   # Add triggers from annotations in green
-   triggers = raw_selected_channels.annotations.onset[(raw_selected_channels.annotations.description == 'trial_on')]
-   for trigger in triggers:
-        ax1.axvline(trigger, color='green', linestyle='- -', linewidth=1, alpha=1, label='Trigger')
-    
-   plt.title('Combined Plot of EEG Data and Stimulus Onset Array')
-   plt.show()
-    
-   
-    
-   
-    
-   
-    
-   
      
+   
+    
     """ Epoching """
+    # read in preprocessed data:
+    #raw = mne.io.read_raw_fif('/Users/merle/GitHub/PhD/EXNAT/EEG_study_EXNAT2/EEG study analysis/Data/part0011/backup_raw_ica_filtered.fif', preload=True) 
     
     # get trial onsets:    
     curr_events, _ = mne.events_from_annotations(raw_selected_channels, event_id = {"trial_on": trigger_map["trial_on"],
