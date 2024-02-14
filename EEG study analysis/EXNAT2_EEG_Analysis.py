@@ -630,6 +630,7 @@ for curr_file in file_list:
         eeg_shifted_timestamps = [timestamp - eeg_timestamps[0] for timestamp in eeg_timestamps]
         eyelink_shifted_timestamps = [timestamp - eyelink_timestamps[0] for timestamp in eyelink_timestamps]    
     
+        # plot time stamps of both trigger streams:
         plt.figure(figsize=(10, 6))
         plt.scatter(range(len(eeg_shifted_timestamps)), eeg_shifted_timestamps, label='EEG Triggers', marker='.', s = 2, alpha=0.3)
         plt.scatter(range(len(eyelink_shifted_timestamps)), eyelink_shifted_timestamps, label='Eyetracker Triggers', marker='.', s = 2, alpha=0.2)
@@ -642,11 +643,10 @@ for curr_file in file_list:
         # There's a pretty constant shift between the EEG & ET triggers,
         # probably because of a slight clock drift between the two devices.
 
+        # Plot deviation between clocks over the course of the experiment:
         mean_deviation = np.median(np.abs(np.array(eeg_shifted_timestamps) - np.array(eyelink_shifted_timestamps)))
-
-
         deviation = np.abs(np.array(eeg_shifted_timestamps) - np.array(eyelink_shifted_timestamps))
-        
+
         plt.figure(figsize=(10, 6))
         plt.scatter(range(len(deviation)), deviation, label='Deviation: EEG - Eyetracker Triggers', marker='.', color = "darkred", s = 20)
         plt.xlabel('Trial Index')
@@ -725,121 +725,6 @@ for curr_file in file_list:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        # compare the onsets of the last 1000 trials (where everything seemed to work with the triggers)
-        #delay = [x - y for x, y in zip(eeg_timestamps[-1000:], eyelink_timestamps[-1000:])]
-
-        #trigger = range(len(delay))
-        
-        # Plotting the time series
-        #plt.plot(trigger, delay, marker='.', color='black')
-        
-        # Adding labels and title
-        #plt.xlabel('trigger')
-        #plt.ylabel('Delay in ms')
-        #plt.title('Delay: Eyetracking - EEG Triggers')
-        
-        # Show the plot
-        #plt.show()
-
-        # okay so there's about 100 ms between triggers and the eyetracking ones are always first. There's something really odd going on here.
-
-        # something's wrong with the trial onset triggers in the n-back single task blocks and the click training.
-        # As there are some triggers in the n-back single task blocks, but none in the click training where you could only press space, 
-        # I assume there's a problem whenever the participant didn't press c and only pressed space.
-        # I think they are pressing space before the onset trigger is set to 0 again and then the block offset trigger is sent already.
-
-        # If you check the "trial_off" triggers, you can see that there's even less. So there's definitely something odd here.
-
-        # I think sometimes there's not enough time to "turn off" a trigger, so basically the 0-trigger is never sent. 
-        # Maybe I should activate this in the trigger function.
-
-
-
-        # extract shared triggers from EEG and eyetracking data        
-        #eyetracking_events, _ = mne.events_from_annotations(eyelink_raw, event_id = {'start_exp': trigger_map['start_exp'],
-        #                                                                             'click_t_on': trigger_map['click_t_on'], 
-        #                                                                             'trial_on': trigger_map['trial_on'],
-        #                                                                             'resp_continue': trigger_map['resp_continue'],
-        #                                                                             'resp_target': trigger_map['resp_target'], 
-        #                                                                             'trial_off': trigger_map['trial_off'], 
-        #                                                                             'block_off': trigger_map['block_off'],
-        #                                                                             'BL_t_on': trigger_map['BL_t_on'], 
-        #                                                                             'BL_m_on': trigger_map['BL_m_on'],
-        #                                                                             '1back_t1_on': trigger_map['1back_t1_on'],
-        #                                                                             '1back_t2_on': trigger_map['1back_t2_on'],
-        #                                                                             '1back_s_m_on': trigger_map['1back_s_m_on'],
-        #                                                                             '1back_d_m_on': trigger_map['1back_d_m_on'],
-        #                                                                             '2back_t1_on': trigger_map['2back_t1_on'], 
-        #                                                                             '2back_t2_on': trigger_map['2back_t2_on'],
-        #                                                                             '2back_s_m_on': trigger_map['2back_s_m_on'], 
-        #                                                                             '2back_d_m_on': trigger_map['2back_d_m_on'],
-        #                                                                             'vtask_main_on': trigger_map['vtask_main_on'],
-        #                                                                             'vtask_t_on': trigger_map['vtask_t_on'], 
-        #                                                                             'pt_task_on': trigger_map['pt_task_on'],
-        #                                                                             '440_on': trigger_map['440_on'],
-        #                                                                             '440_off': trigger_map['440_off'],
-        #                                                                             '587_on': trigger_map['587_on'],
-        #                                                                             '587_off': trigger_map['587_off'],
-        #                                                                             '782_on': trigger_map['782_on'],
-        #                                                                             '782_off': trigger_map['782_off'],
-        #                                                                             '1043_on': trigger_map['1043_on'],
-        #                                                                             '1043_off': trigger_map['1043_off'],
-        #                                                                             'ordered': trigger_map['ordered'],
-        #                                                                             'random': trigger_map['random'],
-        #                                                                             'end_exp': trigger_map['end_exp'] 
-        #                                                                             }) 
-        
-        #eyetracking_events, _ = mne.events_from_annotations(eyelink_raw, event_id = {'trial_on': trigger_map['trial_on']}) 
-        #eeg_events, _ = mne.events_from_annotations(raw, event_id = {'trial_on': trigger_map['trial_on']})       
-        
-                
-        # Convert event onsets from samples to seconds
-        #eyetracking_events = eyetracking_events[:, 0] / eyelink_raw.info["sfreq"]
-        #eeg_events         = eeg_events[:, 0]         / raw.info["sfreq"]
-        
-        #len(eeg_events)
-        #len(eyetracking_events)
-        
-        # Align the data
-        #mne.preprocessing.realign_raw(raw = raw, 
-        #                              other = eyelink_raw, 
-        #                              t_raw = eeg_events, 
-        #                              t_other = eyetracking_events, 
-        #                              verbose="error")
-
-
-        #  Aligning the data doesn't work because the time array of the EEG is slightly longer than the Eyetracking one. 
-        # The EEG triggers are always sent before the eyetracker triggers, so I guess the time it takes to send the trigger 
-        # is basically added to the eyetracking trigger.
-        
-        # Example: If trigger 1 is sent at 20 ms after experiment onset to the eeg and right afterwards to the the eyetracker. 
-        # If sending the eyetracking trigger takes a few ms, this delay should basically affect the timing of the rest of the script, 
-        # which should be fine as long as the stimuli are also delayed. With each trigger to the eyetracker, we add a few ms to the delay,
-        # which is also fine.
-        # However, at the end of the experiment, we send the last trigger to the eyetracker, which means this delay only affects the 
-        # timing of the eyetracking trigger. 
-
-        
-        # I think the script has to wait until the trigger to the eyetracker is sent, so the 1 ms delay should be passed on, 
-        # so the next EEG trigger is also sent with a 1 ms delay.So basically the delays add up, but both EEG and eyetracker should be affected equally, except for 
-        
         # Add EEG channels to the eye-tracking raw object
         #raw.add_channels([eyelink_raw], force_update_info=True)
 
