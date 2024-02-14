@@ -103,9 +103,17 @@ from sklearn.linear_model import LinearRegression
 
 import re # for regular expressions
 
+# for calculating distance between head shape points and centroid
+!pip install scipy
+from scipy.spatial.distance import cdist
+
 # for plotting
 import matplotlib.pyplot as plt
-from matplotlib.colors import LinearSegmentedColormap #  for plotting bridging between electrodes
+# for plotting bridging between electrodes
+from matplotlib.colors import LinearSegmentedColormap 
+
+# for plotting in 3D
+from mpl_toolkits.mplot3d import Axes3D
 
 # for TRFs: import eelbrain (this can do boosting algorithm)
 # --> make sure eelbrain and its dependencies are all pip installed 
@@ -243,9 +251,9 @@ for curr_file in file_list:
     # remove the entries containing info on nasion, lpa and rpa from dict 
     # as they aren't EEG channels.
     channel_dict = {key: value for key, value in channel_dict.items() if key not in ['Nasion', 'LeftEar', 'RightEar']}
-    
-    
-    # extract head shape points, but create an array of shape (n_points, 3) 
+
+
+    # Extract head shape points, but create an array of shape (n_points, 3) 
     # instead of a dict as they have no labels.
 
     # get index of row containing header "HeadShapePoints":
@@ -261,11 +269,50 @@ for curr_file in file_list:
     head_shape_array = np.array([list(map(float, point.split('\t'))) for point in head_shape_data], dtype=float)
 
 
+    # Sometimes I make an error when tracking the head shape and I generate a few points 
+    # that are not on the scalp but somewhere in the air. I want to exclude those.
+    
+    # calculate the centroid of the head using the head shape points:
+    centroid = np.mean(head_shape_array, axis = 0)
+    
+    # now calculate the distance between each head shape point and the centroid
+    distances = cdist(head_shape_array, [centroid])
+    
+    # Determine the threshold distance (e.g., using some percentile)
+    threshold = np.percentile(distances, 95)
+    
+    # Exclude points that exceed the threshold distance
+    excluded_head_points = head_shape_array[(distances > threshold).flatten()]
+    filtered_head_points = head_shape_array[(distances <= threshold).flatten()]
+    
+    
+    # Plot the excluded head shape points:
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    # show the head shape points
+    ax.scatter(filtered_head_points[:, 0], filtered_head_points[:, 1], 
+               filtered_head_points[:, 2], 
+               c = 'grey', 
+               label = 'Head Shape Points')
+    # show the excluded head shape points
+    ax.scatter(excluded_head_points[:, 0], 
+               excluded_head_points[:, 1], 
+               excluded_head_points[:, 2], 
+               c = 'red', 
+               label = 'Excluded Points')
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    ax.legend()
+    ax.view_init(elev = 20, azim = 100) # change azim to turn it around
+    plt.show()
+
+    # Set montage: 
     custom_montage = mne.channels.make_dig_montage(ch_pos = channel_dict, 
                                           nasion = nasion_pos,
                                           lpa = lpa_pos,
                                           rpa = rpa_pos,
-                                          hsp = head_shape_array,
+                                          hsp = filtered_head_points,
                                           hpi = None,
                                           coord_frame = "unknown")
                                           
@@ -356,6 +403,26 @@ for curr_file in file_list:
     #print(set(raw.annotations.description))
 
 
+    # I sent each trigger once before the beginning of the experiment to 
+    # check if our trigger cable is properly connected. 
+    # So delete these test triggers at the start of the file:
+
+    # get list of all triggers and their time stamps:
+    all_triggers = list(zip(raw.annotations.description, raw.annotations.onset))
+
+    # get rid of all test triggers: 
+    # get index of second "start_exp" trigger
+    start_trigger_ixd = [index for index, (description, onset) in enumerate(all_triggers) if description == "start_exp"][1]
+
+    del_indices = list(range(start_trigger_ixd))
+        
+    # delete annotations by their indices
+    raw.annotations.delete(del_indices)
+    
+    # check if it worked: Now we should see "start_exp", "BL_t_on", "trial_on", "resp_continue", "trial_on",... as the first triggers.
+    all_triggers = list(zip(raw.annotations.description, raw.annotations.onset))
+    #print(all_eeg_triggers[0:10])
+     
     # save backup of raw object in the data folder: 
     raw.save((curr_data_path + "part" + curr_id + "/backup_raw.fif"), overwrite = True)
 
@@ -1068,23 +1135,6 @@ for curr_file in file_list:
 
    # add empty column to df where we can store the time stamps: 
    behav_data["trial_onset_timestamps"] = ''
-
-   # get list of all triggers and their time stamps:
-   all_triggers = list(zip(raw_selected_channels.annotations.description, raw_selected_channels.annotations.onset))
-
-   # get rid of all test triggers: 
-   # get index of second "start_exp" trigger
-   start_trigger_ixd = [index for index, (description, onset) in enumerate(all_triggers) if description == "start_exp"][1]
-
-   del_indices = list(range(start_trigger_ixd))
-        
-   # delete annotations by their indices
-   raw.annotations.delete(del_indices)
-    
-   # check if it worked: Now we should see "start_exp", "BL_t_on", "trial_on", "resp_continue", "trial_on",... as the first triggers.
-   all_triggers = list(zip(raw.annotations.description, raw.annotations.onset))
-   #print(all_eeg_triggers[0:10])
-     
         
 
    # use counter for block index:

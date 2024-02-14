@@ -108,7 +108,7 @@ palet3_dark <- c("#38759C", "#266187")
 ```{r path setup, echo = FALSE}
 # each participant has 1 folder, and all of those folders are in the "Data" folder:
 path_data_folder <- here::here("Data/")
-#print(path_data_folder)
+print(path_data_folder)
 ```
 
 
@@ -142,8 +142,15 @@ for (i in 1:length(file_list)) {
   
   # if all is fine, though, read in files for current participant:
   subj_df       <- read.csv(paste(path_data_folder, file_list[i], "/", exp_data, sep = ""), sep = ",")
+  if (length(subj_df) == 1){
+    subj_df       <- read.csv(paste(path_data_folder, file_list[i], "/", exp_data, sep = ""), sep = ";")
+  }
+ 
   subj_quest_df <- read.csv(questionnaire_data, sep = ",")
-
+  if (length(subj_quest_df) == 1){
+    subj_quest_df <- read.csv(questionnaire_data, sep = ";")
+  }
+  
   # get demographical data from the questionnaire df:
   id             <- subset(subj_quest_df, sender == "ID")$ID # individual code
   message(paste(i, " - Reading in file of participant with ID: ", id, sep = ""))
