@@ -657,15 +657,49 @@ for curr_file in file_list:
 
         # So I was right, there's a constant shift between the EEG & ET triggers.
 
-        # Align EEG & Eyetracking data:
-        mne.preprocessing.realign_raw(raw, eyelink_raw,
-                                      t_raw = eeg_shifted_timestamps, 
-                                      t_other = eyelink_shifted_timestamps, 
+        # Align EEG & Eyetracking data by resampling the eyetracking data:
+        mne.preprocessing.realign_raw(eyelink_raw, raw, 
+                                      t_raw = eyelink_shifted_timestamps, 
+                                      t_other = eeg_shifted_timestamps, 
                                       verbose = None)
+        
+        
+        # Sanity Check: Plot the Drift again as we did before:
+
+        # get all start_exp & trial_on triggers + their time stamps:
+        #all_eeg_triggers = list(zip(raw.annotations.description, raw.annotations.onset))
+        #eeg_onset_time = all_eeg_triggers[0][1]
+        #eeg_trial_on_triggers = [(trigger, timestamp) for trigger, timestamp in all_eeg_triggers if trigger == "trial_on"]
+        #eeg_timestamps = [timestamp for _, timestamp in eeg_trial_on_triggers]
+        
+        #all_eyelink_triggers = list(zip(eyelink_raw.annotations.description, eyelink_raw.annotations.onset))
+        #eyelink_onset_time = all_eyelink_triggers[0][1]
+        #eyelink_trial_on_triggers = [(trigger, timestamp) for trigger, timestamp in all_eyelink_triggers if trigger == "trial_on"]
+        #eyelink_timestamps = [timestamp for _, timestamp in eyelink_trial_on_triggers]
+        
+        # subtract the onset times from all time stamps and check if the triggers match then:
+        #eeg_shifted_timestamps = [timestamp - eeg_onset_time for timestamp in eeg_timestamps]
+        #eyelink_shifted_timestamps = [timestamp - eyelink_onset_time for timestamp in eyelink_timestamps]    
+    
+        # Plot deviation between clocks over the course of the experiment:
+        #clock_drift = np.abs(eeg_shifted_timestamps[-1] - eyelink_shifted_timestamps[-1])
+        #print("Max. clock drift between samples in seconds:", clock_drift) 
+        #deviation = np.abs(np.array(eeg_shifted_timestamps) - np.array(eyelink_shifted_timestamps))
+        #plt.figure(figsize=(10, 6))
+        #plt.scatter(eeg_shifted_timestamps, deviation, label='Deviation: EEG - Eyetracker Triggers', marker='.', color = "darkred", s = 20)
+        #plt.xlabel('Time (from EEG)')
+        #plt.ylabel('Clock Drift between Shared Events (in seconds)')
+        #plt.title('Shift Between EEG and Eyetracker Triggers')
+        #plt.legend()
+        #plt.ylim(0, 0.65)  # Set y-axis range from 0 to 6
+        #plt.show()
+        
+        
+        
         # add eyetracking channels to the eeg raw object:
         raw.add_channels([eyelink_raw], force_update_info = True)
-        
-        #del eyelink_raw
+
+        #del eyelink_raw  # free up some memory
                 
         
         
