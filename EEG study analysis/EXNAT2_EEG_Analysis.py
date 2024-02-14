@@ -403,25 +403,46 @@ for curr_file in file_list:
     #print(set(raw.annotations.description))
 
 
-    # I sent each trigger once before the beginning of the experiment to 
-    # check if our trigger cable is properly connected. 
-    # So delete these test triggers at the start of the file:
-
+    # The EEG should be started before starting the 
+    # experiment in PsychoPy if all goes well. In this case, we should 
+    # see that each trigger value is sent once before the start of the 
+    # experiment to check if everything works.
+    # But sometimes, the EEG recording might be started
+    # after the eyetracker calibration, in this case we miss the first few 
+    # test triggers and maybe even the first real "start_exp" trigger that 
+    # tells us when the experiment started. 
+    
+    # This means we have to account for 2 things:
+    # 1. If there are test triggers, we need to get rid of them or things will get confusing later.
+    # 2. If we have no such triggers, and maybe even a missing start_exp trigger,
+    # we need to make sure we pick a good experiment onset. I think this could 
+    # be the onset of the first BL main block.
+    # --> solution: Delete all annotations before that very first BL main block.
+    
     # get list of all triggers and their time stamps:
     all_triggers = list(zip(raw.annotations.description, raw.annotations.onset))
 
-    # get rid of all test triggers: 
-    # get index of second "start_exp" trigger
-    start_trigger_ixd = [index for index, (description, onset) in enumerate(all_triggers) if description == "start_exp"][1]
-
-    del_indices = list(range(start_trigger_ixd))
+    # Check if there are 2 start_exp triggers in the annotations: 
+    # If yes, we recorded the test triggers.
+    start_exp_count = sum(1 for trigger in all_triggers if trigger[0] == 'start_exp')
+    if start_exp_count == 2:
+        # get index of second "BL_m_on" trigger (because the first one was a test trigger)
+        eeg_start_ixd = [index for index, (description, onset) in enumerate(all_triggers) if description == "BL_m_on"][1]
+    # if there was only one or even no start_exp trigger, we missed the test triggers.
+    else: 
+        # get index of first "BL_m_on" trigger:
+        eeg_start_ixd = [index for index, (description, onset) in enumerate(all_triggers) if description == "BL_m_on"][0]
+    
+    # now delete all annotations before that index:
+    del_indices = list(range(eeg_start_ixd))
         
     # delete annotations by their indices
     raw.annotations.delete(del_indices)
     
-    # check if it worked: Now we should see "start_exp", "BL_t_on", "trial_on", "resp_continue", "trial_on",... as the first triggers.
-    all_triggers = list(zip(raw.annotations.description, raw.annotations.onset))
-    #print(all_eeg_triggers[0:10])
+    # check if it worked: Now we should see "BL_m_on", "trial_on", 
+    # "resp_continue", "trial_off", "trial_on",... as the first triggers.
+    #all_triggers = list(zip(raw.annotations.description, raw.annotations.onset))
+    #print(all_triggers[0:10])
      
     # save backup of raw object in the data folder: 
     raw.save((curr_data_path + "part" + curr_id + "/backup_raw.fif"), overwrite = True)
@@ -558,10 +579,10 @@ for curr_file in file_list:
         # loop annotations in raw object:
         for trigger_key in set(eyelink_raw.annotations.description):
 
-            print(trigger_key)
+            #print(trigger_key)
             # find correct trigger label for the old trigger:
             trigger_label = list(eyelink_eeg_trigger_map.values())[list(eyelink_eeg_trigger_map.keys()).index(trigger_key)] 
-            print(trigger_label)
+            #print(trigger_label)
             
             # change label in the annotations:
             eyelink_raw.annotations.description[eyelink_raw.annotations.description == trigger_key] = trigger_label
@@ -569,160 +590,82 @@ for curr_file in file_list:
         # print annotations again to check if it worked:
         #print(set(eyelink_raw.annotations.description))
     
-    
-    
+        # Now we have the same issue as with the EEG triggers: 
+        # There will be test triggers.
+        # Count occurrences of "start_exp" triggers in annotations
+        all_triggers = list(zip(eyelink_raw.annotations.description, eyelink_raw.annotations.onset))
+        start_exp_count = sum(1 for trigger in all_triggers if trigger[0] == 'start_exp')
+
+        # Check if there are 2 start_exp triggers in the annotations: 
+        # If yes, we recorded the test triggers.
+        start_exp_count = sum(1 for trigger in all_triggers if trigger[0] == 'start_exp')
+        if start_exp_count == 2:
+            # get index of second "BL_m_on" trigger (because the first one was a test trigger)
+            eyelink_start_ixd = [index for index, (description, onset) in enumerate(all_triggers) if description == "BL_m_on"][1]
+        # if there was only one or even no start_exp trigger, we missed the test triggers.
+        else: 
+            # get index of first "BL_m_on" trigger:
+            eyelink_start_ixd = [index for index, (description, onset) in enumerate(all_triggers) if description == "BL_m_on"][0]
+        
+        # now delete all annotations before that index:
+        del_indices = list(range(eyelink_start_ixd))
+            
+        # delete annotations by their indices
+        eyelink_raw.annotations.delete(del_indices)
+        
+        # check if it worked: Now we should see "BL_m_on", "trial_on", 
+        # "resp_continue", "trial_off", "trial_on",... as the first triggers.
+        #all_triggers = list(zip(eyelink_raw.annotations.description, raw.annotations.onset))
+        #print(all_triggers[0:10])
+         
+
         #""" Align EEG & Eyetracking Data """
         
-    
-        # The EEG recording is started before the eyetracking recording and it's also started after the eyetracking recording is ended, 
-        # so the EEG stream should be longer although both streams are recorded with a sampling rate of 1000 Hz. 
-        
-        # sanity check: How many samples are in each stream? EEG should have more. 
-        print("Sanity check: There are more eeg samples than eyetracker samples (should be True): ", str(raw.n_times > eyelink_raw.n_times))
-        
-        # At the start of the experiment, to check if the recording works and all triggers arrive properly,
-        # we test the EEG triggers but we don't send these test triggers to the eyetracker as we can't see them in the Viewer anyways.
-        
-        # This means that there are some triggers at the beginning of the EEG streams that are not present in the eyetracking data.
-        
-        # Solution: delete those annotations from the EEG data.
-        
-        # get indices of all test trigger annotations:
-        
-        # get all triggers + their time stamps
-        all_triggers = list(zip(raw.annotations.description, raw.annotations.onset))
-        #print(all_triggers[0:36])
-            
-        # get index of second "start_exp" trigger
-        start_trigger_ixd = [index for index, (description, onset) in enumerate(all_triggers) if description == "start_exp"][1]
-
-        del_indices = list(range(start_trigger_ixd))
-        
-        # delete annotations by their indices
-        raw.annotations.delete(del_indices)
-    
-        # check if it worked: Now we should see "start_exp", "BL_t_on", "trial_on", "resp_continue", "trial_on",... as the first triggers.
-        all_eeg_triggers = list(zip(raw.annotations.description, raw.annotations.onset))
-        print(all_eeg_triggers[0:10])
-     
-        
-        # In the eyetracking dataset, we have a lot of empty triggers, I think those are also just test triggers.
-        all_et_triggers = list(zip(eyelink_raw.annotations.description, eyelink_raw.annotations.onset))
-        #print(all_et_triggers[0:40])
-        
-        # If we compare the timestamps of the "start_exp" triggers, you can see that they don't match. 
-        # Here's an example: 
-        # EEG: ('start_exp', 104.323)
-        # Eyetracker: ('start_exp', 5.04)
-        
+        # The EEG & the eyetracking data will most definitely have different lengths and 
+        # probably a slight clock drift as we couldn't use LSL to record them.
+        # We need to account for this when trying to merge them into 1 dataset.
         
         # Plot the shift between EEG triggers and Eyetracker triggers: 
-        
-        # get all triggers + their time stamps again:
-        all_triggers = list(zip(raw.annotations.description, raw.annotations.onset))
-        eeg_trial_on_triggers = [(trigger, timestamp) for trigger, timestamp in all_triggers if trigger in ["start_exp", "trial_on"]]
-        all_triggers = list(zip(eyelink_raw.annotations.description, eyelink_raw.annotations.onset))
-        eyelink_trial_on_triggers = [(trigger, timestamp) for trigger, timestamp in all_triggers if trigger in ["start_exp", "trial_on"]]
+        # get all start_exp & trial_on triggers + their time stamps:
+        all_eeg_triggers = list(zip(raw.annotations.description, raw.annotations.onset))
+        eeg_onset_time = all_eeg_triggers[0][1]
+        eeg_trial_on_triggers = [(trigger, timestamp) for trigger, timestamp in all_eeg_triggers if trigger == "trial_on"]
         eeg_timestamps = [timestamp for _, timestamp in eeg_trial_on_triggers]
+        
+        all_eyelink_triggers = list(zip(eyelink_raw.annotations.description, eyelink_raw.annotations.onset))
+        eyelink_onset_time = all_eyelink_triggers[0][1]
+        eyelink_trial_on_triggers = [(trigger, timestamp) for trigger, timestamp in all_eyelink_triggers if trigger == "trial_on"]
         eyelink_timestamps = [timestamp for _, timestamp in eyelink_trial_on_triggers]
         
         # subtract the onset times from all time stamps and check if the triggers match then:
-        eeg_shifted_timestamps = [timestamp - eeg_timestamps[0] for timestamp in eeg_timestamps]
-        eyelink_shifted_timestamps = [timestamp - eyelink_timestamps[0] for timestamp in eyelink_timestamps]    
+        eeg_shifted_timestamps = [timestamp - eeg_onset_time for timestamp in eeg_timestamps]
+        eyelink_shifted_timestamps = [timestamp - eyelink_onset_time for timestamp in eyelink_timestamps]    
     
-        # plot time stamps of both trigger streams:
-        plt.figure(figsize=(10, 6))
-        plt.scatter(range(len(eeg_shifted_timestamps)), eeg_shifted_timestamps, label='EEG Triggers', marker='.', s = 2, alpha=0.3)
-        plt.scatter(range(len(eyelink_shifted_timestamps)), eyelink_shifted_timestamps, label='Eyetracker Triggers', marker='.', s = 2, alpha=0.2)
-        plt.xlabel('Trial Index')
-        plt.ylabel('Time (seconds)')
-        plt.title('Shift Between EEG and Eyetracker Triggers')
-        plt.legend()
-        plt.show()
-
-        # There's a pretty constant shift between the EEG & ET triggers,
-        # probably because of a slight clock drift between the two devices.
-
+    
         # Plot deviation between clocks over the course of the experiment:
-        mean_deviation = np.median(np.abs(np.array(eeg_shifted_timestamps) - np.array(eyelink_shifted_timestamps)))
+        clock_drift = np.abs(eeg_shifted_timestamps[-1] - eyelink_shifted_timestamps[-1])
+        print("Max. clock drift between samples in seconds:", clock_drift) 
         deviation = np.abs(np.array(eeg_shifted_timestamps) - np.array(eyelink_shifted_timestamps))
-
         plt.figure(figsize=(10, 6))
-        plt.scatter(range(len(deviation)), deviation, label='Deviation: EEG - Eyetracker Triggers', marker='.', color = "darkred", s = 20)
-        plt.xlabel('Trial Index')
-        plt.ylabel('Deviation (seconds)')
+        #plt.scatter(range(len(deviation)), deviation, label='Deviation: EEG - Eyetracker Triggers', marker='.', color = "darkred", s = 20)
+        plt.scatter(eeg_shifted_timestamps, deviation, label='Deviation: EEG - Eyetracker Triggers', marker='.', color = "darkred", s = 20)
+        plt.xlabel('Time (from EEG)')
+        plt.ylabel('Clock Drift between Shared Events (in seconds)')
         plt.title('Shift Between EEG and Eyetracker Triggers')
         plt.legend()
         plt.show()
 
-
-
-
-
-        # TO DO: 
+        # So I was right, there's a constant shift between the EEG & ET triggers.
 
         # Align EEG & Eyetracking data:
-        
         mne.preprocessing.realign_raw(raw, eyelink_raw,
-                                      t_raw = , 
-                                      t_other = , 
+                                      t_raw = pass, 
+                                      t_other = pass, 
                                       verbose = None)
 
 
-        
-        # However, it would be nice if we could align the data so the time stamps match.
-        
-        
-        
-        
-
-
 
     
-        
-        """ Check if we have enough Eyetracking Data """
-        
-        eye_triggers = list(zip(eyelink_raw.annotations.description, eyelink_raw.annotations.onset))  
-        
-        # check if there's an end_experiment trigger in the signal. If there isn't, 
-        # the Eyetracker probably didn't record properly. If there is, we can try to further analyse the data:
-        eye_end = [(trigger, timestamp) for trigger, timestamp in eye_triggers if trigger == 'end_exp']
-        if eye_end != []:
-
-            # get experiment and visual task training onset triggers
-            eye_onset = list(zip(eyelink_raw.annotations.description, eyelink_raw.annotations.onset))  
-            eye_onset = [(trigger, timestamp) for trigger, timestamp in eye_onset if trigger in ['start_exp', 'end_exp']]
-            eye_onsets = [onset for description, onset in eye_onset]
-    
-            eeg_onset = list(zip(raw.annotations.description, raw.annotations.onset))  
-            eeg_onset = [(trigger, timestamp) for trigger, timestamp in eeg_onset if trigger in ['start_exp', 'end_exp']]
-            eeg_onsets = [onset for description, onset in eeg_onset]
-
-    
-            # Align the data -> doesn't work
-            mne.preprocessing.realign_raw(raw = raw, 
-                                          other = eyelink_raw, 
-                                          t_raw = eeg_onsets, 
-                                          t_other = eye_onsets, 
-                                          verbose="error")
-            
-            # Estimate the clock drift (in seconds): 
-            # eeg time between start and end, and eyetracker time between start and end:
-            total_clock_drift = (eeg_onsets[1] - eeg_onsets[0]) - (eye_onsets[1] - eye_onsets[0])
-            
-            
-            # crop EEG & Eyetracker signals so both recordings start at the start_exp trigger at onset time = 0:
-                
-                
-                
-            # adjust time stamps based on clock drift.
-            # --> how much does it drift per sample on average? Subtract that from the time stamps of the longer signal.
-                
-                
-            # also make sure the streams have the same amount of samples between start & end
-            
-        
-
 
 
         # Add EEG channels to the eye-tracking raw object
