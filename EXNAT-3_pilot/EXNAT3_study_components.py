@@ -13,7 +13,7 @@ from psychopy import visual, event, core
 import numpy as np
 
 """ 1) Function to turn background from colour 1 to colour 2 (both defined in RGB -1:1 as list) over the course of x seconds """
-def change_bg_colour(window, start_rgb, end_rgb, seconds = 2):
+def change_bg_colour(window, start_rgb, end_rgb, seconds = 0):
 
     # create a rectangle with the same size as the window
     rect = visual.Rect(window, width = window.size[0], height = window.size[1])

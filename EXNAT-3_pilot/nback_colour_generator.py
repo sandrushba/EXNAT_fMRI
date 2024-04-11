@@ -151,27 +151,27 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
       if target[i] == True:
           target_count = target_count + 1
 
-  print("nr of targets in random colour list:", target_count)
+  #print("nr of targets in random colour list:", target_count)
 
 
   # if we have more targets than min. targets and less than max. targets,
   # everything's fine:
   if target_count >= target_abs_min and target_count <= target_abs_max:
     target_nr = target_count
-    print("target count is correct! We have", target_count,
-          "targets and we needed at least", target_abs_min,
-          "and at most", target_abs_max, "targets")
+    #print("target count is correct! We have", target_count,
+          # "targets and we needed at least", target_abs_min,
+          # "and at most", target_abs_max, "targets")
 
   # if our target count is not in the correct range...
   else:
     # if we don't have enough targets or too many targets...
     if target_count < target_abs_min or target_count > target_abs_max:
-        #print("target count is not correct. There are", target_count, "targets currently." )
+        ##print("target count is not correct. There are", target_count, "targets currently." )
 
         # randomly draw a target number to use for adding/taking away targets
         target_nr = round(random.uniform(target_abs_min, target_abs_max))
         
-        print("adding/removing", target_nr - target_count, "targets now.")
+        #print("adding/removing", target_nr - target_count, "targets now.")
 
         # MISSING TARGETS:
 		# --> turn non-target trials into target trials to reach the desired number of targets
@@ -271,8 +271,8 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
     
             # if for some reason there are less replacement colours than we need, use recursion
             if (len(replacement_colours) < target_nr - target_count):
-                print("did not find enough replacement colours")
-                print("-------------- recursion -------------")
+                #print("did not find enough replacement colours")
+                #print("-------------- recursion -------------")
                 return create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, target_abs_max, zeroback_target = None)
 
             # if everything's fine, go on: 
@@ -307,7 +307,7 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
 
             if target_count - target_nr > 0:
                 nr_replacements = abs(target_count - target_nr)
-                print("Too many targets, replacing ", nr_replacements, "targets by non-targets")
+                #print("Too many targets, replacing ", nr_replacements, "targets by non-targets")
 
                 # find indices of targets we could get rid of
                 indices_targets = [t for t, x in enumerate(target) if x]
@@ -399,7 +399,7 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
                 target_count = target_count + 1
 
   
-        print("nr of targets after replacements:", target_count)
+        #print("nr of targets after replacements:", target_count)
 
 
         # weird stuff is happening and I'm losing my patience with this:
@@ -410,8 +410,8 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
 
         if target_count != target_nr:
 
-            print("current target number is", target_count, "but should be", target_nr)
-            print("-------------- recursion -------------")
+            #print("current target number is", target_count, "but should be", target_nr)
+            #print("-------------- recursion -------------")
             # recursion: generate new colour list
             return create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, target_abs_max, zeroback_target = None)
 
@@ -477,15 +477,15 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
   # if everything's fine...
   if target_colours_equal and change_prob_equal:
        # return colour list:
-       print("current target number is", target_count, "and should be", target_nr, "- all fine!")
-       print("returning colour list")
+       #print("current target number is", target_count, "and should be", target_nr, "- all fine!")
+       #print("returning colour list")
        return random_colour_list
    
   # if change probabilities or distribution of target colours is not balanced...
   else:
        # recursion: generate new colour list
-       print("distribution of target colours & change probabilities were a little off")
-       print("-------------- recursion -------------")
+       #print("distribution of target colours & change probabilities were a little off")
+       #print("-------------- recursion -------------")
        return create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, target_abs_max, zeroback_target = None)
 
 
