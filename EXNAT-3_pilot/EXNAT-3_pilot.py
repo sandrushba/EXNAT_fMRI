@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-This experiment was created using PsychoPy3 Experiment Builder (v2023.2.3),
-    on Thu Apr 11 13:58:52 2024
+This experiment was created using PsychoPy3 Experiment Builder (v2024.1.0),
+    on Tue Apr 16 20:10:38 2024
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -11,6 +11,10 @@ If you publish work using this script the most relevant publication is:
 
 """
 
+import psychopy
+psychopy.useVersion('2024.1.0')
+
+
 # --- Import packages ---
 from psychopy import locale_setup
 from psychopy import prefs
@@ -18,7 +22,7 @@ from psychopy import plugins
 plugins.activatePlugins()
 prefs.hardware['audioLib'] = 'ptb'
 prefs.hardware['audioLatencyMode'] = '3'
-from psychopy import sound, gui, visual, core, data, event, logging, clock, colors, layout
+from psychopy import sound, gui, visual, core, data, event, logging, clock, colors, layout, hardware
 from psychopy.tools import environmenttools
 from psychopy.constants import (NOT_STARTED, STARTED, PLAYING, PAUSED,
                                 STOPPED, FINISHED, PRESSED, RELEASED, FOREVER, priority)
@@ -34,20 +38,43 @@ import psychopy.iohub as io
 from psychopy.hardware import keyboard
 
 # --- Setup global variables (available in all functions) ---
-# Ensure that relative paths start from the same directory as this script
+# create a device manager to handle hardware (keyboards, mice, mirophones, speakers, etc.)
+deviceManager = hardware.DeviceManager()
+# ensure that relative paths start from the same directory as this script
 _thisDir = os.path.dirname(os.path.abspath(__file__))
-# Store info about the experiment session
-psychopyVersion = '2023.2.3'
+# store info about the experiment session
+psychopyVersion = '2024.1.0'
 expName = 'EXNAT-3_pilot'  # from the Builder filename that created this script
+# information about this experiment
 expInfo = {
     'participant': f"{randint(0, 999999):06.0f}",
     'session': '001',
     'testing_mode': 'yes',
-    'date': data.getDateStr(),  # add a simple timestamp
-    'expName': expName,
-    'psychopyVersion': psychopyVersion,
+    'date|hid': data.getDateStr(),
+    'expName|hid': expName,
+    'psychopyVersion|hid': psychopyVersion,
 }
 
+# --- Define some variables which will change depending on pilot mode ---
+'''
+To run in pilot mode, either use the run/pilot toggle in Builder, Coder and Runner, 
+or run the experiment with `--pilot` as an argument. To change what pilot 
+#mode does, check out the 'Pilot mode' tab in preferences.
+'''
+# work out from system args whether we are running in pilot mode
+PILOTING = core.setPilotModeFromArgs()
+# start off with values from experiment settings
+_fullScr = True
+_loggingLevel = logging.getLevel('data')
+# if in pilot mode, apply overrides according to preferences
+if PILOTING:
+    # force windowed mode
+    if prefs.piloting['forceWindowed']:
+        _fullScr = False
+    # override logging level
+    _loggingLevel = logging.getLevel(
+        prefs.piloting['pilotLoggingLevel']
+    )
 
 def showExpInfoDlg(expInfo):
     """
@@ -55,25 +82,19 @@ def showExpInfoDlg(expInfo):
     Parameters
     ==========
     expInfo : dict
-        Information about this experiment, created by the `setupExpInfo` function.
+        Information about this experiment.
     
     Returns
     ==========
     dict
         Information about this experiment.
     """
-    # temporarily remove keys which the dialog doesn't need to show
-    poppedKeys = {
-        'date': expInfo.pop('date', data.getDateStr()),
-        'expName': expInfo.pop('expName', expName),
-        'psychopyVersion': expInfo.pop('psychopyVersion', psychopyVersion),
-    }
     # show participant info dialog
-    dlg = gui.DlgFromDict(dictionary=expInfo, sortKeys=False, title=expName)
+    dlg = gui.DlgFromDict(
+        dictionary=expInfo, sortKeys=False, title=expName, alwaysOnTop=True
+    )
     if dlg.OK == False:
         core.quit()  # user pressed cancel
-    # restore hidden keys
-    expInfo.update(poppedKeys)
     # return expInfo
     return expInfo
 
@@ -94,6 +115,10 @@ def setupData(expInfo, dataDir=None):
         Handler object for this experiment, contains the data to save and information about 
         where to save it to.
     """
+    # remove dialog-specific syntax from expInfo
+    for key, val in expInfo.copy().items():
+        newKey, _ = data.utils.parsePipeSyntax(key)
+        expInfo[newKey] = expInfo.pop(key)
     
     # data file name stem = absolute path + name; later add .psyexp, .csv, .log, etc
     if dataDir is None:
@@ -108,7 +133,7 @@ def setupData(expInfo, dataDir=None):
     thisExp = data.ExperimentHandler(
         name=expName, version='',
         extraInfo=expInfo, runtimeInfo=None,
-        originPath='/Users/sandramartin/ownCloud/EXNAT/EXNAT_fMRI/EXNAT-3 pilot/EXNAT-3_pilot.py',
+        originPath='/data/tu_martin_cloud/EXNAT/EXNAT_fMRI/EXNAT-3_pilot/EXNAT-3_pilot.py',
         savePickle=True, saveWideText=True,
         dataFileName=dataDir + os.sep + filename, sortColumns='time'
     )
@@ -133,9 +158,9 @@ def setupLogging(filename):
         Text stream to receive inputs from the logging system.
     """
     # this outputs to the screen, not a file
-    logging.console.setLevel(logging.WARNING)
+    logging.console.setLevel(_loggingLevel)
     # save a log file for detail verbose info
-    logFile = logging.LogFile(filename+'.log', level=logging.WARNING)
+    logFile = logging.LogFile(filename+'.log', level=_loggingLevel)
     
     return logFile
 
@@ -156,19 +181,20 @@ def setupWindow(expInfo=None, win=None):
     psychopy.visual.Window
         Window in which to run this experiment.
     """
+    if PILOTING:
+        logging.debug('Fullscreen settings ignored as running in pilot mode.')
+    
     if win is None:
         # if not given a window to setup, make one
         win = visual.Window(
-            size=[1440, 900], fullscr=True, screen=0,
+            size=[1920, 1080], fullscr=_fullScr, screen=0,
             winType='pyglet', allowStencil=False,
             monitor='testMonitor', color=[0,0,0], colorSpace='rgb',
             backgroundImage='', backgroundFit='none',
             blendMode='avg', useFBO=True,
-            units='height'
+            units='height', 
+            checkTiming=False  # we're going to do this ourselves in a moment
         )
-        if expInfo is not None:
-            # store frame rate of monitor if we can measure it
-            expInfo['frameRate'] = win.getActualFrameRate()
     else:
         # if we have a window, just set the attributes which are safe to set
         win.color = [0,0,0]
@@ -178,12 +204,17 @@ def setupWindow(expInfo=None, win=None):
         win.units = 'height'
     win.mouseVisible = False
     win.hideMessage()
+    # show a visual indicator if we're in piloting mode
+    if PILOTING and prefs.piloting['showPilotingIndicator']:
+        win.showPilotingIndicator()
+    
     return win
 
 
-def setupInputs(expInfo, thisExp, win):
+def setupDevices(expInfo, thisExp, win):
     """
-    Setup whatever inputs are available (mouse, keyboard, eyetracker, etc.)
+    Setup whatever devices are available (mouse, keyboard, speaker, eyetracker, etc.) and add them to 
+    the device manager (deviceManager)
     
     Parameters
     ==========
@@ -196,11 +227,10 @@ def setupInputs(expInfo, thisExp, win):
         Window in which to run this experiment.
     Returns
     ==========
-    dict
-        Dictionary of input devices by name.
+    bool
+        True if completed successfully.
     """
     # --- Setup input devices ---
-    inputs = {}
     ioConfig = {}
     
     # Setup iohub keyboard
@@ -210,18 +240,18 @@ def setupInputs(expInfo, thisExp, win):
     if 'session' in expInfo:
         ioSession = str(expInfo['session'])
     ioServer = io.launchHubServer(window=win, **ioConfig)
-    eyetracker = None
+    # store ioServer object in the device manager
+    deviceManager.ioServer = ioServer
     
     # create a default keyboard (e.g. to check for escape)
-    defaultKeyboard = keyboard.Keyboard(backend='iohub')
-    # return inputs dict
-    return {
-        'ioServer': ioServer,
-        'defaultKeyboard': defaultKeyboard,
-        'eyetracker': eyetracker,
-    }
+    if deviceManager.getDevice('defaultKeyboard') is None:
+        deviceManager.addDevice(
+            deviceClass='keyboard', deviceName='defaultKeyboard', backend='iohub'
+        )
+    # return True if completed successfully
+    return True
 
-def pauseExperiment(thisExp, inputs=None, win=None, timers=[], playbackComponents=[]):
+def pauseExperiment(thisExp, win=None, timers=[], playbackComponents=[]):
     """
     Pause this experiment, preventing the flow from advancing to the next routine until resumed.
     
@@ -230,8 +260,6 @@ def pauseExperiment(thisExp, inputs=None, win=None, timers=[], playbackComponent
     thisExp : psychopy.data.ExperimentHandler
         Handler object for this experiment, contains the data to save and information about 
         where to save it to.
-    inputs : dict
-        Dictionary of input devices by name.
     win : psychopy.visual.Window
         Window for this experiment.
     timers : list, tuple
@@ -248,21 +276,24 @@ def pauseExperiment(thisExp, inputs=None, win=None, timers=[], playbackComponent
         comp.pause()
     # prevent components from auto-drawing
     win.stashAutoDraw()
+    # make sure we have a keyboard
+    defaultKeyboard = deviceManager.getDevice('defaultKeyboard')
+    if defaultKeyboard is None:
+        defaultKeyboard = deviceManager.addKeyboard(
+            deviceClass='keyboard',
+            deviceName='defaultKeyboard',
+            backend='ioHub',
+        )
     # run a while loop while we wait to unpause
     while thisExp.status == PAUSED:
-        # make sure we have a keyboard
-        if inputs is None:
-            inputs = {
-                'defaultKeyboard': keyboard.Keyboard(backend='ioHub')
-            }
         # check for quit (typically the Esc key)
-        if inputs['defaultKeyboard'].getKeys(keyList=['escape']):
-            endExperiment(thisExp, win=win, inputs=inputs)
+        if defaultKeyboard.getKeys(keyList=['escape']):
+            endExperiment(thisExp, win=win)
         # flip the screen
         win.flip()
     # if stop was requested while paused, quit
     if thisExp.status == FINISHED:
-        endExperiment(thisExp, inputs=inputs, win=win)
+        endExperiment(thisExp, win=win)
     # resume any playback components
     for comp in playbackComponents:
         comp.play()
@@ -273,7 +304,7 @@ def pauseExperiment(thisExp, inputs=None, win=None, timers=[], playbackComponent
         timer.reset()
 
 
-def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
+def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     """
     Run the experiment flow.
     
@@ -286,8 +317,6 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
         where to save it to.
     psychopy.visual.Window
         Window in which to run this experiment.
-    inputs : dict
-        Dictionary of input devices by name.
     globalClock : psychopy.core.clock.Clock or None
         Clock to get global time from - supply None to make a new one.
     thisSession : psychopy.session.Session or None
@@ -298,9 +327,14 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
     # make sure variables created by exec are available globally
     exec = environmenttools.setExecEnvironment(globals())
     # get device handles from dict of input devices
-    ioServer = inputs['ioServer']
-    defaultKeyboard = inputs['defaultKeyboard']
-    eyetracker = inputs['eyetracker']
+    ioServer = deviceManager.ioServer
+    # get/create a default keyboard (e.g. to check for escape)
+    defaultKeyboard = deviceManager.getDevice('defaultKeyboard')
+    if defaultKeyboard is None:
+        deviceManager.addDevice(
+            deviceClass='keyboard', deviceName='defaultKeyboard', backend='ioHub'
+        )
+    eyetracker = deviceManager.getDevice('eyetracker')
     # make sure we're running in the directory for this experiment
     os.chdir(_thisDir)
     # get filename from ExperimentHandler for convenience
@@ -341,6 +375,8 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
     import pandas as pd
     # additional timing package (I know we have core.wait, but I also want this one)
     import time
+    # math package for log function
+    import math
     
     # Get functions from my custom scripts:
     # import all texts
@@ -369,8 +405,11 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
     
     # make mouse invisible during experiment
     #mouse = io.devices.mouse
-    win.setMouseVisible(False)
-    
+    # win.setMouseVisible(False)
+    #mouse = event.Mouse(visible = False) 
+    #mouse.setExclusive(True) # this disables mouse during entire experiment
+    win.mouseVisible = False
+     
     # create 10 ms timer that we can use instead of core.wait()
     my_timer = core.CountdownTimer(0.01)
     # Run 'Begin Experiment' code from stimuli
@@ -555,13 +594,6 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
     exp_block_counter = 0
     
     print("starting experiment now!")
-    empty_placeholder = visual.TextStim(win=win, name='empty_placeholder',
-        text=None,
-        font='Open Sans',
-        pos=(0, 0), height=0.05, wrapWidth=None, ori=0.0, 
-        color='white', colorSpace='rgb', opacity=None, 
-        languageStyle='LTR',
-        depth=-2.0);
     
     # --- Initialize components for Routine "no_text_training" ---
     
@@ -572,22 +604,39 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
     # --- Initialize components for Routine "end" ---
     
     # create some handy timers
+    
+    # global clock to track the time since experiment started
     if globalClock is None:
-        globalClock = core.Clock()  # to track the time since experiment started
+        # create a clock if not given one
+        globalClock = core.Clock()
+    if isinstance(globalClock, str):
+        # if given a string, make a clock accoridng to it
+        if globalClock == 'float':
+            # get timestamps as a simple value
+            globalClock = core.Clock(format='float')
+        elif globalClock == 'iso':
+            # get timestamps in ISO format
+            globalClock = core.Clock(format='%Y-%m-%d_%H:%M:%S.%f%z')
+        else:
+            # get timestamps in a custom format
+            globalClock = core.Clock(format=globalClock)
     if ioServer is not None:
         ioServer.syncClock(globalClock)
     logging.setDefaultClock(globalClock)
-    routineTimer = core.Clock()  # to track time remaining of each (possibly non-slip) routine
+    # routine timer to track time remaining of each (possibly non-slip) routine
+    routineTimer = core.Clock()
     win.flip()  # flip window to reset last flip timer
     # store the exact time the global clock started
-    expInfo['expStart'] = data.getDateStr(format='%Y-%m-%d %Hh%M.%S.%f %z', fractionalSecondDigits=6)
+    expInfo['expStart'] = data.getDateStr(
+        format='%Y-%m-%d %Hh%M.%S.%f %z', fractionalSecondDigits=6
+    )
     
     # --- Prepare to start Routine "Settings" ---
     continueRoutine = True
     # update component parameters for each repeat
-    thisExp.addData('Settings.started', globalClock.getTime())
+    thisExp.addData('Settings.started', globalClock.getTime(format='float'))
     # keep track of which components have finished
-    SettingsComponents = [empty_placeholder]
+    SettingsComponents = []
     for thisComponent in SettingsComponents:
         thisComponent.tStart = None
         thisComponent.tStop = None
@@ -602,7 +651,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
     
     # --- Run Routine "Settings" ---
     routineForceEnded = not continueRoutine
-    while continueRoutine and routineTimer.getTime() < 1.0:
+    while continueRoutine:
         # get current time
         t = routineTimer.getTime()
         tThisFlip = win.getFutureFlipTime(clock=routineTimer)
@@ -610,44 +659,11 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
         frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
         # update/draw components on each frame
         
-        # *empty_placeholder* updates
-        
-        # if empty_placeholder is starting this frame...
-        if empty_placeholder.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
-            # keep track of start time/frame for later
-            empty_placeholder.frameNStart = frameN  # exact frame index
-            empty_placeholder.tStart = t  # local t and not account for scr refresh
-            empty_placeholder.tStartRefresh = tThisFlipGlobal  # on global time
-            win.timeOnFlip(empty_placeholder, 'tStartRefresh')  # time at next scr refresh
-            # add timestamp to datafile
-            thisExp.timestampOnFlip(win, 'empty_placeholder.started')
-            # update status
-            empty_placeholder.status = STARTED
-            empty_placeholder.setAutoDraw(True)
-        
-        # if empty_placeholder is active this frame...
-        if empty_placeholder.status == STARTED:
-            # update params
-            pass
-        
-        # if empty_placeholder is stopping this frame...
-        if empty_placeholder.status == STARTED:
-            # is it time to stop? (based on global clock, using actual start)
-            if tThisFlipGlobal > empty_placeholder.tStartRefresh + 1.0-frameTolerance:
-                # keep track of stop time/frame for later
-                empty_placeholder.tStop = t  # not accounting for scr refresh
-                empty_placeholder.frameNStop = frameN  # exact frame index
-                # add timestamp to datafile
-                thisExp.timestampOnFlip(win, 'empty_placeholder.stopped')
-                # update status
-                empty_placeholder.status = FINISHED
-                empty_placeholder.setAutoDraw(False)
-        
         # check for quit (typically the Esc key)
         if defaultKeyboard.getKeys(keyList=["escape"]):
             thisExp.status = FINISHED
         if thisExp.status == FINISHED or endExpNow:
-            endExperiment(thisExp, inputs=inputs, win=win)
+            endExperiment(thisExp, win=win)
             return
         
         # check if all components have finished
@@ -668,12 +684,10 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
     for thisComponent in SettingsComponents:
         if hasattr(thisComponent, "setAutoDraw"):
             thisComponent.setAutoDraw(False)
-    thisExp.addData('Settings.stopped', globalClock.getTime())
-    # using non-slip timing so subtract the expected duration of this Routine (unless ended on request)
-    if routineForceEnded:
-        routineTimer.reset()
-    else:
-        routineTimer.addTime(-1.000000)
+    thisExp.addData('Settings.stopped', globalClock.getTime(format='float'))
+    thisExp.nextEntry()
+    # the Routine "Settings" was not non-slip safe, so reset the non-slip timer
+    routineTimer.reset()
     
     # set up handler to look after randomisation of conditions etc
     blocks = data.TrialHandler(nReps=30.0, method='sequential', 
@@ -689,12 +703,11 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
     
     for thisBlock in blocks:
         currentLoop = blocks
-        thisExp.timestampOnFlip(win, 'thisRow.t')
+        thisExp.timestampOnFlip(win, 'thisRow.t', format=globalClock.format)
         # pause experiment here if requested
         if thisExp.status == PAUSED:
             pauseExperiment(
                 thisExp=thisExp, 
-                inputs=inputs, 
                 win=win, 
                 timers=[routineTimer], 
                 playbackComponents=[]
@@ -707,7 +720,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
         # --- Prepare to start Routine "no_text_training" ---
         continueRoutine = True
         # update component parameters for each repeat
-        thisExp.addData('no_text_training.started', globalClock.getTime())
+        thisExp.addData('no_text_training.started', globalClock.getTime(format='float'))
         # Run 'Begin Routine' code from no_text_and_training_2
         #################################################
         #                Blocks w/o text                #
@@ -720,6 +733,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
         # until we have to display a main text block (in this case we exit the routine).
         
         while True:
+            event. Mouse(visible=False)
             # keep background ivory
             win.setColor(light_bg_col, colorSpace='rgb')
             win.flip()
@@ -1033,7 +1047,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
             if defaultKeyboard.getKeys(keyList=["escape"]):
                 thisExp.status = FINISHED
             if thisExp.status == FINISHED or endExpNow:
-                endExperiment(thisExp, inputs=inputs, win=win)
+                endExperiment(thisExp, win=win)
                 return
             
             # check if all components have finished
@@ -1054,14 +1068,14 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
         for thisComponent in no_text_trainingComponents:
             if hasattr(thisComponent, "setAutoDraw"):
                 thisComponent.setAutoDraw(False)
-        thisExp.addData('no_text_training.stopped', globalClock.getTime())
+        thisExp.addData('no_text_training.stopped', globalClock.getTime(format='float'))
         # the Routine "no_text_training" was not non-slip safe, so reset the non-slip timer
         routineTimer.reset()
         
         # --- Prepare to start Routine "text_blocks_self_paced" ---
         continueRoutine = True
         # update component parameters for each repeat
-        thisExp.addData('text_blocks_self_paced.started', globalClock.getTime())
+        thisExp.addData('text_blocks_self_paced.started', globalClock.getTime(format='float'))
         # Run 'Begin Routine' code from text_blocks
         #################################################
         #           Blocks with text – self-paced       #
@@ -1184,7 +1198,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
             else:
                 # create ImageStim object
                 curr_instr_pic = visual.ImageStim(win,
-                                                  size=(0.7, 0.3),
+                                                  size=(0.8, 0.3),
                                                   pos=(0, -0.2),
                                                   image=locals()["instr_pic_" + curr_block])  # set path to image here
         
@@ -1312,11 +1326,10 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                 ### start recording responses
                 # start "endless" while loop that looks for responses
                 continue_trial = True
+                trial_start_time = my_trial_clock.getTime()  # Record the start time of the trial
                 while continue_trial:
         
                     # in each iteration, draw word on screen
-                    # --> flicker again
-        
                     stim.draw()
                     win.flip()
         
@@ -1355,6 +1368,17 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                             # parallel.setData(0)
                             core.wait(0.5)
                             core.quit()
+        
+                    # Check for timeout - if more than 1.5, 2 or 1.5 seconds have passed, move to the next trial
+                    if my_trial_clock.getTime() - trial_start_time >= 1.5 and curr_block in ["Reading_Baseline_training_click", "Reading_Baseline_main_click"]:
+                        curr_duration = 1500
+                        continue_trial = False
+                    elif my_trial_clock.getTime() - trial_start_time >= 2 and curr_block == "1back_dual_main_click":
+                        curr_duration = 2000
+                        continue_trial = False
+                    elif my_trial_clock.getTime() - trial_start_time >= 2.5 and curr_block == "2back_dual_main_click":
+                        curr_duration = 2500
+                        continue_trial = False
         
                 ### end trial
                 print("\tend self-paced trial")
@@ -1449,7 +1473,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
             Q1 = reading_bl_tr_Q1
             Q1_answers = reading_bl_tr_Q1_ans
             Q1_corr = reading_bl_tr_Q1_corr
-            
+        
         # if we have a main text, set regular questions
         elif skip_questions == False and training_Qs == False:
             # load first question for current text & their respective answers
@@ -1460,33 +1484,33 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
         if not skip_questions:
             # Define text positions and formatting
             question_pos = (0, 0.2)
-            answer_xpos = -0.75 # move questions a bit to the left 
-            answer_ypos = [0.1, 0.05, 0, -0.05] # set the y axis positions of all 4 answers
+            answer_xpos = -0.75  # move questions a bit to the left
+            answer_ypos = [0.1, 0.05, 0, -0.05]  # set the y axis positions of all 4 answers
         
             # Create text stim for the question:
-            question = visual.TextStim(win, 
-                                       text = Q1, 
-                                       pos = question_pos,
-                                       color = "black",
-                                       height = 0.025,  # font height relative to height of screen
-                                       anchorHoriz = 'center',
-                                       alignText = 'center', 
-                                       wrapWidth = 1)
-            # create 1 text stim for each answer option:
-            answers = [visual.TextStim(win, 
-                                       text = Q1_answers[i], 
-                                       pos = (answer_xpos, answer_ypos[i]), 
-                                       color = "black", # set all to black as a default
+            question = visual.TextStim(win,
+                                       text=Q1,
+                                       pos=question_pos,
+                                       color="black",
                                        height=0.025,  # font height relative to height of screen
-                                       wrapWidth = 1.5,
-                                       anchorHoriz = 'left', 
-                                       alignText = 'center') for i in range(len(Q1_answers))]
+                                       anchorHoriz='center',
+                                       alignText='center',
+                                       wrapWidth=1)
+            # create 1 text stim for each answer option:
+            answers = [visual.TextStim(win,
+                                       text=Q1_answers[i],
+                                       pos=(answer_xpos, answer_ypos[i]),
+                                       color="black",  # set all to black as a default
+                                       height=0.025,  # font height relative to height of screen
+                                       wrapWidth=1.5,
+                                       anchorHoriz='left',
+                                       alignText='center') for i in range(len(Q1_answers))]
             # set up instruction text
-            instr_text = visual.TextStim(win, 
-                                         text = "(Bitte benutzen Sie die Tasten 1, 2, 3 und 4, um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
-                                         color = "grey",
-                                         pos = (0, -0.3),
-                                         wrapWidth = 2,
+            instr_text = visual.TextStim(win,
+                                         text="(Bitte benutzen Sie die Tasten 1, 2, 3 und 4, um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
+                                         color="grey",
+                                         pos=(0, -0.3),
+                                         wrapWidth=2,
                                          height=0.018)  # font height relative to height of screen
         
             ### Show all on screen until I set .autoDraw = False
@@ -1496,17 +1520,17 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                 answer.autoDraw = True
             win.flip()
         
-        
             ### Record key responses:
             Q1_chosen_ans = None
         
-            while True:        
+            while True:
                 # if 1 was pressed...
-                if event.getKeys(['1']):
+                if defaultKeyboard.getKeys('1'):
+                    # if event.getKeys(['1']):
                     # print('\ta')
-                    # save Q1 answer as a 
+                    # save Q1 answer as a
                     Q1_chosen_ans = "a"
-                    # set font colour of the first answer (answer a) to 
+                    # set font colour of the first answer (answer a) to
                     # green and the rest to black:
                     answers[0].setColor("green")
                     for answer in answers[1:]:
@@ -1514,50 +1538,53 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                         # draw updated stimulus:
                         win.flip()
                 # same procedure for all other answer options:
-                if event.getKeys(['2']):
+                if defaultKeyboard.getKeys('2'):
+                    # if event.getKeys(['2']):
                     # print('\tb')
                     Q1_chosen_ans = "b"
-                    # set font colour of the second answer (answer b) to 
+                    # set font colour of the second answer (answer b) to
                     # green and the rest to black:
                     answers[1].setColor("green")
                     for answer in [answers[0]] + answers[2:]:
                         answer.setColor("black")
                         # draw updated stimulus:
                         win.flip()
-                if event.getKeys(['3']):
+                if defaultKeyboard.getKeys('3'):
+                    # if event.getKeys(['3']):
                     # print('\tc')
                     Q1_chosen_ans = "c"
-                    # set font colour of the third answer (answer c) to 
+                    # set font colour of the third answer (answer c) to
                     # green and the rest to black:
                     answers[2].setColor("green")
                     for answer in answers[:2] + answers[3:]:
                         answer.setColor("black")
                     # draw updated stimulus:
                     win.flip()
-                if event.getKeys(['4']):
+                if defaultKeyboard.getKeys('4'):
+                    # if event.getKeys(['4']):
                     # print('\td')
                     Q1_chosen_ans = "d"
-                    # set font colour of the fourth answer (answer d) to 
+                    # set font colour of the fourth answer (answer d) to
                     # green and the rest to black:
                     answers[3].setColor("green")
                     for answer in answers[:-1]:
                         answer.setColor("black")
-                    # draw updated stimulus 
+                    # draw updated stimulus
                     win.flip()
                 # if participant pressed "space", check whether they chose an answer.
                 # if yes, end this routine and go to next question, if not, wait for valid answer.
-                elif event.getKeys(['space']) and Q1_chosen_ans != None:
+                elif defaultKeyboard.getKeys(['space']) and Q1_chosen_ans != None:
                     break
         
             # print chosen answer for Q1
             print("answer for Q1 self-paced:" + str(Q1_chosen_ans))
         
             # check if answer was correct:
-            if Q1_chosen_ans == Q1_corr: 
+            if Q1_chosen_ans == Q1_corr:
                 print("\tanswer correct!")
-            else: 
+            else:
                 print("\tanswer incorrect!")
-                
+        
             # save data:
             thisExp.addData('question', 'Q1')
             thisExp.addData('chosen_ans', Q1_chosen_ans)
@@ -1566,7 +1593,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
             thisExp.addData('block_nr', exp_block_counter)
             thisExp.addData('block_name', curr_block)
             thisExp.addData('block_kind', curr_nback_cond)
-                            
+        
             # start a new row in the csv
             thisExp.nextEntry()
         
@@ -1600,7 +1627,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
             Q2 = reading_bl_tr_Q2
             Q2_answers = reading_bl_tr_Q2_ans
             Q2_corr = reading_bl_tr_Q2_corr
-            
+        
         # if we have a main text, set regular questions
         elif skip_questions == False and training_Qs == False:
             # load first question for current text & their respective answers
@@ -1609,37 +1636,37 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
             Q2_corr = locals()[curr_text_nr + "_Q2_corr"]
         
         if not skip_questions:
-                # Define text positions and formatting
+            # Define text positions and formatting
             question_pos = (0, 0.2)
-            answer_xpos = -0.75 # move questions a bit to the left 
-            answer_ypos = [ 0.1, 0.05, 0, -0.05] # set the y axis positions of all 4 answers
+            answer_xpos = -0.75  # move questions a bit to the left 
+            answer_ypos = [0.1, 0.05, 0, -0.05]  # set the y axis positions of all 4 answers
         
             # Create text stim for the question:
-            question = visual.TextStim(win, 
-                                       text = Q2, 
-                                       pos = question_pos,
-                                       color = "black",
-                                       height = 0.025,  # font height relative to height of screen
-                                       anchorHoriz = 'center',
-                                       alignText = 'center', 
-                                       wrapWidth = 1)
-            # create 1 text stim for each answer option:
-            answers = [visual.TextStim(win, 
-                                       text = Q2_answers[i], 
-                                       pos = (answer_xpos, answer_ypos[i]), 
-                                       color = "black", # set all to black as a default
+            question = visual.TextStim(win,
+                                       text=Q2,
+                                       pos=question_pos,
+                                       color="black",
                                        height=0.025,  # font height relative to height of screen
-                                       wrapWidth = 1.5,
-                                       anchorHoriz = 'left', 
-                                       alignText = 'center') for i in range(len(Q1_answers))]
+                                       anchorHoriz='center',
+                                       alignText='center',
+                                       wrapWidth=1)
+            # create 1 text stim for each answer option:
+            answers = [visual.TextStim(win,
+                                       text=Q2_answers[i],
+                                       pos=(answer_xpos, answer_ypos[i]),
+                                       color="black",  # set all to black as a default
+                                       height=0.025,  # font height relative to height of screen
+                                       wrapWidth=1.5,
+                                       anchorHoriz='left',
+                                       alignText='center') for i in range(len(Q1_answers))]
             # set up instruction text
-            instr_text = visual.TextStim(win, 
-                                         text = "(Bitte benutzen Sie die Tasten 1, 2, 3 und 4, um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
-                                         color = "grey",
-                                         pos = (0, -0.3),
-                                         wrapWidth = 2,
+            instr_text = visual.TextStim(win,
+                                         text="(Bitte benutzen Sie die Tasten 1, 2, 3 und 4, um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
+                                         color="grey",
+                                         pos=(0, -0.3),
+                                         wrapWidth=2,
                                          height=0.018)  # font height relative to height of screen
-                                         
+        
             ### Show all on screen until I set .autoDraw = False
             question.autoDraw = True
             instr_text.autoDraw = True
@@ -1647,15 +1674,15 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                 answer.autoDraw = True
             win.flip()
         
-        
             ### Record key responses:
             Q2_chosen_ans = None
         
-            while True:        
+            while True:
                 # if 1 was pressed...
-                if event.getKeys(['1']):
+                if defaultKeyboard.getKeys('1'):
+                    # if event.getKeys(['1']):
                     # print('\ta')
-                    # save Q2 answer as a 
+                    # save Q1 answer as a 
                     Q2_chosen_ans = "a"
                     # set font colour of the first answer (answer a) to 
                     # green and the rest to black:
@@ -1665,7 +1692,8 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                         # draw updated stimulus:
                         win.flip()
                 # same procedure for all other answer options:
-                if event.getKeys(['2']):
+                if defaultKeyboard.getKeys('2'):
+                    # if event.getKeys(['2']):
                     # print('\tb')
                     Q2_chosen_ans = "b"
                     # set font colour of the second answer (answer b) to 
@@ -1675,7 +1703,8 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                         answer.setColor("black")
                         # draw updated stimulus:
                         win.flip()
-                if event.getKeys(['3']):
+                if defaultKeyboard.getKeys('3'):
+                    # if event.getKeys(['3']):
                     # print('\tc')
                     Q2_chosen_ans = "c"
                     # set font colour of the third answer (answer c) to 
@@ -1685,7 +1714,8 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                         answer.setColor("black")
                     # draw updated stimulus:
                     win.flip()
-                if event.getKeys(['4']):
+                if defaultKeyboard.getKeys('4'):
+                    # if event.getKeys(['4']):
                     # print('\td')
                     Q2_chosen_ans = "d"
                     # set font colour of the fourth answer (answer d) to 
@@ -1697,18 +1727,18 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                     win.flip()
                 # if participant pressed "space", check whether they chose an answer.
                 # if yes, end this routine and go to next question, if not, wait for valid answer.
-                elif event.getKeys(['space']) and Q2_chosen_ans != None:
+                elif defaultKeyboard.getKeys(['space']) and Q2_chosen_ans != None:
                     break
         
             # print chosen answer for Q2
             print("answer for Q2 self-paced:" + str(Q2_chosen_ans))
         
             # check if answer was correct:
-            if Q2_chosen_ans == Q2_corr: 
+            if Q2_chosen_ans == Q2_corr:
                 print("\tanswer correct!")
-            else: 
+            else:
                 print("\tanswer incorrect!")
-                
+        
             # save data:
             thisExp.addData('question', 'Q2')
             thisExp.addData('chosen_ans', Q2_chosen_ans)
@@ -1717,7 +1747,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
             thisExp.addData('block_nr', exp_block_counter)
             thisExp.addData('block_name', curr_block)
             thisExp.addData('block_kind', curr_nback_cond)
-                            
+        
             # start a new row in the csv
             thisExp.nextEntry()
         
@@ -1751,7 +1781,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
             Q3 = reading_bl_tr_Q3
             Q3_answers = reading_bl_tr_Q3_ans
             Q3_corr = reading_bl_tr_Q3_corr
-            
+        
         # if we have a main text, set regular questions
         elif skip_questions == False and training_Qs == False:
             # load first question for current text & their respective answers
@@ -1760,37 +1790,37 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
             Q3_corr = locals()[curr_text_nr + "_Q3_corr"]
         
         if not skip_questions:
-                # Define text positions and formatting
+            # Define text positions and formatting
             question_pos = (0, 0.2)
-            answer_xpos = -0.75 # move questions a bit to the left 
-            answer_ypos = [ 0.1, 0.05, 0, -0.05] # set the y axis positions of all 4 answers
+            answer_xpos = -0.75  # move questions a bit to the left 
+            answer_ypos = [0.1, 0.05, 0, -0.05]  # set the y axis positions of all 4 answers
         
             # Create text stim for the question:
-            question = visual.TextStim(win, 
-                                       text = Q3, 
-                                       pos = question_pos,
-                                       color = "black",
-                                       height = 0.025,  # font height relative to height of screen
-                                       anchorHoriz = 'center',
-                                       alignText = 'center', 
-                                       wrapWidth = 1)
-            # create 1 text stim for each answer option:
-            answers = [visual.TextStim(win, 
-                                       text = Q3_answers[i], 
-                                       pos = (answer_xpos, answer_ypos[i]), 
-                                       color = "black", # set all to black as a default
+            question = visual.TextStim(win,
+                                       text=Q3,
+                                       pos=question_pos,
+                                       color="black",
                                        height=0.025,  # font height relative to height of screen
-                                       wrapWidth = 1.5,
-                                       anchorHoriz = 'left', 
-                                       alignText = 'center') for i in range(len(Q1_answers))]
+                                       anchorHoriz='center',
+                                       alignText='center',
+                                       wrapWidth=1)
+            # create 1 text stim for each answer option:
+            answers = [visual.TextStim(win,
+                                       text=Q3_answers[i],
+                                       pos=(answer_xpos, answer_ypos[i]),
+                                       color="black",  # set all to black as a default
+                                       height=0.025,  # font height relative to height of screen
+                                       wrapWidth=1.5,
+                                       anchorHoriz='left',
+                                       alignText='center') for i in range(len(Q1_answers))]
             # set up instruction text
-            instr_text = visual.TextStim(win, 
-                                         text = "(Bitte benutzen Sie die Tasten 1, 2, 3 und 4, um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
-                                         color = "grey",
-                                         pos = (0, -0.3),
-                                         wrapWidth = 2,
+            instr_text = visual.TextStim(win,
+                                         text="(Bitte benutzen Sie die Tasten 1, 2, 3 und 4, um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
+                                         color="grey",
+                                         pos=(0, -0.3),
+                                         wrapWidth=2,
                                          height=0.018)  # font height relative to height of screen
-                                         
+        
             ### Show all on screen until I set .autoDraw = False
             question.autoDraw = True
             instr_text.autoDraw = True
@@ -1798,15 +1828,15 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                 answer.autoDraw = True
             win.flip()
         
-        
             ### Record key responses:
             Q3_chosen_ans = None
         
-            while True:        
+            while True:
                 # if 1 was pressed...
-                if event.getKeys(['1']):
+                if defaultKeyboard.getKeys('1'):
+                    # if event.getKeys(['1']):
                     # print('\ta')
-                    # save Q3 answer as a 
+                    # save Q1 answer as a 
                     Q3_chosen_ans = "a"
                     # set font colour of the first answer (answer a) to 
                     # green and the rest to black:
@@ -1816,7 +1846,8 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                         # draw updated stimulus:
                         win.flip()
                 # same procedure for all other answer options:
-                if event.getKeys(['2']):
+                if defaultKeyboard.getKeys('2'):
+                    # if event.getKeys(['2']):
                     # print('\tb')
                     Q3_chosen_ans = "b"
                     # set font colour of the second answer (answer b) to 
@@ -1826,7 +1857,8 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                         answer.setColor("black")
                         # draw updated stimulus:
                         win.flip()
-                if event.getKeys(['3']):
+                if defaultKeyboard.getKeys('3'):
+                    # if event.getKeys(['3']):
                     # print('\tc')
                     Q3_chosen_ans = "c"
                     # set font colour of the third answer (answer c) to 
@@ -1836,7 +1868,8 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                         answer.setColor("black")
                     # draw updated stimulus:
                     win.flip()
-                if event.getKeys(['4']):
+                if defaultKeyboard.getKeys('4'):
+                    # if event.getKeys(['4']):
                     # print('\td')
                     Q3_chosen_ans = "d"
                     # set font colour of the fourth answer (answer d) to 
@@ -1848,18 +1881,18 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                     win.flip()
                 # if participant pressed "space", check whether they chose an answer.
                 # if yes, end this routine and go to next question, if not, wait for valid answer.
-                elif event.getKeys(['space']) and Q3_chosen_ans != None:
+                elif defaultKeyboard.getKeys(['space']) and Q3_chosen_ans != None:
                     break
         
             # print chosen answer for Q3
             print("answer for Q3 self-paced:" + str(Q3_chosen_ans))
         
             # check if answer was correct:
-            if Q3_chosen_ans == Q3_corr: 
+            if Q3_chosen_ans == Q3_corr:
                 print("\tanswer correct!")
-            else: 
+            else:
                 print("\tanswer incorrect!")
-                
+        
             # save data:
             thisExp.addData('question', 'Q3')
             thisExp.addData('chosen_ans', Q3_chosen_ans)
@@ -1890,7 +1923,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
         
             # when text rating is included, only use this instead of "go to next block":
             # end current routine
-            #continueRoutine = False
+            # continueRoutine = False
         # keep track of which components have finished
         text_blocks_self_pacedComponents = []
         for thisComponent in text_blocks_self_pacedComponents:
@@ -1919,7 +1952,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
             if defaultKeyboard.getKeys(keyList=["escape"]):
                 thisExp.status = FINISHED
             if thisExp.status == FINISHED or endExpNow:
-                endExperiment(thisExp, inputs=inputs, win=win)
+                endExperiment(thisExp, win=win)
                 return
             
             # check if all components have finished
@@ -1940,14 +1973,14 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
         for thisComponent in text_blocks_self_pacedComponents:
             if hasattr(thisComponent, "setAutoDraw"):
                 thisComponent.setAutoDraw(False)
-        thisExp.addData('text_blocks_self_paced.stopped', globalClock.getTime())
+        thisExp.addData('text_blocks_self_paced.stopped', globalClock.getTime(format='float'))
         # the Routine "text_blocks_self_paced" was not non-slip safe, so reset the non-slip timer
         routineTimer.reset()
         
         # --- Prepare to start Routine "text_blocks_paced" ---
         continueRoutine = True
         # update component parameters for each repeat
-        thisExp.addData('text_blocks_paced.started', globalClock.getTime())
+        thisExp.addData('text_blocks_paced.started', globalClock.getTime(format='float'))
         # Run 'Begin Routine' code from paced_blocks
         #################################################
         #            Blocks with text – paced           #
@@ -1978,8 +2011,8 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                 if 50 <= duration <= 2000:
                     filtered_durations_BL.append(duration)
                     filtered_words_BL.append(word)
-            print("\tfiltered_durations_BL:", filtered_durations_BL)
-            print("\tfiltered_words_BL:", filtered_words_BL)
+            # print("\tfiltered_durations_BL:", filtered_durations_BL)
+            # print("\tfiltered_words_BL:", filtered_words_BL)
         
             # Now get number of letters (not words, I want to know how fast they read 1 letter on average!):
             letters_total_BL = sum(len(word) for word in filtered_words_BL)
@@ -2011,8 +2044,8 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                 if 50 <= duration <= 2000:
                     filtered_durations_1bck.append(duration)
                     filtered_words_1bck.append(word)
-            print("\tfiltered_durations_1bck:", filtered_durations_1bck)
-            print("\tfiltered_words_1bck:", filtered_words_1bck)
+            # print("\tfiltered_durations_1bck:", filtered_durations_1bck)
+            # print("\tfiltered_words_1bck:", filtered_words_1bck)
         
             # Now get number of letters (not words, I want to know how fast they read 1 letter on average!):
             letters_total_1bck = sum(len(word) for word in filtered_words_1bck)
@@ -2044,8 +2077,8 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                 if 50 <= duration <= 2000:
                     filtered_durations_2bck.append(duration)
                     filtered_words_2bck.append(word)
-            print("\tfiltered_durations_2bck:", filtered_durations_2bck)
-            print("\tfiltered_words_2bck:", filtered_words_2bck)
+            # print("\tfiltered_durations_2bck:", filtered_durations_2bck)
+            # print("\tfiltered_words_2bck:", filtered_words_2bck)
         
             # Now get number of letters (not words, I want to know how fast they read 1 letter on average!):
             letters_total_2bck = sum(len(word) for word in filtered_words_2bck)
@@ -2143,9 +2176,29 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
             curr_targets = all_target_lists[exp_block_counter]
             curr_colours = all_colour_lists[exp_block_counter]
         
+            # compute RTs using participant's average reading speed / letter – old, based on linear increase of RTs,
+            # feels very unnatural however
+            # curr_durations = [len(word) * RT_per_letter_baseline for word in curr_text]  # in ms
+        
             # compute RTs using participant's average reading speed / letter
-            curr_durations = [len(word) * RT_per_letter_baseline for word in curr_text]  # in ms
-            # print(f"\tdurations for paced task training block: {curr_durations_training}")
+            # we define a minimum and a maximum duration for each word
+            # the minimum is based on 5 x RT per letter in the respective condition
+            # the max duration is based on a time-out of 1.5 s in the reading baseline condition
+            minimum_duration = 5 * RT_per_letter_baseline
+            maximum_duration = 1500
+            curr_durations = []
+            for word in curr_text:
+                # this is an absolute value based on estimates of how long you need to feel comfortable reading a word on
+                # screen in a paced task
+                # duration = RT_per_letter_baseline * math.log((len(word))) + 300
+                # more flexible solution:
+                duration = RT_per_letter_baseline * math.log((len(word))) + 4 * RT_per_letter_baseline
+                if duration < maximum_duration:
+                    curr_durations.append(max(duration, minimum_duration))
+                else:
+                    curr_durations.append(maximum_duration)
+        
+            print(f"\tdurations for paced task training block: {curr_durations}")
         
             # we also need the start time (let's set it as current time
             # at this point in the script):
@@ -2193,8 +2246,30 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                 # get text nr:
                 curr_text_nr = all_texts_nrs_list[exp_block_counter]
                 curr_text = locals()[curr_text_nr]
+        
+                # compute RTs using participant's average reading speed / letter – old, based on linear increase of RTs,
+                # feels very unnatural however
+                # curr_durations = [len(word) * RT_per_letter_baseline for word in curr_text]  # in ms
+        
                 # compute RTs using participant's average reading speed / letter
-                curr_durations = [len(word) * RT_per_letter_baseline for word in curr_text]  # in ms
+                # we define a minimum and a maximum duration for each word
+                # the minimum is based on 5 x RT per letter in the respective condition
+                # the max duration is based on a time-out of 1.5 s in the reading baseline condition
+                minimum_duration = 5 * RT_per_letter_baseline
+                maximum_duration = 1500
+                curr_durations = []
+                for word in curr_text:
+                    # this is an absolute value based on estimates of how long you need to feel comfortable reading a word on
+                    # screen in a paced task
+                    # duration = RT_per_letter_baseline * math.log((len(word))) + 300
+                    # more flexible solution:
+                    duration = RT_per_letter_baseline * math.log((len(word))) + 4 * RT_per_letter_baseline
+                    if duration < maximum_duration:
+                        curr_durations.append(max(duration, minimum_duration))
+                    else:
+                        curr_durations.append(maximum_duration)
+        
+                print(f"\tdurations for paced baseline block: {curr_durations}")
         
                 ### change background colour
                 win.setColor(dark_bg_col, colorSpace='rgb')
@@ -2212,7 +2287,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                                                   color="black")
                 # create ImageStim object
                 curr_instr_pic = visual.ImageStim(win,
-                                                  size=(0.7, 0.3),
+                                                  size=(0.8, 0.3),
                                                   pos=(0, -0.2),
                                                   image=locals()["instr_pic_" + curr_block])  # set path to image here
         
@@ -2237,9 +2312,61 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                 curr_text = locals()[curr_text_nr]
                 # compute RTs using participant's average reading speed / letter
                 if curr_block == "1back_dual_main_no_click":
-                    curr_durations = [len(word) * RT_per_letter_1bck for word in curr_text]  # in ms
+                    # curr_durations = [len(word) * RT_per_letter_1bck for word in curr_text]  # in ms
+        
+                    # compute RTs using participant's average reading speed / letter
+                    # we define a minimum and a maximum duration for each word
+                    # the minimum is based on 5 x RT per letter in the respective condition
+                    # the max duration is based on a time-out of 2 s in the 1-back condition
+                    minimum_duration = 5 * RT_per_letter_1bck
+                    maximum_duration = 2000
+                    curr_durations = []
+                    for word in curr_text:
+                        # this is an absolute value based on estimates of how long you need to feel comfortable reading a
+                        # word on screen in a paced task
+                        # duration = RT_per_letter_baseline * math.log((len(word))) + 300 more
+                        # more flexible solution:
+                        duration = RT_per_letter_1bck * math.log((len(word))) + 4 * RT_per_letter_1bck
+                        if duration < maximum_duration:
+                            curr_durations.append(max(duration, minimum_duration))
+                        else:
+                            curr_durations.append(maximum_duration)
+        
+                    # Latency factor of an incremental increase (increment per trial = 3 ms) added over duration of entire
+                    # block assuming that participants get tired of the course of a 300 words block and thus need a bit more
+                    # time:
+                    # Increment of 3 ms per trial
+                    increment_per_trial = 3
+                    for i in range(len(curr_durations)):
+                        # Calculate incremental increase for current trial
+                        increment = i * increment_per_trial
+                        # Add incremental increase to current trial's duration
+                        curr_durations[i] += increment
+        
                 elif curr_block == "2back_dual_main_no_click":
-                    curr_durations = [len(word) * RT_per_letter_2bck for word in curr_text]  # in ms
+                    minimum_duration = 5 * RT_per_letter_2bck
+                    maximum_duration = 2000
+                    curr_durations = []
+                    for word in curr_text:
+                        # this is an absolute value based on estimates of how long you need to feel comfortable reading a word on
+                        # screen in a paced task
+                        # duration = RT_per_letter_baseline * math.log((len(word))) + 300
+                        # more flexible solution:
+                        duration = RT_per_letter_2bck * math.log((len(word))) + 4 * RT_per_letter_2bck
+                        if duration < maximum_duration:
+                            curr_durations.append(max(duration, minimum_duration))
+                        else:
+                            curr_durations.append(maximum_duration)
+        
+                    # Add increment of 3 ms per trial
+                    increment_per_trial = 3
+                    for i in range(len(curr_durations)):
+                        # Calculate incremental increase for current trial
+                        increment = i * increment_per_trial
+                        # Add incremental increase to current trial's duration
+                        curr_durations[i] += increment
+        
+                print(f"\tdurations for paced n-back block: {curr_durations}")
         
                 ### change background colour
                 win.setColor(dark_bg_col, colorSpace='rgb')
@@ -2309,7 +2436,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
         
                 # get duration for current word
                 curr_duration = curr_durations[trial_idx] / 1000  # convert ms to seconds
-                print("duration for current word (in s):", curr_duration)
+                # print("duration for current word (in s):", curr_duration)
         
                 # get trial number (start counting from 1, so add 1)
                 curr_trial_nr = trial_idx + 1
@@ -2442,7 +2569,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
             Q1 = reading_bl_tr_no_click_Q1
             Q1_answers = reading_bl_tr_no_click_Q1_ans
             Q1_corr = reading_bl_tr_no_click_Q1_corr
-            
+        
         # if we have a main text, set regular questions
         elif skip_questions_paced == False and training_Qs_paced == False:
             # load first question for current text & their respective answers
@@ -2453,35 +2580,35 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
         if not skip_questions_paced:
             # Define text positions and formatting
             question_pos = (0, 0.2)
-            answer_xpos = -0.75 # move questions a bit to the left 
-            answer_ypos = [ 0.1, 0.05, 0, -0.05] # set the y axis positions of all 4 answers
+            answer_xpos = -0.75  # move questions a bit to the left 
+            answer_ypos = [0.1, 0.05, 0, -0.05]  # set the y axis positions of all 4 answers
         
             # Create text stim for the question:
-            question = visual.TextStim(win, 
-                                       text = Q1, 
-                                       pos = question_pos,
-                                       color = "black",
-                                       height = 0.025,  # font height relative to height of screen
-                                       anchorHoriz = 'center',
-                                       alignText = 'center', 
-                                       wrapWidth = 1)
-            # create 1 text stim for each answer option:
-            answers = [visual.TextStim(win, 
-                                       text = Q1_answers[i], 
-                                       pos = (answer_xpos, answer_ypos[i]), 
-                                       color = "black", # set all to black as a default
+            question = visual.TextStim(win,
+                                       text=Q1,
+                                       pos=question_pos,
+                                       color="black",
                                        height=0.025,  # font height relative to height of screen
-                                       wrapWidth = 1.5,
-                                       anchorHoriz = 'left', 
-                                       alignText = 'center') for i in range(len(Q1_answers))]
+                                       anchorHoriz='center',
+                                       alignText='center',
+                                       wrapWidth=1)
+            # create 1 text stim for each answer option:
+            answers = [visual.TextStim(win,
+                                       text=Q1_answers[i],
+                                       pos=(answer_xpos, answer_ypos[i]),
+                                       color="black",  # set all to black as a default
+                                       height=0.025,  # font height relative to height of screen
+                                       wrapWidth=1.5,
+                                       anchorHoriz='left',
+                                       alignText='center') for i in range(len(Q1_answers))]
             # set up instruction text
-            instr_text = visual.TextStim(win, 
-                                         text = "(Bitte benutzen Sie die Tasten 1, 2, 3 und 4, um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
-                                         color = "grey",
-                                         pos = (0, -0.3),
-                                         wrapWidth = 2,
+            instr_text = visual.TextStim(win,
+                                         text="(Bitte benutzen Sie die Tasten 1, 2, 3 und 4, um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
+                                         color="grey",
+                                         pos=(0, -0.3),
+                                         wrapWidth=2,
                                          height=0.018)  # font height relative to height of screen
-                                         
+        
             ### Show all on screen until I set .autoDraw = False
             question.autoDraw = True
             instr_text.autoDraw = True
@@ -2489,14 +2616,14 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                 answer.autoDraw = True
             win.flip()
         
-        
             ### Record key responses:
             Q1_chosen_ans = None
         
-            while True:        
+            while True:
                 # if 1 was pressed...
-                if event.getKeys(['1']):
-                    print('\ta')
+                if defaultKeyboard.getKeys('1'):
+                    # if event.getKeys(['1']):
+                    # print('\ta')
                     # save Q1 answer as a 
                     Q1_chosen_ans = "a"
                     # set font colour of the first answer (answer a) to 
@@ -2507,8 +2634,9 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                         # draw updated stimulus:
                         win.flip()
                 # same procedure for all other answer options:
-                if event.getKeys(['2']):
-                    print('\tb')
+                if defaultKeyboard.getKeys('2'):
+                    # if event.getKeys(['2']):
+                    # print('\tb')
                     Q1_chosen_ans = "b"
                     # set font colour of the second answer (answer b) to 
                     # green and the rest to black:
@@ -2517,8 +2645,9 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                         answer.setColor("black")
                         # draw updated stimulus:
                         win.flip()
-                if event.getKeys(['3']):
-                    print('\tc')
+                if defaultKeyboard.getKeys('3'):
+                    # if event.getKeys(['3']):
+                    # print('\tc')
                     Q1_chosen_ans = "c"
                     # set font colour of the third answer (answer c) to 
                     # green and the rest to black:
@@ -2527,8 +2656,9 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                         answer.setColor("black")
                     # draw updated stimulus:
                     win.flip()
-                if event.getKeys(['4']):
-                    print('\td')
+                if defaultKeyboard.getKeys('4'):
+                    # if event.getKeys(['4']):
+                    # print('\td')
                     Q1_chosen_ans = "d"
                     # set font colour of the fourth answer (answer d) to 
                     # green and the rest to black:
@@ -2539,18 +2669,18 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                     win.flip()
                 # if participant pressed "space", check whether they chose an answer.
                 # if yes, end this routine and go to next question, if not, wait for valid answer.
-                elif event.getKeys(['space']) and Q1_chosen_ans != None:
+                elif defaultKeyboard.getKeys(['space']) and Q1_chosen_ans != None:
                     break
         
             # print chosen answer for Q1
             print("answer for Q1 paced:" + str(Q1_chosen_ans))
         
             # check if answer was correct:
-            if Q1_chosen_ans == Q1_corr: 
+            if Q1_chosen_ans == Q1_corr:
                 print("\tanswer correct!")
-            else: 
+            else:
                 print("\tanswer incorrect!")
-                
+        
             # save data:
             thisExp.addData('question', 'Q1')
             thisExp.addData('chosen_ans', Q1_chosen_ans)
@@ -2559,7 +2689,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
             thisExp.addData('block_nr', exp_block_counter)
             thisExp.addData('block_name', curr_block)
             thisExp.addData('block_kind', curr_nback_cond)
-                            
+        
             # start a new row in the csv
             thisExp.nextEntry()
         
@@ -2593,7 +2723,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
             Q2 = reading_bl_tr_no_click_Q2
             Q2_answers = reading_bl_tr_no_click_Q2_ans
             Q2_corr = reading_bl_tr_no_click_Q2_corr
-            
+        
         # if we have a main text, set regular questions
         elif skip_questions_paced == False and training_Qs_paced == False:
             # load first question for current text & their respective answers
@@ -2604,35 +2734,35 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
         if not skip_questions_paced:
             # Define text positions and formatting
             question_pos = (0, 0.2)
-            answer_xpos = -0.75 # move questions a bit to the left 
-            answer_ypos = [ 0.1, 0.05, 0, -0.05] # set the y axis positions of all 4 answers
+            answer_xpos = -0.75  # move questions a bit to the left 
+            answer_ypos = [0.1, 0.05, 0, -0.05]  # set the y axis positions of all 4 answers
         
             # Create text stim for the question:
-            question = visual.TextStim(win, 
-                                       text = Q2, 
-                                       pos = question_pos,
-                                       color = "black",
-                                       height = 0.025,  # font height relative to height of screen
-                                       anchorHoriz = 'center',
-                                       alignText = 'center', 
-                                       wrapWidth = 1)
-            # create 1 text stim for each answer option:
-            answers = [visual.TextStim(win, 
-                                       text = Q2_answers[i], 
-                                       pos = (answer_xpos, answer_ypos[i]), 
-                                       color = "black", # set all to black as a default
+            question = visual.TextStim(win,
+                                       text=Q2,
+                                       pos=question_pos,
+                                       color="black",
                                        height=0.025,  # font height relative to height of screen
-                                       wrapWidth = 1.5,
-                                       anchorHoriz = 'left', 
-                                       alignText = 'center') for i in range(len(Q1_answers))]
+                                       anchorHoriz='center',
+                                       alignText='center',
+                                       wrapWidth=1)
+            # create 1 text stim for each answer option:
+            answers = [visual.TextStim(win,
+                                       text=Q2_answers[i],
+                                       pos=(answer_xpos, answer_ypos[i]),
+                                       color="black",  # set all to black as a default
+                                       height=0.025,  # font height relative to height of screen
+                                       wrapWidth=1.5,
+                                       anchorHoriz='left',
+                                       alignText='center') for i in range(len(Q1_answers))]
             # set up instruction text
-            instr_text = visual.TextStim(win, 
-                                         text = "(Bitte benutzen Sie die Tasten 1, 2, 3 und 4, um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
-                                         color = "grey",
-                                         pos = (0, -0.3),
-                                         wrapWidth = 2,
-                                         height = 0.018)  # font height relative to height of screen
-                                         
+            instr_text = visual.TextStim(win,
+                                         text="(Bitte benutzen Sie die Tasten 1, 2, 3 und 4, um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
+                                         color="grey",
+                                         pos=(0, -0.3),
+                                         wrapWidth=2,
+                                         height=0.018)  # font height relative to height of screen
+        
             ### Show all on screen until I set .autoDraw = False
             question.autoDraw = True
             instr_text.autoDraw = True
@@ -2640,15 +2770,15 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                 answer.autoDraw = True
             win.flip()
         
-        
             ### Record key responses:
             Q2_chosen_ans = None
         
-            while True:        
+            while True:
                 # if 1 was pressed...
-                if event.getKeys(['1']):
-                    print('\ta')
-                    # save Q2 answer as a 
+                if defaultKeyboard.getKeys('1'):
+                    # if event.getKeys(['1']):
+                    # print('\ta')
+                    # save Q1 answer as a 
                     Q2_chosen_ans = "a"
                     # set font colour of the first answer (answer a) to 
                     # green and the rest to black:
@@ -2658,8 +2788,9 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                         # draw updated stimulus:
                         win.flip()
                 # same procedure for all other answer options:
-                if event.getKeys(['2']):
-                    print('\tb')
+                if defaultKeyboard.getKeys('2'):
+                    # if event.getKeys(['2']):
+                    # print('\tb')
                     Q2_chosen_ans = "b"
                     # set font colour of the second answer (answer b) to 
                     # green and the rest to black:
@@ -2668,8 +2799,9 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                         answer.setColor("black")
                         # draw updated stimulus:
                         win.flip()
-                if event.getKeys(['3']):
-                    print('\tc')
+                if defaultKeyboard.getKeys('3'):
+                    # if event.getKeys(['3']):
+                    # print('\tc')
                     Q2_chosen_ans = "c"
                     # set font colour of the third answer (answer c) to 
                     # green and the rest to black:
@@ -2678,8 +2810,9 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                         answer.setColor("black")
                     # draw updated stimulus:
                     win.flip()
-                if event.getKeys(['4']):
-                    print('\td')
+                if defaultKeyboard.getKeys('4'):
+                    # if event.getKeys(['4']):
+                    # print('\td')
                     Q2_chosen_ans = "d"
                     # set font colour of the fourth answer (answer d) to 
                     # green and the rest to black:
@@ -2690,18 +2823,17 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                     win.flip()
                 # if participant pressed "space", check whether they chose an answer.
                 # if yes, end this routine and go to next question, if not, wait for valid answer.
-                elif event.getKeys(['space']) and Q2_chosen_ans != None:
+                elif defaultKeyboard.getKeys(['space']) and Q2_chosen_ans != None:
                     break
-        
             # print chosen answer for Q2
             print("answer for Q2 paced:" + str(Q2_chosen_ans))
         
             # check if answer was correct:
-            if Q2_chosen_ans == Q2_corr: 
+            if Q2_chosen_ans == Q2_corr:
                 print("\tanswer correct!")
-            else: 
+            else:
                 print("\tanswer incorrect!")
-                
+        
             # save data:
             thisExp.addData('question', 'Q2')
             thisExp.addData('chosen_ans', Q2_chosen_ans)
@@ -2710,7 +2842,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
             thisExp.addData('block_nr', exp_block_counter)
             thisExp.addData('block_name', curr_block)
             thisExp.addData('block_kind', curr_nback_cond)
-                            
+        
             # start a new row in the csv
             thisExp.nextEntry()
         
@@ -2744,7 +2876,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
             Q3 = reading_bl_tr_no_click_Q3
             Q3_answers = reading_bl_tr_no_click_Q3_ans
             Q3_corr = reading_bl_tr_no_click_Q3_corr
-            
+        
         # if we have a main text, set regular questions
         elif skip_questions_paced == False and training_Qs_paced == False:
             # load first question for current text & their respective answers
@@ -2755,35 +2887,35 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
         if not skip_questions_paced:
             # Define text positions and formatting
             question_pos = (0, 0.2)
-            answer_xpos = -0.75 # move questions a bit to the left 
-            answer_ypos = [ 0.1, 0.05, 0, -0.05] # set the y axis positions of all 4 answers
+            answer_xpos = -0.75  # move questions a bit to the left 
+            answer_ypos = [0.1, 0.05, 0, -0.05]  # set the y axis positions of all 4 answers
         
             # Create text stim for the question:
-            question = visual.TextStim(win, 
-                                       text = Q3, 
-                                       pos = question_pos,
-                                       color = "black",
-                                       height = 0.025,  # font height relative to height of screen
-                                       anchorHoriz = 'center',
-                                       alignText = 'center', 
-                                       wrapWidth = 1)
+            question = visual.TextStim(win,
+                                       text=Q3,
+                                       pos=question_pos,
+                                       color="black",
+                                       height=0.025,  # font height relative to height of screen
+                                       anchorHoriz='center',
+                                       alignText='center',
+                                       wrapWidth=1)
             # create 1 text stim for each answer option:
-            answers = [visual.TextStim(win, 
-                                       text = Q3_answers[i], 
-                                       pos = (answer_xpos, answer_ypos[i]), 
-                                       color = "black", # set all to black as a default
-                                       height = 0.025,  # font height relative to height of screen
-                                       wrapWidth = 1.5,
-                                       anchorHoriz = 'left', 
-                                       alignText = 'center') for i in range(len(Q1_answers))]
+            answers = [visual.TextStim(win,
+                                       text=Q3_answers[i],
+                                       pos=(answer_xpos, answer_ypos[i]),
+                                       color="black",  # set all to black as a default
+                                       height=0.025,  # font height relative to height of screen
+                                       wrapWidth=1.5,
+                                       anchorHoriz='left',
+                                       alignText='center') for i in range(len(Q1_answers))]
             # set up instruction text
-            instr_text = visual.TextStim(win, 
-                                         text = "(Bitte benutzen Sie die Tasten 1, 2, 3 und 4, um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
-                                         color = "grey",
-                                         pos = (0, -0.3),
-                                         wrapWidth = 2,
-                                         height = 0.018)  # font height relative to height of screen
-                                         
+            instr_text = visual.TextStim(win,
+                                         text="(Bitte benutzen Sie die Tasten 1, 2, 3 und 4, um die richtige Antwort auszuwählen. Mit der Leertaste können Sie Ihre Auswahl bestätigen.)",
+                                         color="grey",
+                                         pos=(0, -0.3),
+                                         wrapWidth=2,
+                                         height=0.018)  # font height relative to height of screen
+        
             ### Show all on screen until I set .autoDraw = False
             question.autoDraw = True
             instr_text.autoDraw = True
@@ -2791,15 +2923,15 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                 answer.autoDraw = True
             win.flip()
         
-        
             ### Record key responses:
             Q3_chosen_ans = None
         
-            while True:        
+            while True:
                 # if 1 was pressed...
-                if event.getKeys(['1']):
-                    print('\ta')
-                    # save Q3 answer as a 
+                if defaultKeyboard.getKeys('1'):
+                    # if event.getKeys(['1']):
+                    # print('\ta')
+                    # save Q1 answer as a 
                     Q3_chosen_ans = "a"
                     # set font colour of the first answer (answer a) to 
                     # green and the rest to black:
@@ -2809,8 +2941,9 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                         # draw updated stimulus:
                         win.flip()
                 # same procedure for all other answer options:
-                if event.getKeys(['2']):
-                    print('\tb')
+                if defaultKeyboard.getKeys('2'):
+                    # if event.getKeys(['2']):
+                    # print('\tb')
                     Q3_chosen_ans = "b"
                     # set font colour of the second answer (answer b) to 
                     # green and the rest to black:
@@ -2819,8 +2952,9 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                         answer.setColor("black")
                         # draw updated stimulus:
                         win.flip()
-                if event.getKeys(['3']):
-                    print('\tc')
+                if defaultKeyboard.getKeys('3'):
+                    # if event.getKeys(['3']):
+                    # print('\tc')
                     Q3_chosen_ans = "c"
                     # set font colour of the third answer (answer c) to 
                     # green and the rest to black:
@@ -2829,8 +2963,9 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                         answer.setColor("black")
                     # draw updated stimulus:
                     win.flip()
-                if event.getKeys(['4']):
-                    print('\td')
+                if defaultKeyboard.getKeys('4'):
+                    # if event.getKeys(['4']):
+                    # print('\td')
                     Q3_chosen_ans = "d"
                     # set font colour of the fourth answer (answer d) to 
                     # green and the rest to black:
@@ -2841,18 +2976,18 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
                     win.flip()
                 # if participant pressed "space", check whether they chose an answer.
                 # if yes, end this routine and go to next question, if not, wait for valid answer.
-                elif event.getKeys(['space']) and Q3_chosen_ans != None:
+                elif defaultKeyboard.getKeys(['space']) and Q3_chosen_ans != None:
                     break
         
             # print chosen answer for Q3
             print("answer for Q3 paced:" + str(Q3_chosen_ans))
         
             # check if answer was correct:
-            if Q3_chosen_ans == Q3_corr: 
+            if Q3_chosen_ans == Q3_corr:
                 print("\tanswer correct!")
-            else: 
+            else:
                 print("\tanswer incorrect!")
-                
+        
             # save data:
             thisExp.addData('question', 'Q3')
             thisExp.addData('chosen_ans', Q3_chosen_ans)
@@ -2883,7 +3018,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
         
         # when text rating is included, only use this instead of "go to next block":
         # end current routine
-        #continueRoutine = False
+        # continueRoutine = False
         # keep track of which components have finished
         text_blocks_pacedComponents = []
         for thisComponent in text_blocks_pacedComponents:
@@ -2912,7 +3047,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
             if defaultKeyboard.getKeys(keyList=["escape"]):
                 thisExp.status = FINISHED
             if thisExp.status == FINISHED or endExpNow:
-                endExperiment(thisExp, inputs=inputs, win=win)
+                endExperiment(thisExp, win=win)
                 return
             
             # check if all components have finished
@@ -2933,7 +3068,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
         for thisComponent in text_blocks_pacedComponents:
             if hasattr(thisComponent, "setAutoDraw"):
                 thisComponent.setAutoDraw(False)
-        thisExp.addData('text_blocks_paced.stopped', globalClock.getTime())
+        thisExp.addData('text_blocks_paced.stopped', globalClock.getTime(format='float'))
         # the Routine "text_blocks_paced" was not non-slip safe, so reset the non-slip timer
         routineTimer.reset()
         thisExp.nextEntry()
@@ -2947,7 +3082,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
     # --- Prepare to start Routine "end" ---
     continueRoutine = True
     # update component parameters for each repeat
-    thisExp.addData('end.started', globalClock.getTime())
+    thisExp.addData('end.started', globalClock.getTime(format='float'))
     # Run 'Begin Routine' code from end
     ### END OF EXPERIMENT:
     # keep background ivory
@@ -2961,7 +3096,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
     # create text box
     instr_text_stim = visual.TextStim(win, 
                                       text = instr_text, 
-                                      height = 0.09, 
+                                      height = 0.08, 
                                       pos = (0, 0),
                                       color = "black")
     
@@ -3004,7 +3139,7 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
         if defaultKeyboard.getKeys(keyList=["escape"]):
             thisExp.status = FINISHED
         if thisExp.status == FINISHED or endExpNow:
-            endExperiment(thisExp, inputs=inputs, win=win)
+            endExperiment(thisExp, win=win)
             return
         
         # check if all components have finished
@@ -3025,12 +3160,13 @@ def run(expInfo, thisExp, win, inputs, globalClock=None, thisSession=None):
     for thisComponent in endComponents:
         if hasattr(thisComponent, "setAutoDraw"):
             thisComponent.setAutoDraw(False)
-    thisExp.addData('end.stopped', globalClock.getTime())
+    thisExp.addData('end.stopped', globalClock.getTime(format='float'))
+    thisExp.nextEntry()
     # the Routine "end" was not non-slip safe, so reset the non-slip timer
     routineTimer.reset()
     
     # mark experiment as finished
-    endExperiment(thisExp, win=win, inputs=inputs)
+    endExperiment(thisExp, win=win)
 
 
 def saveData(thisExp):
@@ -3045,11 +3181,11 @@ def saveData(thisExp):
     """
     filename = thisExp.dataFileName
     # these shouldn't be strictly necessary (should auto-save)
-    thisExp.saveAsWideText(filename + '.csv', delim='auto')
+    thisExp.saveAsWideText(filename + '.csv', delim='tab')
     thisExp.saveAsPickle(filename)
 
 
-def endExperiment(thisExp, inputs=None, win=None):
+def endExperiment(thisExp, win=None):
     """
     End this experiment, performing final shut down operations.
     
@@ -3060,8 +3196,6 @@ def endExperiment(thisExp, inputs=None, win=None):
     thisExp : psychopy.data.ExperimentHandler
         Handler object for this experiment, contains the data to save and information about 
         where to save it to.
-    inputs : dict
-        Dictionary of input devices by name.
     win : psychopy.visual.Window
         Window for this experiment.
     """
@@ -3074,13 +3208,12 @@ def endExperiment(thisExp, inputs=None, win=None):
     # mark experiment handler as finished
     thisExp.status = FINISHED
     # shut down eyetracker, if there is one
-    if inputs is not None:
-        if 'eyetracker' in inputs and inputs['eyetracker'] is not None:
-            inputs['eyetracker'].setConnectionState(False)
+    if deviceManager.getDevice('eyetracker') is not None:
+        deviceManager.removeDevice('eyetracker')
     logging.flush()
 
 
-def quit(thisExp, win=None, inputs=None, thisSession=None):
+def quit(thisExp, win=None, thisSession=None):
     """
     Fully quit, closing the window and ending the Python process.
     
@@ -3088,8 +3221,6 @@ def quit(thisExp, win=None, inputs=None, thisSession=None):
     ==========
     win : psychopy.visual.Window
         Window to close.
-    inputs : dict
-        Dictionary of input devices by name.
     thisSession : psychopy.session.Session or None
         Handle of the Session object this experiment is being run from, if any.
     """
@@ -3100,9 +3231,9 @@ def quit(thisExp, win=None, inputs=None, thisSession=None):
         # and win.timeOnFlip() tasks get executed before quitting
         win.flip()
         win.close()
-    if inputs is not None:
-        if 'eyetracker' in inputs and inputs['eyetracker'] is not None:
-            inputs['eyetracker'].setConnectionState(False)
+    # shut down eyetracker, if there is one
+    if deviceManager.getDevice('eyetracker') is not None:
+        deviceManager.removeDevice('eyetracker')
     logging.flush()
     if thisSession is not None:
         thisSession.stop()
@@ -3117,12 +3248,12 @@ if __name__ == '__main__':
     thisExp = setupData(expInfo=expInfo)
     logFile = setupLogging(filename=thisExp.dataFileName)
     win = setupWindow(expInfo=expInfo)
-    inputs = setupInputs(expInfo=expInfo, thisExp=thisExp, win=win)
+    setupDevices(expInfo=expInfo, thisExp=thisExp, win=win)
     run(
         expInfo=expInfo, 
         thisExp=thisExp, 
-        win=win, 
-        inputs=inputs
+        win=win,
+        globalClock='float'
     )
     saveData(thisExp=thisExp)
-    quit(thisExp=thisExp, win=win, inputs=inputs)
+    quit(thisExp=thisExp, win=win)

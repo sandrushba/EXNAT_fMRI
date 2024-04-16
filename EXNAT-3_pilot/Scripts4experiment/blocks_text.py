@@ -247,11 +247,10 @@ if curr_block in ["Reading_Baseline_training_click", "Reading_Baseline_main_clic
         ### start recording responses
         # start "endless" while loop that looks for responses
         continue_trial = True
+        trial_start_time = my_trial_clock.getTime()  # Record the start time of the trial
         while continue_trial:
 
             # in each iteration, draw word on screen
-            # --> flicker again
-
             stim.draw()
             win.flip()
 
@@ -290,6 +289,17 @@ if curr_block in ["Reading_Baseline_training_click", "Reading_Baseline_main_clic
                     # parallel.setData(0)
                     core.wait(0.5)
                     core.quit()
+
+            # Check for timeout - if more than 1.5, 2 or 1.5 seconds have passed, move to the next trial
+            if my_trial_clock.getTime() - trial_start_time >= 1.5 and curr_block in ["Reading_Baseline_training_click", "Reading_Baseline_main_click"]:
+                curr_duration = 1500
+                continue_trial = False
+            elif my_trial_clock.getTime() - trial_start_time >= 2 and curr_block == "1back_dual_main_click":
+                curr_duration = 2000
+                continue_trial = False
+            elif my_trial_clock.getTime() - trial_start_time >= 2.5 and curr_block == "2back_dual_main_click":
+                curr_duration = 2500
+                continue_trial = False
 
         ### end trial
         print("\tend self-paced trial")

@@ -18,7 +18,8 @@ instr_pic_path = "Stimuli_and_Resources/EXNAT3_Instr_Pics/"
 instr_Reading_Baseline_training_click = "Willkommen zum Experiment!\n\n\nIm folgenden Block werden Ihnen einzelne " \
                                         "Wörter angezeigt, die einen zusammenhängenden Text bilden.\n\nBitte lesen " \
                                         "Sie den Text, indem Sie mithilfe der Leertaste von Wort zu Wort " \
-                                        "weiterklicken. Die Schriftfarbe der Worte variiert, Sie können das jedoch " \
+                                        "weiterklicken. Bitte reagieren Sie stets so schnell wie möglich!\n\nDie " \
+                                        "Schriftfarbe der Wörter variiert, Sie können das jedoch " \
                                         "einfach ignorieren.\n\nAuf den Text folgen drei Fragen zum Textinhalt. " \
                                         "\n\nSie können die Aufgabe nun in einem kurzen Übungsblock testen. Bitte " \
                                         "drücken Sie die Leertaste, um den Übungsblock zu starten. "
@@ -79,6 +80,7 @@ instr_1back_dual_main_click = "LESEN MIT 1-ZURÜCK UND TASTENDRUCK\n\n\nNun wird
                               "\n\nBitte drücken Sie die Taste C, " \
                               "wenn die Farbe des aktuellen Worts mit der des vorherigen Worts (1 zurück) " \
                               "übereinstimmt.\n\n " \
+                              "Denken Sie daran: Reagieren Sie so schnell wie möglich!\n\n " \
                               "Am Ende des Blocks werden Ihnen wieder Verständnisfragen zum Inhalt des " \
                               "Texts gestellt.\n\nBitte drücken Sie die Leertaste, um den Block zu starten. "
 instr_pic_1back_dual_main_click = instr_pic_path + "1back.jpeg"
@@ -86,7 +88,7 @@ instr_pic_1back_dual_main_click = instr_pic_path + "1back.jpeg"
 instr_1back_dual_main_no_click = "LESEN MIT 1-ZURÜCK OHNE TASTENDRUCK\n\n\nGut gemacht!\n\nIm folgenden Block werden " \
                                  "die Wörter " \
                                  "wieder von allein abgespielt. Sie müssen also nicht die Leertaste drücken.\n\nBitte " \
-                                 "drücken Sie aber die Taste C, wenn die Farbe des " \
+                                 "drücken Sie aber so schnell wie möglich die Taste C, wenn die Farbe des " \
                                  "aktuellen Worts mit der des vorherigen Worts (1 zurück) übereinstimmt.\n\nDrücken " \
                                  "Sie die Leertaste, um den Block zu starten."
 instr_pic_1back_dual_main_no_click = instr_pic_path + "1back.jpeg"
@@ -106,14 +108,14 @@ instr_pic_2back_single_training2 = instr_pic_path + "2back_rect.jpeg"
 instr_2back_single_main = "2-ZURÜCK\n\n\nNun folgt ein etwas längerer Block, die Aufgabe bleibt aber die " \
                           "Gleiche:\n\nBitte drücken Sie die Taste C, wenn die aktuelle Farbe die gleiche ist wie die " \
                           "des vorletzten Rechtecks (2 zurück).\n\nWie auch zuvor können Sie mithilfe der Leertaste " \
-                          "zum nächsten Rechteck weiterklicken.\n\nBitte drücken Sie die Leertaste, um den Block zu " \
+                          "zum nächsten Rechteck weiterklicken. Denken Sie daran: Reagieren Sie so schnell wie möglich!\n\nBitte drücken Sie die Leertaste, um den Block zu " \
                           "starten. "
 instr_pic_2back_single_main = instr_pic_path + "2back_rect.jpeg"
 
 instr_2back_dual_main_click = "LESEN MIT 2-ZURÜCK UND TASTENDRUCK\n\n\nNun wird das Lesen mit der Gedächtnisaufgabe " \
                               "kombiniert. Sie lesen einen Text Wort für Wort und klicken mithilfe der Leertaste " \
                               "weiter zum nächsten Wort. Gleichzeitig sollen Sie auf die Farben der Wörter achten: " \
-                              "\n\nBitte drücken Sie die Taste C, " \
+                              "\n\nBitte drücken Sie so schnell wie möglich die Taste C, " \
                               "wenn die Farbe des aktuellen Worts mit der des vorletzten Worts (2 zurück) " \
                               "übereinstimmt.\n\n " \
                               "Am Ende des Blocks werden Ihnen wieder Verständnisfragen zum Inhalt des " \
@@ -489,7 +491,7 @@ text_07 = ["Wer", "Angkor", "sagt,", "meint", "in", "der", "Regel", "Angkor", "W
            "um", "den", "Forscher", "Damian", "Evans", "hat", "nun", "erstmals", "eine", "Karte", "von", "Angkor",
            "Wat", "erstellt.", "Die", "Karte", "zeigt,", "dass", "Angkor", "Wat", "eine", "richtige", "Stadt", "war,",
            "nicht", "nur", "eine", "kleine", "Tempelanlage.", "Die", "Forscher", "gehen", "davon", "aus,", "dass",
-           "Ihre", "Größe", "sogar", "New", "York", "übertroffen", "haben", "könnte.", "Damit", "ist",
+           "ihre", "Größe", "sogar", "New", "York", "übertroffen", "haben", "könnte.", "Damit", "ist",
            "\"Groß-Angkor\"", "die", "mit", "Abstand", "größte", "vorindustrielle", "Siedlung", "der", "Welt.",
            "Selbst", "die", "riesigen", "Städte", "der", "Maya", "erscheinen", "dagegen", "winzig.", "Die", "Forscher",
            "fanden", "außerdem", "heraus,", "dass", "Angkor", "eine", "hydraulische", "Stadt", "war.", "Dank", "eines",
@@ -600,7 +602,7 @@ text_09 = ["William", "Shakespeare", "war", "etwa", "fünf", "Jahre", "alt,", "a
            "worden.", "Dazu", "könnte", "auch", "die", "Geschichte", "über", "den", "Tod", "von", "Jane", "Shaxspere",
            "gezählt", "haben."]
 
-text_09_Q1 = "Im Artikel wird beschrieben, dass ein Unfall in einem Nachbarort Shakespeare zu einem seiner bekanntesten Stücke inspiriert haben könnte. Um welches Stück handelt es sich?"
+text_09_Q1 = "Im Artikel wird beschrieben, dass ein Unfall Shakespeare zu einem seiner Stücke inspiriert haben könnte. Um welches Stück handelt es sich?"
 text_09_Q1_ans = ["1) Othello", "2) King Lear", "3) Hamlet", "4) Macbeth"]
 text_09_Q1_corr = "c"
 

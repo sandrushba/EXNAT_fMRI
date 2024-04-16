@@ -27,8 +27,8 @@ if curr_block in ["Reading_Baseline_main_no_click", "Reading_Baseline_training_n
         if 50 <= duration <= 2000:
             filtered_durations_BL.append(duration)
             filtered_words_BL.append(word)
-    print("\tfiltered_durations_BL:", filtered_durations_BL)
-    print("\tfiltered_words_BL:", filtered_words_BL)
+    # print("\tfiltered_durations_BL:", filtered_durations_BL)
+    # print("\tfiltered_words_BL:", filtered_words_BL)
 
     # Now get number of letters (not words, I want to know how fast they read 1 letter on average!):
     letters_total_BL = sum(len(word) for word in filtered_words_BL)
@@ -60,8 +60,8 @@ elif curr_block in ["1back_dual_main_no_click"]:
         if 50 <= duration <= 2000:
             filtered_durations_1bck.append(duration)
             filtered_words_1bck.append(word)
-    print("\tfiltered_durations_1bck:", filtered_durations_1bck)
-    print("\tfiltered_words_1bck:", filtered_words_1bck)
+    # print("\tfiltered_durations_1bck:", filtered_durations_1bck)
+    # print("\tfiltered_words_1bck:", filtered_words_1bck)
 
     # Now get number of letters (not words, I want to know how fast they read 1 letter on average!):
     letters_total_1bck = sum(len(word) for word in filtered_words_1bck)
@@ -93,8 +93,8 @@ elif curr_block in ["2back_dual_main_no_click"]:
         if 50 <= duration <= 2000:
             filtered_durations_2bck.append(duration)
             filtered_words_2bck.append(word)
-    print("\tfiltered_durations_2bck:", filtered_durations_2bck)
-    print("\tfiltered_words_2bck:", filtered_words_2bck)
+    # print("\tfiltered_durations_2bck:", filtered_durations_2bck)
+    # print("\tfiltered_words_2bck:", filtered_words_2bck)
 
     # Now get number of letters (not words, I want to know how fast they read 1 letter on average!):
     letters_total_2bck = sum(len(word) for word in filtered_words_2bck)
@@ -192,9 +192,29 @@ elif curr_block == "Reading_Baseline_training_no_click":
     curr_targets = all_target_lists[exp_block_counter]
     curr_colours = all_colour_lists[exp_block_counter]
 
+    # compute RTs using participant's average reading speed / letter – old, based on linear increase of RTs,
+    # feels very unnatural however
+    # curr_durations = [len(word) * RT_per_letter_baseline for word in curr_text]  # in ms
+
     # compute RTs using participant's average reading speed / letter
-    curr_durations = [len(word) * RT_per_letter_baseline for word in curr_text]  # in ms
-    # print(f"\tdurations for paced task training block: {curr_durations_training}")
+    # we define a minimum and a maximum duration for each word
+    # the minimum is based on 5 x RT per letter in the respective condition
+    # the max duration is based on a time-out of 1.5 s in the reading baseline condition
+    minimum_duration = 5 * RT_per_letter_baseline
+    maximum_duration = 1500
+    curr_durations = []
+    for word in curr_text:
+        # this is an absolute value based on estimates of how long you need to feel comfortable reading a word on
+        # screen in a paced task
+        # duration = RT_per_letter_baseline * math.log((len(word))) + 300
+        # more flexible solution:
+        duration = RT_per_letter_baseline * math.log((len(word))) + 4 * RT_per_letter_baseline
+        if duration < maximum_duration:
+            curr_durations.append(max(duration, minimum_duration))
+        else:
+            curr_durations.append(maximum_duration)
+
+    print(f"\tdurations for paced task training block: {curr_durations}")
 
     # we also need the start time (let's set it as current time
     # at this point in the script):
@@ -242,8 +262,30 @@ elif curr_block in ["Reading_Baseline_main_no_click", "1back_dual_main_no_click"
         # get text nr:
         curr_text_nr = all_texts_nrs_list[exp_block_counter]
         curr_text = locals()[curr_text_nr]
+
+        # compute RTs using participant's average reading speed / letter – old, based on linear increase of RTs,
+        # feels very unnatural however
+        # curr_durations = [len(word) * RT_per_letter_baseline for word in curr_text]  # in ms
+
         # compute RTs using participant's average reading speed / letter
-        curr_durations = [len(word) * RT_per_letter_baseline for word in curr_text]  # in ms
+        # we define a minimum and a maximum duration for each word
+        # the minimum is based on 5 x RT per letter in the respective condition
+        # the max duration is based on a time-out of 1.5 s in the reading baseline condition
+        minimum_duration = 5 * RT_per_letter_baseline
+        maximum_duration = 1500
+        curr_durations = []
+        for word in curr_text:
+            # this is an absolute value based on estimates of how long you need to feel comfortable reading a word on
+            # screen in a paced task
+            # duration = RT_per_letter_baseline * math.log((len(word))) + 300
+            # more flexible solution:
+            duration = RT_per_letter_baseline * math.log((len(word))) + 4 * RT_per_letter_baseline
+            if duration < maximum_duration:
+                curr_durations.append(max(duration, minimum_duration))
+            else:
+                curr_durations.append(maximum_duration)
+
+        print(f"\tdurations for paced baseline block: {curr_durations}")
 
         ### change background colour
         win.setColor(dark_bg_col, colorSpace='rgb')
@@ -286,9 +328,61 @@ elif curr_block in ["Reading_Baseline_main_no_click", "1back_dual_main_no_click"
         curr_text = locals()[curr_text_nr]
         # compute RTs using participant's average reading speed / letter
         if curr_block == "1back_dual_main_no_click":
-            curr_durations = [len(word) * RT_per_letter_1bck for word in curr_text]  # in ms
+            # curr_durations = [len(word) * RT_per_letter_1bck for word in curr_text]  # in ms
+
+            # compute RTs using participant's average reading speed / letter
+            # we define a minimum and a maximum duration for each word
+            # the minimum is based on 5 x RT per letter in the respective condition
+            # the max duration is based on a time-out of 2 s in the 1-back condition
+            minimum_duration = 5 * RT_per_letter_1bck
+            maximum_duration = 2000
+            curr_durations = []
+            for word in curr_text:
+                # this is an absolute value based on estimates of how long you need to feel comfortable reading a
+                # word on screen in a paced task
+                # duration = RT_per_letter_baseline * math.log((len(word))) + 300 more
+                # more flexible solution:
+                duration = RT_per_letter_1bck * math.log((len(word))) + 4 * RT_per_letter_1bck
+                if duration < maximum_duration:
+                    curr_durations.append(max(duration, minimum_duration))
+                else:
+                    curr_durations.append(maximum_duration)
+
+            # Latency factor of an incremental increase (increment per trial = 3 ms) added over duration of entire
+            # block assuming that participants get tired of the course of a 300 words block and thus need a bit more
+            # time:
+            # Increment of 3 ms per trial
+            increment_per_trial = 3
+            for i in range(len(curr_durations)):
+                # Calculate incremental increase for current trial
+                increment = i * increment_per_trial
+                # Add incremental increase to current trial's duration
+                curr_durations[i] += increment
+
         elif curr_block == "2back_dual_main_no_click":
-            curr_durations = [len(word) * RT_per_letter_2bck for word in curr_text]  # in ms
+            minimum_duration = 5 * RT_per_letter_2bck
+            maximum_duration = 2000
+            curr_durations = []
+            for word in curr_text:
+                # this is an absolute value based on estimates of how long you need to feel comfortable reading a word on
+                # screen in a paced task
+                # duration = RT_per_letter_baseline * math.log((len(word))) + 300
+                # more flexible solution:
+                duration = RT_per_letter_2bck * math.log((len(word))) + 4 * RT_per_letter_2bck
+                if duration < maximum_duration:
+                    curr_durations.append(max(duration, minimum_duration))
+                else:
+                    curr_durations.append(maximum_duration)
+
+            # Add increment of 3 ms per trial
+            increment_per_trial = 3
+            for i in range(len(curr_durations)):
+                # Calculate incremental increase for current trial
+                increment = i * increment_per_trial
+                # Add incremental increase to current trial's duration
+                curr_durations[i] += increment
+
+        print(f"\tdurations for paced n-back block: {curr_durations}")
 
         ### change background colour
         win.setColor(dark_bg_col, colorSpace='rgb')
@@ -358,7 +452,7 @@ if curr_block in ["Reading_Baseline_training_no_click", "Reading_Baseline_main_n
 
         # get duration for current word
         curr_duration = curr_durations[trial_idx] / 1000  # convert ms to seconds
-        print("duration for current word (in s):", curr_duration)
+        # print("duration for current word (in s):", curr_duration)
 
         # get trial number (start counting from 1, so add 1)
         curr_trial_nr = trial_idx + 1
