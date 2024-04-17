@@ -24,7 +24,7 @@ if curr_block in ["Reading_Baseline_main_no_click", "Reading_Baseline_training_n
     filtered_durations_BL = []
     filtered_words_BL = []
     for duration, word in zip(BL_paced_durations, BL_paced_words):
-        if 50 <= duration <= 2000:
+        if 50 <= duration <= 1500:
             filtered_durations_BL.append(duration)
             filtered_words_BL.append(word)
     # print("\tfiltered_durations_BL:", filtered_durations_BL)
@@ -90,7 +90,7 @@ elif curr_block in ["2back_dual_main_no_click"]:
     filtered_durations_2bck = []
     filtered_words_2bck = []
     for duration, word in zip(twoback_paced_durations, twoback_paced_words):
-        if 50 <= duration <= 2000:
+        if 50 <= duration <= 2500:
             filtered_durations_2bck.append(duration)
             filtered_words_2bck.append(word)
     # print("\tfiltered_durations_2bck:", filtered_durations_2bck)

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2024.1.0),
-    on Tue Apr 16 20:10:38 2024
+    on Wed Apr 17 14:40:53 2024
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -2008,7 +2008,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             filtered_durations_BL = []
             filtered_words_BL = []
             for duration, word in zip(BL_paced_durations, BL_paced_words):
-                if 50 <= duration <= 2000:
+                if 50 <= duration <= 1500:
                     filtered_durations_BL.append(duration)
                     filtered_words_BL.append(word)
             # print("\tfiltered_durations_BL:", filtered_durations_BL)
@@ -2074,7 +2074,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             filtered_durations_2bck = []
             filtered_words_2bck = []
             for duration, word in zip(twoback_paced_durations, twoback_paced_words):
-                if 50 <= duration <= 2000:
+                if 50 <= duration <= 2500:
                     filtered_durations_2bck.append(duration)
                     filtered_words_2bck.append(word)
             # print("\tfiltered_durations_2bck:", filtered_durations_2bck)
