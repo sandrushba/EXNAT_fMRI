@@ -83,7 +83,7 @@ elif curr_block in ["1back_dual_main_no_click"]:
 elif curr_block in ["2back_dual_main_no_click"]:
 
     # exclude all RTs where participant was way too fast (< 50 ms) or
-    # way too slow (> 2s), also remove the corresponding words from vis_task_words
+    # way too slow (> 2.5s), also remove the corresponding words from vis_task_words
     print("\t2back_paced_durations:", twoback_paced_durations)
     print("\t2back_paced_words:", twoback_paced_words)
 
