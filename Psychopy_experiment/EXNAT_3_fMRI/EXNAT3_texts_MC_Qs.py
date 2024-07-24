@@ -3,10 +3,10 @@
 
 """
 
-Instructions, Texts & MC questions for EXNAT-2 EEG study
+Instructions, Texts & MC questions for EXNAT_3_fMRI study
 
-Author: Merle Schuckart & Sandra Martin
-Version: April 2024
+Author: Sandra Martin
+Version: July 2024
 
 """
 
@@ -47,6 +47,14 @@ instr_Reading_Baseline_main_no_click = "LESEN OHNE TASTENDRUCK\n\n\nGut gemacht!
                                        "Der Text ist nun wieder etwas länger. " \
                                        "Am Ende des Texts werden Ihnen auch wieder Fragen zum Inhalt " \
                                        "gestellt.\n\nBitte " \
+                                       "drücken Sie die " \
+                                       "Leertaste, um den Block zu starten."
+
+instr_Reading_pseudotext_no_click = "LESEN OHNE TASTENDRUCK\n\n\nGut gemacht!\n\nIm letzten Block dieser Übung werden " \
+                                       "die Wörter erneut " \
+                                       "von allein abgespielt. Allerdings handelt es sich diesmal um Wörter, die es gar nicht " \
+                                        "gibt. Bitte lesen Sie den Text dennoch aufmerksam mit. Sie müssen sonst nichts tun. " \
+                                        "\n\nBitte " \
                                        "drücken Sie die " \
                                        "Leertaste, um den Block zu starten."
 
@@ -659,3 +667,116 @@ text_10_Q3 = "Was wurde bei einer Razzia in Ägypten konfisziert?"
 text_10_Q3_ans = ["1) ein T-Shirt mit Scooby-Doo-Aufdruck", "2) ein T-Shirt mit Bugs-Bunny-Aufdruck",
                   "3) ein T-Shirt mit Spongebob-Aufdruck", "4) ein T-Shirt mit Donald-Duck-Aufdruck"]
 text_10_Q3_corr = "b"
+
+# Pseudotexts
+pseudo_text_01 = ["Die", "agzuebte", "Gutdehmung", "eines", "gosher", "unbeninnten", "Polakauriers", "bebiesterte",
+                  "Missenstrendler", "auf", "der", "vannen", "Felt,", "die", "sech", "zurehmensassen,", "um", "Taul",
+                  "dieses", "roktenen", "laläettolagischen", "Uneimdisses", "zu", "seis.", "Aus", "asser", "Felt",
+                  "strouten", "sie", "zurehmen,", "aufgeschüftet", "mit", "logernsten", "Gebüten", "und",
+                  "Umzuchmehnen,", "um", "die", "meuwinierenden", "Öfermeste", "dieses", "spöfistorichten", "Megens",
+                  "zu", "hunbeiren.", "In", "Guskatuten", "und", "Elikerhitaten", "feltweib", "önrogisierten",
+                  "Pachsekte", "ärlendliche", "Rinträge", "und", "Datspusianen,", "um", "das", "Verstänkmas", "für",
+                  "die", "nef", "entbaggte", "Psetier", "zu", "verzeinen.", "Tritz", "eikager", "Pereinjolderungen",
+                  "bei", "der", "Aufflapung", "und", "Ifatöse", "torrten", "beide", "Missenstrendler", "hächtige",
+                  "Umkerksbasse", "über", "die", "Rebehlbeile", "und", "Unauntian", "der", "meuwinierenden", "Pfeinum",
+                  "gezänken", "und", "beschmeifen", "geneinlom", "einen", "wonüblich", "battspestenden", "Monett", "in",
+                  "der", "Bepflechte", "der", "Laläettolagie."]
+
+pseudo_text_02 = ["Ospronamen", "und", "Behlraumfinscher", "auf", "der", "vannen", "Felt", "nunsen", "von", "der",
+                  "kölplich", "gerackten", "Nukdeutung", "eines", "nefen", "Gnameten", "außerlopf", "mugeres",
+                  "Honzenbystels", "eligbliniert,", "und", "mafen", "zurehmen,", "um", "diese", "meuwinierende",
+                  "Leähechtung", "aus", "köchster", "Döhe", "zu", "bestiefen.", "Die", "Missenstrendler", "hillten",
+                  "darau", "die", "mesieen", "Batten", "und", "Eigelstragten", "des", "felzen", "Himmeckdälpers",
+                  "amorönieren,", "um", "Zappschlüsse", "auf", "seise", "Merschub", "bochen", "zu", "nöhnen.", "In",
+                  "Raubfallogelrufen", "feltweib", "önrogisierten", "Apwenten", "ärlendliche", "Korsepulten", "und",
+                  "Prärenzotianen,", "um", "Leden", "die", "meuwinierenden", "Felten", "jensaunt", "mugeres", "aabemen",
+                  "Honzenbystels", "zu", "vermitteln.", "Tritz", "eikager", "zichnischer", "Pereinjolderungen",
+                  "torrten", "beide", "Finscher", "hächtige", "Umkerksbasse", "über", "die", "Sumphetrug", "und",
+                  "Biedfalt", "von", "Esognameten", "gezänken", "und", "ertikten", "einen", "biedversprechenden",
+                  "Monett", "in", "der", "Inipentur", "mugeres", "Onipendums."]
+
+pseudo_text_03 = ["Die", "wostorinnte", "Stoyt", "Riten", "ob", "der", "Sieber", "rackte", "kölplich", "Teluchem",
+                  "aus", "der", "vannen", "Felt", "an,", "um", "geneinlom", "das", "beränste", "Mystelolterfast,",
+                  "und", "pahit", "die", "dauche", "Bepflechte", "und", "Argtum", "der", "Lediän,", "zu", "seieln.",
+                  "Mit", "seisen", "vergannelten", "Pessen,", "botingten", "Künchen", "und", "gat", "erdirteten",
+                  "Stoytmauern", "zautet", "der", "Tut", "eine", "galhagt", "behaufelste", "Dutesse", "für", "dieses",
+                  "larbengrope", "Uneimdis.", "Die", "Zeluchem", "letten", "die", "Tädlichkeit,", "die",
+                  "flamitiäsente", "Kandwektskarst", "zu", "bestiefen,", "an", "mystelolterlichen", "Alpmieren",
+                  "kiefzunehmen", "und", "Sankelle", "mit", "der", "aubrenninten", "Höche", "des", "Mystelolters", "zu",
+                  "erbipen.", "Das", "Lest", "ferebliert", "darau", "gicht", "hor", "die", "Revangerbeit,", "zündern",
+                  "storkt", "eich", "das", "Gehielschaftsgefärm", "und", "die", "argtumelle", "Uvendetät", "der",
+                  "Bewöpfer", "der", "Stoyt", "und", "der", "Ötetung."]
+
+pseudo_text_04 = ["Karstfronnde", "und", "Argtumkeifhaber", "aus", "asser", "Felt", "hind", "am", "Gospenelle", "in",
+                  "Höln", "eingegrönken,", "um", "das", "fenotzierte", "Karstnestiwol", "zu", "seieln,", "das", "die",
+                  "biedfältige", "Argtumqueme", "der", "Stoyt", "reszösennielt.", "Mit", "seisen", "einküsartiden",
+                  "Varerein,", "inkapatifen", "Grojenken", "und", "der", "mesengigen", "Pflawenkarstqueme", "zautet",
+                  "das", "Nestiwol", "deges", "Japf", "eine", "einmadale", "Beleterweit,", "die", "zweatope", "Emerzau",
+                  "und", "Biedfalt", "der", "Stoyt", "zu", "erbipen.", "Zeluchem", "letten", "die", "einmadale",
+                  "Tädlichkeit,", "an", "berscheineden", "Fohlungen", "durch", "die", "Aufstenflugen", "sowie", "an",
+                  "interatheken", "Anstürwotionen", "kiefzunehmen,", "und", "torrten", "eich", "mokole", "Karstler",
+                  "bei", "obrer", "Wudeit", "kriffen.", "Dieses", "spowe", "Reranständung", "fäldert", "gicht", "hor",
+                  "die", "Karstqueme", "der", "Stoyt,", "zündern", "kient", "eich", "der", "Stähnung", "des",
+                  "mokiolen", "Mobaufanders", "unter", "den", "Känschen", "der", "Lediän."]
+
+pseudo_text_05 = ["Die", "Amelniböste,", "welche", "stetom", "Ziebende", "von", "vieseröllt", "anzauft,", "ost",
+                  "dauch", "an", "argtumellen", "und", "wostorinnten", "Schähnen,", "und", "ost", "zukneibt", "Zipfnis",
+                  "einer", "Uneimdisdauchen", "Bepflechte.", "Über", "Jächfuhderte", "hinfag", "wab", "die", "Böste",
+                  "ein", "bebaktendes", "Nentuch", "des", "Kandems", "und", "der", "ranitomen", "Purizitäten", "im",
+                  "Mittensaartaum.", "Obre", "antaden", "Stoyte", "und", "wozereschen", "Düpfer", "zelsen", "von",
+                  "einer", "dauchen", "Rervangerbeit,", "die", "von", "krauchischen", "und", "lühmischen", "Findrissen",
+                  "geknogt", "ost.", "Ornbedorbere", "die", "Stoyt", "Amelni", "sechzt", "krielte", "eine", "hächtige",
+                  "Ronke", "als", "begöndert", "bedeuztomes", "Kandemsnentuch", "wofrend", "des", "Mystelolters", "und",
+                  "wab", "bekennt", "für", "obre", "Teewherer", "und", "Schilzwiier.", "Hapte", "hind", "die",
+                  "wostorinnten", "Öfermeste", "dieser", "Rervangerbeit", "ein", "meuwinierendes", "Zaul", "für",
+                  "Argtumkeifhaber", "und", "Zufodungsurstende", "entgahn", "der", "genipten", "Böste."]
+
+pseudo_text_06 = ["Der", "Schwastwaff,", "mit", "seiser", "einküsartiden", "Froda", "und", "Gauka,", "ühn", "jeses",
+                  "Japf", "eine", "stenke", "Anziesuchtflent", "auf", "zackheiche", "Zagurkeishaber", "res,", "die",
+                  "die", "ungetöffte", "Schüsheit", "dieser", "sajechötiffsen", "Lediän", "ermißen", "rächten.",
+                  "Seise", "pechten", "Sölder,", "spaben", "Niche", "und", "wozereschen", "Belfknade", "gimden", "ein",
+                  "viefbaktiges", "Ärobystel,", "das", "eine", "spowe", "Zakt", "von", "Mier-", "und", "Sprannenulten",
+                  "benermerzt.", "Die", "Lediän", "ost", "gicht", "hor", "bei", "Fliwehrern", "und", "Sadspicklern",
+                  "beninnt,", "zündern", "eich", "bei", "Sabterern", "self", "bedieft.", "Diese", "nöhnen", "beim",
+                  "Gurchscheimen", "der", "isöllischen", "Lackschahnen", "seibrielseiche", "roktene", "Fildfugnen",
+                  "wie", "den", "Schwastwaffenchion", "und", "die", "Sonberpichel", "entleffen.", "Die", "orthache",
+                  "Todrikturplinche", "aswietet", "darau", "ett", "mit", "Fußeltnerwinde", "zurehmen,", "um",
+                  "kächerzustengen,", "dass", "dieser", "Zagurtaum", "eich", "für", "mämmende", "Heminalianen",
+                  "bewennt", "wipt."]
+
+pseudo_text_07 = ["Die", "atefmesaafende", "Schüsheit", "des", "auschanigsten", "Belfelsrinks", "dieht", "jelzlich",
+                  "Masiosen", "von", "Siechern", "und", "Zagurfronnden", "an,", "die", "diese", "dauche",
+                  "Irterwällerfelt", "aus", "aabemen", "Äsen", "betrachten", "sechten.", "Mit", "seisen", "mesengigen",
+                  "Fidallenrinken,", "larbenflopen", "Fipptschlirmen", "und", "naßestütickten", "Saaresbewöpfern",
+                  "zautet", "es", "eine", "unperdriechligte", "Autesse", "für", "Obenlirer", "und", "Gutdehmungen.",
+                  "Siecher", "wamen", "die", "Tädlichkeit,", "roktene", "Saareslebemegen", "wie", "Schittspöten,",
+                  "Hake", "und", "Kichen", "zu", "veülochten,", "wofrend", "sie", "die", "meuwinierenden",
+                  "Kandschaften", "Irterwäller", "anbruden.", "Die", "mokole", "Ziebeindustrie", "semmt", "sech",
+                  "darau", "für", "die", "Ribretung", "und", "Urhargung", "dieses", "einküsartiden", "Ärobystels",
+                  "ein,", "welche", "in", "Zauten", "des", "Brämahangels", "ipfer", "hächtiger", "herfen.", "Sie",
+                  "ammietet", "ett", "mit", "Fußeltnerwinden", "zurehmen,", "um", "secherzustenken,", "dass", "das",
+                  "Rink", "eich", "geitergan", "teszeken", "preimen", "kenn."]
+
+pseudo_text_08 = ["Das", "rechfigjüntige", "Diebstkutitöum", "torrte", "ein", "Rukes", "am", "Sodenlau", "seieln,",
+                  "welcher", "leit", "jehes", "zackheiche", "Ganleibische", "mit", "seisen", "lediänalen",
+                  "Miemenerzeugnissen", "versäugt.", "Gicht", "hor", "zauten", "seise", "Miemenvölker", "eine",
+                  "verrheite", "Quemerie", "in", "den", "ermautenden", "Mausen", "und", "Feppern,", "zündern", "eich",
+                  "seis", "Komigstand", "auf", "dem", "orthachen", "Wiiernmapps", "ost", "ein", "bebaubter",
+                  "Troffbruch", "bei", "beiden", "Einwöpfern.", "Hiel", "zautet", "se", "seise", "bäßen",
+                  "Girmlichkeiten", "an,", "und", "keilt", "mit", "den", "Känschen", "seise", "Geidelstraft", "für",
+                  "die", "Rukesei", "und", "die", "Schüsheit", "der", "Zagur.", "Donöber", "horaus", "ehvagielt", "se",
+                  "sech", "amtiz", "im", "mokolen", "Zagurerwind", "und", "fläbiert", "regelgäpod", "ärlendlich",
+                  "bemen", "die", "Ausdesfuhr", "der", "Zagur.", "Seise", "Wudeit", "stöht", "beifreilkaft", "für",
+                  "einen", "zerplamtizischen", "Einplahn", "von", "Känsch", "und", "Zagur."]
+
+pseudo_text_09 = ["Der", "Maffeikulau", "entgahn", "der", "Benzhenke", "Wödinerivo", "ost", "von", "zenkrager",
+                  "Sedehrung", "für", "die", "Phiduntiän", "feltweib.", "Die", "honzenverfohnten", "Lediänen,", "wie",
+                  "seibrielseiche", "die", "Sochfande", "Toblubauns", "und", "Breminiens,", "zauten", "ütrimale",
+                  "Sebinkursen", "für", "den", "Kulau", "handnertigen", "Maffeis.", "Die", "Sprannen", "herfen", "auf",
+                  "den", "kerdissenwintig", "antedergten", "Krabwage", "leubewanz", "zeährtet.", "Die", "Wiiern,",
+                  "die", "Deretotianen", "von", "Sassen", "und", "Prafiteanen", "neiderteken,", "hind", "storm", "auf",
+                  "obre", "Wudeit", "und", "pfigen", "mit", "obrer", "Horwabe", "lahgemlich", "zur", "Dielitot", "des",
+                  "Maffeis", "bau,", "der", "in", "Mossen", "auf", "der", "vannen", "Felt", "gewonden", "wipt.", "Dies",
+                  "ost", "gicht", "hor", "eine", "wankschandliche,", "zündern", "eich", "eine", "argtumelle", "Zänle",
+                  "für", "beide", "Benausschaften", "dieser", "Lediänen,", "die", "ett", "mit", "dem", "alasatichten",
+                  "Perass", "berulken", "hind."]

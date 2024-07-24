@@ -1,12 +1,11 @@
 ######################################################################
 #                                                                    #
-#   Colour List Generator Function for the n-Back Tasks in EXNAT-2   #
+#      Colour List Generator Function for n-back tasks               #
 #                                                                    #    
 ######################################################################
 
 
-# Author: Merle Schuckart (Auditory Cognition Group, Dep. for Psych. 1, University of Lübeck)
-# Contact: merle.schuckart@uni-luebeck.de
+# Author: Merle Schuckart
 # Version: 1.0 (09.03.2023)
 
 
@@ -493,7 +492,7 @@ def create_nback_stimlist(nback_level, colour_codes, story, target_abs_min, targ
 
 ''' ---- 3rd Function: Create stimulus list for 0-back ----------'''
 
-def create_0back_stimlist(target_colour, nr_targets = 50, colour_codes = ["#D292F3", "#F989A2", "#2AB7EF", "#88BA3F"], nr_words = 300):
+def create_0back_stimlist(target_colour, nr_targets = 15, colour_codes = ["#D292F3", "#F989A2", "#2AB7EF", "#88BA3F"], nr_words = 91):
   
 
   """

@@ -361,7 +361,7 @@ elif curr_block in ["Reading_Baseline_main_no_click", "1back_dual_main_no_click"
 
         elif curr_block == "2back_dual_main_no_click":
             minimum_duration = 5 * RT_per_letter_2bck
-            maximum_duration = 2000
+            maximum_duration = 2500
             curr_durations = []
             for word in curr_text:
                 # this is an absolute value based on estimates of how long you need to feel comfortable reading a word on
