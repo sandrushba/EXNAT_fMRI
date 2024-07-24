@@ -20,10 +20,10 @@ curr_block = all_blocks[exp_block_counter]
 
 # Check whether it's a block that isn't self-paced
 # If yes, skip this routine
-if curr_block in ["click_training", "1back_single_training1", "1back_single_training2",
-                  "2back_single_training1", "2back_single_training2",
-                  "Reading_Baseline_main_no_click", "1back_dual_main_no_click", "2back_dual_main_no_click",
-                  "Reading_Baseline_training_no_click"]:
+if curr_block in ["click_training", "0back_single_training", "1back_single_training1", "1back_single_training2",
+                  "1back_single_main", "2back_single_training1", "2back_single_training2", "2back_single_main",
+                  "Reading_Baseline_main_no_click", "0back_dual_main_no_click", "1back_dual_main_no_click", "2back_dual_main_no_click",
+                  "Reading_Baseline_training_no_click", "1back_single_main_no_click", "2back_single_main_no_click"]:
     print(f"this is block {curr_block}")
     print("\tskipping self-paced text routine")
     # skip questions & end current routine
@@ -93,7 +93,7 @@ elif curr_block == "Reading_Baseline_training_click":
     print(f"\tcurrent text: {curr_text_nr}")
 
 # if it's one of the "normal" main blocks, prepare main block stimuli:
-elif curr_block in ["Reading_Baseline_main_click", "1back_dual_main_click", "2back_dual_main_click"]:
+elif curr_block in ["Reading_Baseline_main_click", "0back_dual_main_click", "1back_dual_main_click", "2back_dual_main_click"]:
     print(f"this is block {curr_block}")
     print(f"start preparing block {curr_block}")
 
@@ -103,41 +103,89 @@ elif curr_block in ["Reading_Baseline_main_click", "1back_dual_main_click", "2ba
 
     ### Show instructions
     # set instruction text
-    instr_text = locals()["instr_" + curr_block]
-    # create text box
-    instr_text_stim = visual.TextStim(win,
-                                      text=instr_text,
-                                      height=0.025,  # font height relative to height of screen
-                                      pos=(0, 0.2),  # move up a bit
-                                      color="black")
-    if curr_block == "Reading_Baseline_main_click":
+    if curr_block == "0back_dual_main_click":
+        # create text boxes
+        instr_text_stim1 = visual.TextStim(win,
+                                           text=locals()["instr_0back_dual_main_click1"],
+                                           height=0.025,  # font height relative to height of screen
+                                           pos=(0, 0.3),  # move instructions up a bit
+                                           color="black")
+        instr_text_stim2 = visual.TextStim(win,
+                                           text=locals()["instr_0back_dual_main_click2"],
+                                           height=0.025,  # font height: 5° visual angle
+                                           pos=(0, -0.35),  # move instructions down a bit
+                                           color="black")
+        # create "empty" circle as stimulus
+        instr_colour_circle_stim = visual.Circle(win=win,
+                                                 radius=0.065,
+                                                 pos=(0, 0.1))  # move circle slightly down
+
+        # set current target colour as colour of circle:
+        instr_colour_circle_stim.fillColor = target_colours_list[1]
+
         # create ImageStim object
         curr_instr_pic = visual.ImageStim(win,
-                                          size=(0.6, 0.3),
-                                          pos=(0, -0.2),
-                                          image=locals()["instr_pic_" + curr_block])  # set path to image here
+                                          size=(0.55, 0.25),
+                                          pos=(0, -0.15),
+                                          image=locals()["instr_pic_0back"])  # set path to image here
+
     else:
-        # create ImageStim object
-        curr_instr_pic = visual.ImageStim(win,
-                                          size=(0.8, 0.3),
-                                          pos=(0, -0.2),
-                                          image=locals()["instr_pic_" + curr_block])  # set path to image here
+        instr_text = locals()["instr_" + curr_block]
+        # create text box
+        instr_text_stim = visual.TextStim(win,
+                                          text=instr_text,
+                                          height=0.025,  # font height relative to height of screen
+                                          pos=(0, 0.2),  # move up a bit
+                                          color="black")
+        if curr_block == "Reading_Baseline_main_click":
+            # create ImageStim object
+            curr_instr_pic = visual.ImageStim(win,
+                                              size=(0.6, 0.3),
+                                              pos=(0, -0.2),
+                                              image=locals()["instr_pic_" + curr_block])  # set path to image here
+        else:
+            # create ImageStim object
+            curr_instr_pic = visual.ImageStim(win,
+                                              size=(0.8, 0.3),
+                                              pos=(0, -0.2),
+                                              image=locals()["instr_pic_" + curr_block])  # set path to image here
 
     # show instructions
-    win.setColor(light_bg_col, colorSpace='rgb')
-    instr_text_stim.draw()
-    curr_instr_pic.draw()
-    win.flip()
-    core.wait(3)  # wait for 3s before starting response window
+    if curr_block == "0back_dual_main_click":
+        win.setColor(light_bg_col, colorSpace='rgb')
+        instr_text_stim1.draw()
+        instr_text_stim2.draw()
+        instr_colour_circle_stim.draw()
+        curr_instr_pic.draw()
+        win.flip()
+        core.wait(3)  # wait for 3s before starting response window
 
-    # Display the text on screen
-    while True:
+        # display the text & the circle on screen until Space is pressed
+        while True:
+            instr_text_stim1.draw()
+            instr_text_stim2.draw()
+            instr_colour_circle_stim.draw()
+            curr_instr_pic.draw()
+            win.flip()
+            # end screen if participant presses space
+            if event.getKeys(['space']):
+                break
+
+    else:
+        win.setColor(light_bg_col, colorSpace='rgb')
         instr_text_stim.draw()
         curr_instr_pic.draw()
         win.flip()
-        # end showing screen if participant presses space
-        if 'space' in event.getKeys():
-            break
+        core.wait(3)  # wait for 3s before starting response window
+
+        # Display the text on screen
+        while True:
+            instr_text_stim.draw()
+            curr_instr_pic.draw()
+            win.flip()
+            # end showing screen if participant presses space
+            if 'space' in event.getKeys():
+                break
 
     ### change background colour
     win.setColor(dark_bg_col, colorSpace='rgb')
@@ -153,10 +201,10 @@ elif curr_block in ["Reading_Baseline_main_click", "1back_dual_main_click", "2ba
     # get n-back condition:
     curr_nback_cond = curr_block[0]  # get first character of block name
 
-    # if it is a 1 or a 2, set that as current n-back level:
-    if curr_nback_cond in ['1', '2']:
+    # if it is a 0, 1 or 2, set that as current n-back level:
+    if curr_nback_cond in ['0', '1', '2']:
         curr_nback_cond == int(curr_nback_cond)
-    # if it's neither 1 nor 2, it has to be a block without n-back,
+    # if it's neither 0, 1 nor 2, it has to be a block without n-back,
     # so set curr_nback_cond to None
     else:
         curr_nback_cond = None
@@ -171,12 +219,15 @@ elif curr_block in ["Reading_Baseline_main_click", "1back_dual_main_click", "2ba
     curr_text = locals()[curr_text_nr]
 
 ### Start block loop
-if curr_block in ["Reading_Baseline_training_click", "Reading_Baseline_main_click", "1back_dual_main_click", "2back_dual_main_click"]:
+if curr_block in ["Reading_Baseline_training_click", "Reading_Baseline_main_click", "0back_dual_main_click", "1back_dual_main_click", "2back_dual_main_click"]:
     # depending on condition, create arrays for saving response
     # times & words - we need that later for the paced reading tasks
     if curr_block == "Reading_Baseline_main_click":
         BL_paced_durations = []
         BL_paced_words = []
+    elif curr_block == "0back_dual_main_click":
+        zeroback_paced_durations = []
+        zeroback_paced_words = []
     elif curr_block == "1back_dual_main_click":
         oneback_paced_durations = []
         oneback_paced_words = []
@@ -209,7 +260,6 @@ if curr_block in ["Reading_Baseline_training_click", "Reading_Baseline_main_clic
         # print("current idx: " + str(trial_idx) + ", curr word:" + curr_word)
 
         ### prepare & show current word:
-
         # get current colour
         curr_colour = curr_colours[trial_idx]
 
@@ -290,8 +340,9 @@ if curr_block in ["Reading_Baseline_training_click", "Reading_Baseline_main_clic
                     core.wait(0.5)
                     core.quit()
 
-            # Check for timeout - if more than 1.5, 2 or 1.5 seconds have passed, move to the next trial
-            if my_trial_clock.getTime() - trial_start_time >= 1.5 and curr_block in ["Reading_Baseline_training_click", "Reading_Baseline_main_click"]:
+            # Check for timeout - if more than 1.5, 2 or 2.5 seconds have passed, move to the next trial
+            if my_trial_clock.getTime() - trial_start_time >= 1.5 and curr_block in ["Reading_Baseline_training_click", "Reading_Baseline_main_click",
+                                                                                     "0back_dual_main_click"]:
                 curr_duration = 1500
                 continue_trial = False
             elif my_trial_clock.getTime() - trial_start_time >= 2 and curr_block == "1back_dual_main_click":
@@ -351,6 +402,9 @@ if curr_block in ["Reading_Baseline_training_click", "Reading_Baseline_main_clic
         if curr_block == "Reading_Baseline_main_click":
             BL_paced_durations.append(curr_duration)
             BL_paced_words.append(curr_word)
+        elif curr_block == "0back_dual_main_click":
+            zeroback_paced_durations.append(curr_duration)
+            zeroback_paced_words.append(curr_word)
         elif curr_block == "1back_dual_main_click":
             oneback_paced_durations.append(curr_duration)
             oneback_paced_words.append(curr_word)

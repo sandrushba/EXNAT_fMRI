@@ -1,14 +1,14 @@
 #################################################
-#                Blocks w/o text                #
+#          Blocks w/o text – self-paced         #
 #################################################
 # this routine is for all blocks where there are
 # coloured rectangles instead of words
 
-# the non-text blocks all come in succession, there's just 1 main block in between them.
-# So use loop here that runs the non-text blocks
+# Use loop here that runs the non-text blocks
 # until we have to display a main text block (in this case we exit the routine).
 
 while True:
+    event. Mouse(visible=False)
     # keep background ivory
     win.setColor(light_bg_col, colorSpace='rgb')
     win.flip()
@@ -22,14 +22,13 @@ while True:
 
     # get block kind
     curr_block = all_blocks[exp_block_counter]
-    # print("start preparing block " + curr_block)
 
     # Check whether it's one of the non-text tasks.
     # If current block is a text block, skip this routine and go to the next.
-    if curr_block not in ["click_training", "1back_single_training1", "1back_single_training2",
-                          "2back_single_training1", "2back_single_training2"]:
+    if curr_block not in ["click_training", "0back_single_training", "1back_single_training1", "1back_single_training2",
+                          "1back_single_main", "2back_single_training1", "2back_single_training2", "2back_single_main"]:
         print(f"this is block {curr_block}")
-        print(f"\tskipping n-back routine")
+        print(f"\tskipping self-paced n-back routine")
         break
 
     # if it's one of the non-text blocks, though, prepare stimuli:
@@ -44,22 +43,70 @@ while True:
 
         ### Show instructions
         # set instruction text
-        instr_text = locals()["instr_" + curr_block]
-        # create text box
-        instr_text_stim = visual.TextStim(win,
-                                          text=instr_text,
-                                          height=0.025,  # font height relative to height of screen
-                                          pos=(0, 0.2),  # move up a bit
-                                          color="black")
-        # create ImageStim object
-        curr_instr_pic = visual.ImageStim(win,
-                                          size=(0.8, 0.3),
-                                          pos=(0, -0.2),
-                                          image=locals()["instr_pic_" + curr_block])  # set path to image here
+        if curr_block == "0back_single_training":
+            # create text boxes
+            instr_text_stim1 = visual.TextStim(win,
+                                               text=locals()["instr_0back_single_training1"],
+                                               height=0.025,  # font height relative to height of screen
+                                               pos=(0, 0.30),  # move instructions up a bit
+                                               color="black")
+            instr_text_stim2 = visual.TextStim(win,
+                                               text=locals()["instr_0back_single_training2"],
+                                               height=0.025,  # font height: 5° visual angle
+                                               pos=(0, -0.35),  # move instructions down a bit
+                                               color="black")
+            # create "empty" circle as stimulus
+            instr_colour_circle_stim = visual.Circle(win=win,
+                                                     radius=0.065,
+                                                     pos=(0, 0.1))  # move circle slightly down
+
+            # set current target colour as colour of circle:
+            instr_colour_circle_stim.fillColor = target_colours_list[0]
+
+            # create ImageStim object
+            curr_instr_pic = visual.ImageStim(win,
+                                              size=(0.55, 0.25),
+                                              pos=(0, -0.15),
+                                              image=locals()["instr_pic_0back"])  # set path to image here
+
+        else:
+            instr_text = locals()["instr_" + curr_block]
+            # create text box
+            instr_text_stim = visual.TextStim(win,
+                                              text=instr_text,
+                                              height=0.025,  # font height relative to height of screen
+                                              pos=(0, 0.2),  # move up a bit
+                                              color="black")
+            # create ImageStim object
+            curr_instr_pic = visual.ImageStim(win,
+                                              size=(0.8, 0.3),
+                                              pos=(0, -0.2),
+                                              image=locals()["instr_pic_" + curr_block])  # set path to image here
 
         # display the text & image on screen
-        if curr_block in ["1back_single_training2", "2back_single_training2"]:
+        if curr_block == "0back_single_training":
+            # show instructions on screen
+            instr_text_stim1.draw()
+            instr_text_stim2.draw()
+            instr_colour_circle_stim.draw()
+            curr_instr_pic.draw()
+            win.flip()
+            core.wait(3)  # wait for 3s before starting response window
 
+            # display the text & the circle on screen until Space is pressed
+            while True:
+                instr_text_stim1.draw()
+                instr_text_stim2.draw()
+                instr_colour_circle_stim.draw()
+                curr_instr_pic.draw()
+                win.flip()
+                # end screen if participant presses space
+                if event.getKeys(['space']):
+                    print("\t\tstart current block")
+                    skip_curr_block = False
+                    break
+
+        elif curr_block in ["1back_single_training2", "2back_single_training2"]:
             # draw instructions on screen
             instr_text_stim.draw()
             curr_instr_pic.draw()
@@ -80,6 +127,7 @@ while True:
                     print("\t\trepeat training block")
                     skip_curr_block = False
                     break
+
         # for regular blocks that can't be repeated:
         else:
             while True:
@@ -105,10 +153,10 @@ while True:
             # get n-back condition:
             curr_nback_cond = curr_block[0]  # get first character of block name
 
-            # if it is a 1 or a 2, set that as current n-back level:
-            if curr_nback_cond in ['1', '2']:
+            # if it is a 0, 1 or 2, set that as current n-back level:
+            if curr_nback_cond in ['0', '1', '2']:
                 curr_nback_cond == int(curr_nback_cond)
-            # if it's neither 1 nor 2, it has to be a block without n-back,
+            # if it's neither 0, 1 nor 2, it has to be a block without n-back,
             # so set curr_nback_cond to None
             else:
                 curr_nback_cond = None
@@ -118,10 +166,14 @@ while True:
             # get list with targets & list with colours
             curr_targets = all_target_lists[exp_block_counter]
             curr_colours = all_colour_lists[exp_block_counter]
-            # for current text nr, get text whose name = current text nr
-            curr_text = locals()[curr_text_nr]
 
             ### Start block loop
+            # depending on condition, create arrays for saving response
+            # times - we need that later for the paced task of the 1- and 2-back single blocks
+            if curr_block == "1back_single_main":
+                oneback_single_paced_durations = []
+            elif curr_block == "2back_single_main":
+                twoback_single_paced_durations = []
 
             # CREATE CLOCKS:
             my_block_clock = core.Clock()
@@ -147,7 +199,7 @@ while True:
             for trial_idx, curr_col in enumerate(curr_colours):
                 # print("current idx: " + str(trial_idx) + ", curr colour:" + curr_col)
 
-                ### prepare & show current word:
+                ### prepare & show current trial:
                 my_trial_clock.reset()  # start trial clock
                 onset_time = my_trial_clock.getTime()
 
@@ -236,6 +288,16 @@ while True:
                             # end experiment
                             core.quit()
 
+                    # Check for timeout - if more than 1.5 or 2 seconds have passed, move to the next trial
+                    if my_trial_clock.getTime() - trial_start_time >= 1.5 and curr_block in [
+                        "Oback_single_training", "1back_single_training1", "1back_single_training2", "1back_single_main"]:
+                        curr_duration = 1500
+                        continue_trial = False
+                    elif my_trial_clock.getTime() - trial_start_time >= 2 and curr_block in [
+                        "2back_single_training1", "2back_single_training2", "2back_single_main"]:
+                        curr_duration = 2000
+                        continue_trial = False
+
                 ### end trial
                 # print("end trial")
 
@@ -275,6 +337,13 @@ while True:
                 # start a new row in the csv
                 thisExp.nextEntry()
 
+                # depending on condition, save response times and words in previously created arrays
+                # we need that later for the paced reading tasks
+                if curr_block == "1back_single_main":
+                    oneback_single_paced_durations.append(curr_duration)
+                elif curr_block == "2back_single_main":
+                    twoback_single_paced_durations.append(curr_duration)
+
                 ### IF TESTING MODE ENABLED: end loop after 4 trials
                 if expInfo['testing_mode'] == "yes":
                     if trial_idx == 3:
@@ -289,7 +358,7 @@ while True:
 
         # add 1 to the block counter to go load the next block
         exp_block_counter = exp_block_counter + 1
-        print(f"\tGoing to block {exp_block_counter + 1}/15 now!")
+        print(f"\tGoing to block {exp_block_counter + 1}/20 now!")
 
 # go to next routine
 # print("going to next routine")

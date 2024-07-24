@@ -17,7 +17,7 @@ curr_block = all_blocks[exp_block_counter]
 if curr_block in ["Reading_Baseline_main_no_click", "Reading_Baseline_training_no_click"]:
 
     # exclude all RTs where participant was way too fast (< 50 ms) or
-    # way too slow (> 2s), also remove the corresponding words from vis_task_words
+    # too slow (> 2s)
     print("\tBL_paced_durations:", BL_paced_durations)
     print("\tBL_paced_words:", BL_paced_words)
 
@@ -46,6 +46,39 @@ if curr_block in ["Reading_Baseline_main_no_click", "Reading_Baseline_training_n
 
     # save this in the output csv:
     thisExp.addData('RT_per_letter_baseline', RT_per_letter_baseline)
+
+elif curr_block in ["0back_dual_main_no_click"]:
+
+    # exclude all RTs where participant was way too fast (< 50 ms) or
+    # too slow (> 2s)
+    print("\t0back_paced_durations:", zeroback_paced_durations)
+    print("\t0back_paced_words:", zeroback_paced_words)
+
+    filtered_durations_0back = []
+    filtered_words_0back = []
+    for duration, word in zip(zeroback_paced_durations, zeroback_paced_words):
+        if 50 <= duration <= 1500:
+            filtered_durations_0back.append(duration)
+            filtered_words_0back.append(word)
+    # print("\tfiltered_durations_BL:", filtered_durations_BL)
+    # print("\tfiltered_words_BL:", filtered_words_BL)
+
+    # Now get number of letters (not words, I want to know how fast they read 1 letter on average!):
+    letters_total_0back = sum(len(word) for word in filtered_words_0back)
+    print("\tletters_total_0back:", letters_total_0back)
+    # also get time it took in total to read them all:
+    reading_time_total_0back = sum(filtered_durations_0back)  # in ms
+
+    # Now check how many words / min they read on average.
+    # reading_speed_wpm = words_total / (reading_time_total/60000)
+    # print("reading speed in words / min:" + str(reading_speed_wpm))
+
+    # Check average RT / letter
+    RT_per_letter_0back = reading_time_total_0back / letters_total_0back
+    print("\taverage RT per letter in ms 0-back:", RT_per_letter_0back)
+
+    # save this in the output csv:
+    thisExp.addData('RT_per_letter_0back', RT_per_letter_0back)
 
 elif curr_block in ["1back_dual_main_no_click"]:
 
@@ -83,7 +116,7 @@ elif curr_block in ["1back_dual_main_no_click"]:
 elif curr_block in ["2back_dual_main_no_click"]:
 
     # exclude all RTs where participant was way too fast (< 50 ms) or
-    # way too slow (> 2.5s), also remove the corresponding words from vis_task_words
+    # way too slow (> 2s), also remove the corresponding words from vis_task_words
     print("\t2back_paced_durations:", twoback_paced_durations)
     print("\t2back_paced_words:", twoback_paced_words)
 
@@ -134,9 +167,10 @@ curr_block = all_blocks[exp_block_counter]
 # Also, if current block is a non-text block, skip this routine.
 if curr_block in ["click_training", "1back_single_training1", "1back_single_training2",
                   "2back_single_training1", "2back_single_training2",
-                  "Reading_Baseline_main_click", "1back_dual_main_click", "2back_dual_main_click", "Reading_Baseline_training_click"]:
+                  "Reading_Baseline_main_click", "1back_dual_main_click", "2back_dual_main_click", "Reading_Baseline_training_click",
+                  "1back_single_main_no_click", "2back_single_main_no_click", "0back_single_training", "0back_dual_main_click"]:
     print(f"this is block {curr_block}")
-    print("\tskipping paced routine")
+    print("\tskipping paced text routine")
     # skip questions & end current routine
     skip_questions_paced = True
     continueRoutine = False
@@ -225,7 +259,8 @@ elif curr_block == "Reading_Baseline_training_no_click":
     win.flip()
 
 # if it's one of the "normal" main blocks, prepare main block stimuli:
-elif curr_block in ["Reading_Baseline_main_no_click", "1back_dual_main_no_click", "2back_dual_main_no_click"]:
+elif curr_block in ["Reading_Baseline_main_no_click", "0back_dual_main_no_click",
+                    "1back_dual_main_no_click", "2back_dual_main_no_click"]:
     print(f"start preparing block {curr_block}")
 
     # keep background ivory
@@ -233,7 +268,7 @@ elif curr_block in ["Reading_Baseline_main_no_click", "1back_dual_main_no_click"
     win.flip()
 
     ### Show instructions
-    # only add image, if it's a 1- or 2-back block where participants have to press "c"
+    # only add image, if it's a 0-, 1- or 2-back block where participants have to press "c"
     if curr_block == "Reading_Baseline_main_no_click":
 
         # set instruction text
@@ -286,6 +321,89 @@ elif curr_block in ["Reading_Baseline_main_no_click", "1back_dual_main_no_click"
                 curr_durations.append(maximum_duration)
 
         print(f"\tdurations for paced baseline block: {curr_durations}")
+
+        ### change background colour
+        win.setColor(dark_bg_col, colorSpace='rgb')
+        win.flip()
+
+    elif curr_block == "0back_dual_main_no_click":
+        # create text boxes
+        instr_text_stim1 = visual.TextStim(win,
+                                           text=locals()["instr_0back_dual_main_no_click1"],
+                                           height=0.025,
+                                           pos=(0, 0.3),  # move instructions up a bit
+                                           color="black")
+        instr_text_stim2 = visual.TextStim(win,
+                                           text=locals()["instr_0back_dual_main_no_click2"],
+                                           height=0.025,
+                                           pos=(0, -0.35),  # move instructions down a bit
+                                           color="black")
+        # create "empty" circle as stimulus
+        instr_colour_circle_stim = visual.Circle(win=win,
+                                                 radius=0.065,
+                                                 pos=(0, 0.1))  # move circle slightly down
+
+        # set current target colour as colour of circle:
+        instr_colour_circle_stim.fillColor = target_colours_list[2]
+
+        # create ImageStim object
+        curr_instr_pic = visual.ImageStim(win,
+                                          size=(0.55, 0.25),
+                                          pos=(0, -0.15),
+                                          image=locals()["instr_pic_0back"])  # set path to image here
+
+        # show instructions
+        win.setColor(light_bg_col, colorSpace='rgb')
+        instr_text_stim1.draw()
+        instr_text_stim2.draw()
+        instr_colour_circle_stim.draw()
+        curr_instr_pic.draw()
+        win.flip()
+        core.wait(3)  # wait for 3s before starting response window
+
+        # display the text & the circle on screen until Space is pressed
+        while True:
+            instr_text_stim1.draw()
+            instr_text_stim2.draw()
+            instr_colour_circle_stim.draw()
+            curr_instr_pic.draw()
+            win.flip()
+            # end screen if participant presses space
+            if event.getKeys(['space']):
+                break
+
+        # get text nr:
+        curr_text_nr = all_texts_nrs_list[exp_block_counter]
+        curr_text = locals()[curr_text_nr]
+
+        # compute RTs using participant's average reading speed / letter
+        # we define a minimum and a maximum duration for each word
+        # the minimum is based on 5 x RT per letter in the respective condition
+        # the max duration is based on a time-out of 1.5 s in the 0-back condition
+        minimum_duration = 5 * RT_per_letter_0back
+        maximum_duration = 1500
+        curr_durations = []
+        for word in curr_text:
+            # this is an absolute value based on estimates of how long you need to feel comfortable reading a
+            # word on screen in a paced task
+            # duration = RT_per_letter_baseline * math.log((len(word))) + 300 more
+            # more flexible solution:
+            duration = RT_per_letter_0back * math.log((len(word))) + 4 * RT_per_letter_0back
+            if duration < maximum_duration:
+                curr_durations.append(max(duration, minimum_duration))
+            else:
+                curr_durations.append(maximum_duration)
+
+        # Latency factor of an incremental increase (increment per trial = 3 ms) added over duration of entire
+        # block assuming that participants get tired of the course of a 300 words block and thus need a bit more
+        # time:
+        # Increment of 3 ms per trial
+        increment_per_trial = 3
+        for i in range(len(curr_durations)):
+            # Calculate incremental increase for current trial
+            increment = i * increment_per_trial
+            # Add incremental increase to current trial's duration
+            curr_durations[i] += increment
 
         ### change background colour
         win.setColor(dark_bg_col, colorSpace='rgb')
@@ -361,7 +479,7 @@ elif curr_block in ["Reading_Baseline_main_no_click", "1back_dual_main_no_click"
 
         elif curr_block == "2back_dual_main_no_click":
             minimum_duration = 5 * RT_per_letter_2bck
-            maximum_duration = 2500
+            maximum_duration = 2000
             curr_durations = []
             for word in curr_text:
                 # this is an absolute value based on estimates of how long you need to feel comfortable reading a word on
@@ -395,8 +513,8 @@ elif curr_block in ["Reading_Baseline_main_no_click", "1back_dual_main_no_click"
     # get n-back condition:
     curr_nback_cond = curr_block[0]  # get first character of block name
 
-    # if it is a 1 or a 2, set that as current n-back level:
-    if curr_nback_cond in ['1', '2']:
+    # if it is a 0, 1 or 2, set that as current n-back level:
+    if curr_nback_cond in ['0', '1', '2']:
         curr_nback_cond == int(curr_nback_cond)
     # if it's neither 1 nor 2, it has to be a block without n-back,
     # so set curr_nback_cond to None
@@ -413,8 +531,8 @@ elif curr_block in ["Reading_Baseline_main_no_click", "1back_dual_main_no_click"
     # curr_text = locals()[curr_text_nr]
 
 ### Start block loop
-if curr_block in ["Reading_Baseline_training_no_click", "Reading_Baseline_main_no_click", "1back_dual_main_no_click",
-                  "2back_dual_main_no_click"]:
+if curr_block in ["Reading_Baseline_training_no_click", "Reading_Baseline_main_no_click", "0back_dual_main_no_click",
+                  "1back_dual_main_no_click", "2back_dual_main_no_click"]:
 
     # create empty text stimulus
     stim = visual.TextStim(win=win,

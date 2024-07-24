@@ -1,4 +1,5 @@
 ### Stimulus settings
+import random
 
 # measure frame rate (in Hz)
 # frame_rate = win.getActualFrameRate() # frame rate in Hz
@@ -47,7 +48,7 @@ print("Preparing experiment with n-back colours:", colours)
 ### Shuffle order of texts
 print("shuffle texts")
 # collect the text IDs in lists so I know which text was shown
-all_main_texts_nrs_list = ["text_01", "text_02", "text_03", "text_04", "text_05", "text_06"]
+all_main_texts_nrs_list = ["text_01", "text_02", "text_03", "text_04", "text_05", "text_06", "text_07", "text_08"]
 # shuffle text numbers
 random.shuffle(all_main_texts_nrs_list)
 
@@ -63,58 +64,73 @@ for t_idx, t in enumerate(all_main_texts_nrs_list):
     # Append 1 empty text number before text (for the reading BL training) and one after for the paced reading BL training
     if t_idx == 0:
         all_texts_nrs_list = all_texts_nrs_list + ["", t, ""]
+    # append one text for paced baseline reading, then one empty block for 0-back training
     elif t_idx == 1:
-        all_texts_nrs_list = all_texts_nrs_list + [t, "", ""]
+        all_texts_nrs_list = all_texts_nrs_list + [t, ""]
+    # one text for 0back dual block with click, one text for 0-back no click
     elif t_idx == 2:
-        all_texts_nrs_list = all_texts_nrs_list + [t, "", ""]
-    # all following texts are main blocks and can be appended to all_texts_nrs_list
-    elif t_idx > 2:
+        all_texts_nrs_list = all_texts_nrs_list + [t]
+    # append one text for self-paced dual block 0-back,
+    # then two empty blocks for n-back training, then two blocks for single n-back blocks (self-paced and paced)
+    elif t_idx == 3:
+        all_texts_nrs_list = all_texts_nrs_list + [t, "", "", "", ""]
+    # one text for paced dual block, then again four empty blocks for other n-back condition
+    elif t_idx == 4:
+        all_texts_nrs_list = all_texts_nrs_list + [t]
+    elif t_idx == 5:
+        all_texts_nrs_list = all_texts_nrs_list + [t, "", "", "", ""]
+    # then finally append rest of texts (two texts)
+    elif t_idx > 5:
         all_texts_nrs_list.append(t)
 
 print(all_texts_nrs_list)
 
 ### Set order of blocks
+# Currently 20 blocks in total
 print("set block order")
 
 # this always comes first in the experiment
 Reading_BL = ["Reading_Baseline_training_click", "Reading_Baseline_main_click", "Reading_Baseline_training_no_click",
-              "Reading_Baseline_main_no_click"]  # "click_training"
+              "Reading_Baseline_main_no_click", "0back_single_training", "0back_dual_main_click", "0back_dual_main_no_click"]
 
 # then you get both n-back conditions with trainings (which of them is first is randomized)
-oneback = ["1back_single_training1", "1back_single_training2", "1back_dual_main_click"]
-twoback = ["2back_single_training1", "2back_single_training2", "2back_dual_main_click"]
+oneback = ["1back_single_training1", "1back_single_training2", "1back_single_main", "1back_single_main_no_click",
+           "1back_dual_main_click", "1back_dual_main_no_click"]
+twoback = ["2back_single_training1", "2back_single_training2", "2back_single_main", "2back_single_main_no_click",
+           "2back_dual_main_click", "2back_dual_main_no_click"]
 
 # shuffle the order of the 2 lists
-main_blocks1 = [oneback, twoback]
-random.shuffle(main_blocks1)
+main_blocks = [oneback, twoback]
+random.shuffle(main_blocks)
 
 # flatten nested list
-main_blocks1 = flatten_list(main_blocks1)
+main_blocks = flatten_list(main_blocks)
 
-# now shuffle order of the last 6 main blocks:
-main_blocks2 = ["1back_dual_main_no_click", "2back_dual_main_no_click"]
-random.shuffle(main_blocks2)
+pseudo_block = ["Reading_pseudotext_no_click"]
 
 # put them all together:
 # global all_blocks
-all_blocks = Reading_BL + main_blocks1 + main_blocks2
+all_blocks = Reading_BL + main_blocks + pseudo_block
+all_blocks = flatten_list(all_blocks)
 print(all_blocks)
+
 ### Create n-back colour lists for all blocks
 
 print("create n-back colour lists")
-# The reading bl training text has 159 trials.
+# The reading bl training text has 55 trials.
+# the reading bl main has 91 words
+# reading training no click has 58 words
+# then main reading bl no click with 91 words
+# then 0-back short training with 20 trials
+# then 0-back dual self-paced and paced block with 91 trials and 15 targets each
 
-# The click training has 6 trials.
+# Then we have 2 short training blocks à 20 trials each (5 targets) for n-back
+# then two single n-back blocks with 90 trials each (15 targets)
+# then two dual blocks with 91 trials each (15 targets)
+# then again two short training blocks, two single n-back blocks with 90 trials each (15 targets), and two dual blocks with 91 trials (15 targets)
+# and finally, one pseudotext block
 
-# Then we also have 4 short training blocks à 20 trials each (5 targets)
-# 4 * single training
-
-# There are 6 dual-task main blocks à 91 stimuli each (15 targets)
-# reading bl * 2
-# 1-back * 2
-# 2-back * 2
-
-# --> all in all, 12 blocks
+# --> all in all, 20 blocks
 
 # So for every block, build a list with colour codes containing the right amount of targets.
 # The function is defined in another script bc it's super long,
@@ -122,18 +138,21 @@ print("create n-back colour lists")
 
 # First, create list with length of all texts. The length of the blocks is
 # always in the same order, only the conditions change.
-blocks_textlen = [159, 91, 146, 91,  # reading bl blocks
-                  20, 20, 91,  # main block 1 trainings & dual-tasks (300 trials)
-                  20, 20, 91,  # main block 2 trainings & dual-tasks (300 trials)
-                  91, 91]  # main blocks 2
-blocks_target_counts = [25, 15, 25, 15,  # reading bl blocks
-                        5, 5, 15,  # main block 1 trainings & main block
-                        5, 5, 15,  # main block 2 trainings & main block
-                        15, 15]
-
+blocks_textlen = [60, 91, 60, 91,
+                  20, 91, 91,
+                  20, 20, 90, 90, 91, 91,
+                  20, 20, 90, 90, 91, 91,
+                  100]
+blocks_target_counts = [15, 15, 15, 15,
+                        5, 15, 15,
+                        5, 5, 15, 15, 15, 15,
+                        5, 5, 15, 15, 15, 15,
+                        15]
 # Now loop this list. Check which condition we have there and the create colour list for each text.
 all_colour_lists = []
 all_target_lists = []
+target_colours_list = []
+# target_colour = np.random.choice(colours)
 for block_idx, block_length in enumerate(blocks_textlen):
     # get 1st letter of block name - that tells us the condition
     block_cond = all_blocks[block_idx][0]
@@ -143,24 +162,47 @@ for block_idx, block_length in enumerate(blocks_textlen):
     # global curr_nback_level
     if block_cond == "R":
         curr_nback_level = 1
-    elif block_cond == "c":
-        curr_nback_level = 1
+    elif block_cond == "0":
+        curr_nback_level = 0
     elif block_cond == "1":
         curr_nback_level = 1
     else:
         curr_nback_level = 2
 
     # generate colour list for current block
-    # global curr_colours
-    curr_colours = create_nback_stimlist(nback_level=curr_nback_level,
+    if curr_nback_level == 0:
+        # generate random colour list for 0-back:
+        # Filter out the colours that have already been used as target colours
+        available_colours = [colour for colour in colours if colour not in target_colours_list]
+
+        # Shuffle the available colours to randomize the selection
+        random.shuffle(available_colours)
+
+        # Select the first colour from the shuffled available colours as the target colour
+        target_colour = available_colours[0]
+
+        print("curr target colour:", target_colour)
+        curr_colours = create_0back_stimlist(target_colour=target_colour,
+                                             nr_targets=blocks_target_counts[block_idx],
+                                             colour_codes=colours,
+                                             nr_words=blocks_textlen[block_idx])
+        # Get list of targets / non-targets
+        curr_targets = [colour == target_colour for colour in curr_colours]
+
+        # Add the selected target colour to the list of target colours
+        target_colours_list.append(target_colour)
+
+    elif curr_nback_level in [1, 2]:
+        # global curr_colours
+        curr_colours = create_nback_stimlist(nback_level=curr_nback_level,
                                          colour_codes=colours,
                                          story=["x"] * block_length,
                                          target_abs_min=blocks_target_counts[block_idx],
                                          target_abs_max=blocks_target_counts[block_idx],
                                          zeroback_target=None)
 
-    # get list of targets / non-targets
-    curr_targets = get_targets(stim_list=curr_colours,
+        # get list of targets / non-targets
+        curr_targets = get_targets(stim_list=curr_colours,
                                nback_level=curr_nback_level)
 
     # add to bigger lists
