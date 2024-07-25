@@ -1,5 +1,5 @@
 ### Stimulus settings
-import random
+# import random
 
 # set colours you want to use for background:
 # light_bg_col_hex = "#FDFBF0" # ivory instructions background
@@ -76,25 +76,31 @@ print("set block order for runs")
 # always starts with single reading (BL + PS)
 single_reading = ["Reading_Baseline_main_no_click", "Reading_pseudotext_no_click"]
 
+run1_blocks = single_reading
+print("Blocks for run1:", run1_blocks)
+
+# RUN 2
 # then you get both single n-back conditions
-nback = ["1back_single_main", "1back_single_main", "2back_single_main", "2back_single_main"]
-random.shuffle(nback)
+nback1 = ["1back_single_main_no_click", "2back_single_main_no_click"]
+random.shuffle(nback1)
 
-run1_blocks = single_reading + nback
+nback2 = ["1back_single_main_no_click", "2back_single_main_no_click"]
+random.shuffle(nback2)
 
-# RUN 2 & 3
+run2_blocks = nback1 + nback2
+print("Blocks for run2:", run2_blocks)
+
+# RUNS 3 & 4
 # two dual-task blocks, order randomized
 dualtask = ["1back_dual_main_no_click", "2back_dual_main_no_click"]
 random.shuffle(dualtask)
 
-run2_blocks = dualtask
+run3_blocks = dualtask
+print("Blocks for run3:", dualtask)
 
 random.shuffle(dualtask)
-run3_blocks = dualtask
-
-print(run_1_blocks)
-print(run2_blocks)
-print(run3_blocks)
+run4_blocks = dualtask
+print("Blocks for run4:", dualtask)
 
 ### Create n-back colour lists for all blocks
 
@@ -110,18 +116,15 @@ print("create n-back colour lists")
 # RUN 1
 # First, create list with length of all texts. The length of the blocks is
 # always in the same order, only the conditions change.
-blocks_textlen = [300, 100, # reading blocks
-                  90, 90, 90, 90]  # single n-back blocks
-
-blocks_target_counts = [25, 25,  # reading blocks
-                        20, 20, 20, 20]  # single n-back blocks
+blocks_textlen = [300, 100] # reading blocks
+blocks_target_counts = [25, 25]  # reading blocks
 
 # Now loop this list. Check which condition we have there and then create colour list for each text.
 run1_colour_lists = []
 run1_target_lists = []
 for block_idx, block_length in enumerate(blocks_textlen):
     # get 1st letter of block name - that tells us the condition
-    block_cond = run_1_blocks[block_idx][0]
+    block_cond = run1_blocks[block_idx][0]
 
     # for each condition, decide which n-back level we want to assign
     # For all no-n-back blocks, we use 1 (just for the colour list generation)
@@ -150,17 +153,52 @@ for block_idx, block_length in enumerate(blocks_textlen):
     run1_colour_lists.append(curr_colours)
     run1_target_lists.append(curr_targets)
 
-# RUNS 2 & 3
-# First, create list with length of all texts. The length of the blocks is
-# always in the same order, only the conditions change.
-blocks_textlen = [300, 300, 300, 300] # dual-task blocks
+# RUN 2
+blocks_textlen = [90, 90, 90, 90]  # single n-back blocks
+blocks_target_counts = [15, 15, 15, 15]
 
+# Now loop this list. Check which condition we have there and then create colour list for each text.
+run2_colour_lists = []
+run2_target_lists = []
+for block_idx, block_length in enumerate(blocks_textlen):
+    # get 1st letter of block name - that tells us the condition
+    block_cond = run2_blocks[block_idx][0]
+
+    # for each condition, decide which n-back level we want to assign
+    # For all no-n-back blocks, we use 1 (just for the colour list generation)
+    # global curr_nback_level
+    if block_cond == "R":
+        curr_nback_level = 1
+    elif block_cond == "1":
+        curr_nback_level = 1
+    else:
+        curr_nback_level = 2
+
+    # generate colour list for current block
+    # global curr_colours
+    curr_colours = create_nback_stimlist(nback_level=curr_nback_level,
+                                         colour_codes=colours,
+                                         story=["x"] * block_length,
+                                         target_abs_min=blocks_target_counts[block_idx],
+                                         target_abs_max=blocks_target_counts[block_idx],
+                                         zeroback_target=None)
+
+    # get list of targets / non-targets
+    curr_targets = get_targets(stim_list=curr_colours,
+                               nback_level=curr_nback_level)
+
+    # add to bigger lists
+    run2_colour_lists.append(curr_colours)
+    run2_target_lists.append(curr_targets)
+
+# RUNS 3 & 4
+blocks_textlen = [300, 300, 300, 300] # dual-task blocks
 blocks_target_counts = [50, 50, 50, 50]  # dual-task blocks
 
 # Now loop this list. Check which condition we have there and then create colour list for each text.
-dual_blocks = run2_blocks + run3_blocks
-run2_3_colour_lists = []
-run2_3_target_lists = []
+dual_blocks = run3_blocks + run4_blocks
+run3_4_colour_lists = []
+run3_4_target_lists = []
 for block_idx, block_length in enumerate(blocks_textlen):
     # get 1st letter of block name - that tells us the condition
     block_cond = dual_blocks[block_idx][0]
@@ -189,20 +227,28 @@ for block_idx, block_length in enumerate(blocks_textlen):
                                nback_level=curr_nback_level)
 
     # add to bigger lists
-    run2_3_colour_lists.append(curr_colours)
-    run2_3_target_lists.append(curr_targets)
+    run3_4_colour_lists.append(curr_colours)
+    run3_4_target_lists.append(curr_targets)
 
-run2_colour_lists = run2_3_colour_lists[0:2]
-run3_colour_lists = run2_3_colour_lists[2:4]
+run3_colour_lists = run3_4_colour_lists[0:2]
+run4_colour_lists = run3_4_colour_lists[2:4]
 
-run2_target_lists = run2_3_target_lists[0:2]
-run3_target_lists = run2_3_target_lists[2:4]
+run3_target_lists = run3_4_target_lists[0:2]
+run4_target_lists = run3_4_target_lists[2:4]
 
 print("------ finished preparing stimuli! ------")
 
 # ------------------------------------------
 
-# init block counter for the whole experiment
+# init block counter for the whole experiment and for each run
 exp_block_counter = 0
+# init block counter for run1 (two blocks in total)
+run1_block_counter = 0
+# init block counter for run2 (four blocks in total)
+run2_block_counter = 0
+# init block counter for run3 (two blocks in total)
+run3_block_counter = 0
+# init block counter for run4 (two blocks in total)
+run4_block_counter = 0
 
 print("starting experiment now!")

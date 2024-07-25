@@ -161,3 +161,4 @@ cython_debug/
 
 # Mac files
 .DS_Store
+.Rproj.user

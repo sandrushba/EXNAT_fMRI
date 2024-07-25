@@ -22,25 +22,15 @@ import random
 import pandas as pd
 # additional timing package (I know we have core.wait, but I also want this one)
 import time
+# for calculations
+import math
 
 # Get functions from my custom scripts:
 # import all texts and instructions
-from EXNAT3_texts_MC_Qs import instr_pic_path, instr_Reading_Baseline_training_click, \
-    instr_pic_Reading_Baseline_training_click, instr_Reading_Baseline_main_click, instr_pic_Reading_Baseline_main_click, \
-    instr_Reading_Baseline_main_no_click, instr_Reading_Baseline_training_no_click, instr_click_training, \
-    instr_pic_click_training, instr_1back_single_training1, \
-    instr_pic_1back_single_training1, instr_1back_single_training2, instr_pic_1back_single_training2, \
-    instr_1back_single_main, instr_pic_1back_single_main, instr_1back_dual_main_click, instr_pic_1back_dual_main_click, \
-    instr_1back_dual_main_no_click, instr_2back_single_training1, instr_pic_2back_single_training1, \
-    instr_2back_single_training2, instr_pic_2back_single_training2, instr_2back_single_main, \
-    instr_pic_2back_single_main, instr_2back_dual_main_click, instr_pic_2back_dual_main_click, \
-    instr_2back_dual_main_no_click, instr_pic_1back_dual_main_no_click, \
-    instr_pic_2back_dual_main_no_click, warning_sign, reading_bl_tr_text, reading_bl_tr_Q1, reading_bl_tr_Q1_ans, \
-    reading_bl_tr_Q1_corr, reading_bl_tr_Q2, reading_bl_tr_Q2_ans, reading_bl_tr_Q2_corr, reading_bl_tr_Q3, \
-    reading_bl_tr_Q3_ans, reading_bl_tr_Q3_corr, reading_bl_tr_text_no_click, reading_bl_tr_no_click_Q1, \
-    reading_bl_tr_no_click_Q1_ans, reading_bl_tr_no_click_Q1_corr, reading_bl_tr_no_click_Q2, \
-    reading_bl_tr_no_click_Q2_ans, reading_bl_tr_no_click_Q2_corr, reading_bl_tr_no_click_Q3, \
-    reading_bl_tr_no_click_Q3_ans, reading_bl_tr_no_click_Q3_corr, text_01, text_01_Q1, text_01_Q1_ans, text_01_Q1_corr, \
+from EXNAT3_texts_MC_Qs import (instr_pic_path, instr_Reading_Baseline_main_no_click, instr_Reading_pseudotext_no_click, \
+    instr_1back_single_main_no_click, instr_pic_1back_single_main_no_click, instr_1back_dual_main_no_click, \
+    instr_pic_1back_dual_main_no_click, instr_2back_single_main_no_click, instr_pic_2back_single_main_no_click, instr_2back_dual_main_no_click, \
+    instr_pic_2back_dual_main_no_click, warning_sign, text_01, text_01_Q1, text_01_Q1_ans, text_01_Q1_corr, \
     text_01_Q2, text_01_Q2_ans, text_01_Q2_corr, text_01_Q3, text_01_Q3_ans, text_01_Q3_corr, text_02, text_02_Q1, \
     text_02_Q1_ans, text_02_Q1_corr, text_02_Q2, text_02_Q2_ans, text_02_Q2_corr, text_02_Q3, text_02_Q3_ans, \
     text_02_Q3_corr, text_03, text_03_Q1, text_03_Q1_ans, text_03_Q1_corr, text_03_Q2, text_03_Q2_ans, text_03_Q2_corr, \
@@ -53,7 +43,8 @@ from EXNAT3_texts_MC_Qs import instr_pic_path, instr_Reading_Baseline_training_c
     text_08_Q2, text_08_Q2_ans, text_08_Q2_corr, text_08_Q3, text_08_Q3_ans, text_08_Q3_corr, text_09, text_09_Q1, \
     text_09_Q1_ans, text_09_Q1_corr, text_09_Q2, text_09_Q2_ans, text_09_Q2_corr, text_09_Q3, text_09_Q3_ans, \
     text_09_Q3_corr, text_10, text_10_Q1, text_10_Q1_ans, text_10_Q1_corr, text_10_Q2, text_10_Q2_ans, text_10_Q2_corr, \
-    text_10_Q3, text_10_Q3_ans, text_10_Q3_corr
+    text_10_Q3, text_10_Q3_ans, text_10_Q3_corr, pseudo_text_01, pseudo_text_02, pseudo_text_03, pseudo_text_04, pseudo_text_05, \
+    pseudo_text_06, pseudo_text_07, pseudo_text_08, pseudo_text_09)
 
 # import some additional functions I wrote for the experiment:
 # from EXNAT3_study_components import change_bg_colour

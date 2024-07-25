@@ -15,209 +15,39 @@ Version: July 2024
 # for each block, set instruction texts + path to instruction image you want to show:
 instr_pic_path = "Stimuli_and_Resources/EXNAT3_Instr_Pics/"
 
-instr_Reading_Baseline_training_click = "Willkommen zum Experiment!\n\n\nIm folgenden Block werden Ihnen einzelne " \
-                                        "Wörter angezeigt, die einen zusammenhängenden Text bilden.\n\nBitte lesen " \
-                                        "Sie den Text, indem Sie mithilfe der Leertaste von Wort zu Wort " \
-                                        "weiterklicken. Bitte reagieren Sie stets so schnell wie möglich!\n\nDie " \
-                                        "Schriftfarbe der Wörter variiert, Sie können das jedoch " \
-                                        "einfach ignorieren.\n\nAuf den Text folgen drei Fragen zum Textinhalt. " \
-                                        "\n\nSie können die Aufgabe nun in einem kurzen Übungsblock testen. Bitte " \
-                                        "drücken Sie die Leertaste, um den Übungsblock zu starten. "
-instr_pic_Reading_Baseline_training_click = instr_pic_path + "BL_single.jpeg"
+instr_Reading_Baseline_main_no_click = "Herzlich Willkommen zum Experiment!\n\n\nLESEN\n\nIm " \
+                                       "folgenden Block lesen Sie einen Text. Die Wörter werden " \
+                                       "von allein abgespielt. Am Ende des Texts werden Ihnen Fragen zum Inhalt " \
+                                       "gestellt. Wählen Sie mithilfe der vier Tasten die richtige Antwort aus."
 
-instr_Reading_Baseline_main_click = "LESEN MIT TASTENDRUCK\n\n\nGut gemacht!\n\nIm nun folgenden Block wird Ihnen ein längerer Text " \
-                                    "angezeigt.\n\nBitte lesen Sie den Text, indem Sie mithilfe der Leertaste von " \
-                                    "Wort zu Wort weiterklicken. Bitte ignorieren Sie wie eben auch die sich " \
-                                    "verändernde Schriftfarbe.\n\nAm Ende des Texts werden Ihnen wieder Fragen zum " \
-                                    "Inhalt gestellt.\n\nBitte drücken Sie die Leertaste, um den Block zu starten. "
-instr_pic_Reading_Baseline_main_click = instr_pic_path + "BL_single.jpeg"
+instr_Reading_pseudotext_no_click = "LESEN\n\n\nGut gemacht!\n\n" \
+                                       "Nun folgt ein Block mit Wörtern, die es gar nicht gibt.\n" \
+                                        "Bitte lesen Sie den Text dennoch aufmerksam mit. Sie müssen sonst nichts tun."
 
-instr_Reading_Baseline_training_no_click = "LESEN OHNE TASTENDRUCK\n\n\nSehr gut!\n\nNun ändert sich die Aufgabe " \
-                                           "etwas:\nIm folgenden Block werden die Wörter von " \
-                                           "allein abgespielt. Sie müssen also diesmal nicht die Leertaste " \
-                                           "drücken, lesen Sie aber bitte trotzdem den Text mit. Am Ende des Texts " \
-                                           "werden Ihnen wieder Fragen zum Inhalt gestellt.\n\nSie können die " \
-                                           "Aufgabe kurz üben, bevor der Hauptblock startet. Drücken Sie dafür die " \
-                                           "Leertaste."
-instr_pic_vis_task = instr_pic_path + "vis_task.jpeg"
+instr_1back_single_main_no_click = "1-ZURÜCK\n\n\nGut gemacht!\n\nIm folgenden Block werden " \
+                                 "farbige Rechtecke abgespielt." \
+                                 "\n\nBitte drücken Sie so schnell wie möglich die Zieltaste (Zeigefinger), wenn die Farbe des " \
+                                 "aktuellen Rechtecks mit der des vorherigen Rechtecks (1 zurück) übereinstimmt."
+instr_pic_1back_single_main_no_click = instr_pic_path + "fMRI_target_button.png"
 
-instr_Reading_Baseline_main_no_click = "LESEN OHNE TASTENDRUCK\n\n\nGut gemacht!\n\nIm nun folgenden Block werden " \
-                                       "die Wörter erneut " \
-                                       "von allein abgespielt. Sie müssen also nicht die Leertaste drücken. " \
-                                       "Der Text ist nun wieder etwas länger. " \
-                                       "Am Ende des Texts werden Ihnen auch wieder Fragen zum Inhalt " \
-                                       "gestellt.\n\nBitte " \
-                                       "drücken Sie die " \
-                                       "Leertaste, um den Block zu starten."
+instr_1back_dual_main_no_click = "LESEN MIT 1-ZURÜCK\n\n\nGut gemacht!\n\nIm folgenden Block lesen Sie wieder einen Text. " \
+                                 "\n\nBitte drücken Sie so schnell wie möglich die Zieltaste (Zeigefinger), wenn die Farbe des " \
+                                 "aktuellen Worts mit der des vorherigen Worts (1 zurück) übereinstimmt."
+instr_pic_1back_dual_main_no_click = instr_pic_path + "fMRI_target_button.png"
 
-instr_Reading_pseudotext_no_click = "LESEN OHNE TASTENDRUCK\n\n\nGut gemacht!\n\nIm letzten Block dieser Übung werden " \
-                                       "die Wörter erneut " \
-                                       "von allein abgespielt. Allerdings handelt es sich diesmal um Wörter, die es gar nicht " \
-                                        "gibt. Bitte lesen Sie den Text dennoch aufmerksam mit. Sie müssen sonst nichts tun. " \
-                                        "\n\nBitte " \
-                                       "drücken Sie die " \
-                                       "Leertaste, um den Block zu starten."
+instr_2back_single_main_no_click = "2-ZURÜCK\n\n\nGut gemacht!\n\nIm folgenden Block werden " \
+                                 "farbige Rechtecke abgespielt." \
+                                 "\n\nBitte drücken Sie so schnell wie möglich die Zieltaste (Zeigefinger), wenn die Farbe des " \
+                                 "aktuellen Rechtecks mit der des vorletzten Rechtecks (2 zurück) übereinstimmt."
+instr_pic_2back_single_main_no_click = instr_pic_path + "fMRI_target_button.png"
 
-instr_click_training = "Instruktionen\n\n\nNun kommt eine neue Aufgabe:\nIhnen werden gleich nacheinander " \
-                       "verschiedenfarbige Rechtecke gezeigt. Wie auch eben bei der Leseaufgabe können Sie mit der " \
-                       "Leertaste weiter klicken.\n\nBitte drücken Sie die Leertaste um den Übungsblock zu starten. "
-instr_pic_click_training = instr_pic_path + "BL_single.jpeg"
-
-instr_1back_single_training1 = "ÜBUNG 1-ZURÜCK\n\n\nIn den nun folgenden Blöcken geht es darum, auf Wiederholungen " \
-                               "der Farben zu achten:\n\nBitte drücken Sie die Taste C auf Ihrer Tastatur, " \
-                               "wenn die aktuelle Farbe die gleiche ist wie die des vorherigen Rechtecks (1 " \
-                               "zurück).\n\nWie zuvor auch können Sie mithilfe der Leertaste weiterklicken.\n\nBitte " \
-                               "drücken Sie die Leertaste, um den Übungsblock zu starten. "
-instr_pic_1back_single_training1 = instr_pic_path + "1back_rect.jpeg"
-
-instr_1back_single_training2 = "Gut gemacht!\n\nMöchten Sie die Übung noch einmal wiederholen oder möchten " \
-                               "Sie mit dem Hauptblock fortfahren?\nBitte drücken Sie die Taste W, wenn sie die Übung " \
-                               "wiederholen möchten oder die Leertaste, wenn Sie fortfahren möchten. "
-instr_pic_1back_single_training2 = instr_pic_path + "1back_rect.jpeg"
-
-instr_1back_single_main = "1-ZURÜCK\n\n\nNun folgt ein etwas längerer Block, die Aufgabe bleibt aber die " \
-                          "Gleiche:\n\nBitte drücken Sie die Taste C, wenn die aktuelle Farbe die gleiche ist wie die " \
-                          "des vorigen Rechtecks (1 zurück).\n\nWie auch zuvor können Sie mithilfe der Leertaste zum " \
-                          "nächsten Rechteck weiterklicken.\n\nBitte drücken Sie die Leertaste, um den Block zu " \
-                          "starten. "
-instr_pic_1back_single_main = instr_pic_path + "1back_rect.jpeg"
-
-instr_1back_dual_main_click = "LESEN MIT 1-ZURÜCK UND TASTENDRUCK\n\n\nNun wird das Lesen mit der Gedächtnisaufgabe " \
-                              "kombiniert. Sie lesen einen Text Wort für Wort und klicken mithilfe der Leertaste " \
-                              "weiter zum nächsten Wort. Gleichzeitig sollen Sie auf die Farben der Wörter achten: " \
-                              "\n\nBitte drücken Sie die Taste C, " \
-                              "wenn die Farbe des aktuellen Worts mit der des vorherigen Worts (1 zurück) " \
-                              "übereinstimmt.\n\n " \
-                              "Denken Sie daran: Reagieren Sie so schnell wie möglich!\n\n " \
-                              "Am Ende des Blocks werden Ihnen wieder Verständnisfragen zum Inhalt des " \
-                              "Texts gestellt.\n\nBitte drücken Sie die Leertaste, um den Block zu starten. "
-instr_pic_1back_dual_main_click = instr_pic_path + "1back.jpeg"
-
-instr_1back_dual_main_no_click = "LESEN MIT 1-ZURÜCK OHNE TASTENDRUCK\n\n\nGut gemacht!\n\nIm folgenden Block werden " \
-                                 "die Wörter " \
-                                 "wieder von allein abgespielt. Sie müssen also nicht die Leertaste drücken.\n\nBitte " \
-                                 "drücken Sie aber so schnell wie möglich die Taste C, wenn die Farbe des " \
-                                 "aktuellen Worts mit der des vorherigen Worts (1 zurück) übereinstimmt.\n\nDrücken " \
-                                 "Sie die Leertaste, um den Block zu starten."
-instr_pic_1back_dual_main_no_click = instr_pic_path + "1back.jpeg"
-
-instr_2back_single_training1 = "ÜBUNG 2-ZURÜCK\n\n\nIn den nun folgenden Blöcken geht es darum, auf Wiederholungen " \
-                               "der Farben zu achten:\n\nBitte drücken Sie die Taste C auf Ihrer Tastatur, " \
-                               "wenn die aktuelle Farbe die gleiche ist wie die des vorletzten Rechtecks (2 zurück). " \
-                               "Wie zuvor können Sie mithilfe der Leertaste weiterklicken.\n\nBitte drücken Sie " \
-                               "die Leertaste, um den Übungsblock zu starten. "
-instr_pic_2back_single_training1 = instr_pic_path + "2back_rect.jpeg"
-
-instr_2back_single_training2 = "Gut gemacht!\n\nMöchten Sie die Übung noch einmal wiederholen oder möchten " \
-                               "Sie mit dem Hauptblock fortfahren?\nBitte drücken Sie die Taste W, wenn sie die Übung " \
-                               "wiederholen möchten oder die Leertaste, wenn Sie fortfahren möchten. "
-instr_pic_2back_single_training2 = instr_pic_path + "2back_rect.jpeg"
-
-instr_2back_single_main = "2-ZURÜCK\n\n\nNun folgt ein etwas längerer Block, die Aufgabe bleibt aber die " \
-                          "Gleiche:\n\nBitte drücken Sie die Taste C, wenn die aktuelle Farbe die gleiche ist wie die " \
-                          "des vorletzten Rechtecks (2 zurück).\n\nWie auch zuvor können Sie mithilfe der Leertaste " \
-                          "zum nächsten Rechteck weiterklicken. Denken Sie daran: Reagieren Sie so schnell wie möglich!\n\nBitte drücken Sie die Leertaste, um den Block zu " \
-                          "starten. "
-instr_pic_2back_single_main = instr_pic_path + "2back_rect.jpeg"
-
-instr_2back_dual_main_click = "LESEN MIT 2-ZURÜCK UND TASTENDRUCK\n\n\nNun wird das Lesen mit der Gedächtnisaufgabe " \
-                              "kombiniert. Sie lesen einen Text Wort für Wort und klicken mithilfe der Leertaste " \
-                              "weiter zum nächsten Wort. Gleichzeitig sollen Sie auf die Farben der Wörter achten: " \
-                              "\n\nBitte drücken Sie so schnell wie möglich die Taste C, " \
-                              "wenn die Farbe des aktuellen Worts mit der des vorletzten Worts (2 zurück) " \
-                              "übereinstimmt.\n\n " \
-                              "Am Ende des Blocks werden Ihnen wieder Verständnisfragen zum Inhalt des " \
-                              "Texts gestellt.\n\nBitte drücken Sie die Leertaste, um den Block zu starten. "
-instr_pic_2back_dual_main_click = instr_pic_path + "2back.jpeg"
-
-instr_2back_dual_main_no_click = "LESEN MIT 2-ZURÜCK OHNE TASTENDRUCK\n\n\nGut gemacht!\n\nIm folgenden Block werden " \
-                                 "die Wörter " \
-                                 "wieder von allein abgespielt. Sie müssen also nicht die Leertaste drücken.\n\nBitte " \
-                                 "drücken Sie aber die Taste C, wenn die Farbe des " \
-                                 "aktuellen Worts mit der des vorletzten Worts (2 zurück) übereinstimmt.\n\nDrücken " \
-                                 "Sie die Leertaste, um den Block zu starten."
-instr_pic_2back_dual_main_no_click = instr_pic_path + "2back.jpeg"
+instr_2back_dual_main_no_click = "LESEN MIT 2-ZURÜCK\n\n\nGut gemacht!\n\nIm folgenden Block lesen Sie wieder einen Text. " \
+                                 "\n\nBitte drücken Sie so schnell wie möglich die Zieltaste (Zeigefinger), wenn die Farbe des " \
+                                 "aktuellen Worts mit der des vorletzten Worts (2 zurück) übereinstimmt."
+instr_pic_2back_dual_main_no_click = instr_pic_path + "fMRI_target_button.png"
 
 # warning sign for change of task:
 warning_sign = instr_pic_path + "warning.jpeg"
-
-""" Reading Baseline Training: """
-
-# the training text is the first paragraph of the novel "Die Schachnovelle" by Stefan Zweig
-reading_bl_tr_text = ["Auf", "dem", "großen", "Passagierdampfer,", "der", "um", "Mitternacht", "von", "New", "York",
-                      "nach", "Buenos", "Aires", "abgehen", "sollte,", "herrschte", "die", "übliche", "Geschäftigkeit",
-                      "und", "Bewegung", "der", "letzten", "Stunde.", "Gäste", "vom", "Land", "drängten",
-                      "durcheinander,", "um", "ihren", "Freunden", "das", "Geleit", "zu", "geben,", "Telegraphenboys",
-                      "mit", "schiefen", "Mützen", "schossen", "Namen", "ausrufend", "durch", "die",
-                      "Gesellschaftsräume,", "Koffer", "und", "Blumen", "wurden", "geschleppt,", "Kinder", "liefen",
-                      "neugierig", "treppauf", "und", "treppab,", "während", "das", "Orchester", "unerschütterlich",
-                      "zur", "Deckshow", "spielte.", "Ich", "stand", "im", "Gespräch", "mit", "einem", "Bekannten",
-                      "etwas", "abseits", "von", "diesem", "Getümmel", "auf", "dem", "Promenadendeck,", "als", "neben",
-                      "uns", "zwei-", "oder", "dreimal", "Blitzlicht", "scharf", "aufsprühte -", "anscheinend", "war",
-                      "irgendein", "Prominenter", "knapp", "vor", "der", "Abfahrt", "noch", "rasch", "von", "Reportern",
-                      "interviewt", "und", "photographiert", "worden.", "Mein", "Freund", "blickte", "hin", "und",
-                      "lächelte.", "\"Sie", "haben", "da", "einen", "raren", "Vogel", "an", "Bord,", "den",
-                      "Czentovic.\"", "Und", "da", "ich", "offenbar", "ein", "ziemlich", "verständnisloses", "Gesicht",
-                      "zu", "dieser", "Mitteilung", "machte,", "fügte", "er", "erklärend", "bei:", "\"Mirko",
-                      "Czentovic,", "der", "Weltschachmeister.", "Er", "hat", "ganz", "Amerika", "von", "Ost", "nach",
-                      "West", "mit", "Turnierspielen", "abgeklappert", "und", "fährt", "jetzt", "zu", "neuen",
-                      "Triumphen", "nach", "Argentinien.\""]
-
-# prepare questions & answers:
-reading_bl_tr_Q1 = "Wo befinden sich die Personen im Text?"
-reading_bl_tr_Q1_ans = ["1) auf einem Schiff", "2) in einem Flugzeug", "3) in einem Zug", "4) in einem Bus"]
-reading_bl_tr_Q1_corr = "a"
-
-reading_bl_tr_Q2 = "Wohin geht ihre Reise?"
-reading_bl_tr_Q2_ans = ["1) Caracas (Venezuela)", "2) Lima (Peru)", "3) Buenos Aires (Argentinien)",
-                        "4) Manaus (Brasilien)"]
-reading_bl_tr_Q2_corr = "c"
-
-reading_bl_tr_Q3 = "Einer der Reisenden hat einen ungewöhnlichen Beruf. Welchen?"
-reading_bl_tr_Q3_ans = ["1) Schachspieler", "2) Dressurreiter", "3) Trickbetrüger", "4) Diamantenhändler"]
-reading_bl_tr_Q3_corr = "a"
-
-""" PACED Reading Baseline Training: """
-reading_bl_tr_text_no_click = ['Einen', 'Augenblick', 'herrschte', 'totale', 'Stille.', 'Man', 'hörte', 'plötzlich',
-                               'die',
-                               'Wellen', 'rauschen', 'und', 'das', 'Radio', 'aus', 'dem', 'Salon', 'herüberjazzen,',
-                               'man',
-                               'vernahm', 'jeden', 'Schritt', 'vom', 'Promenadendeck', 'und', 'das', 'leise,', 'feine',
-                               'Sausen',
-                               'des', 'Winds,', 'der', 'durch', 'die', 'Fugen', 'der', 'Fenster', 'fuhr.', 'Keiner',
-                               'von',
-                               'uns', 'atmete,', 'es', 'war', 'zu', 'plötzlich', 'gekommen', 'und', 'wir', 'alle',
-                               'noch',
-                               'geradezu', 'erschrocken', 'über', 'das', 'Unwahrscheinliche,', 'dass', 'dieser',
-                               'Unbekannte',
-                               'dem', 'Weltmeister', 'in', 'einer', 'schon', 'halb', 'verlorenen', 'Partie', 'seinen',
-                               'Willen',
-                               'aufgezwungen', 'haben', 'sollte.', 'McConnor', 'lehnte', 'sich', 'mit', 'einem', 'Ruck',
-                               'zurück,', 'der', 'zurückgehaltene', 'Atem', 'fuhr', 'ihm', 'hörbar', 'in', 'einem',
-                               'beglückten',
-                               "\"Ah!\"", 'von', 'den', 'Lippen.', 'Ich', 'wiederum', 'beobachtete', 'Czentovic.',
-                               'Schon',
-                               'bei', 'den', 'letzten', 'Zügen', 'hatte', 'mir', 'geschienen,', 'als', 'ob', 'er',
-                               'blässer',
-                               'geworden', 'sei.', 'Aber', 'er', 'verstand', 'sich', 'gut', 'zusammenzuhalten.', 'Er',
-                               'verharrte', 'in', 'seiner', 'scheinbar', 'gleichmütigen', 'Starre', 'und', 'fragte',
-                               'nur', 'in',
-                               'lässigster', 'Weise,', 'während', 'er', 'die', 'Figuren', 'mit', 'ruhiger', 'Hand',
-                               'vom',
-                               'Brette', 'schob:', "\"Wünschen", 'die', 'Herren', 'noch', 'eine', 'dritte', 'Partie?\"']
-
-# prepare questions & answers:
-reading_bl_tr_no_click_Q1 = "Was hören die Personen vom Promenadendeck?"
-reading_bl_tr_no_click_Q1_ans = ["1) Hunde", "2) Schritte", "3) Stimmen", "4) Geschrei"]
-reading_bl_tr_no_click_Q1_corr = "c"
-
-reading_bl_tr_no_click_Q2 = "Die wievielte Partie schlägt Czentovic vor?"
-reading_bl_tr_no_click_Q2_ans = ["1) die dritte", "2) die zweite", "3) die letzte", "4) die erste"]
-reading_bl_tr_no_click_Q2_corr = "a"
-
-reading_bl_tr_no_click_Q3 = "Mit welcher Farbe beschreibt der Erzähler die Gesichtsfarbe des Spielers Czentovic?"
-reading_bl_tr_no_click_Q3_ans = ["1) Rot", "2) Gräulich", "3) Fahl", "4) Blass"]
-reading_bl_tr_no_click_Q3_corr = "d"
 
 """ Main Blocks: """
 
