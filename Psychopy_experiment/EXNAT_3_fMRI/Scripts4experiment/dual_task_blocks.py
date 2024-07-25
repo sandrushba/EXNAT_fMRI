@@ -3,7 +3,7 @@
 #################################################
 # this routine is for all blocks with texts that are paced, i.e., visually presented without space bar
 
-if 6 <= exp_block_counter <= 7:
+if exp_block_counter == 6:
     # We collected RTs & words from the self-paced block of each condition
     RT_per_letter_oneback_dual = int(expInfo['RT_per_letter_oneback_dual'])
     RT_per_letter_twoback_dual = int(expInfo['RT_per_letter_twoback_dual'])
@@ -17,10 +17,10 @@ if 6 <= exp_block_counter <= 7:
     if curr_block in ["1back_dual_main_no_click", "2back_dual_main_no_click"]:
         print(f"Start preparing block {curr_block}")
         if curr_block == "1back_dual_main_no_click":
-            print("Using RT_per_letter_oneback_dual for this block:", RT_per_letter_oneback_dual)
+            print("\tUsing RT_per_letter_oneback_dual for this block:", RT_per_letter_oneback_dual)
 
         elif curr_block == "2back_dual_main_no_click":
-            print("Using RT_per_letter_twoback_dual for this block:", RT_per_letter_twoback_dual)
+            print("\tUsing RT_per_letter_twoback_dual for this block:", RT_per_letter_twoback_dual)
 
     ### Prepare stimuli:
     # keep background ivory
@@ -89,7 +89,7 @@ if 6 <= exp_block_counter <= 7:
 
     elif curr_block == "2back_dual_main_no_click":
         minimum_duration = 5 * RT_per_letter_twoback_dual
-        maximum_duration = 2000
+        maximum_duration = 2500
         curr_durations = []
         for word in curr_text:
             # this is an absolute value based on estimates of how long you need to feel comfortable reading a word on
@@ -310,10 +310,10 @@ elif 8 <= exp_block_counter <= 9:
     if curr_block in ["1back_dual_main_no_click", "2back_dual_main_no_click"]:
         print(f"Start preparing block {curr_block}")
         if curr_block == "1back_dual_main_no_click":
-            print("Using RT_per_letter_oneback_dual for this block:", RT_per_letter_oneback_dual)
+            print("\tUsing RT_per_letter_oneback_dual for this block:", RT_per_letter_oneback_dual)
 
         elif curr_block == "2back_dual_main_no_click":
-            print("Using RT_per_letter_twoback_dual for this block:", RT_per_letter_twoback_dual)
+            print("\tUsing RT_per_letter_twoback_dual for this block:", RT_per_letter_twoback_dual)
 
     ### Prepare stimuli:
     # keep background ivory
