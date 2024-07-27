@@ -147,6 +147,31 @@ if not skip_questions_paced:
             print(f"Finished block {run3_block_counter}/2 in run 3, moving on to next run!")
             # loop_dual_task_blocks.finished = True
 
+            # keep background ivory
+            win.setColor(light_bg_col, colorSpace='rgb')
+            win.flip()
+
+            run_finished_text = "Diese Runde des Experiments ist nun zu Ende. Bitte bleiben Sie ruhig liegen, es geht gleich weiter."
+            # set text
+            instr_text = run_finished_text
+            # create text box
+            instr_text_stim = visual.TextStim(win,
+                                              text=instr_text,
+                                              height=0.05,
+                                              pos=(0, 0),
+                                              color="black")
+
+            # display the text on screen until Space is pressed
+            while True:
+                # keep background ivory
+                win.setColor(light_bg_col, colorSpace='rgb')
+                instr_text_stim.draw()
+                win.flip()
+                # end screen if participant presses space
+                if 'return' in event.getKeys():
+                    print("moving on to next run!")
+                    break
+
     # this is run 4:
     elif 8 <= exp_block_counter <= 9:
 

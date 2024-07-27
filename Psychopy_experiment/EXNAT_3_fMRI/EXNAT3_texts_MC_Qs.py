@@ -20,31 +20,31 @@ instr_Reading_Baseline_main_no_click = "Herzlich Willkommen zum Experiment!\n\n\
                                        "von allein abgespielt. Am Ende des Texts werden Ihnen Fragen zum Inhalt " \
                                        "gestellt. Wählen Sie mithilfe der vier Tasten die richtige Antwort aus."
 
-instr_Reading_pseudotext_no_click = "LESEN\n\n\nGut gemacht!\n\n" \
+instr_Reading_pseudotext_no_click = "LESEN\n\n\n" \
                                        "Nun folgt ein Block mit Wörtern, die es gar nicht gibt.\n" \
                                         "Bitte lesen Sie den Text dennoch aufmerksam mit. Sie müssen sonst nichts tun."
 
-instr_1back_single_main_no_click = "1-ZURÜCK\n\n\nGut gemacht!\n\nIm folgenden Block werden " \
+instr_1back_single_main_no_click = "1-ZURÜCK\n\n\nIm folgenden Block werden " \
                                  "farbige Rechtecke abgespielt." \
                                  "\n\nBitte drücken Sie so schnell wie möglich die Zieltaste (Zeigefinger), wenn die Farbe des " \
                                  "aktuellen Rechtecks mit der des vorherigen Rechtecks (1 zurück) übereinstimmt."
-instr_pic_1back_single_main_no_click = instr_pic_path + "fMRI_target_button.png"
+instr_pic_1back_single_main_no_click = instr_pic_path + "1back_rect_fMRI.png"
 
-instr_1back_dual_main_no_click = "LESEN MIT 1-ZURÜCK\n\n\nGut gemacht!\n\nIm folgenden Block lesen Sie wieder einen Text. " \
+instr_1back_dual_main_no_click = "LESEN MIT 1-ZURÜCK\n\n\nIm folgenden Block lesen Sie wieder einen Text. " \
                                  "\n\nBitte drücken Sie so schnell wie möglich die Zieltaste (Zeigefinger), wenn die Farbe des " \
                                  "aktuellen Worts mit der des vorherigen Worts (1 zurück) übereinstimmt."
-instr_pic_1back_dual_main_no_click = instr_pic_path + "fMRI_target_button.png"
+instr_pic_1back_dual_main_no_click = instr_pic_path + "1back_fMRI.png"
 
-instr_2back_single_main_no_click = "2-ZURÜCK\n\n\nGut gemacht!\n\nIm folgenden Block werden " \
+instr_2back_single_main_no_click = "2-ZURÜCK\n\n\nIm folgenden Block werden " \
                                  "farbige Rechtecke abgespielt." \
                                  "\n\nBitte drücken Sie so schnell wie möglich die Zieltaste (Zeigefinger), wenn die Farbe des " \
                                  "aktuellen Rechtecks mit der des vorletzten Rechtecks (2 zurück) übereinstimmt."
-instr_pic_2back_single_main_no_click = instr_pic_path + "fMRI_target_button.png"
+instr_pic_2back_single_main_no_click = instr_pic_path + "2back_rect_fMRI.png"
 
-instr_2back_dual_main_no_click = "LESEN MIT 2-ZURÜCK\n\n\nGut gemacht!\n\nIm folgenden Block lesen Sie wieder einen Text. " \
+instr_2back_dual_main_no_click = "LESEN MIT 2-ZURÜCK\n\n\nIm folgenden Block lesen Sie wieder einen Text. " \
                                  "\n\nBitte drücken Sie so schnell wie möglich die Zieltaste (Zeigefinger), wenn die Farbe des " \
                                  "aktuellen Worts mit der des vorletzten Worts (2 zurück) übereinstimmt."
-instr_pic_2back_dual_main_no_click = instr_pic_path + "fMRI_target_button.png"
+instr_pic_2back_dual_main_no_click = instr_pic_path + "2back_fMRI.png"
 
 # warning sign for change of task:
 warning_sign = instr_pic_path + "warning.jpeg"

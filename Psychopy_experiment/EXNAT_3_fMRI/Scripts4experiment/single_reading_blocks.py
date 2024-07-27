@@ -38,15 +38,15 @@ if 0 <= exp_block_counter <= 1:
             # create text box
             instr_text_stim = visual.TextStim(win,
                                               text=instr_text,
-                                              height=0.025,  # font height relative to height of screen
-                                              pos=(0, 0),  # move up a bit
+                                              height=0.03,  # font height relative to height of screen
+                                              pos=(0, 0.08),  # move up a bit
                                               color="black")
 
             # show instructions on screen
             win.setColor(light_bg_col, colorSpace='rgb')
             instr_text_stim.draw()
             win.flip()
-            core.wait(1)  # wait for 3s before starting response window
+            core.wait(8.75)  # wait for 8.75 s
 
             # get text nr:
             curr_text_nr = all_texts_nrs_list[exp_block_counter]
@@ -82,15 +82,16 @@ if 0 <= exp_block_counter <= 1:
             # create text box
             instr_text_stim = visual.TextStim(win,
                                               text=instr_text,
-                                              height=0.025,  # font height relative to height of screen
-                                              pos=(0, 0),  # move up a bit
-                                              color="black")
+                                              height=0.03,  # font height relative to height of screen
+                                              pos=(0, 0.08),  # move up a bit
+                                              color="black",
+                                              wrapWidth=1.5)
 
             # show instructions on screen
             win.setColor(light_bg_col, colorSpace='rgb')
             instr_text_stim.draw()
             win.flip()
-            core.wait(1)  # wait for 3s before starting response window
+            core.wait(8.75)  # wait for 8.75 s
 
             # get text nr:
             curr_text_nr = all_texts_nrs_list[exp_block_counter]

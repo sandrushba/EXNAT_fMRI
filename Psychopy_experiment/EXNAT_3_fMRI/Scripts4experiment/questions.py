@@ -75,9 +75,11 @@ if not skip_questions_paced:
     thisExp.addData('chosen_ans', chosen_ans)
     thisExp.addData('ans_correct', chosen_ans == Q1_correct)
     thisExp.addData('text_nr', curr_text_nr)
-    thisExp.addData('block_nr', exp_block_counter)
+    thisExp.addData('block_nr_exp', exp_block_counter)
+    thisExp.addData('run_nr', "run1")
+    thisExp.addData('block_nr_run', block_nr_run)
     thisExp.addData('block_name', curr_block)
-    thisExp.addData('block_kind', curr_nback_cond)
+    thisExp.addData('n-back_level', curr_nback_cond)
 
     # start a new row in the csv
     thisExp.nextEntry()
@@ -98,9 +100,11 @@ if not skip_questions_paced:
     thisExp.addData('chosen_ans', chosen_ans)
     thisExp.addData('ans_correct', chosen_ans == Q2_correct)
     thisExp.addData('text_nr', curr_text_nr)
-    thisExp.addData('block_nr', exp_block_counter)
+    thisExp.addData('block_nr_exp', exp_block_counter)
+    thisExp.addData('run_nr', "run1")
+    thisExp.addData('block_nr_run', block_nr_run)
     thisExp.addData('block_name', curr_block)
-    thisExp.addData('block_kind', curr_nback_cond)
+    thisExp.addData('n-back_level', curr_nback_cond)
 
     # start a new row in the csv
     thisExp.nextEntry()
@@ -122,8 +126,8 @@ if not skip_questions_paced:
     thisExp.addData('ans_correct', chosen_ans == Q3_correct)
     thisExp.addData('text_nr', curr_text_nr)
     thisExp.addData('block_nr_exp', exp_block_counter)
-    thisExp.addData('run_nr', 'run1')
-    thisExp.addData('block_nr_run', run1_block_counter)
+    thisExp.addData('run_nr', "run1")
+    thisExp.addData('block_nr_run', block_nr_run)
     thisExp.addData('block_name', curr_block)
     thisExp.addData('n-back_level', curr_nback_cond)
 

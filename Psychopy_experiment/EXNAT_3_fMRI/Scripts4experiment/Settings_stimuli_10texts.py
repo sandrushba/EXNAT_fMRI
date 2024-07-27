@@ -1,10 +1,10 @@
 ### Stimulus settings
-# import random
 
 # set colours you want to use for background:
 # light_bg_col_hex = "#FDFBF0" # ivory instructions background
 # dark_bg_col_hex  = "#505050" # dark grey background for stimuli
-light_bg_col = [(x / 127.5) - 1 for x in (253, 251, 240)]  # ivory instructions background (use RGB -1:1)
+#light_bg_col = [(x / 127.5) - 1 for x in (253, 251, 240)]
+light_bg_col = [(x / 127.5) - 1 for x in (186, 186, 186)] # ivory instructions background (use RGB -1:1)
 dark_bg_col = [(x / 127.5) - 1 for x in (80, 80, 80)]  # dark grey background for stimuli (use RGB -1:1)
 
 # make background light for a start - use rgb -1:1 colour codes
@@ -90,17 +90,21 @@ random.shuffle(nback2)
 run2_blocks = nback1 + nback2
 print("Blocks for run2:", run2_blocks)
 
-# RUNS 3 & 4
-# two dual-task blocks, order randomized
-dualtask = ["1back_dual_main_no_click", "2back_dual_main_no_click"]
-random.shuffle(dualtask)
+# RUNS 3, 4, 5 & 6
+# one dual-task block per run, order randomized
+dual_blocks = ["1back_dual_main_no_click", "2back_dual_main_no_click", "1back_dual_main_no_click", "2back_dual_main_no_click"]
 
-run3_blocks = dualtask
-print("Blocks for run3:", dualtask)
+random.shuffle(dual_blocks)
 
-random.shuffle(dualtask)
-run4_blocks = dualtask
-print("Blocks for run4:", dualtask)
+run3_blocks = dual_blocks[0]
+run4_blocks = dual_blocks[1]
+run5_blocks = dual_blocks[2]
+run6_blocks = dual_blocks[3]
+
+print("Blocks for run3:", run3_blocks)
+print("Blocks for run4:", run4_blocks)
+print("Blocks for run5:", run5_blocks)
+print("Blocks for run6:", run6_blocks)
 
 ### Create n-back colour lists for all blocks
 
@@ -191,14 +195,14 @@ for block_idx, block_length in enumerate(blocks_textlen):
     run2_colour_lists.append(curr_colours)
     run2_target_lists.append(curr_targets)
 
-# RUNS 3 & 4
+# RUNS 3, 4, 5 & 6
 blocks_textlen = [300, 300, 300, 300] # dual-task blocks
 blocks_target_counts = [50, 50, 50, 50]  # dual-task blocks
 
 # Now loop this list. Check which condition we have there and then create colour list for each text.
-dual_blocks = run3_blocks + run4_blocks
-run3_4_colour_lists = []
-run3_4_target_lists = []
+dual_blocks = run3_blocks + run4_blocks + run5_blocks + run6_blocks
+run3_4_5_6_colour_lists = []
+run3_4_5_6_target_lists = []
 for block_idx, block_length in enumerate(blocks_textlen):
     # get 1st letter of block name - that tells us the condition
     block_cond = dual_blocks[block_idx][0]
@@ -227,14 +231,18 @@ for block_idx, block_length in enumerate(blocks_textlen):
                                nback_level=curr_nback_level)
 
     # add to bigger lists
-    run3_4_colour_lists.append(curr_colours)
-    run3_4_target_lists.append(curr_targets)
+    run3_4_5_6_colour_lists.append(curr_colours)
+    run3_4_5_6_target_lists.append(curr_targets)
 
-run3_colour_lists = run3_4_colour_lists[0:2]
-run4_colour_lists = run3_4_colour_lists[2:4]
+run3_colour_lists = run3_4_5_6_colour_lists[0]
+run4_colour_lists = run3_4_5_6_colour_lists[1]
+run5_colour_lists = run3_4_5_6_colour_lists[2]
+run6_colour_lists = run3_4_5_6_colour_lists[3]
 
-run3_target_lists = run3_4_target_lists[0:2]
-run4_target_lists = run3_4_target_lists[2:4]
+run3_target_lists = run3_4_5_6_target_lists[0]
+run4_target_lists = run3_4_5_6_target_lists[1]
+run5_target_lists = run3_4_5_6_target_lists[2]
+run6_target_lists = run3_4_5_6_target_lists[3]
 
 print("------ finished preparing stimuli! ------")
 
@@ -246,9 +254,13 @@ exp_block_counter = 0
 run1_block_counter = 0
 # init block counter for run2 (four blocks in total)
 run2_block_counter = 0
-# init block counter for run3 (two blocks in total)
+# init block counter for run3 (one block in total)
 run3_block_counter = 0
-# init block counter for run4 (two blocks in total)
+# init block counter for run4 (one block in total)
 run4_block_counter = 0
+# init block counter for run5 (one block in total)
+run5_block_counter = 0
+# init block counter for run6 (one block in total)
+run6_block_counter = 0
 
 print("starting experiment now!")

@@ -37,7 +37,7 @@ if 2 <= exp_block_counter <= 5:
         # create text box
         instr_text_stim = visual.TextStim(win,
                                           text=instr_text,
-                                          height=0.025,  # font height relative to height of screen
+                                          height=0.03,  # font height relative to height of screen
                                           pos=(0, 0.2),  # move up a bit
                                           color="black")
         # create ImageStim object
@@ -50,7 +50,7 @@ if 2 <= exp_block_counter <= 5:
         instr_text_stim.draw()
         curr_instr_pic.draw()
         win.flip()
-        core.wait(3)  # wait for 3s before starting response window
+        core.wait(8.75)  # wait for 3s before starting response window
 
         ### change background colour
         win.setColor(dark_bg_col, colorSpace='rgb')
