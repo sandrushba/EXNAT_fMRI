@@ -15,34 +15,36 @@ Version: July 2024
 # for each block, set instruction texts + path to instruction image you want to show:
 instr_pic_path = "Stimuli_and_Resources/EXNAT3_Instr_Pics/"
 
-instr_Reading_Baseline_main_no_click = "Herzlich Willkommen zum Experiment!\n\n\nLESEN\n\nIm " \
+welcome_text = "Herzlich willkommen zum Experiment!\n\nBitte bleiben Sie ruhig liegen. Es geht gleich los."
+
+instr_Reading_Baseline_main_no_click = "LESEN\n\n\nIm " \
                                        "folgenden Block lesen Sie einen Text. Die Wörter werden " \
-                                       "von allein abgespielt. Am Ende des Texts werden Ihnen Fragen zum Inhalt " \
+                                       "von allein abgespielt.\n\nAm Ende des Texts werden Ihnen Fragen zum Inhalt " \
                                        "gestellt. Wählen Sie mithilfe der vier Tasten die richtige Antwort aus."
 
 instr_Reading_pseudotext_no_click = "LESEN\n\n\n" \
-                                       "Nun folgt ein Block mit Wörtern, die es gar nicht gibt.\n" \
+                                       "Nun folgt ein Block mit Wörtern, die es gar nicht gibt.\n\n" \
                                         "Bitte lesen Sie den Text dennoch aufmerksam mit. Sie müssen sonst nichts tun."
 
 instr_1back_single_main_no_click = "1-ZURÜCK\n\n\nIm folgenden Block werden " \
                                  "farbige Rechtecke abgespielt." \
-                                 "\n\nBitte drücken Sie so schnell wie möglich die Zieltaste (Zeigefinger), wenn die Farbe des " \
-                                 "aktuellen Rechtecks mit der des vorherigen Rechtecks (1 zurück) übereinstimmt."
+                                 "\n\nBitte drücken Sie so schnell wie möglich mit dem Zeigefinger, wenn die Farbe des " \
+                                 "aktuellen Rechtecks mit der des <b>vorherigen Rechtecks (1 zurück)</b> übereinstimmt."
 instr_pic_1back_single_main_no_click = instr_pic_path + "1back_rect_fMRI.png"
 
 instr_1back_dual_main_no_click = "LESEN MIT 1-ZURÜCK\n\n\nIm folgenden Block lesen Sie wieder einen Text. " \
-                                 "\n\nBitte drücken Sie so schnell wie möglich die Zieltaste (Zeigefinger), wenn die Farbe des " \
+                                 "\n\nBitte drücken Sie so schnell wie möglich mit dem Zeigefinger, wenn die Farbe des " \
                                  "aktuellen Worts mit der des vorherigen Worts (1 zurück) übereinstimmt."
 instr_pic_1back_dual_main_no_click = instr_pic_path + "1back_fMRI.png"
 
 instr_2back_single_main_no_click = "2-ZURÜCK\n\n\nIm folgenden Block werden " \
                                  "farbige Rechtecke abgespielt." \
-                                 "\n\nBitte drücken Sie so schnell wie möglich die Zieltaste (Zeigefinger), wenn die Farbe des " \
-                                 "aktuellen Rechtecks mit der des vorletzten Rechtecks (2 zurück) übereinstimmt."
+                                 "\n\nBitte drücken Sie so schnell wie möglich mit dem Zeigefinger, wenn die Farbe des " \
+                                 "aktuellen Rechtecks mit der des <b>vorletzten Rechtecks (2 zurück)</b> übereinstimmt."
 instr_pic_2back_single_main_no_click = instr_pic_path + "2back_rect_fMRI.png"
 
 instr_2back_dual_main_no_click = "LESEN MIT 2-ZURÜCK\n\n\nIm folgenden Block lesen Sie wieder einen Text. " \
-                                 "\n\nBitte drücken Sie so schnell wie möglich die Zieltaste (Zeigefinger), wenn die Farbe des " \
+                                 "\n\nBitte drücken Sie so schnell wie möglich mit dem Zeigefinger, wenn die Farbe des " \
                                  "aktuellen Worts mit der des vorletzten Worts (2 zurück) übereinstimmt."
 instr_pic_2back_dual_main_no_click = instr_pic_path + "2back_fMRI.png"
 

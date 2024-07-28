@@ -2,6 +2,11 @@
 #        Blocks with text – reading only        #
 #################################################
 # this routine is for all blocks with texts that are paced, i.e., visually presented without space bar
+# this is for reading only texts
+
+# make mouse invisible during experiment
+# mouse = io.devices.mouse
+win.setMouseVisible(False)
 
 if 0 <= exp_block_counter <= 1:
     # We collected RTs & words from the self-paced block of each condition
@@ -10,10 +15,6 @@ if 0 <= exp_block_counter <= 1:
 
     # get block kind
     curr_block = run1_blocks[run1_block_counter]
-
-    # keep background ivory
-    win.setColor(light_bg_col, colorSpace='rgb')
-    win.flip()
 
     # ----------------------------------
 
@@ -26,7 +27,7 @@ if 0 <= exp_block_counter <= 1:
     if curr_block in ["Reading_Baseline_main_no_click", "Reading_pseudotext_no_click"]:
         print(f"Start preparing block {curr_block}")
 
-        # keep background ivory
+        # light background
         win.setColor(light_bg_col, colorSpace='rgb')
         win.flip()
 
@@ -158,6 +159,10 @@ if 0 <= exp_block_counter <= 1:
         for trial_idx, curr_word in enumerate(curr_text):
             # print("current idx: " + str(trial_idx) + ", curr word:" + curr_word)
 
+            print(f"trigger count: {trigger_count}")
+            # Log trigger information before or after other trial-specific logging
+            # trigger_count = log_trigger(trigger_count)
+
             ### prepare & show current word:
             # get current colour
             curr_colour = curr_colours[trial_idx]
@@ -179,6 +184,8 @@ if 0 <= exp_block_counter <= 1:
             # start trial clock & record trial onset time
             my_trial_clock.reset()
             onset_time = my_trial_clock.getTime()
+            global_onset_time = globalClock.getTime()
+            onset_time_rel2trigger = global_onset_time - first_trigger_time
 
             ### start recording responses
             # start while loop that looks for responses
@@ -189,14 +196,14 @@ if 0 <= exp_block_counter <= 1:
                 win.flip()
 
                 # check for key responses:
-                keys = event.getKeys(['c', 'escape'])
+                keys = event.getKeys(['1', 'escape'])
 
                 # if there were, check responses:
                 for key in keys:
 
                     # if participant pressed button "c" for the first time and it's an n-back condition
                     # where they're actually supposed to do that (aka not a reading baseline condition)...
-                    if key == 'c' and curr_nback_cond != None and saw_target == False:
+                    if key == '1' and curr_nback_cond != None and saw_target == False:
                         # get reaction time
                         curr_nback_RT = my_trial_clock.getTime() * 1000
                         # send trigger for response:
@@ -242,15 +249,17 @@ if 0 <= exp_block_counter <= 1:
 
             ### save everything in output csv
             thisExp.addData('colour', curr_colour)
+            thisExp.addData('global_onset_time', global_onset_time)
+            thisExp.addData('onset_time_rel2trigger', onset_time_rel2trigger)
             thisExp.addData('target', curr_target)
             thisExp.addData('nback_response', curr_nback_response)
             thisExp.addData('nback_RT', curr_nback_RT)  # in ms
             thisExp.addData('duration', curr_duration * 1000)  # in ms
             thisExp.addData('text_nr', curr_text_nr)
             thisExp.addData('trial_nr', curr_trial_nr)
-            thisExp.addData('block_nr_exp', exp_block_counter)
-            thisExp.addData('run_nr', 'run1')
-            thisExp.addData('block_nr_run', run1_block_counter)
+            thisExp.addData('block_nr_exp', exp_block_counter+1)
+            thisExp.addData('run_nr', '1')
+            thisExp.addData('block_nr_run', run1_block_counter+1)
             thisExp.addData('block_name', curr_block)
             thisExp.addData('n-back_level', curr_nback_cond)
             # careful, make sure quotes in the strings are escaped using a

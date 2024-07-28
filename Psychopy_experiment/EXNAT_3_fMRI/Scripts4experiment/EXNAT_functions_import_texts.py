@@ -27,7 +27,7 @@ import math
 
 # Get functions from my custom scripts:
 # import all texts and instructions
-from EXNAT3_texts_MC_Qs import (instr_pic_path, instr_Reading_Baseline_main_no_click, instr_Reading_pseudotext_no_click, \
+from EXNAT3_texts_MC_Qs import (instr_pic_path, welcome_text, instr_Reading_Baseline_main_no_click, instr_Reading_pseudotext_no_click, \
     instr_1back_single_main_no_click, instr_pic_1back_single_main_no_click, instr_1back_dual_main_no_click, \
     instr_pic_1back_dual_main_no_click, instr_2back_single_main_no_click, instr_pic_2back_single_main_no_click, instr_2back_dual_main_no_click, \
     instr_pic_2back_dual_main_no_click, warning_sign, text_01, text_01_Q1, text_01_Q1_ans, text_01_Q1_corr, \
@@ -69,10 +69,98 @@ def escape_quotes(string):
     # escape quotes with quotes instead of backslashes
     return string.replace('"', '""')
 
+### fMRI set-up ####
+# Define a list to store all trigger times and a counter for the number of triggers
+all_trigger_times = []
+trigger_count = 0
 
-# make mouse invisible during experiment
-# mouse = io.devices.mouse
-win.setMouseVisible(False)
+# Start global clock
+globalClock = core.Clock()
 
-# create 10 ms timer that we can use instead of core.wait()
-my_timer = core.CountdownTimer(0.01)
+def wait_for_first_trigger(instr_text, number_of_triggers):
+    """
+    Wait for the first scanner trigger while displaying instructions on the screen.
+
+    Parameters:
+    - instr_text: The instruction text to display.
+    """
+    trigger_count = number_of_triggers  # Declare trigger_count as global to modify it
+
+    print("Waiting for the first scanner trigger...")
+
+    # Define the instruction text stimulus
+    instr_text_stim = visual.TextStim(
+        win,
+        text=instr_text,
+        height=0.04,  # font height relative to height of screen
+        pos=(0, 0.08),  # move up a bit
+        color="black"
+    )
+
+    while True:
+        # Display the instructions
+        win.setColor(light_bg_col, colorSpace='rgb')
+        instr_text_stim.draw()
+        win.flip()
+
+        # Check for the first trigger key '5'
+        keys = event.getKeys(keyList=['5'])
+        if keys:
+            first_trigger_time = globalClock.getTime(format='float')
+            trigger_count += 1
+            thisExp.addData('TriggerCount', trigger_count)
+            thisExp.addData('TriggerTime', first_trigger_time)
+            # Start a new row in the csv
+            # thisExp.nextEntry()
+            print(f"First trigger received at {first_trigger_time}")
+            return first_trigger_time, trigger_count
+
+
+def log_trigger(instr_text, instr_pic, number_of_triggers):
+    """
+    Wait for the first scanner trigger while displaying instructions on the screen.
+
+    Parameters:
+    - instr_text: The instruction text to display.
+    """
+    trigger_count = number_of_triggers
+
+    print("Waiting for the first scanner trigger...")
+
+    # create text box
+    instr_text_stim = visual.TextStim(win,
+                                      text=instr_text,
+                                      height=0.03,  # font height relative to height of screen
+                                      pos=(0, 0.2),  # move up a bit
+                                      color="black",
+                                      wrapWidth=1.5)
+    # create ImageStim object
+    curr_instr_pic = visual.ImageStim(win,
+                                      size=(0.8, 0.3),
+                                      pos=(0, -0.2),
+                                      image=instr_pic)  # set path to image here
+
+    first_trigger_time = None
+    while True:
+        # Display the instructions
+        win.setColor(light_bg_col, colorSpace='rgb')
+        instr_text_stim.draw()
+        curr_instr_pic.draw()
+        win.flip()
+
+        # Check for the first trigger key '5'
+        keys = event.getKeys(keyList=['5'])
+        if keys:
+            first_trigger_time = globalClock.getTime(format='float')
+            trigger_count += 1
+            thisExp.addData('TriggerCount', trigger_count)
+            thisExp.addData('TriggerTime', first_trigger_time)
+            # Start a new row in the csv
+            # thisExp.nextEntry()
+            print(f"First trigger received at {first_trigger_time}")
+            # break
+
+            # Wait for an additional 8.75 seconds
+            core.wait(8.75)
+
+            return first_trigger_time, trigger_count

@@ -3,16 +3,24 @@
 ##########################################################
 
 def setup_question(question_text, answers_text):
-    question = visual.TextStim(win, text=question_text, pos=(0, 0.2), color="black", height=0.025, anchorHoriz='center', alignText='center', wrapWidth=1)
-    answers = [visual.TextStim(win, text=ans, pos=(-0.75, 0.1 - i * 0.05), color="black", height=0.025, wrapWidth=1.5, anchorHoriz='left', alignText='center') for i, ans in enumerate(answers_text)]
+    question = visual.TextStim(win, text=question_text, pos=(0, 0.2), color="black", height=0.03, anchorHoriz='center', alignText='center', wrapWidth=1)
+    answers = [visual.TextStim(win, text=ans, pos=(-0.75, 0.1 - i * 0.05), color="black", height=0.03, wrapWidth=1.5, anchorHoriz='left', alignText='center') for i, ans in enumerate(answers_text)]
     return question, answers
 
 def display_question(question, answers):
+
+    # set-up time to write into logfile
+    #my_trial_clock = core.Clock()
+    #my_trial_clock.reset()
+    question_time = globalClock.getTime()
+    onset_time_rel2trigger = question_time - first_trigger_time
+
     question.autoDraw = True
     for answer in answers:
         answer.autoDraw = True
     instr_text.autoDraw = True
     win.flip()
+    return question_time, onset_time_rel2trigger
 
 def get_response(answers, correct_answer):
     while True:
@@ -65,19 +73,21 @@ if not skip_questions_paced:
     Q1_correct = locals()[curr_text_nr + "_Q1_corr"]
 
     question, answers = setup_question(Q1_text, Q1_answers)
-    display_question(question, answers)
+    question_time, onset_time_rel2trigger = display_question(question, answers)
     chosen_ans, is_correct = get_response(answers, Q1_correct)
     print(f"Chosen answer for Q1: {chosen_ans}, Correct: {is_correct}")
     reset_answers(answers)
 
     # save data:
+    thisExp.addData('global_onset_time', question_time)
+    thisExp.addData('onset_time_rel2trigger', onset_time_rel2trigger)
     thisExp.addData('question', 'Q1')
     thisExp.addData('chosen_ans', chosen_ans)
     thisExp.addData('ans_correct', chosen_ans == Q1_correct)
     thisExp.addData('text_nr', curr_text_nr)
-    thisExp.addData('block_nr_exp', exp_block_counter)
-    thisExp.addData('run_nr', "run1")
-    thisExp.addData('block_nr_run', block_nr_run)
+    thisExp.addData('block_nr_exp', exp_block_counter+1)
+    thisExp.addData('run_nr', '1')
+    thisExp.addData('block_nr_run', run1_block_counter+1)
     thisExp.addData('block_name', curr_block)
     thisExp.addData('n-back_level', curr_nback_cond)
 
@@ -90,19 +100,21 @@ if not skip_questions_paced:
     Q2_correct = locals()[curr_text_nr + "_Q2_corr"]
 
     question, answers = setup_question(Q2_text, Q2_answers)
-    display_question(question, answers)
+    question_time, onset_time_rel2trigger = display_question(question, answers)
     chosen_ans, is_correct = get_response(answers, Q2_correct)
     print(f"Chosen answer for Q2: {chosen_ans}, Correct: {is_correct}")
     reset_answers(answers)
 
     # save data:
+    thisExp.addData('global_onset_time', question_time)
+    thisExp.addData('onset_time_rel2trigger', onset_time_rel2trigger)
     thisExp.addData('question', 'Q2')
     thisExp.addData('chosen_ans', chosen_ans)
     thisExp.addData('ans_correct', chosen_ans == Q2_correct)
     thisExp.addData('text_nr', curr_text_nr)
-    thisExp.addData('block_nr_exp', exp_block_counter)
-    thisExp.addData('run_nr', "run1")
-    thisExp.addData('block_nr_run', block_nr_run)
+    thisExp.addData('block_nr_exp', exp_block_counter+1)
+    thisExp.addData('run_nr', "1")
+    thisExp.addData('block_nr_run', run1_block_counter+1)
     thisExp.addData('block_name', curr_block)
     thisExp.addData('n-back_level', curr_nback_cond)
 
@@ -115,19 +127,21 @@ if not skip_questions_paced:
     Q3_correct = locals()[curr_text_nr + "_Q3_corr"]
 
     question, answers = setup_question(Q3_text, Q3_answers)
-    display_question(question, answers)
+    question_time, onset_time_rel2trigger = display_question(question, answers)
     chosen_ans, is_correct = get_response(answers, Q3_correct)
     print(f"Chosen answer for Q3: {chosen_ans}, Correct: {is_correct}")
     reset_answers(answers)
 
     # save data:
+    thisExp.addData('global_onset_time', question_time)
+    thisExp.addData('onset_time_rel2trigger', onset_time_rel2trigger)
     thisExp.addData('question', 'Q3')
     thisExp.addData('chosen_ans', chosen_ans)
     thisExp.addData('ans_correct', chosen_ans == Q3_correct)
     thisExp.addData('text_nr', curr_text_nr)
-    thisExp.addData('block_nr_exp', exp_block_counter)
-    thisExp.addData('run_nr', "run1")
-    thisExp.addData('block_nr_run', block_nr_run)
+    thisExp.addData('block_nr_exp', exp_block_counter+1)
+    thisExp.addData('run_nr', "1")
+    thisExp.addData('block_nr_run', run1_block_counter+1)
     thisExp.addData('block_name', curr_block)
     thisExp.addData('n-back_level', curr_nback_cond)
 
@@ -137,7 +151,7 @@ if not skip_questions_paced:
     # go to next block!
     exp_block_counter += 1
     run1_block_counter += 1
-    print(f"Going to block {exp_block_counter + 1}/20 in the experiment now!")
+    print(f"Going to block {exp_block_counter + 1}/10 in the experiment now!")
     print(f"Going to block {run1_block_counter + 1}/2 in run 1 now!")
     continueRoutine = False
 

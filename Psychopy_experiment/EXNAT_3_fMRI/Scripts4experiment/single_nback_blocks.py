@@ -1,8 +1,9 @@
-#################################################
-#        Blocks w/o text – single n-back        #
-#################################################
-# this routine is for all blocks where there are
-# coloured rectangles instead of words and participants are presented with a paced version, i.e., rectangles are presented based on their reaction times in a
+# ################################################
+#         Blocks w/o text – single n-back        #
+# ################################################
+# this routine is for all blocks where there are coloured rectangles
+# instead of words and participants are presented with a paced version, i.e., rectangles are presented based on their
+# reaction times in the training before scanning
 
 if 2 <= exp_block_counter <= 5:
 
@@ -27,30 +28,47 @@ if 2 <= exp_block_counter <= 5:
         elif curr_block == "2back_single_main_no_click":
             print("Using RT_per_rectangle_twoback for this block:", RT_per_rectangle_twoback_single)
 
-        # keep background ivory
+        # light background
         win.setColor(light_bg_col, colorSpace='rgb')
         win.flip()
 
         ### Show instructions
-        # set instruction text
-        instr_text = locals()["instr_" + curr_block]
-        # create text box
-        instr_text_stim = visual.TextStim(win,
-                                          text=instr_text,
-                                          height=0.03,  # font height relative to height of screen
-                                          pos=(0, 0.2),  # move up a bit
-                                          color="black")
-        # create ImageStim object
-        curr_instr_pic = visual.ImageStim(win,
-                                          size=(0.8, 0.3),
-                                          pos=(0, -0.2),
-                                          image=locals()["instr_pic_" + curr_block])  # set path to image here
+        # if it's the first block of this run, wait for the first scanner trigger before moving on
+        if exp_block_counter == 2:
 
-        # show instructions on screen
-        instr_text_stim.draw()
-        curr_instr_pic.draw()
-        win.flip()
-        core.wait(8.75)  # wait for 3s before starting response window
+            # set instruction text
+            instr_text = locals()["instr_" + curr_block]
+            instr_pic = locals()["instr_pic_" + curr_block]
+
+            first_trigger_time, trigger_count = log_trigger(instr_text, instr_pic, trigger_count)
+
+        else:
+            # set instruction text
+            instr_text = locals()["instr_" + curr_block]
+            # create text box
+            instr_text_stim = visual.TextStim(win,
+                                              text=instr_text,
+                                              height=0.03,  # font height relative to height of screen
+                                              pos=(0, 0.2),  # move up a bit
+                                              color="black",
+                                              wrapwidth=1.5)
+            # instr_text_stim = visual.TextBox2(win,
+            #                                   text=instr_text,
+            #                                   letterHeight=0.03,  # font height relative to height of screen
+            #                                   pos=(0, 0.2),  # move up a bit
+            #                                   color="black")
+            #                                   #wrapwidth = 1.5)
+            # create ImageStim object
+            curr_instr_pic = visual.ImageStim(win,
+                                              size=(0.8, 0.3),
+                                              pos=(0, -0.2),
+                                              image=locals()["instr_pic_" + curr_block])  # set path to image here
+
+            # show instructions on screen
+            instr_text_stim.draw()
+            curr_instr_pic.draw()
+            win.flip()
+            core.wait(8.75)  # wait for 3s before starting response window
 
         ### change background colour
         win.setColor(dark_bg_col, colorSpace='rgb')
@@ -168,6 +186,8 @@ if 2 <= exp_block_counter <= 5:
             # start trial clock for measuring RTs from stimulus onset
             my_trial_clock.reset()
             onset_time = my_trial_clock.getTime()
+            global_onset_time = globalClock.getTime()
+            onset_time_rel2trigger = global_onset_time - first_trigger_time
 
             ### start recording responses
             # start "endless" while loop that looks for responses
@@ -179,7 +199,7 @@ if 2 <= exp_block_counter <= 5:
                 win.flip()
 
                 # check for responses:
-                keys = event.getKeys(['c', 'escape'])
+                keys = event.getKeys(['1', 'escape'])
 
                 # check if there was a response. If there wasn't, we can go straight
                 # to the next iteration which will hopefully save us some dropped
@@ -188,7 +208,7 @@ if 2 <= exp_block_counter <= 5:
 
                     # if participant pressed button "c" for the first time and it's an n-back condition
                     # where they're actually supposed to do that (aka not a reading baseline condition)...
-                    if key == 'c' and curr_nback_cond != None and saw_target == False:
+                    if key == '1' and curr_nback_cond != None and saw_target == False:
                         # get reaction time
                         curr_nback_RT = my_trial_clock.getTime() * 1000
                         # send trigger for response:
@@ -232,14 +252,16 @@ if 2 <= exp_block_counter <= 5:
 
             ### save everything in output csv
             thisExp.addData('colour', curr_col)
+            thisExp.addData('global_onset_time', global_onset_time)
+            thisExp.addData('onset_time_rel2trigger', onset_time_rel2trigger)
             thisExp.addData('target', curr_target)
             thisExp.addData('nback_response', curr_nback_response)
             thisExp.addData('nback_RT', curr_nback_RT)  # in ms
             thisExp.addData('duration', curr_duration)  # in ms
             thisExp.addData('trial_nr', curr_trial_nr)
-            thisExp.addData('block_nr_exp', exp_block_counter)
-            thisExp.addData('run_nr', 'run2')
-            thisExp.addData('block_nr_run', run2_block_counter)
+            thisExp.addData('block_nr_exp', exp_block_counter+1)
+            thisExp.addData('run_nr', '2')
+            thisExp.addData('block_nr_run', run2_block_counter+1)
             thisExp.addData('block_name', curr_block)
             thisExp.addData('n-back_level', curr_nback_cond)
 
