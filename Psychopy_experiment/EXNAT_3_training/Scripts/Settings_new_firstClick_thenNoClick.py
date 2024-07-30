@@ -136,22 +136,6 @@ print("create n-back colour lists")
 # --> all in all, 20 blocks
 
 # So for every block, build a list with colour codes containing the right amount of targets.
-# The function is defined in another script bc it's super long,
-# I import it at the beginning of this script.
-
-# First, create list with length of all texts. The length of the blocks is
-# always in the same order, only the conditions change.
-
-blocks_click = ["Reading_Baseline_training_click", "Reading_Baseline_main_click", "0back_single_training",
-                "0back_dual_main_click", "1back_single_training1", "1back_single_training2", "1back_single_main",
-                "1back_dual_main_click", "2back_single_training1", "2back_single_training2", "2back_single_main",
-                "2back_dual_main_click"]
-reading_no_click = ["Reading_Baseline_training_no_click", "Reading_Baseline_main_no_click", "0back_dual_main_no_click"]
-
-# then you get both n-back conditions with trainings (which of them is first is randomized)
-oneback = ["1back_single_main_no_click", "1back_dual_main_no_click"]
-twoback = ["2back_single_main_no_click", "2back_dual_main_no_click"]
-
 blocks_textlen = [60, 91, 20, 91,
                   20, 20, 90, 91,
                   20, 20, 90, 91,
