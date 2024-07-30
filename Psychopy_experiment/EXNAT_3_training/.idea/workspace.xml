@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="3d621c0e-9aaa-4613-a78c-1840be8743e2" name="Changes" comment="update EXNAT-3 task training">
+      <change afterPath="$PROJECT_DIR$/../EXNAT_3_fMRI_Psychopy2023.1.3/Scripts4experiment/Eyetracker_calibration_setup.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../EXNAT_3_fMRI_Psychopy2023.1.3/Scripts4experiment/Pupil_measurement.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../EXNAT_3_fMRI_Psychopy2023.1.3/Scripts4experiment/Setup_Eyelink.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../EXNAT_3_fMRI_Psychopy2023.1.3/Scripts4experiment/end_experiment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/EXNAT3_texts_MC_Qs.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/EXNAT_3_fMRI.psyexp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/EXNAT_3_fMRI.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/Scripts4experiment/EXNAT_functions_import_texts.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/Scripts4experiment/Settings_stimuli_10texts.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/Scripts4experiment/dual_task_blocks.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/Scripts4experiment/questions.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/Scripts4experiment/questions_dual_task.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/Scripts4experiment/run_finished.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/Scripts4experiment/single_nback_blocks.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/Scripts4experiment/single_reading_blocks.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/Stimuli_and_Resources/EXNAT3_Instr_Pics/1back.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/Stimuli_and_Resources/EXNAT3_Instr_Pics/1back_rect.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/Stimuli_and_Resources/EXNAT3_Instr_Pics/2back.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/Stimuli_and_Resources/EXNAT3_Instr_Pics/2back_rect.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/Stimuli_and_Resources/EXNAT3_Instr_Pics/BL_single.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/Stimuli_and_Resources/EXNAT3_Instr_Pics/dual.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/Stimuli_and_Resources/EXNAT3_Instr_Pics/vis_task.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/Stimuli_and_Resources/EXNAT3_Instr_Pics/warning.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/fmri_exp_dur_calculations.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/nback_colour_generator.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../EXNAT_3_fMRI/readme.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Scripts/Settings_alternativeSetup.py" beforeDir="false" afterPath="$PROJECT_DIR$/Scripts/Settings_new_firstClick_thenNoClick.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager">
+    <option name="groupingKeys">
+      <option value="directory" />
+    </option>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="2jKaVtUtX2pw9Of1klulMNiveNy" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/data/tu_martin_cloud/EXNAT/EXNAT_fMRI/Psychopy_experiment/EXNAT_3_training&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;Python&quot;
+    ]
+  }
+}</component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings module-name="EXNAT_3_training" is-module-sdk="true">
+        <option name="useSoftWraps" value="true" />
+        <option name="myUseModuleSdk" value="true" />
+        <option name="myModuleName" value="EXNAT_3_training" />
+      </console-settings>
+    </option>
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/Scripts" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-PY-241.14494.241" />
+        <option value="bundled-python-sdk-0509580d9d50-28c9f5db9ffe-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-241.14494.241" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3d621c0e-9aaa-4613-a78c-1840be8743e2" name="Changes" comment="" />
+      <created>1721138248895</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1721138248895</updated>
+      <workItem from="1721138249948" duration="23000" />
+      <workItem from="1721138278607" duration="51000" />
+      <workItem from="1721138336205" duration="1777000" />
+      <workItem from="1721140139993" duration="34706000" />
+      <workItem from="1721315612326" duration="648000" />
+      <workItem from="1721728131025" duration="2770000" />
+      <workItem from="1721823962795" duration="7695000" />
+      <workItem from="1721836287521" duration="4628000" />
+      <workItem from="1722350522662" duration="912000" />
+      <workItem from="1722359724836" duration="321000" />
+    </task>
+    <task id="LOCAL-00001" summary="update EXNAT-3 task training">
+      <option name="closed" value="true" />
+      <created>1721833160928</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1721833160928</updated>
+    </task>
+    <task id="LOCAL-00002" summary="update EXNAT-3 task training">
+      <option name="closed" value="true" />
+      <created>1721833206822</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1721833206822</updated>
+    </task>
+    <task id="LOCAL-00003" summary="update EXNAT-3 task training">
+      <option name="closed" value="true" />
+      <created>1721837183959</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1721837183959</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="update EXNAT-3 task training" />
+    <option name="LAST_COMMIT_MESSAGE" value="update EXNAT-3 task training" />
+  </component>
+</project>
