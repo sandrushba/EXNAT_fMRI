@@ -176,6 +176,17 @@ else:
 
     ### Start block loop
 
+    if curr_block == "1back_single_main_no_click":
+        oneback_single_n_hits = 0
+        oneback_single_n_misses = 0
+        oneback_single_n_false_alarms = 0
+        oneback_single_n_correct_rejections = 0
+    elif curr_block == "2back_single_main_no_click":
+        twoback_single_n_hits = 0
+        twoback_single_n_misses = 0
+        twoback_single_n_false_alarms = 0
+        twoback_single_n_correct_rejections = 0
+
     # CREATE CLOCKS:
     my_block_clock = core.Clock()
     my_block_clock.reset()  # start block clock
@@ -310,6 +321,25 @@ else:
 
         # start a new row in the csv
         thisExp.nextEntry()
+
+        if curr_block == "1back_single_main_no_click":
+            if curr_nback_response == "hit":
+                oneback_single_n_hits += 1
+            elif curr_nback_response == "miss":
+                oneback_single_n_misses += 1
+            elif curr_nback_response == "false alarm":
+                oneback_single_n_false_alarms += 1
+            elif curr_nback_response == "correct rejection":
+                oneback_single_n_correct_rejections += 1
+        elif curr_block == "2back_single_main_no_click":
+            if curr_nback_response == "hit":
+                twoback_single_n_hits += 1
+            elif curr_nback_response == "miss":
+                twoback_single_n_misses += 1
+            elif curr_nback_response == "false alarm":
+                twoback_single_n_false_alarms += 1
+            elif curr_nback_response == "correct rejection":
+                twoback_single_n_correct_rejections += 1
 
         ### IF TESTING MODE ENABLED: end loop after 4 trials
         if expInfo['testing_mode'] == "yes":
