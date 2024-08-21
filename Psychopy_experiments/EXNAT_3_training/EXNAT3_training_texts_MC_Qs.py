@@ -88,6 +88,8 @@ instr_0back_dual_main_no_click1 = "LESEN MIT FARBERKENNUNG OHNE TASTENDRUCK\n\n\
 instr_0back_dual_main_no_click2 = "Am Ende des Blocks werden Ihnen wieder Verständnisfragen zum Inhalt des " \
                               "Texts gestellt.\nBitte drücken Sie die Leertaste, um den Block zu starten. "
 
+instr_pic_0back_dual_no_click = instr_pic_path + "0back_button.png"
+
 instr_1back_single_training1 = "ÜBUNG 1-ZURÜCK\n\n\nIn den nun folgenden Blöcken geht es darum, auf Wiederholungen " \
                                "der Farben zu achten:\n\nBitte drücken Sie die Taste C auf Ihrer Tastatur, " \
                                "wenn die aktuelle Farbe die gleiche ist wie die des vorherigen Rechtecks (1 " \

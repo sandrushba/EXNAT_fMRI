@@ -38,7 +38,7 @@ from EXNAT3_training_texts_MC_Qs import instr_pic_path, instr_Reading_Baseline_t
     instr_pic_Reading_Baseline_training_click, instr_Reading_pseudotext_no_click, instr_Reading_Baseline_main_click, \
     instr_pic_Reading_Baseline_main_click, instr_Reading_Baseline_main_no_click, instr_click_training, \
     instr_pic_click_training, instr_0back_single_training1, instr_0back_single_training2, instr_pic_0back, instr_0back_dual_main_click1, instr_0back_dual_main_click2, instr_0back_dual_main_no_click1, instr_0back_dual_main_no_click2, instr_1back_single_training1, instr_pic_1back_single_training1, \
-    instr_1back_single_training2, instr_pic_1back_single_training2, instr_1back_single_main, \
+    instr_pic_0back_dual_no_click, instr_1back_single_training2, instr_pic_1back_single_training2, instr_1back_single_main, \
     instr_pic_1back_single_main, instr_1back_single_main_no_click, instr_pic_1back_single_main_no_click, instr_1back_dual_main_click, instr_pic_1back_dual_main_click, \
     instr_1back_dual_main_no_click, instr_2back_single_training1, instr_pic_2back_single_training1, \
     instr_2back_single_training2, instr_pic_2back_single_training2, instr_2back_single_main, \

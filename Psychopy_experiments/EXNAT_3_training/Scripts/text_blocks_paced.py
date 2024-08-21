@@ -344,7 +344,7 @@ elif curr_block in ["Reading_Baseline_main_no_click", "0back_dual_main_no_click"
         curr_instr_pic = visual.ImageStim(win,
                                           size=(0.55, 0.25),
                                           pos=(0, -0.15),
-                                          image=locals()["instr_pic_0back"])  # set path to image here
+                                          image=locals()["instr_pic_0back_dual_no_click"])  # set path to image here
 
         # show instructions
         win.setColor(light_bg_col, colorSpace='rgb')
