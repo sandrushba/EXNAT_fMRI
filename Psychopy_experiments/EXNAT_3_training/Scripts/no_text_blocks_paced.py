@@ -211,6 +211,13 @@ else:
     for trial_idx, curr_col in enumerate(curr_colours):
         # print("current idx: " + str(trial_idx) + ", curr colour:" + curr_col)
 
+        # clear buffer of all previously recorded key events:
+        event.clearEvents()
+
+        # clear the input buffer before starting the trial
+        ser.flushInput()
+        button_pressed = None
+
         ### prepare & show current trial:
         my_trial_clock.reset()  # start trial clock
         onset_time = my_trial_clock.getTime()
@@ -248,40 +255,34 @@ else:
         onset_time = my_trial_clock.getTime()
 
         ### start recording responses
-        # start "endless" while loop that looks for responses
+        # start while loop that looks for responses
         # --> end while loop only if duration for current word is over
         while my_trial_clock.getTime() < (onset_time + curr_duration):
 
-            # draw stimulus on screen
             stim.draw()
             win.flip()
 
-            # check for responses:
-            keys = event.getKeys(['c', 'escape'])
+            # check for key responses:
+            keys = event.getKeys(['escape'])
+            if 'escape' in keys:
+                core.wait(0.5)
+                core.quit()
 
-            # check if there was a response. If there wasn't, we can go straight
-            # to the next iteration which will hopefully save us some dropped
-            # frames in the flicker.
-            for key in keys:
+            # Calculate remaining time for the stimulus
+            remaining_time = (onset_time + curr_duration) - my_trial_clock.getTime()
+            ser.timeout = remaining_time
 
-                # if participant pressed button "c" for the first time and it's an n-back condition
-                # where they're actually supposed to do that (aka not a reading baseline condition)...
-                if key == 'c' and curr_nback_cond != None and saw_target == False:
-                    # get reaction time
+            # Check for button box responses
+            response = ser.read()
+            if response:
+                button_pressed = response.hex()
+                if button_pressed == '01' and curr_nback_cond is not None and not saw_target:
+                    # Get reaction time
                     curr_nback_RT = my_trial_clock.getTime() * 1000
-                    # send trigger for response:
+                    # Send trigger for response:
                     # send_trigger("response_target")
-                    # only get first target response, we don't care if they press the button more than once:
+                    # Only get first target response, we don't care if they press the button more than once:
                     saw_target = True
-
-                # If esc is pressed, end the experiment:
-                elif key == 'escape':
-                    # et_abort_exp()  # shut down eyetrigger and download incremental data
-                    # close trigger & close experiment
-                    # core.wait(time_after_trigger)
-                    # parallel.setData(0)
-                    core.wait(0.5)
-                    core.quit()
 
         ### end trial
         # print("end paced rect trial")
@@ -311,6 +312,7 @@ else:
         ### save everything in output csv
         thisExp.addData('colour', curr_col)
         thisExp.addData('target', curr_target)
+        thisExp.addData('button_pressed', button_pressed)
         thisExp.addData('nback_response', curr_nback_response)
         thisExp.addData('nback_RT', curr_nback_RT)  # in ms
         thisExp.addData('duration', curr_duration)  # in ms

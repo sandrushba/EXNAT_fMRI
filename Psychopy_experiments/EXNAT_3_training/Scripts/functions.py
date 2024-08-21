@@ -25,6 +25,13 @@ import time
 # math package for log function
 import math
 
+# Button box set-up
+# Import serial for button box
+import serial
+# Initialize serial connection
+ser = serial.Serial('/dev/ttyUSB0', 19200)
+
+
 # Get functions from my custom scripts:
 # import all texts
 from EXNAT3_training_texts_MC_Qs import instr_pic_path, instr_Reading_Baseline_training_click, \

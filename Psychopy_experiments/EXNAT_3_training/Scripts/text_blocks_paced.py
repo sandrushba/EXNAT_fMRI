@@ -335,7 +335,7 @@ elif curr_block in ["Reading_Baseline_main_no_click", "0back_dual_main_no_click"
         # create "empty" circle as stimulus
         instr_colour_circle_stim = visual.Circle(win=win,
                                                  radius=0.065,
-                                                 pos=(0, 0.1))  # move circle slightly down
+                                                 pos=(0, 0.075))  # move circle slightly down
 
         # set current target colour as colour of circle:
         instr_colour_circle_stim.fillColor = target_colours_list[2]
@@ -557,6 +557,10 @@ if curr_block in ["Reading_Baseline_training_no_click", "Reading_Baseline_main_n
     # clear buffer of all previously recorded key events:
     event.clearEvents()
 
+    # clear the input buffer before starting the trial
+    ser.flushInput()
+    button_pressed = None
+
     # CREATE CLOCKS:
     my_block_clock = core.Clock()
     my_block_clock.reset()  # start block clock
@@ -597,7 +601,7 @@ if curr_block in ["Reading_Baseline_training_no_click", "Reading_Baseline_main_n
         onset_time = my_trial_clock.getTime()
 
         ### wait for key response:
-        # In blocks with n-back task, participants can press "c" to indicate they saw a target colour.
+        # In blocks with n-back task, participants can press button 1 on the button box to indicate they saw a target colour.
 
         ### start recording responses
         # start while loop that looks for responses
@@ -608,29 +612,48 @@ if curr_block in ["Reading_Baseline_training_no_click", "Reading_Baseline_main_n
             win.flip()
 
             # check for key responses:
-            keys = event.getKeys(['c', 'escape'])
+            keys = event.getKeys(['escape'])
+            if 'escape' in keys:
+                core.wait(0.5)
+                core.quit()
 
-            # if there were, check responses:
-            for key in keys:
+            # Calculate remaining time for the stimulus
+            remaining_time = (onset_time + curr_duration) - my_trial_clock.getTime()
+            ser.timeout = remaining_time
 
-                # if participant pressed button "c" for the first time and it's an n-back condition
-                # where they're actually supposed to do that (aka not a reading baseline condition)...
-                if key == 'c' and curr_nback_cond != None and saw_target == False:
-                    # get reaction time
+            # Check for button box responses
+            response = ser.read()
+            if response:
+                button_pressed = response.hex()
+                if button_pressed == '01' and curr_nback_cond is not None and not saw_target:
+                    # Get reaction time
                     curr_nback_RT = my_trial_clock.getTime() * 1000
-                    # send trigger for response:
+                    # Send trigger for response:
                     # send_trigger("response_target")
-                    # only get first target response, we don't care if they press the button more than once:
+                    # Only get first target response, we don't care if they press the button more than once:
                     saw_target = True
 
-                # If esc is pressed, end the experiment:
-                elif key == 'escape':
-                    # et_abort_exp()  # shut down eyetrigger and download incremental data
-                    # close trigger & close experiment
-                    # core.wait(time_after_trigger)
-                    # parallel.setData(0)
-                    core.wait(0.5)
-                    core.quit()
+            # # if there were, check responses:
+            # for resp in response:
+            #
+            #     # if participant pressed button "c" for the first time and it's an n-back condition
+            #     # where they're actually supposed to do that (aka not a reading baseline condition)...
+            #     if resp == 'c' and curr_nback_cond != None and saw_target == False:
+            #         # get reaction time
+            #         curr_nback_RT = my_trial_clock.getTime() * 1000
+            #         # send trigger for response:
+            #         # send_trigger("response_target")
+            #         # only get first target response, we don't care if they press the button more than once:
+            #         saw_target = True
+            #
+            #     # If esc is pressed, end the experiment:
+            #     elif key == 'escape':
+            #         # et_abort_exp()  # shut down eyetrigger and download incremental data
+            #         # close trigger & close experiment
+            #         # core.wait(time_after_trigger)
+            #         # parallel.setData(0)
+            #         core.wait(0.5)
+            #         core.quit()
 
         ### end trial
         # print("\tend paced trial")
@@ -664,6 +687,7 @@ if curr_block in ["Reading_Baseline_training_no_click", "Reading_Baseline_main_n
         thisExp.addData('target', curr_target)
         if curr_block == "0back_dual_main_no_click":
             thisExp.addData('curr_0back_target', target_colours_list[2])
+        thisExp.addData('button_pressed', button_pressed)
         thisExp.addData('nback_response', curr_nback_response)
         thisExp.addData('nback_RT', curr_nback_RT)  # in ms
         thisExp.addData('duration', curr_duration * 1000)  # in ms
@@ -713,11 +737,3 @@ if curr_block in ["Reading_Baseline_training_no_click", "Reading_Baseline_main_n
                 break
 
     print("finished presenting trials")
-
-    # Send end of block trigger:
-    # core.wait(time_after_trigger)  # wait 3 ms
-    # send block offset trigger
-    # send_trigger("block_offset")
-
-# end current routine
-# continueRoutine = False

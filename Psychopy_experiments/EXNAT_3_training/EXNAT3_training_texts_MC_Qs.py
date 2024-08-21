@@ -83,7 +83,7 @@ instr_0back_dual_main_click2 = "Am Ende des Blocks werden Ihnen wieder Verständ
 instr_0back_dual_main_no_click1 = "LESEN MIT FARBERKENNUNG OHNE TASTENDRUCK\n\n\nGut gemacht!\n\nIm folgenden Block werden " \
                                  "die Wörter " \
                                  "von allein abgespielt. Sie müssen also NICHT die Leertaste drücken.\n\nBitte " \
-                                 "drücken Sie aber schnellstmöglich die Taste C, wenn das Wort die folgende Farbe hat: "
+                                 "drücken Sie aber schnellstmöglich die Zieltaste (Zeigefinger), wenn das Wort die folgende Farbe hat: "
 
 instr_0back_dual_main_no_click2 = "Am Ende des Blocks werden Ihnen wieder Verständnisfragen zum Inhalt des " \
                               "Texts gestellt.\nBitte drücken Sie die Leertaste, um den Block zu starten. "
@@ -109,11 +109,11 @@ instr_pic_1back_single_main = instr_pic_path + "1back_rect.jpeg"
 
 instr_1back_single_main_no_click = "1-ZURÜCK OHNE TASTENDRUCK\n\n\nGut gemacht!\n\nIm folgenden Block werden " \
                                  "die Rechtecke " \
-                                 "wieder von allein abgespielt. Sie müssen also nicht die Leertaste drücken.\n\nBitte " \
-                                 "drücken Sie aber so schnell wie möglich die Taste C, wenn die Farbe des " \
+                                 "wieder von allein abgespielt.\n\nBitte " \
+                                 "drücken Sie aber so schnell wie möglich die Zieltaste (Zeigefinger), wenn die Farbe des " \
                                  "aktuellen Rechtecks mit der des vorherigen Rechtecks (1 zurück) übereinstimmt.\n\nDrücken " \
                                  "Sie die Leertaste, um den Block zu starten."
-instr_pic_1back_single_main_no_click = instr_pic_path + "1back_rect.jpeg"
+instr_pic_1back_single_main_no_click = instr_pic_path + "1back_rect_button.png"
 
 instr_1back_dual_main_click = "LESEN MIT 1-ZURÜCK UND TASTENDRUCK\n\n\nNun wird das Lesen mit der Gedächtnisaufgabe " \
                               "kombiniert. Sie lesen einen Text Wort für Wort und klicken mithilfe der Leertaste " \
@@ -128,11 +128,11 @@ instr_pic_1back_dual_main_click = instr_pic_path + "1back.jpeg"
 
 instr_1back_dual_main_no_click = "LESEN MIT 1-ZURÜCK OHNE TASTENDRUCK\n\n\nGut gemacht!\n\nIm folgenden Block werden " \
                                  "die Wörter " \
-                                 "wieder von allein abgespielt. Sie müssen also nicht die Leertaste drücken.\n\nBitte " \
-                                 "drücken Sie aber so schnell wie möglich die Taste C, wenn die Farbe des " \
+                                 "wieder von allein abgespielt.\n\nBitte " \
+                                 "drücken Sie aber so schnell wie möglich die Zieltaste (Zeigefinger), wenn die Farbe des " \
                                  "aktuellen Worts mit der des vorherigen Worts (1 zurück) übereinstimmt.\n\nDrücken " \
                                  "Sie die Leertaste, um den Block zu starten."
-instr_pic_1back_dual_main_no_click = instr_pic_path + "1back.jpeg"
+instr_pic_1back_dual_main_no_click = instr_pic_path + "1back_button.png"
 
 instr_2back_single_training1 = "ÜBUNG 2-ZURÜCK\n\n\nIn den nun folgenden Blöcken geht es darum, auf Wiederholungen " \
                                "der Farben zu achten:\n\nBitte drücken Sie die Taste C auf Ihrer Tastatur, " \
@@ -156,11 +156,11 @@ instr_pic_2back_single_main = instr_pic_path + "2back_rect.jpeg"
 
 instr_2back_single_main_no_click = "2-ZURÜCK OHNE TASTENDRUCK\n\n\nGut gemacht!\n\nIm folgenden Block werden " \
                                  "die Rechtecke " \
-                                 "wieder von allein abgespielt. Sie müssen also nicht die Leertaste drücken.\n\nBitte " \
-                                 "drücken Sie aber so schnell wie möglich die Taste C, wenn die Farbe des " \
+                                 "wieder von allein abgespielt.\n\nBitte " \
+                                 "drücken Sie aber so schnell wie möglich die Zieltaste (Zeigefinger), wenn die Farbe des " \
                                  "aktuellen Rechtecks mit der des vorletzten Rechtecks (2 zurück) übereinstimmt.\n\nDrücken " \
                                  "Sie die Leertaste, um den Block zu starten."
-instr_pic_2back_single_main_no_click = instr_pic_path + "2back_rect.jpeg"
+instr_pic_2back_single_main_no_click = instr_pic_path + "2back_rect_button.png"
 
 instr_2back_dual_main_click = "LESEN MIT 2-ZURÜCK UND TASTENDRUCK\n\n\nNun wird das Lesen mit der Gedächtnisaufgabe " \
                               "kombiniert. Sie lesen einen Text Wort für Wort und klicken mithilfe der Leertaste " \
@@ -174,11 +174,11 @@ instr_pic_2back_dual_main_click = instr_pic_path + "2back.jpeg"
 
 instr_2back_dual_main_no_click = "LESEN MIT 2-ZURÜCK OHNE TASTENDRUCK\n\n\nGut gemacht!\n\nIm folgenden Block werden " \
                                  "die Wörter " \
-                                 "wieder von allein abgespielt. Sie müssen also nicht die Leertaste drücken.\n\nBitte " \
-                                 "drücken Sie aber die Taste C, wenn die Farbe des " \
+                                 "wieder von allein abgespielt.\n\nBitte " \
+                                 "drücken Sie aber die Zieltaste (Zeigefinger), wenn die Farbe des " \
                                  "aktuellen Worts mit der des vorletzten Worts (2 zurück) übereinstimmt.\n\nDrücken " \
                                  "Sie die Leertaste, um den Block zu starten."
-instr_pic_2back_dual_main_no_click = instr_pic_path + "2back.jpeg"
+instr_pic_2back_dual_main_no_click = instr_pic_path + "2back_button.png"
 
 # warning sign for change of task:
 warning_sign = instr_pic_path + "warning.jpeg"

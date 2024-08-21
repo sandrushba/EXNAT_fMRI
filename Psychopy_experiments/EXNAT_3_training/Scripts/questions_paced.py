@@ -24,7 +24,6 @@ def display_question_and_get_response(question, answers, correct_answer):
     countdown_timer = visual.TextStim(win, text='', pos=(0, -0.25), color="grey", height=0.02, anchorHoriz='center',
                                       alignText='center', wrapWidth=1)
 
-    # defaultKeyboard = keyboard.Keyboard()
     chosen_ans = "NA"
     is_correct = "NA"
     button_pressed = "NA"
@@ -40,22 +39,37 @@ def display_question_and_get_response(question, answers, correct_answer):
         countdown_timer.draw()
         win.flip()
 
-        keys = defaultKeyboard.getKeys(['1', '2', '3', '4'], waitRelease=False)
-        if keys:
-            key_name = keys[0].name  # Get the name of the first key pressed
-            button_pressed = key_name
+        if ser.in_waiting > 0:
+            response = ser.read()
+            button_pressed = response.hex()
 
-            # Now, use the key_name to determine the action
-            if key_name == '1':
+            if button_pressed == '01':
                 index = 0  # Corresponds to the first choice
-            elif key_name == '2':
+            elif button_pressed == '02':
                 index = 1  # Corresponds to the second choice
-            elif key_name == '3':
+            elif button_pressed == '03':
                 index = 2  # Corresponds to the third choice
-            elif key_name == '4':
+            elif button_pressed == '04':
                 index = 3  # Corresponds to the fourth choice
             else:
                 index = None  # Just in case, not really needed if you're sure about the input keys
+
+        # keys = defaultKeyboard.getKeys(['1', '2', '3', '4'], waitRelease=False)
+        # if keys:
+        #     key_name = keys[0].name  # Get the name of the first key pressed
+        #     button_pressed = key_name
+        #
+        #     # Now, use the key_name to determine the action
+        #     if key_name == '1':
+        #         index = 0  # Corresponds to the first choice
+        #     elif key_name == '2':
+        #         index = 1  # Corresponds to the second choice
+        #     elif key_name == '3':
+        #         index = 2  # Corresponds to the third choice
+        #     elif key_name == '4':
+        #         index = 3  # Corresponds to the fourth choice
+        #     else:
+        #         index = None  # Just in case, not really needed if you're sure about the input keys
 
             # Proceed with your logic based on the index
             if index is not None:
