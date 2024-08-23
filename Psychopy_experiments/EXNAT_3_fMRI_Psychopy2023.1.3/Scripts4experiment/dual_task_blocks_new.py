@@ -203,7 +203,7 @@ def process_block(block_config, curr_text, run_nr, block_nr_run, curr_block, cur
                     core.quit()
 
         ### end trial
-        print("\tend paced trial")
+        # print("\tend paced trial")
         # stop display of current word & send trial offset trigger
         win.callOnFlip(send_trigger, "trial_offset")
 

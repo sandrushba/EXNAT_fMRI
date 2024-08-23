@@ -570,7 +570,7 @@ pseudo_text_06 = ["Der", "Schwastwaff,", "mit", "seiser", "einküsartiden", "Fro
                   "benermerzt.", "Die", "Lediän", "ost", "gicht", "hor", "bei", "Fliwehrern", "und", "Sadspicklern",
                   "beninnt,", "zündern", "eich", "bei", "Sabterern", "self", "bedieft.", "Diese", "nöhnen", "beim",
                   "Gurchscheimen", "der", "isöllischen", "Lackschahnen", "seibrielseiche", "roktene", "Fildfugnen",
-                  "wie", "den", "Schwastwaffenchion", "und", "die", "Sonberpichel", "entleffen.", "Die", "orthache",
+                  "wie", "den", "Schwastwaffenchion", "und", "die", "Sonberpichel", "entleffen.", "Die",
                   "Todrikturplinche", "aswietet", "darau", "ett", "mit", "Fußeltnerwinde", "zurehmen,", "um",
                   "kächerzustengen,", "dass", "dieser", "Zagurtaum", "eich", "für", "mämmende", "Heminalianen",
                   "bewennt", "wipt."]

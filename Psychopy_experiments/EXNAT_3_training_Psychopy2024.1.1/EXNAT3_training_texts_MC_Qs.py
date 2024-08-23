@@ -188,13 +188,11 @@ warning_sign = instr_pic_path + "warning.jpeg"
 """ Reading Baseline Training: """
 
 # the training text is the first paragraph of the novel "Die Schachnovelle" by Stefan Zweig
-reading_bl_tr_text = ["Auf", "dem", "großen", "Passagierdampfer,", "der", "um", "Mitternacht", "von", "New", "York",
-                      "nach", "Buenos", "Aires", "abgehen", "sollte,", "herrschte", "die", "übliche", "Geschäftigkeit",
-                      "und", "Bewegung", "der", "letzten", "Stunde.", "Gäste", "vom", "Land", "verabschiedeten",
-                      "sich,", "während", "das", "Orchester", "zur", "Deckshow", "aufspielte.", "Abseits", "des",
-                      "Trubels", "bemerkten", "wir", "Blitzlichter:", "Reporter", "hatten", "den", "Weltschachmeister",
-                      "Mirko", "Czentovic,", "der", "nach", "Turnieren", "in", "Amerika", "nun", "nach", "Argentinien",
-                      "reiste,", "für", "ein", "Interview", "erwischt."]
+reading_bl_tr_text = ["Auf", "dem", "großen", "Passagierdampfer,", "der", "um", "Mitternacht", "von", "New", "York", "nach", "Buenos", "Aires", "abgehen", "sollte,", "herrschte", "geschäftiges", "Treiben.", "Einige", "Reporter",  "interviewten", "den", "berühmten", "Weltschachmeister", "Mirko", "Czentovic,", "der", "nach",  "Argentinien", "reiste."]
+                      # , "das", "Orchester", "zur", "Deckshow", "aufspielte.", "Abseits", "des",)
+                      # "Trubels", "bemerkten", "wir", "Blitzlichter:", "Reporter", "hatten", "den", "Weltschachmeister",
+                      # "Mirko", "Czentovic,", "der", "nach", "Turnieren", "in", "Amerika", "nun", "nach", "Argentinien",
+                      # "reiste,", "für", "ein", "Interview", "erwischt."]
 # prepare questions & answers:
 reading_bl_tr_Q1 = "Wo befinden sich die Personen im Text?"
 reading_bl_tr_Q1_ans = ["1) auf einem Schiff", "2) in einem Flugzeug", "3) in einem Zug", "4) in einem Bus"]
@@ -210,20 +208,15 @@ reading_bl_tr_Q3_ans = ["1) Schachspieler", "2) Dressurreiter", "3) Trickbetrüg
 reading_bl_tr_Q3_corr = "a"
 
 """ PACED Reading Baseline Training: """
-reading_bl_tr_text_no_click = ["In", "einem", "Augenblick", "der", "Stille", "hörte", "man", "die", "Wellen",
-                               "rauschen,", "das", "Radio", "aus", "dem", "Salon", "herüberjazzen", "und", "man",
-                               "vernahm", "auf", "einmal", "jeden", "Schritt", "vom", "Promenadendeck.", "Keiner",
-                               "von", "uns", "atmete,", "es", "war", "zu", "plötzlich", "gekommen", "und", "wir",
-                               "alle", "noch", "geradezu", "erschrocken", "über", "das", "Unwahrscheinliche,", "dass",
-                               "dieser", "Unbekannte", "dem", "Weltmeister", "in", "einer", "schon", "halb",
-                               "verlorenen", "Partie", "Schach", "seinen", "Willen", "aufgezwungen", "haben", "sollte."]
+reading_bl_tr_text_no_click = ["In", "dem", "Augenblick", "der", "Stille", "hörte", "man", "auf", "einmal", "die", "Wellen", "rauschen", "und", "jeden", "Schritt", "vom", "Promenadendeck.", "Wir", "alle", "waren", "erschrocken,", "dass", "dieser", "Unbekannte",  "dem", "Weltmeister", "im", "Schach", "überlegen", "war."]
+
 # prepare questions & answers:
 reading_bl_tr_no_click_Q1 = "Was hören die Personen vom Promenadendeck?"
 reading_bl_tr_no_click_Q1_ans = ["1) Hunde", "2) Schritte", "3) Stimmen", "4) Geschrei"]
 reading_bl_tr_no_click_Q1_corr = "b"
 
-reading_bl_tr_no_click_Q2 = "Was machte keiner der Zuschauer laut dem Text?"
-reading_bl_tr_no_click_Q2_ans = ["1) atmen", "2) rennen", "3) wegschauen", "4) jubeln"]
+reading_bl_tr_no_click_Q2 = "Wie reagierten die Menschen auf das Schachspiel?"
+reading_bl_tr_no_click_Q2_ans = ["1) erschrocken", "2) freudig", "3) traurig", "4) verzweifelt"]
 reading_bl_tr_no_click_Q2_corr = "a"
 
 reading_bl_tr_no_click_Q3 = "Wer wurde im Schach besiegt?"
@@ -437,12 +430,4 @@ text_08_Q3_corr = "c"
 reading_ps_text_no_click = ['Die', 'jittste', 'Vonwendinsternes', 'meuninierte', 'Masiosen', 'von', 'Känschen', 'im',
                             'vannen', 'Kand,', 'die', 'sech', 'verlonlelten,', 'um', 'dieses', 'roktene',
                             'aschagahische', 'Uneimdis', 'erbipen', 'zu', 'nöhnen.', 'An', 'jesem', 'Tut', 'strouten',
-                            'Stramen', 'von', 'Estrauers', 'zurehmen,', 'eibbegüstet', 'mit', 'trekiegten', 'Drollen',
-                            'und', 'Temegloßen,', 'um', 'den', 'reauskundwenden', 'Homell', 'zu', 'ermißen,', 'wenn',
-                            'der', 'Tond', 'die', 'Honze', 'gerdetzt.', 'In', 'Stoyten', 'wie', 'Bürchen,', 'Mamburs',
-                            'und', 'Berban', 'önrogisierten', 'winale', 'Benausschafte', 'ärlendliche',
-                            'Zeransporbumgen,', 'um', 'Rutethanenten', 'nentdundige', 'Rinträge', 'zu', 'vefen', 'und',
-                            'mokit', 'das', 'Verstänkmas', 'für', 'dieses', 'Zalusknümomem', 'zu', 'verleinen.',
-                            'Tritz', 'eikages', 'Wonlen', 'am', 'Rämmel', 'torrten', 'gaule', 'der', 'Kiefnehmer',
-                            'einen', 'abehmeleivenden', 'Frick', 'auf', 'die', 'verborcherte', 'Honze', 'erkistren',
-                            'und', 'erbipten', 'mokit', 'ein', 'harklich', 'einmadales', 'Schaufreil', 'der', 'Zagur.']
+                            'Stramen', 'mit', 'trekiegten', 'Drollen', 'zurehmen.']

@@ -136,16 +136,33 @@ print("create n-back colour lists")
 # --> all in all, 20 blocks
 
 # So for every block, build a list with colour codes containing the right amount of targets.
-blocks_textlen = [60, 91, 20, 91,
-                  20, 20, 90, 91,
-                  20, 20, 90, 91,
-                  60, 91, 91, 90, 91, 90, 91,
-                  100]
-blocks_target_counts = [15, 15, 5, 15,
-                        5, 5, 15, 15,
-                        5, 5, 15, 15,
-                        15, 15, 15, 15,
-                        15, 15, 15, 15]
+# blocks_textlen = [60, 91, 20, 91,
+#                   20, 20, 90, 91,
+#                   20, 20, 90, 91,
+#                   60, 91, 91, 90, 91, 90, 91,
+#                   100]
+# alternative, shorter:
+# Schachnovelle training texts: each 30 words
+# pseudotext: 30 words
+# dual task blocks:
+# single n-back blocks: 60 trials
+# bl = 30*1.5 + 30*1.5 + 91*1.5 + 91*1.5
+# ps = 60*1.5
+# single_nback = 2*60*1.5 + 2*60*2 + 40*1.5 + 40*2
+# dual = 2*91*2 + 2*91*2.5
+# sum = (bl + ps + single_nback + dual)/60
+
+blocks_textlen = [30, 91, 20, 91,
+                  20, 20, 60, 91,
+                  20, 20, 60, 91,
+                  30, 91, 91, 60,
+                  91, 60, 91, 30]
+
+blocks_target_counts = [5, 15, 5, 15,
+                        5, 5, 10, 15,
+                        5, 5, 10, 15,
+                        5, 15, 15, 10,
+                        15, 10, 15, 5]
 # Now loop this list. Check which condition we have there and the create colour list for each text.
 all_colour_lists = []
 all_target_lists = []

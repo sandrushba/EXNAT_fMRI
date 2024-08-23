@@ -53,12 +53,12 @@ while True:
         print(f"\t\tcorrect rejections: {twoback_n_correct_rejections}")
         print(f"\t\tcorrect answers to questions: {twoback_correct_answers}")
         print(f"These are the RTs for the fMRI experiment:")
-        print(f"RT_per_rect_1back_single: {RT_per_rectangle_oneback_single}")
-        print(f"RT_per_rect_2back_single: {RT_per_rectangle_twoback_single}")
-        print(f"\tRT_per_letter_baseline: {RT_per_letter_baseline}")
-        print(f"\tRT_per_letter_0back: {RT_per_letter_0back}")
-        print(f"\tRT_per_letter_1back: {RT_per_letter_1bck}")
-        print(f"\tRT_per_letter_2back: {RT_per_letter_2bck}")
+        print(f"RT_per_rect_1back_single: {round(RT_per_rectangle_oneback_single)}")
+        print(f"RT_per_rect_2back_single: {round(RT_per_rectangle_twoback_single)}")
+        print(f"\tRT_per_letter_baseline: {round(RT_per_letter_baseline)}")
+        print(f"\tRT_per_letter_0back: {round(RT_per_letter_0back)}")
+        print(f"\tRT_per_letter_1back: {round(RT_per_letter_1bck)}")
+        print(f"\tRT_per_letter_2back: {round(RT_per_letter_2bck)}")
 
         # end experiment
         break

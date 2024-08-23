@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2024.1.0),
-    on Wed Aug 21 22:44:31 2024
+    on Thu Aug 22 16:44:06 2024
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -48,7 +48,7 @@ expName = 'EXNAT_3_training'  # from the Builder filename that created this scri
 # information about this experiment
 expInfo = {
     'participant': '',
-    'testing_mode': 'yes',
+    'testing_mode': 'no',
     'date|hid': data.getDateStr(),
     'expName|hid': expName,
     'psychopyVersion|hid': psychopyVersion,
@@ -132,7 +132,7 @@ def setupData(expInfo, dataDir=None):
     thisExp = data.ExperimentHandler(
         name=expName, version='',
         extraInfo=expInfo, runtimeInfo=None,
-        originPath='/Users/sandramartin/ownCloud/EXNAT/EXNAT_fMRI/Psychopy_experiments/EXNAT_3_training/EXNAT_3_training_lastrun.py',
+        originPath='/data/tu_martin_cloud/EXNAT/EXNAT_fMRI/Psychopy_experiments/EXNAT_3_training/EXNAT_3_training_lastrun.py',
         savePickle=True, saveWideText=True,
         dataFileName=dataDir + os.sep + filename, sortColumns='time'
     )
@@ -186,7 +186,7 @@ def setupWindow(expInfo=None, win=None):
     if win is None:
         # if not given a window to setup, make one
         win = visual.Window(
-            size=[1920, 1080], fullscr=_fullScr, screen=0,
+            size=[1470, 956], fullscr=_fullScr, screen=0,
             winType='pyglet', allowStencil=True,
             monitor='testMonitor', color=[0,0,0], colorSpace='rgb',
             backgroundImage='', backgroundFit='none',
@@ -381,7 +381,8 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     # Import serial for button box
     import serial
     # Initialize serial connection
-    #ser = serial.Serial('/dev/ttyUSB0', 19200)
+    #ser = serial.Serial('/dev/tty.usbserial-130', 19200)
+    ser = serial.Serial('/dev/ttyUSB0', 19200)
     
     
     # Get functions from my custom scripts:
@@ -587,32 +588,33 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     # --> all in all, 20 blocks
     
     # So for every block, build a list with colour codes containing the right amount of targets.
-    # The function is defined in another script bc it's super long,
-    # I import it at the beginning of this script.
+    # blocks_textlen = [60, 91, 20, 91,
+    #                   20, 20, 90, 91,
+    #                   20, 20, 90, 91,
+    #                   60, 91, 91, 90, 91, 90, 91,
+    #                   100]
+    # alternative, shorter:
+    # Schachnovelle training texts: each 30 words
+    # pseudotext: 30 words
+    # dual task blocks:
+    # single n-back blocks: 60 trials
+    # bl = 30*1.5 + 30*1.5 + 91*1.5 + 91*1.5
+    # ps = 60*1.5
+    # single_nback = 2*60*1.5 + 2*60*2 + 40*1.5 + 40*2
+    # dual = 2*91*2 + 2*91*2.5
+    # sum = (bl + ps + single_nback + dual)/60
     
-    # First, create list with length of all texts. The length of the blocks is
-    # always in the same order, only the conditions change.
+    blocks_textlen = [30, 91, 20, 91,
+                      20, 20, 60, 91,
+                      20, 20, 60, 91,
+                      30, 91, 91, 60,
+                      91, 60, 91, 30]
     
-    blocks_click = ["Reading_Baseline_training_click", "Reading_Baseline_main_click", "0back_single_training",
-                    "0back_dual_main_click", "1back_single_training1", "1back_single_training2", "1back_single_main",
-                    "1back_dual_main_click", "2back_single_training1", "2back_single_training2", "2back_single_main",
-                    "2back_dual_main_click"]
-    reading_no_click = ["Reading_Baseline_training_no_click", "Reading_Baseline_main_no_click", "0back_dual_main_no_click"]
-    
-    # then you get both n-back conditions with trainings (which of them is first is randomized)
-    oneback = ["1back_single_main_no_click", "1back_dual_main_no_click"]
-    twoback = ["2back_single_main_no_click", "2back_dual_main_no_click"]
-    
-    blocks_textlen = [60, 91, 20, 91,
-                      20, 20, 90, 91,
-                      20, 20, 90, 91,
-                      60, 91, 91, 90, 91, 90, 91,
-                      100]
-    blocks_target_counts = [15, 15, 5, 15,
-                            5, 5, 15, 15,
-                            5, 5, 15, 15,
-                            15, 15, 15, 15,
-                            15, 15, 15, 15]
+    blocks_target_counts = [5, 15, 5, 15,
+                            5, 5, 10, 15,
+                            5, 5, 10, 15,
+                            5, 15, 15, 10,
+                            15, 10, 15, 5]
     # Now loop this list. Check which condition we have there and the create colour list for each text.
     all_colour_lists = []
     all_target_lists = []
@@ -682,142 +684,6 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     exp_block_counter = 0
     
     print("starting experiment now!")
-    
-    # --- Initialize components for Routine "demographics" ---
-    win.allowStencil = True
-    demographic_form = visual.Form(win=win, name='demographic_form',
-        items='demographics_form.csv',
-        textHeight=0.03,
-        font='Open Sans',
-        randomize=False,
-        style='custom...',
-        fillColor=[1.0000, 1.0000, 1.0000], borderColor=[1.0000, 1.0000, 1.0000], itemColor=[-1.0000, -1.0000, -1.0000], 
-        responseColor=[-1.0000, -1.0000, -1.0000], markerColor=[0.9608, 0.8431, 0.6863], colorSpace='rgb', 
-        size=(1.3, 0.9),
-        pos=(0, 0),
-        itemPadding=0.03,
-        depth=0
-    )
-    demographic_button = visual.ButtonStim(win, 
-        text='Weiter', font='Open Sans',
-        pos=(0.3, -0.35),
-        letterHeight=0.06,
-        size=(0.3, 0.12), borderWidth=0.0,
-        fillColor='darkgrey', borderColor=None,
-        color='white', colorSpace='rgb',
-        opacity=None,
-        bold=True, italic=False,
-        padding=None,
-        anchor='center',
-        name='demographic_button',
-        depth=-1
-    )
-    demographic_button.buttonClock = core.Clock()
-    
-    # --- Initialize components for Routine "education" ---
-    win.allowStencil = True
-    edu_form = visual.Form(win=win, name='edu_form',
-        items='education_form.csv',
-        textHeight=0.03,
-        font='Open Sans',
-        randomize=False,
-        style='custom...',
-        fillColor=[1.0000, 1.0000, 1.0000], borderColor=[1.0000, 1.0000, 1.0000], itemColor=[-1.0000, -1.0000, -1.0000], 
-        responseColor=[-1.0000, -1.0000, -1.0000], markerColor=[0.9608, 0.8431, 0.6863], colorSpace='rgb', 
-        size=(1.3, 0.9),
-        pos=(0, 0),
-        itemPadding=0.03,
-        depth=0
-    )
-    edu_button = visual.ButtonStim(win, 
-        text='Weiter', font='Open Sans',
-        pos=(0.3, -0.35),
-        letterHeight=0.06,
-        size=(0.3, 0.12), borderWidth=0.0,
-        fillColor='darkgrey', borderColor=None,
-        color='white', colorSpace='rgb',
-        opacity=None,
-        bold=True, italic=False,
-        padding=None,
-        anchor='center',
-        name='edu_button',
-        depth=-1
-    )
-    edu_button.buttonClock = core.Clock()
-    
-    # --- Initialize components for Routine "welcome_Ishihara" ---
-    instructions = visual.TextStim(win=win, name='instructions',
-        text='Farbsehtest\n\nIm Folgenden werden Ihnen nun einige Bilder gezeigt, auf denen jeweils eine Zahl zu sehen ist.\n\nBitte geben Sie unter jedem Bild an, welche Zahl Sie sehen. ',
-        font='Open Sans',
-        pos=(0, 0), height=0.035, wrapWidth=None, ori=0.0, 
-        color='black', colorSpace='rgb', opacity=None, 
-        languageStyle='LTR',
-        depth=0.0);
-    instr_button = visual.ButtonStim(win, 
-        text='Weiter', font='Open Sans',
-        pos=(0.3, -0.35),
-        letterHeight=0.035,
-        size=(0.3, 0.12), borderWidth=0.0,
-        fillColor='darkgrey', borderColor=None,
-        color='white', colorSpace='rgb',
-        opacity=None,
-        bold=True, italic=False,
-        padding=None,
-        anchor='center',
-        name='instr_button',
-        depth=-1
-    )
-    instr_button.buttonClock = core.Clock()
-    
-    # --- Initialize components for Routine "Ishihara" ---
-    ishihara_1 = visual.ImageStim(
-        win=win,
-        name='ishihara_1', 
-        image='default.png', mask=None, anchor='center',
-        ori=0.0, pos=(0, 0.1), size=(0.5, 0.5),
-        color=[1,1,1], colorSpace='rgb', opacity=None,
-        flipHoriz=False, flipVert=False,
-        texRes=128.0, interpolate=True, depth=0.0)
-    ishihara_number = visual.TextBox2(
-         win, text=None, placeholder=None, font='Open Sans',
-         pos=(0, -0.3),     letterHeight=0.025,
-         size=(0.15, 0.1), borderWidth=2.0,
-         color=[-1.0000, -1.0000, -1.0000], colorSpace='rgb',
-         opacity=None,
-         bold=True, italic=False,
-         lineSpacing=1.0, speechPoint=None,
-         padding=0.0, alignment='center',
-         anchor='center', overflow='hidden',
-         fillColor=None, borderColor=[-1.0000, -1.0000, -1.0000],
-         flipHoriz=False, flipVert=False, languageStyle='LTR',
-         editable=True,
-         name='ishihara_number',
-         depth=-1, autoLog=True,
-    )
-    ishihara_button = visual.ButtonStim(win, 
-        text='Weiter', font='Open Sans',
-        pos=(0.3, -0.35),
-        letterHeight=0.035,
-        size=(0.3, 0.12), borderWidth=0.0,
-        fillColor='darkgrey', borderColor=None,
-        color='white', colorSpace='rgb',
-        opacity=None,
-        bold=True, italic=False,
-        padding=None,
-        anchor='center',
-        name='ishihara_button',
-        depth=-2
-    )
-    ishihara_button.buttonClock = core.Clock()
-    
-    # --- Initialize components for Routine "feedback" ---
-    feedback_text = visual.TextStim(win=win, name='feedback_text',
-        text='',
-        font='Open Sans',
-        pos=(0, 0), height=0.05, wrapWidth=None, ori=0.0, 
-        color=[-1.0000, -1.0000, -1.0000], colorSpace='rgb', opacity=None, 
-        languageStyle='LTR',
-        depth=-1.0);
     
     # --- Initialize components for Routine "no_text_blocks_self_paced" ---
     
@@ -917,344 +783,6 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     # the Routine "Settings" was not non-slip safe, so reset the non-slip timer
     routineTimer.reset()
     
-    # --- Prepare to start Routine "demographics" ---
-    continueRoutine = True
-    # update component parameters for each repeat
-    thisExp.addData('demographics.started', globalClock.getTime(format='float'))
-    # reset demographic_button to account for continued clicks & clear times on/off
-    demographic_button.reset()
-    # keep track of which components have finished
-    demographicsComponents = [demographic_form, demographic_button]
-    for thisComponent in demographicsComponents:
-        thisComponent.tStart = None
-        thisComponent.tStop = None
-        thisComponent.tStartRefresh = None
-        thisComponent.tStopRefresh = None
-        if hasattr(thisComponent, 'status'):
-            thisComponent.status = NOT_STARTED
-    # reset timers
-    t = 0
-    _timeToFirstFrame = win.getFutureFlipTime(clock="now")
-    frameN = -1
-    
-    # --- Run Routine "demographics" ---
-    routineForceEnded = not continueRoutine
-    while continueRoutine:
-        # get current time
-        t = routineTimer.getTime()
-        tThisFlip = win.getFutureFlipTime(clock=routineTimer)
-        tThisFlipGlobal = win.getFutureFlipTime(clock=None)
-        frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
-        # update/draw components on each frame
-        
-        # *demographic_form* updates
-        
-        # if demographic_form is starting this frame...
-        if demographic_form.status == NOT_STARTED and tThisFlip >= 0-frameTolerance:
-            # keep track of start time/frame for later
-            demographic_form.frameNStart = frameN  # exact frame index
-            demographic_form.tStart = t  # local t and not account for scr refresh
-            demographic_form.tStartRefresh = tThisFlipGlobal  # on global time
-            win.timeOnFlip(demographic_form, 'tStartRefresh')  # time at next scr refresh
-            # update status
-            demographic_form.status = STARTED
-            demographic_form.setAutoDraw(True)
-        
-        # if demographic_form is active this frame...
-        if demographic_form.status == STARTED:
-            # update params
-            pass
-        # *demographic_button* updates
-        
-        # if demographic_button is starting this frame...
-        if demographic_button.status == NOT_STARTED and demographic_form.complete==True:
-            # keep track of start time/frame for later
-            demographic_button.frameNStart = frameN  # exact frame index
-            demographic_button.tStart = t  # local t and not account for scr refresh
-            demographic_button.tStartRefresh = tThisFlipGlobal  # on global time
-            win.timeOnFlip(demographic_button, 'tStartRefresh')  # time at next scr refresh
-            # update status
-            demographic_button.status = STARTED
-            demographic_button.setAutoDraw(True)
-        
-        # if demographic_button is active this frame...
-        if demographic_button.status == STARTED:
-            # update params
-            pass
-            # check whether demographic_button has been pressed
-            if demographic_button.isClicked:
-                if not demographic_button.wasClicked:
-                    # if this is a new click, store time of first click and clicked until
-                    demographic_button.timesOn.append(demographic_button.buttonClock.getTime())
-                    demographic_button.timesOff.append(demographic_button.buttonClock.getTime())
-                elif len(demographic_button.timesOff):
-                    # if click is continuing from last frame, update time of clicked until
-                    demographic_button.timesOff[-1] = demographic_button.buttonClock.getTime()
-                if not demographic_button.wasClicked:
-                    # end routine when demographic_button is clicked
-                    continueRoutine = False
-                if not demographic_button.wasClicked:
-                    # run callback code when demographic_button is clicked
-                    pass
-        # take note of whether demographic_button was clicked, so that next frame we know if clicks are new
-        demographic_button.wasClicked = demographic_button.isClicked and demographic_button.status == STARTED
-        
-        # check for quit (typically the Esc key)
-        if defaultKeyboard.getKeys(keyList=["escape"]):
-            thisExp.status = FINISHED
-        if thisExp.status == FINISHED or endExpNow:
-            endExperiment(thisExp, win=win)
-            return
-        
-        # check if all components have finished
-        if not continueRoutine:  # a component has requested a forced-end of Routine
-            routineForceEnded = True
-            break
-        continueRoutine = False  # will revert to True if at least one component still running
-        for thisComponent in demographicsComponents:
-            if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
-                continueRoutine = True
-                break  # at least one component has not yet finished
-        
-        # refresh the screen
-        if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
-            win.flip()
-    
-    # --- Ending Routine "demographics" ---
-    for thisComponent in demographicsComponents:
-        if hasattr(thisComponent, "setAutoDraw"):
-            thisComponent.setAutoDraw(False)
-    thisExp.addData('demographics.stopped', globalClock.getTime(format='float'))
-    demographic_form.addDataToExp(thisExp, 'rows')
-    demographic_form.autodraw = False
-    thisExp.nextEntry()
-    # the Routine "demographics" was not non-slip safe, so reset the non-slip timer
-    routineTimer.reset()
-    
-    # --- Prepare to start Routine "education" ---
-    continueRoutine = True
-    # update component parameters for each repeat
-    thisExp.addData('education.started', globalClock.getTime(format='float'))
-    # reset edu_button to account for continued clicks & clear times on/off
-    edu_button.reset()
-    # keep track of which components have finished
-    educationComponents = [edu_form, edu_button]
-    for thisComponent in educationComponents:
-        thisComponent.tStart = None
-        thisComponent.tStop = None
-        thisComponent.tStartRefresh = None
-        thisComponent.tStopRefresh = None
-        if hasattr(thisComponent, 'status'):
-            thisComponent.status = NOT_STARTED
-    # reset timers
-    t = 0
-    _timeToFirstFrame = win.getFutureFlipTime(clock="now")
-    frameN = -1
-    
-    # --- Run Routine "education" ---
-    routineForceEnded = not continueRoutine
-    while continueRoutine:
-        # get current time
-        t = routineTimer.getTime()
-        tThisFlip = win.getFutureFlipTime(clock=routineTimer)
-        tThisFlipGlobal = win.getFutureFlipTime(clock=None)
-        frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
-        # update/draw components on each frame
-        
-        # *edu_form* updates
-        
-        # if edu_form is starting this frame...
-        if edu_form.status == NOT_STARTED and tThisFlip >= 0-frameTolerance:
-            # keep track of start time/frame for later
-            edu_form.frameNStart = frameN  # exact frame index
-            edu_form.tStart = t  # local t and not account for scr refresh
-            edu_form.tStartRefresh = tThisFlipGlobal  # on global time
-            win.timeOnFlip(edu_form, 'tStartRefresh')  # time at next scr refresh
-            # update status
-            edu_form.status = STARTED
-            edu_form.setAutoDraw(True)
-        
-        # if edu_form is active this frame...
-        if edu_form.status == STARTED:
-            # update params
-            pass
-        # *edu_button* updates
-        
-        # if edu_button is starting this frame...
-        if edu_button.status == NOT_STARTED and edu_form.complete:
-            # keep track of start time/frame for later
-            edu_button.frameNStart = frameN  # exact frame index
-            edu_button.tStart = t  # local t and not account for scr refresh
-            edu_button.tStartRefresh = tThisFlipGlobal  # on global time
-            win.timeOnFlip(edu_button, 'tStartRefresh')  # time at next scr refresh
-            # update status
-            edu_button.status = STARTED
-            edu_button.setAutoDraw(True)
-        
-        # if edu_button is active this frame...
-        if edu_button.status == STARTED:
-            # update params
-            pass
-            # check whether edu_button has been pressed
-            if edu_button.isClicked:
-                if not edu_button.wasClicked:
-                    # if this is a new click, store time of first click and clicked until
-                    edu_button.timesOn.append(edu_button.buttonClock.getTime())
-                    edu_button.timesOff.append(edu_button.buttonClock.getTime())
-                elif len(edu_button.timesOff):
-                    # if click is continuing from last frame, update time of clicked until
-                    edu_button.timesOff[-1] = edu_button.buttonClock.getTime()
-                if not edu_button.wasClicked:
-                    # end routine when edu_button is clicked
-                    continueRoutine = False
-                if not edu_button.wasClicked:
-                    # run callback code when edu_button is clicked
-                    pass
-        # take note of whether edu_button was clicked, so that next frame we know if clicks are new
-        edu_button.wasClicked = edu_button.isClicked and edu_button.status == STARTED
-        
-        # check for quit (typically the Esc key)
-        if defaultKeyboard.getKeys(keyList=["escape"]):
-            thisExp.status = FINISHED
-        if thisExp.status == FINISHED or endExpNow:
-            endExperiment(thisExp, win=win)
-            return
-        
-        # check if all components have finished
-        if not continueRoutine:  # a component has requested a forced-end of Routine
-            routineForceEnded = True
-            break
-        continueRoutine = False  # will revert to True if at least one component still running
-        for thisComponent in educationComponents:
-            if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
-                continueRoutine = True
-                break  # at least one component has not yet finished
-        
-        # refresh the screen
-        if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
-            win.flip()
-    
-    # --- Ending Routine "education" ---
-    for thisComponent in educationComponents:
-        if hasattr(thisComponent, "setAutoDraw"):
-            thisComponent.setAutoDraw(False)
-    thisExp.addData('education.stopped', globalClock.getTime(format='float'))
-    edu_form.addDataToExp(thisExp, 'rows')
-    edu_form.autodraw = False
-    thisExp.nextEntry()
-    # the Routine "education" was not non-slip safe, so reset the non-slip timer
-    routineTimer.reset()
-    
-    # --- Prepare to start Routine "welcome_Ishihara" ---
-    continueRoutine = True
-    # update component parameters for each repeat
-    # reset instr_button to account for continued clicks & clear times on/off
-    instr_button.reset()
-    # keep track of which components have finished
-    welcome_IshiharaComponents = [instructions, instr_button]
-    for thisComponent in welcome_IshiharaComponents:
-        thisComponent.tStart = None
-        thisComponent.tStop = None
-        thisComponent.tStartRefresh = None
-        thisComponent.tStopRefresh = None
-        if hasattr(thisComponent, 'status'):
-            thisComponent.status = NOT_STARTED
-    # reset timers
-    t = 0
-    _timeToFirstFrame = win.getFutureFlipTime(clock="now")
-    frameN = -1
-    
-    # --- Run Routine "welcome_Ishihara" ---
-    routineForceEnded = not continueRoutine
-    while continueRoutine:
-        # get current time
-        t = routineTimer.getTime()
-        tThisFlip = win.getFutureFlipTime(clock=routineTimer)
-        tThisFlipGlobal = win.getFutureFlipTime(clock=None)
-        frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
-        # update/draw components on each frame
-        
-        # *instructions* updates
-        
-        # if instructions is starting this frame...
-        if instructions.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
-            # keep track of start time/frame for later
-            instructions.frameNStart = frameN  # exact frame index
-            instructions.tStart = t  # local t and not account for scr refresh
-            instructions.tStartRefresh = tThisFlipGlobal  # on global time
-            win.timeOnFlip(instructions, 'tStartRefresh')  # time at next scr refresh
-            # update status
-            instructions.status = STARTED
-            instructions.setAutoDraw(True)
-        
-        # if instructions is active this frame...
-        if instructions.status == STARTED:
-            # update params
-            pass
-        # *instr_button* updates
-        
-        # if instr_button is starting this frame...
-        if instr_button.status == NOT_STARTED and tThisFlip >= 0-frameTolerance:
-            # keep track of start time/frame for later
-            instr_button.frameNStart = frameN  # exact frame index
-            instr_button.tStart = t  # local t and not account for scr refresh
-            instr_button.tStartRefresh = tThisFlipGlobal  # on global time
-            win.timeOnFlip(instr_button, 'tStartRefresh')  # time at next scr refresh
-            # update status
-            instr_button.status = STARTED
-            instr_button.setAutoDraw(True)
-        
-        # if instr_button is active this frame...
-        if instr_button.status == STARTED:
-            # update params
-            pass
-            # check whether instr_button has been pressed
-            if instr_button.isClicked:
-                if not instr_button.wasClicked:
-                    # if this is a new click, store time of first click and clicked until
-                    instr_button.timesOn.append(instr_button.buttonClock.getTime())
-                    instr_button.timesOff.append(instr_button.buttonClock.getTime())
-                elif len(instr_button.timesOff):
-                    # if click is continuing from last frame, update time of clicked until
-                    instr_button.timesOff[-1] = instr_button.buttonClock.getTime()
-                if not instr_button.wasClicked:
-                    # end routine when instr_button is clicked
-                    continueRoutine = False
-                if not instr_button.wasClicked:
-                    # run callback code when instr_button is clicked
-                    pass
-        # take note of whether instr_button was clicked, so that next frame we know if clicks are new
-        instr_button.wasClicked = instr_button.isClicked and instr_button.status == STARTED
-        
-        # check for quit (typically the Esc key)
-        if defaultKeyboard.getKeys(keyList=["escape"]):
-            thisExp.status = FINISHED
-        if thisExp.status == FINISHED or endExpNow:
-            endExperiment(thisExp, win=win)
-            return
-        
-        # check if all components have finished
-        if not continueRoutine:  # a component has requested a forced-end of Routine
-            routineForceEnded = True
-            break
-        continueRoutine = False  # will revert to True if at least one component still running
-        for thisComponent in welcome_IshiharaComponents:
-            if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
-                continueRoutine = True
-                break  # at least one component has not yet finished
-        
-        # refresh the screen
-        if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
-            win.flip()
-    
-    # --- Ending Routine "welcome_Ishihara" ---
-    for thisComponent in welcome_IshiharaComponents:
-        if hasattr(thisComponent, "setAutoDraw"):
-            thisComponent.setAutoDraw(False)
-    thisExp.nextEntry()
-    # the Routine "welcome_Ishihara" was not non-slip safe, so reset the non-slip timer
-    routineTimer.reset()
-    
     # set up handler to look after randomisation of conditions etc
     ishihara_pics = data.TrialHandler(nReps=1.0, method='random', 
         extraInfo=expInfo, originPath=-1,
@@ -1282,233 +810,6 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         if thisIshihara_pic != None:
             for paramName in thisIshihara_pic:
                 globals()[paramName] = thisIshihara_pic[paramName]
-        
-        # --- Prepare to start Routine "Ishihara" ---
-        continueRoutine = True
-        # update component parameters for each repeat
-        thisExp.addData('Ishihara.started', globalClock.getTime(format='float'))
-        ishihara_1.setImage(DisplayImage)
-        ishihara_number.reset()
-        ishihara_number.setText('')
-        # reset ishihara_button to account for continued clicks & clear times on/off
-        ishihara_button.reset()
-        # keep track of which components have finished
-        IshiharaComponents = [ishihara_1, ishihara_number, ishihara_button]
-        for thisComponent in IshiharaComponents:
-            thisComponent.tStart = None
-            thisComponent.tStop = None
-            thisComponent.tStartRefresh = None
-            thisComponent.tStopRefresh = None
-            if hasattr(thisComponent, 'status'):
-                thisComponent.status = NOT_STARTED
-        # reset timers
-        t = 0
-        _timeToFirstFrame = win.getFutureFlipTime(clock="now")
-        frameN = -1
-        
-        # --- Run Routine "Ishihara" ---
-        routineForceEnded = not continueRoutine
-        while continueRoutine:
-            # get current time
-            t = routineTimer.getTime()
-            tThisFlip = win.getFutureFlipTime(clock=routineTimer)
-            tThisFlipGlobal = win.getFutureFlipTime(clock=None)
-            frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
-            # update/draw components on each frame
-            
-            # *ishihara_1* updates
-            
-            # if ishihara_1 is starting this frame...
-            if ishihara_1.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
-                # keep track of start time/frame for later
-                ishihara_1.frameNStart = frameN  # exact frame index
-                ishihara_1.tStart = t  # local t and not account for scr refresh
-                ishihara_1.tStartRefresh = tThisFlipGlobal  # on global time
-                win.timeOnFlip(ishihara_1, 'tStartRefresh')  # time at next scr refresh
-                # update status
-                ishihara_1.status = STARTED
-                ishihara_1.setAutoDraw(True)
-            
-            # if ishihara_1 is active this frame...
-            if ishihara_1.status == STARTED:
-                # update params
-                pass
-            
-            # *ishihara_number* updates
-            
-            # if ishihara_number is starting this frame...
-            if ishihara_number.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
-                # keep track of start time/frame for later
-                ishihara_number.frameNStart = frameN  # exact frame index
-                ishihara_number.tStart = t  # local t and not account for scr refresh
-                ishihara_number.tStartRefresh = tThisFlipGlobal  # on global time
-                win.timeOnFlip(ishihara_number, 'tStartRefresh')  # time at next scr refresh
-                # update status
-                ishihara_number.status = STARTED
-                ishihara_number.setAutoDraw(True)
-            
-            # if ishihara_number is active this frame...
-            if ishihara_number.status == STARTED:
-                # update params
-                pass
-            # *ishihara_button* updates
-            
-            # if ishihara_button is starting this frame...
-            if ishihara_button.status == NOT_STARTED and tThisFlip >= 0-frameTolerance:
-                # keep track of start time/frame for later
-                ishihara_button.frameNStart = frameN  # exact frame index
-                ishihara_button.tStart = t  # local t and not account for scr refresh
-                ishihara_button.tStartRefresh = tThisFlipGlobal  # on global time
-                win.timeOnFlip(ishihara_button, 'tStartRefresh')  # time at next scr refresh
-                # update status
-                ishihara_button.status = STARTED
-                ishihara_button.setAutoDraw(True)
-            
-            # if ishihara_button is active this frame...
-            if ishihara_button.status == STARTED:
-                # update params
-                pass
-                # check whether ishihara_button has been pressed
-                if ishihara_button.isClicked:
-                    if not ishihara_button.wasClicked:
-                        # if this is a new click, store time of first click and clicked until
-                        ishihara_button.timesOn.append(ishihara_button.buttonClock.getTime())
-                        ishihara_button.timesOff.append(ishihara_button.buttonClock.getTime())
-                    elif len(ishihara_button.timesOff):
-                        # if click is continuing from last frame, update time of clicked until
-                        ishihara_button.timesOff[-1] = ishihara_button.buttonClock.getTime()
-                    if not ishihara_button.wasClicked:
-                        # end routine when ishihara_button is clicked
-                        continueRoutine = False
-                    if not ishihara_button.wasClicked:
-                        # run callback code when ishihara_button is clicked
-                        pass
-            # take note of whether ishihara_button was clicked, so that next frame we know if clicks are new
-            ishihara_button.wasClicked = ishihara_button.isClicked and ishihara_button.status == STARTED
-            
-            # check for quit (typically the Esc key)
-            if defaultKeyboard.getKeys(keyList=["escape"]):
-                thisExp.status = FINISHED
-            if thisExp.status == FINISHED or endExpNow:
-                endExperiment(thisExp, win=win)
-                return
-            
-            # check if all components have finished
-            if not continueRoutine:  # a component has requested a forced-end of Routine
-                routineForceEnded = True
-                break
-            continueRoutine = False  # will revert to True if at least one component still running
-            for thisComponent in IshiharaComponents:
-                if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
-                    continueRoutine = True
-                    break  # at least one component has not yet finished
-            
-            # refresh the screen
-            if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
-                win.flip()
-        
-        # --- Ending Routine "Ishihara" ---
-        for thisComponent in IshiharaComponents:
-            if hasattr(thisComponent, "setAutoDraw"):
-                thisComponent.setAutoDraw(False)
-        thisExp.addData('Ishihara.stopped', globalClock.getTime(format='float'))
-        ishihara_pics.addData('ishihara_number.text',ishihara_number.text)
-        # the Routine "Ishihara" was not non-slip safe, so reset the non-slip timer
-        routineTimer.reset()
-        
-        # --- Prepare to start Routine "feedback" ---
-        continueRoutine = True
-        # update component parameters for each repeat
-        # Run 'Begin Routine' code from code
-        if ishihara_number.text == str(corrAns):
-            thisFeedback = "Korrekt"
-        else:
-            thisFeedback = "Falsch"
-        feedback_text.setText(thisFeedback)
-        # keep track of which components have finished
-        feedbackComponents = [feedback_text]
-        for thisComponent in feedbackComponents:
-            thisComponent.tStart = None
-            thisComponent.tStop = None
-            thisComponent.tStartRefresh = None
-            thisComponent.tStopRefresh = None
-            if hasattr(thisComponent, 'status'):
-                thisComponent.status = NOT_STARTED
-        # reset timers
-        t = 0
-        _timeToFirstFrame = win.getFutureFlipTime(clock="now")
-        frameN = -1
-        
-        # --- Run Routine "feedback" ---
-        routineForceEnded = not continueRoutine
-        while continueRoutine and routineTimer.getTime() < 1.0:
-            # get current time
-            t = routineTimer.getTime()
-            tThisFlip = win.getFutureFlipTime(clock=routineTimer)
-            tThisFlipGlobal = win.getFutureFlipTime(clock=None)
-            frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
-            # update/draw components on each frame
-            
-            # *feedback_text* updates
-            
-            # if feedback_text is starting this frame...
-            if feedback_text.status == NOT_STARTED and tThisFlip >= 0.0-frameTolerance:
-                # keep track of start time/frame for later
-                feedback_text.frameNStart = frameN  # exact frame index
-                feedback_text.tStart = t  # local t and not account for scr refresh
-                feedback_text.tStartRefresh = tThisFlipGlobal  # on global time
-                win.timeOnFlip(feedback_text, 'tStartRefresh')  # time at next scr refresh
-                # update status
-                feedback_text.status = STARTED
-                feedback_text.setAutoDraw(True)
-            
-            # if feedback_text is active this frame...
-            if feedback_text.status == STARTED:
-                # update params
-                pass
-            
-            # if feedback_text is stopping this frame...
-            if feedback_text.status == STARTED:
-                # is it time to stop? (based on global clock, using actual start)
-                if tThisFlipGlobal > feedback_text.tStartRefresh + 1.0-frameTolerance:
-                    # keep track of stop time/frame for later
-                    feedback_text.tStop = t  # not accounting for scr refresh
-                    feedback_text.tStopRefresh = tThisFlipGlobal  # on global time
-                    feedback_text.frameNStop = frameN  # exact frame index
-                    # update status
-                    feedback_text.status = FINISHED
-                    feedback_text.setAutoDraw(False)
-            
-            # check for quit (typically the Esc key)
-            if defaultKeyboard.getKeys(keyList=["escape"]):
-                thisExp.status = FINISHED
-            if thisExp.status == FINISHED or endExpNow:
-                endExperiment(thisExp, win=win)
-                return
-            
-            # check if all components have finished
-            if not continueRoutine:  # a component has requested a forced-end of Routine
-                routineForceEnded = True
-                break
-            continueRoutine = False  # will revert to True if at least one component still running
-            for thisComponent in feedbackComponents:
-                if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
-                    continueRoutine = True
-                    break  # at least one component has not yet finished
-            
-            # refresh the screen
-            if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
-                win.flip()
-        
-        # --- Ending Routine "feedback" ---
-        for thisComponent in feedbackComponents:
-            if hasattr(thisComponent, "setAutoDraw"):
-                thisComponent.setAutoDraw(False)
-        # using non-slip timing so subtract the expected duration of this Routine (unless ended on request)
-        if routineForceEnded:
-            routineTimer.reset()
-        else:
-            routineTimer.addTime(-1.000000)
         thisExp.nextEntry()
         
         if thisSession is not None:
@@ -2739,13 +2040,10 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         # get block kind
         curr_block = all_blocks[exp_block_counter]
         
-        if curr_block in ["Reading_Baseline_main_no_click", "Reading_Baseline_training_no_click"]:
+        if 12 <= exp_block_counter < 13:
+        #if curr_block in ["Reading_Baseline_main_no_click", "Reading_Baseline_training_no_click"]:
         
-            # exclude all RTs where participant was way too fast (< 50 ms) or
-            # too slow (> 2s)
-            #print("\tBL_paced_durations:", BL_paced_durations)
-            #print("\tBL_paced_words:", BL_paced_words)
-        
+            # First calculate and print out RTs per letter for each condition. This is needed to have these times if the training experiment breaks or fails or needs to be stopped
             filtered_durations_BL = []
             filtered_words_BL = []
             for duration, word in zip(BL_paced_durations, BL_paced_words):
@@ -2767,17 +2065,12 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         
             # Check average RT / letter
             RT_per_letter_baseline = reading_time_total_BL / letters_total_BL
-            print("\taverage RT per letter in ms:", RT_per_letter_baseline)
+            print("\tRT_per_letter_baseline:", round(RT_per_letter_baseline))
         
             # save this in the output csv:
-            thisExp.addData('RT_per_letter_baseline', RT_per_letter_baseline)
+            thisExp.addData('RT_per_letter_baseline', round(RT_per_letter_baseline))
         
-        elif curr_block in ["0back_dual_main_no_click"]:
-        
-            # exclude all RTs where participant was way too fast (< 50 ms) or
-            # too slow (> 2s)
-            # print("\t0back_paced_durations:", zeroback_paced_durations)
-            # print("\t0back_paced_words:", zeroback_paced_words)
+            # elif curr_block in ["0back_dual_main_no_click"]:
         
             filtered_durations_0back = []
             filtered_words_0back = []
@@ -2800,17 +2093,12 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         
             # Check average RT / letter
             RT_per_letter_0back = reading_time_total_0back / letters_total_0back
-            print("\taverage RT per letter in ms 0-back:", RT_per_letter_0back)
+            print("\tRT_per_letter_0back:", round(RT_per_letter_0back))
         
             # save this in the output csv:
-            thisExp.addData('RT_per_letter_0back', RT_per_letter_0back)
+            thisExp.addData('RT_per_letter_0back', round(RT_per_letter_0back))
         
-        elif curr_block in ["1back_dual_main_no_click"]:
-        
-            # exclude all RTs where participant was way too fast (< 50 ms) or
-            # way too slow (> 2s), also remove the corresponding words from vis_task_words
-            # print("\t1back_paced_durations:", oneback_paced_durations)
-            # print("\t1back_paced_words:", oneback_paced_words)
+            # elif curr_block in ["1back_dual_main_no_click"]:
         
             filtered_durations_1bck = []
             filtered_words_1bck = []
@@ -2833,17 +2121,12 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         
             # Check average RT / letter
             RT_per_letter_1bck = reading_time_total_1bck / letters_total_1bck
-            print("\taverage RT per letter in ms:", RT_per_letter_1bck)
+            print("\tRT_per_letter_1bck:", round(RT_per_letter_1bck))
         
             # save this in the output csv:
-            thisExp.addData('RT_per_letter_1bck', RT_per_letter_1bck)
+            thisExp.addData('RT_per_letter_1bck', round(RT_per_letter_1bck))
         
-        elif curr_block in ["2back_dual_main_no_click"]:
-        
-            # exclude all RTs where participant was way too fast (< 50 ms) or
-            # way too slow (> 2s), also remove the corresponding words from vis_task_words
-            # print("\t2back_paced_durations:", twoback_paced_durations)
-            # print("\t2back_paced_words:", twoback_paced_words)
+            # elif curr_block in ["2back_dual_main_no_click"]:
         
             filtered_durations_2bck = []
             filtered_words_2bck = []
@@ -2866,10 +2149,46 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         
             # Check average RT / letter
             RT_per_letter_2bck = reading_time_total_2bck / letters_total_2bck
-            print("\taverage RT per letter in ms:", RT_per_letter_2bck)
+            print("\tRT_per_letter_2bck:", round(RT_per_letter_2bck))
         
             # save this in the output csv:
-            thisExp.addData('RT_per_letter_2bck', RT_per_letter_2bck)
+            thisExp.addData('RT_per_letter_2bck', round(RT_per_letter_2bck))
+        
+            #if curr_block == "1back_single_main_no_click":
+        
+            filtered_durations_oneback_single = []
+            for duration in oneback_single_paced_durations:
+                if 50 <= duration <= 1500:
+                    filtered_durations_oneback_single.append(duration)
+            # count n of trials:
+            oneback_single_trials = len(filtered_durations_oneback_single)
+            # get time it took in total:
+            oneback_single_time_total = sum(filtered_durations_oneback_single)  # in ms
+        
+            # Check average RT / rectangle
+            RT_per_rectangle_oneback_single = oneback_single_time_total / oneback_single_trials
+            print("\taverage RT per rectangle in ms for single 1back:", round(RT_per_rectangle_oneback_single))
+        
+            # save this in the output csv:
+            thisExp.addData('RT_per_rect_1back_single', round(RT_per_rectangle_oneback_single))
+        
+            # elif curr_block == "2back_single_main_no_click":
+        
+            filtered_durations_twoback_single = []
+            for duration in twoback_single_paced_durations:
+                if 50 <= duration <= 2000:
+                    filtered_durations_twoback_single.append(duration)
+            # count n of trials:
+            twoback_single_trials = len(filtered_durations_twoback_single)
+            # get time it took in total:
+            twoback_single_time_total = sum(filtered_durations_twoback_single)  # in ms
+        
+            # Check average RT / rectangle
+            RT_per_rectangle_twoback_single = twoback_single_time_total / twoback_single_trials
+            print("\taverage RT per rectangle in ms for single 2back:", round(RT_per_rectangle_twoback_single))
+        
+            # save this in the output csv:
+            thisExp.addData('RT_per_rect_2back_single', round(RT_per_rectangle_twoback_single))
         
         # keep background ivory
         win.setColor(light_bg_col, colorSpace='rgb')
@@ -3067,7 +2386,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         
                 # create ImageStim object
                 curr_instr_pic = visual.ImageStim(win,
-                                                  size=(0.55, 0.25),
+                                                  size=(0.1, 0.25),
                                                   pos=(0, -0.15),
                                                   image=locals()["instr_pic_0back_dual_no_click"])  # set path to image here
         
@@ -3282,10 +2601,6 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             # clear buffer of all previously recorded key events:
             event.clearEvents()
         
-            # clear the input buffer before starting the trial
-            ser.flushInput()
-            button_pressed = None
-        
             # CREATE CLOCKS:
             my_block_clock = core.Clock()
             my_block_clock.reset()  # start block clock
@@ -3297,8 +2612,17 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             for trial_idx, curr_word in enumerate(curr_text):
                 # print("current idx: " + str(trial_idx) + ", curr word:" + curr_word)
         
-                ### prepare & show current word:
+                stim.draw()
+                win.flip()
         
+                # clear buffer of all previously recorded key events:
+                event.clearEvents()
+        
+                # clear the input buffer before starting the trial
+                ser.flushInput()
+                button_pressed = None
+        
+                ### prepare & show current word:
                 # get current colour
                 curr_colour = curr_colours[trial_idx]
         
@@ -3344,7 +2668,11 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         
                     # Calculate remaining time for the stimulus
                     remaining_time = (onset_time + curr_duration) - my_trial_clock.getTime()
-                    ser.timeout = remaining_time
+                    # ser.timeout = remaining_time
+                    if remaining_time > 0:
+                        ser.timeout = remaining_time
+                    else:
+                        ser.timeout = 0
         
                     # Check for button box responses
                     response = ser.read()
@@ -3870,50 +3198,50 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         
         else:
             print(f"\tstart preparing block {curr_block}")
-            if curr_block == "1back_single_main_no_click":
-        
-                # exclude all RTs where participant was way too fast (< 50 ms) or
-                # too slow (> 1.5 s)
-                # print("\toneback_single_paced_durations:", oneback_single_paced_durations)
-        
-                filtered_durations_oneback_single = []
-                for duration in oneback_single_paced_durations:
-                    if 50 <= duration <= 1500:
-                        filtered_durations_oneback_single.append(duration)
-                # count n of trials:
-                oneback_single_trials = len(filtered_durations_oneback_single)
-                # get time it took in total:
-                oneback_single_time_total = sum(filtered_durations_oneback_single)  # in ms
-        
-        
-                # Check average RT / rectangle
-                RT_per_rectangle_oneback_single = oneback_single_time_total / oneback_single_trials
-                print("\taverage RT per rectangle in ms for single 1back:", RT_per_rectangle_oneback_single)
-        
-                # save this in the output csv:
-                thisExp.addData('RT_per_rect_1back_single', RT_per_rectangle_oneback_single)
-        
-            elif curr_block == "2back_single_main_no_click":
-        
-                # exclude all RTs where participant was way too fast (< 50 ms) or
-                # too slow (> 2.0 s)
-                # print("\ttwoback_single_paced_durations:", twoback_single_paced_durations)
-        
-                filtered_durations_twoback_single = []
-                for duration in twoback_single_paced_durations:
-                    if 50 <= duration <= 2000:
-                        filtered_durations_twoback_single.append(duration)
-                # count n of trials:
-                twoback_single_trials = len(filtered_durations_twoback_single)
-                # get time it took in total:
-                twoback_single_time_total = sum(filtered_durations_twoback_single)  # in ms
-        
-                # Check average RT / rectangle
-                RT_per_rectangle_twoback_single = twoback_single_time_total / twoback_single_trials
-                print("\taverage RT per rectangle in ms for single 2back:", RT_per_rectangle_twoback_single)
-        
-                # save this in the output csv:
-                thisExp.addData('RT_per_rect_2back_single', RT_per_rectangle_twoback_single)
+            # if curr_block == "1back_single_main_no_click":
+            #
+            #     # exclude all RTs where participant was way too fast (< 50 ms) or
+            #     # too slow (> 1.5 s)
+            #     # print("\toneback_single_paced_durations:", oneback_single_paced_durations)
+            #
+            #     filtered_durations_oneback_single = []
+            #     for duration in oneback_single_paced_durations:
+            #         if 50 <= duration <= 1500:
+            #             filtered_durations_oneback_single.append(duration)
+            #     # count n of trials:
+            #     oneback_single_trials = len(filtered_durations_oneback_single)
+            #     # get time it took in total:
+            #     oneback_single_time_total = sum(filtered_durations_oneback_single)  # in ms
+            #
+            #
+            #     # Check average RT / rectangle
+            #     RT_per_rectangle_oneback_single = oneback_single_time_total / oneback_single_trials
+            #     print("\taverage RT per rectangle in ms for single 1back:", RT_per_rectangle_oneback_single)
+            #
+            #     # save this in the output csv:
+            #     thisExp.addData('RT_per_rect_1back_single', RT_per_rectangle_oneback_single)
+            #
+            # elif curr_block == "2back_single_main_no_click":
+            #
+            #     # exclude all RTs where participant was way too fast (< 50 ms) or
+            #     # too slow (> 2.0 s)
+            #     # print("\ttwoback_single_paced_durations:", twoback_single_paced_durations)
+            #
+            #     filtered_durations_twoback_single = []
+            #     for duration in twoback_single_paced_durations:
+            #         if 50 <= duration <= 2000:
+            #             filtered_durations_twoback_single.append(duration)
+            #     # count n of trials:
+            #     twoback_single_trials = len(filtered_durations_twoback_single)
+            #     # get time it took in total:
+            #     twoback_single_time_total = sum(filtered_durations_twoback_single)  # in ms
+            #
+            #     # Check average RT / rectangle
+            #     RT_per_rectangle_twoback_single = twoback_single_time_total / twoback_single_trials
+            #     print("\taverage RT per rectangle in ms for single 2back:", RT_per_rectangle_twoback_single)
+            #
+            #     # save this in the output csv:
+            #     thisExp.addData('RT_per_rect_2back_single', RT_per_rectangle_twoback_single)
         
         
             # keep background ivory
@@ -4107,7 +3435,11 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         
                     # Calculate remaining time for the stimulus
                     remaining_time = (onset_time + curr_duration) - my_trial_clock.getTime()
-                    ser.timeout = remaining_time
+                    # ser.timeout = remaining_time
+                    if remaining_time > 0:
+                        ser.timeout = remaining_time
+                    else:
+                        ser.timeout = 0
         
                     # Check for button box responses
                     response = ser.read()
@@ -4685,13 +4017,13 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
             print(f"\t\tcorrect rejections: {twoback_n_correct_rejections}")
             print(f"\t\tcorrect answers to questions: {twoback_correct_answers}")
             print(f"These are the RTs for the fMRI experiment:")
-            print(f"RT_per_rect_1back_single: {RT_per_rectangle_oneback_single}")
-            print(f"RT_per_rect_2back_single: {RT_per_rectangle_twoback_single}")
-            print(f"\tRT_per_letter_baseline: {RT_per_letter_baseline}")
-            print(f"\tRT_per_letter_0back: {RT_per_letter_0back}")
-            print(f"\tRT_per_letter_1back: {RT_per_letter_1bck}")
-            print(f"\tRT_per_letter_2back: {RT_per_letter_2bck}")
-            
+            print(f"RT_per_rect_1back_single: {round(RT_per_rectangle_oneback_single)}")
+            print(f"RT_per_rect_2back_single: {round(RT_per_rectangle_twoback_single)}")
+            print(f"\tRT_per_letter_baseline: {round(RT_per_letter_baseline)}")
+            print(f"\tRT_per_letter_0back: {round(RT_per_letter_0back)}")
+            print(f"\tRT_per_letter_1back: {round(RT_per_letter_1bck)}")
+            print(f"\tRT_per_letter_2back: {round(RT_per_letter_2bck)}")
+    
             # end experiment
             break
     # keep track of which components have finished

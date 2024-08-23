@@ -14,13 +14,10 @@
 # get block kind
 curr_block = all_blocks[exp_block_counter]
 
-if curr_block in ["Reading_Baseline_main_no_click", "Reading_Baseline_training_no_click"]:
+if 12 <= exp_block_counter < 13:
+#if curr_block in ["Reading_Baseline_main_no_click", "Reading_Baseline_training_no_click"]:
 
-    # exclude all RTs where participant was way too fast (< 50 ms) or
-    # too slow (> 2s)
-    #print("\tBL_paced_durations:", BL_paced_durations)
-    #print("\tBL_paced_words:", BL_paced_words)
-
+    # First calculate and print out RTs per letter for each condition. This is needed to have these times if the training experiment breaks or fails or needs to be stopped
     filtered_durations_BL = []
     filtered_words_BL = []
     for duration, word in zip(BL_paced_durations, BL_paced_words):
@@ -42,17 +39,12 @@ if curr_block in ["Reading_Baseline_main_no_click", "Reading_Baseline_training_n
 
     # Check average RT / letter
     RT_per_letter_baseline = reading_time_total_BL / letters_total_BL
-    print("\taverage RT per letter in ms:", RT_per_letter_baseline)
+    print("\tRT_per_letter_baseline:", round(RT_per_letter_baseline))
 
     # save this in the output csv:
-    thisExp.addData('RT_per_letter_baseline', RT_per_letter_baseline)
+    thisExp.addData('RT_per_letter_baseline', round(RT_per_letter_baseline))
 
-elif curr_block in ["0back_dual_main_no_click"]:
-
-    # exclude all RTs where participant was way too fast (< 50 ms) or
-    # too slow (> 2s)
-    # print("\t0back_paced_durations:", zeroback_paced_durations)
-    # print("\t0back_paced_words:", zeroback_paced_words)
+    # elif curr_block in ["0back_dual_main_no_click"]:
 
     filtered_durations_0back = []
     filtered_words_0back = []
@@ -75,17 +67,12 @@ elif curr_block in ["0back_dual_main_no_click"]:
 
     # Check average RT / letter
     RT_per_letter_0back = reading_time_total_0back / letters_total_0back
-    print("\taverage RT per letter in ms 0-back:", RT_per_letter_0back)
+    print("\tRT_per_letter_0back:", round(RT_per_letter_0back))
 
     # save this in the output csv:
-    thisExp.addData('RT_per_letter_0back', RT_per_letter_0back)
+    thisExp.addData('RT_per_letter_0back', round(RT_per_letter_0back))
 
-elif curr_block in ["1back_dual_main_no_click"]:
-
-    # exclude all RTs where participant was way too fast (< 50 ms) or
-    # way too slow (> 2s), also remove the corresponding words from vis_task_words
-    # print("\t1back_paced_durations:", oneback_paced_durations)
-    # print("\t1back_paced_words:", oneback_paced_words)
+    # elif curr_block in ["1back_dual_main_no_click"]:
 
     filtered_durations_1bck = []
     filtered_words_1bck = []
@@ -108,17 +95,12 @@ elif curr_block in ["1back_dual_main_no_click"]:
 
     # Check average RT / letter
     RT_per_letter_1bck = reading_time_total_1bck / letters_total_1bck
-    print("\taverage RT per letter in ms:", RT_per_letter_1bck)
+    print("\tRT_per_letter_1bck:", round(RT_per_letter_1bck))
 
     # save this in the output csv:
-    thisExp.addData('RT_per_letter_1bck', RT_per_letter_1bck)
+    thisExp.addData('RT_per_letter_1bck', round(RT_per_letter_1bck))
 
-elif curr_block in ["2back_dual_main_no_click"]:
-
-    # exclude all RTs where participant was way too fast (< 50 ms) or
-    # way too slow (> 2s), also remove the corresponding words from vis_task_words
-    # print("\t2back_paced_durations:", twoback_paced_durations)
-    # print("\t2back_paced_words:", twoback_paced_words)
+    # elif curr_block in ["2back_dual_main_no_click"]:
 
     filtered_durations_2bck = []
     filtered_words_2bck = []
@@ -141,10 +123,46 @@ elif curr_block in ["2back_dual_main_no_click"]:
 
     # Check average RT / letter
     RT_per_letter_2bck = reading_time_total_2bck / letters_total_2bck
-    print("\taverage RT per letter in ms:", RT_per_letter_2bck)
+    print("\tRT_per_letter_2bck:", round(RT_per_letter_2bck))
 
     # save this in the output csv:
-    thisExp.addData('RT_per_letter_2bck', RT_per_letter_2bck)
+    thisExp.addData('RT_per_letter_2bck', round(RT_per_letter_2bck))
+
+    #if curr_block == "1back_single_main_no_click":
+
+    filtered_durations_oneback_single = []
+    for duration in oneback_single_paced_durations:
+        if 50 <= duration <= 1500:
+            filtered_durations_oneback_single.append(duration)
+    # count n of trials:
+    oneback_single_trials = len(filtered_durations_oneback_single)
+    # get time it took in total:
+    oneback_single_time_total = sum(filtered_durations_oneback_single)  # in ms
+
+    # Check average RT / rectangle
+    RT_per_rectangle_oneback_single = oneback_single_time_total / oneback_single_trials
+    print("\taverage RT per rectangle in ms for single 1back:", round(RT_per_rectangle_oneback_single))
+
+    # save this in the output csv:
+    thisExp.addData('RT_per_rect_1back_single', round(RT_per_rectangle_oneback_single))
+
+    # elif curr_block == "2back_single_main_no_click":
+
+    filtered_durations_twoback_single = []
+    for duration in twoback_single_paced_durations:
+        if 50 <= duration <= 2000:
+            filtered_durations_twoback_single.append(duration)
+    # count n of trials:
+    twoback_single_trials = len(filtered_durations_twoback_single)
+    # get time it took in total:
+    twoback_single_time_total = sum(filtered_durations_twoback_single)  # in ms
+
+    # Check average RT / rectangle
+    RT_per_rectangle_twoback_single = twoback_single_time_total / twoback_single_trials
+    print("\taverage RT per rectangle in ms for single 2back:", round(RT_per_rectangle_twoback_single))
+
+    # save this in the output csv:
+    thisExp.addData('RT_per_rect_2back_single', round(RT_per_rectangle_twoback_single))
 
 # keep background ivory
 win.setColor(light_bg_col, colorSpace='rgb')
@@ -342,7 +360,7 @@ elif curr_block in ["Reading_Baseline_main_no_click", "0back_dual_main_no_click"
 
         # create ImageStim object
         curr_instr_pic = visual.ImageStim(win,
-                                          size=(0.55, 0.25),
+                                          size=(0.15, 0.25),
                                           pos=(0, -0.15),
                                           image=locals()["instr_pic_0back_dual_no_click"])  # set path to image here
 
@@ -557,10 +575,6 @@ if curr_block in ["Reading_Baseline_training_no_click", "Reading_Baseline_main_n
     # clear buffer of all previously recorded key events:
     event.clearEvents()
 
-    # clear the input buffer before starting the trial
-    ser.flushInput()
-    button_pressed = None
-
     # CREATE CLOCKS:
     my_block_clock = core.Clock()
     my_block_clock.reset()  # start block clock
@@ -572,8 +586,17 @@ if curr_block in ["Reading_Baseline_training_no_click", "Reading_Baseline_main_n
     for trial_idx, curr_word in enumerate(curr_text):
         # print("current idx: " + str(trial_idx) + ", curr word:" + curr_word)
 
-        ### prepare & show current word:
+        stim.draw()
+        win.flip()
 
+        # clear buffer of all previously recorded key events:
+        event.clearEvents()
+
+        # clear the input buffer before starting the trial
+        ser.flushInput()
+        button_pressed = None
+
+        ### prepare & show current word:
         # get current colour
         curr_colour = curr_colours[trial_idx]
 
@@ -619,7 +642,11 @@ if curr_block in ["Reading_Baseline_training_no_click", "Reading_Baseline_main_n
 
             # Calculate remaining time for the stimulus
             remaining_time = (onset_time + curr_duration) - my_trial_clock.getTime()
-            ser.timeout = remaining_time
+            # ser.timeout = remaining_time
+            if remaining_time > 0:
+                ser.timeout = remaining_time
+            else:
+                ser.timeout = 0
 
             # Check for button box responses
             response = ser.read()

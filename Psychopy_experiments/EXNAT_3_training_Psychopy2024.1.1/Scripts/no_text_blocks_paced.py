@@ -33,50 +33,50 @@ if curr_block not in ["1back_single_main_no_click", "2back_single_main_no_click"
 
 else:
     print(f"\tstart preparing block {curr_block}")
-    if curr_block == "1back_single_main_no_click":
-
-        # exclude all RTs where participant was way too fast (< 50 ms) or
-        # too slow (> 1.5 s)
-        # print("\toneback_single_paced_durations:", oneback_single_paced_durations)
-
-        filtered_durations_oneback_single = []
-        for duration in oneback_single_paced_durations:
-            if 50 <= duration <= 1500:
-                filtered_durations_oneback_single.append(duration)
-        # count n of trials:
-        oneback_single_trials = len(filtered_durations_oneback_single)
-        # get time it took in total:
-        oneback_single_time_total = sum(filtered_durations_oneback_single)  # in ms
-
-
-        # Check average RT / rectangle
-        RT_per_rectangle_oneback_single = oneback_single_time_total / oneback_single_trials
-        print("\taverage RT per rectangle in ms for single 1back:", RT_per_rectangle_oneback_single)
-
-        # save this in the output csv:
-        thisExp.addData('RT_per_rect_1back_single', RT_per_rectangle_oneback_single)
-
-    elif curr_block == "2back_single_main_no_click":
-
-        # exclude all RTs where participant was way too fast (< 50 ms) or
-        # too slow (> 2.0 s)
-        # print("\ttwoback_single_paced_durations:", twoback_single_paced_durations)
-
-        filtered_durations_twoback_single = []
-        for duration in twoback_single_paced_durations:
-            if 50 <= duration <= 2000:
-                filtered_durations_twoback_single.append(duration)
-        # count n of trials:
-        twoback_single_trials = len(filtered_durations_twoback_single)
-        # get time it took in total:
-        twoback_single_time_total = sum(filtered_durations_twoback_single)  # in ms
-
-        # Check average RT / rectangle
-        RT_per_rectangle_twoback_single = twoback_single_time_total / twoback_single_trials
-        print("\taverage RT per rectangle in ms for single 2back:", RT_per_rectangle_twoback_single)
-
-        # save this in the output csv:
-        thisExp.addData('RT_per_rect_2back_single', RT_per_rectangle_twoback_single)
+    # if curr_block == "1back_single_main_no_click":
+    #
+    #     # exclude all RTs where participant was way too fast (< 50 ms) or
+    #     # too slow (> 1.5 s)
+    #     # print("\toneback_single_paced_durations:", oneback_single_paced_durations)
+    #
+    #     filtered_durations_oneback_single = []
+    #     for duration in oneback_single_paced_durations:
+    #         if 50 <= duration <= 1500:
+    #             filtered_durations_oneback_single.append(duration)
+    #     # count n of trials:
+    #     oneback_single_trials = len(filtered_durations_oneback_single)
+    #     # get time it took in total:
+    #     oneback_single_time_total = sum(filtered_durations_oneback_single)  # in ms
+    #
+    #
+    #     # Check average RT / rectangle
+    #     RT_per_rectangle_oneback_single = oneback_single_time_total / oneback_single_trials
+    #     print("\taverage RT per rectangle in ms for single 1back:", RT_per_rectangle_oneback_single)
+    #
+    #     # save this in the output csv:
+    #     thisExp.addData('RT_per_rect_1back_single', RT_per_rectangle_oneback_single)
+    #
+    # elif curr_block == "2back_single_main_no_click":
+    #
+    #     # exclude all RTs where participant was way too fast (< 50 ms) or
+    #     # too slow (> 2.0 s)
+    #     # print("\ttwoback_single_paced_durations:", twoback_single_paced_durations)
+    #
+    #     filtered_durations_twoback_single = []
+    #     for duration in twoback_single_paced_durations:
+    #         if 50 <= duration <= 2000:
+    #             filtered_durations_twoback_single.append(duration)
+    #     # count n of trials:
+    #     twoback_single_trials = len(filtered_durations_twoback_single)
+    #     # get time it took in total:
+    #     twoback_single_time_total = sum(filtered_durations_twoback_single)  # in ms
+    #
+    #     # Check average RT / rectangle
+    #     RT_per_rectangle_twoback_single = twoback_single_time_total / twoback_single_trials
+    #     print("\taverage RT per rectangle in ms for single 2back:", RT_per_rectangle_twoback_single)
+    #
+    #     # save this in the output csv:
+    #     thisExp.addData('RT_per_rect_2back_single', RT_per_rectangle_twoback_single)
 
 
     # keep background ivory
@@ -270,7 +270,11 @@ else:
 
             # Calculate remaining time for the stimulus
             remaining_time = (onset_time + curr_duration) - my_trial_clock.getTime()
-            ser.timeout = remaining_time
+            # ser.timeout = remaining_time
+            if remaining_time > 0:
+                ser.timeout = remaining_time
+            else:
+                ser.timeout = 0
 
             # Check for button box responses
             response = ser.read()
