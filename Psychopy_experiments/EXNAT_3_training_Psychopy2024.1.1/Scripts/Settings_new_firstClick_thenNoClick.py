@@ -1,11 +1,6 @@
 ### Stimulus settings
 import random
-
-# measure frame rate (in Hz)
-# frame_rate = win.getActualFrameRate() # frame rate in Hz
-# print("measured frame rate:", frame_rate, "Hz")
-# set flicker frequency (in Hz)
-# flicker_freq = frame_rate/4 # 60/4 = 15 Hz
+import re
 
 # set colours you want to use for background:
 # light_bg_col_hex = "#FDFBF0" # ivory instructions background
@@ -13,17 +8,12 @@ import random
 light_bg_col = [(x / 127.5) - 1 for x in (253, 251, 240)]  # ivory instructions background (use RGB -1:1)
 dark_bg_col = [(x / 127.5) - 1 for x in (80, 80, 80)]  # dark grey background for stimuli (use RGB -1:1)
 
-# for timing test:
-# dark_bg_col = [(x / 127.5) - 1 for x in (255, 255, 255)]
-
 # make background light for a start - use rgb -1:1 colour codes
 win.setColor(light_bg_col, colorSpace='rgb')
 
 # set colours you want to use for the stimuli:
 colours = ["#D292F3", "#F989A2", "#2AB7EF", "#88BA3F"]
 print("Preparing experiment with n-back colours:", colours)
-# for timing test:
-# colours = ["#000000", "#F989A2", "#2AB7EF", "#88BA3F"]
 
 #  #D292F3 = weird lilac with a 2000s vibe
 #  #F989A2 = Barbie pink
@@ -48,13 +38,9 @@ print("Preparing experiment with n-back colours:", colours)
 ### Shuffle order of texts
 print("shuffle texts")
 # collect the text IDs in lists so I know which text was shown
-all_main_texts_nrs_list = ["text_01", "text_02", "text_03", "text_04", "text_05", "text_06", "text_07", "text_08"]
+all_main_texts_nrs_list = ["text_01", "text_02", "text_03", "text_04"]
 # shuffle text numbers
 random.shuffle(all_main_texts_nrs_list)
-
-# only get first 9 texts for the main blocks, the last one will be used for the vis task:
-# vis_task_text_nr = all_main_texts_nrs_list[-1]
-# all_main_texts_nrs_list = all_main_texts_nrs_list[0:-1]
 
 # append "empty" text numbers to the list where we have blocks that are not main blocks.
 all_texts_nrs_list = []
@@ -73,18 +59,43 @@ for t_idx, t in enumerate(all_main_texts_nrs_list):
     elif t_idx == 3:
         all_texts_nrs_list = all_texts_nrs_list + [t, ""]
     # one text for paced dual block, then again four empty blocks for other n-back condition
-    elif t_idx == 4:
-        all_texts_nrs_list = all_texts_nrs_list + [t]
-    elif t_idx == 5:
-        all_texts_nrs_list = all_texts_nrs_list + [t, ""]
-    elif t_idx == 6:
-        all_texts_nrs_list = all_texts_nrs_list + [t, ""]
-    elif t_idx > 6:
-        [t]
+    # elif t_idx == 4:
+    #     all_texts_nrs_list = all_texts_nrs_list + [t]
+    # elif t_idx == 5:
+    #     all_texts_nrs_list = all_texts_nrs_list + [t, ""]
+    # elif t_idx == 6:
+    #     all_texts_nrs_list = all_texts_nrs_list + [t, ""]
+    # elif t_idx > 6:
+    #     [t]
     # then finally append rest of texts (two texts)
 
-        all_texts_nrs_list.append(t)
+    #    all_texts_nrs_list.append(t)
 
+# print(all_texts_nrs_list)
+
+short_texts = ["text_05", "text_06", "text_07", "text_08"]
+random.shuffle(short_texts)
+
+all_short_texts_nrs_list = []
+
+for t_idx, t in enumerate(short_texts):
+    # if it's the first text, it's the reading BL main block.
+    if t_idx == 0:
+        all_short_texts_nrs_list = all_short_texts_nrs_list + [t]
+    elif t_idx == 1:
+        all_short_texts_nrs_list = all_short_texts_nrs_list + [t, ""]
+    # one text for 0back dual block with click, one text for 0-back no click
+    elif t_idx == 2:
+        all_short_texts_nrs_list = all_short_texts_nrs_list + [t, ""]
+    # append one text for self-paced dual block 0-back,
+    # then two empty blocks for n-back training, then two blocks for single n-back blocks (self-paced and paced)
+    elif t_idx == 3:
+        all_short_texts_nrs_list = all_short_texts_nrs_list + [t, ""]
+
+# print(all_short_texts_nrs_list)
+
+all_texts_nrs_list = all_texts_nrs_list, all_short_texts_nrs_list
+all_texts_nrs_list = flatten_list(all_texts_nrs_list)
 print(all_texts_nrs_list)
 
 ### Set order of blocks
@@ -120,22 +131,18 @@ print(all_blocks)
 ### Create n-back colour lists for all blocks
 
 print("create n-back colour lists")
-# The reading bl training text has 55 trials.
+# The reading bl training text has 30 trials.
 # the reading bl main has 91 words
-# reading training no click has 58 words
-# then main reading bl no click with 91 words
-# then 0-back short training with 20 trials
+# then 0-back training with 20 trials
 # then 0-back dual self-paced and paced block with 91 trials and 15 targets each
-
 # Then we have 2 short training blocks à 20 trials each (5 targets) for n-back
-# then two single n-back blocks with 90 trials each (15 targets)
+# then two single n-back blocks with 60 trials each (15 targets)
 # then two dual blocks with 91 trials each (15 targets)
-# then again two short training blocks, two single n-back blocks with 90 trials each (15 targets), and two dual blocks with 91 trials (15 targets)
-# and finally, one pseudotext block
-
+# then we repeat everything in the paced version; except that blocks are much shorter
 # --> all in all, 20 blocks
 
 # So for every block, build a list with colour codes containing the right amount of targets.
+# this is the old set-up with all texts in the same length
 # blocks_textlen = [60, 91, 20, 91,
 #                   20, 20, 90, 91,
 #                   20, 20, 90, 91,
@@ -155,14 +162,14 @@ print("create n-back colour lists")
 blocks_textlen = [30, 91, 20, 91,
                   20, 20, 60, 91,
                   20, 20, 60, 91,
-                  30, 91, 91, 60,
-                  91, 60, 91, 30]
+                  30, 30, 30, 40,
+                  30, 40, 30, 30]
 
 blocks_target_counts = [5, 15, 5, 15,
                         5, 5, 10, 15,
                         5, 5, 10, 15,
-                        5, 15, 15, 10,
-                        15, 10, 15, 5]
+                        5, 15, 15, 6,
+                        15, 6, 15, 5]
 # Now loop this list. Check which condition we have there and the create colour list for each text.
 all_colour_lists = []
 all_target_lists = []
@@ -229,6 +236,40 @@ print("------ finished preparing stimuli! ------")
 # ------------------------------------------
 
 # init block counter for the whole experiment
-exp_block_counter = 0
+# exp_block_counter = 0
+
+# There is the option to skip the demographics part and the self-paced block if for instance the experiment crashed in the middle or the participant needs to repeat the paced blocks
+# In this case, the RTs per condition are entered and the experiment directly starts with the paced blocks
+if expInfo['self-paced_blocks'] == "yes":
+    exp_block_counter = 0
+elif expInfo['self-paced_blocks'] == "no":
+    exp_block_counter = 12
+
+    # Define the form items
+    info = {
+        'RT_per_letter_baseline': '',
+        'RT_per_letter_0back': '',
+        'RT_per_letter_1bck': '',
+        'RT_per_letter_2bck': '',
+        'RT_per_rect_1back_single': '',
+        'RT_per_rect_2back_single': ''
+    }
+
+    # Create the dialog
+    dlg = gui.DlgFromDict(dictionary=info, title='User Information')
+
+    # Check if the user pressed OK
+    if dlg.OK:
+        RT_per_letter_baseline = int(info['RT_per_letter_baseline'])
+        RT_per_letter_0back = int(info['RT_per_letter_0back'])
+        RT_per_letter_1bck = int(info['RT_per_letter_1bck'])
+        RT_per_letter_2bck = int(info['RT_per_letter_2bck'])
+        RT_per_rectangle_oneback_single = int(info['RT_per_rect_1back_single'])
+        RT_per_rectangle_twoback_single = int(info['RT_per_rect_2back_single'])
+        print(f'RT_per_letter_baseline: {RT_per_letter_baseline},\nRT_per_letter_0back: {RT_per_letter_0back},\n'
+              f'RT_per_letter_1bck: {RT_per_letter_1bck},\nRT_per_letter_2bck: {RT_per_letter_2bck},\n'
+              f'RT_per_rect_1back_single: {RT_per_rectangle_oneback_single},\nRT_per_rect_2back_single: {RT_per_rectangle_twoback_single}')
+    else:
+        core.quit()
 
 print("starting experiment now!")

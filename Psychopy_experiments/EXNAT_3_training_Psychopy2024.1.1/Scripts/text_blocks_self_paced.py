@@ -421,10 +421,153 @@ if curr_block in ["Reading_Baseline_training_click", "Reading_Baseline_main_clic
 
     print("finished presenting trials")
 
-    # Send end of block trigger:
-    # core.wait(time_after_trigger)  # wait 3 ms
-    # send block offset trigger
-    # send_trigger("block_offset")
+    if 11 <= exp_block_counter < 12:
+        # Calculate and print out RTs per letter for each condition. This is needed to have these times if the training experiment breaks or fails or needs to be stopped
+        filtered_durations_BL = []
+        filtered_words_BL = []
+        for duration, word in zip(BL_paced_durations, BL_paced_words):
+            if 50 <= duration <= 1500:
+                filtered_durations_BL.append(duration)
+                filtered_words_BL.append(word)
+        # print("\tfiltered_durations_BL:", filtered_durations_BL)
+        # print("\tfiltered_words_BL:", filtered_words_BL)
+
+        # Now get number of letters (not words, I want to know how fast they read 1 letter on average!):
+        letters_total_BL = sum(len(word) for word in filtered_words_BL)
+        # print("\tletters_total_BL:", letters_total_BL)
+        # also get time it took in total to read them all:
+        reading_time_total_BL = sum(filtered_durations_BL)  # in ms
+
+        # Now check how many words / min they read on average.
+        # reading_speed_wpm = words_total / (reading_time_total/60000)
+        # print("reading speed in words / min:" + str(reading_speed_wpm))
+
+        # Check average RT / letter
+        RT_per_letter_baseline = reading_time_total_BL / letters_total_BL
+        print("\tRT_per_letter_baseline:", round(RT_per_letter_baseline))
+
+        # save this in the output csv:
+        thisExp.addData('RT_per_letter_baseline', round(RT_per_letter_baseline))
+
+        # elif curr_block in ["0back_dual_main_no_click"]:
+
+        filtered_durations_0back = []
+        filtered_words_0back = []
+        for duration, word in zip(zeroback_paced_durations, zeroback_paced_words):
+            if 50 <= duration <= 1500:
+                filtered_durations_0back.append(duration)
+                filtered_words_0back.append(word)
+        # print("\tfiltered_durations_BL:", filtered_durations_BL)
+        # print("\tfiltered_words_BL:", filtered_words_BL)
+
+        # Now get number of letters (not words, I want to know how fast they read 1 letter on average!):
+        letters_total_0back = sum(len(word) for word in filtered_words_0back)
+        # print("\tletters_total_0back:", letters_total_0back)
+        # also get time it took in total to read them all:
+        reading_time_total_0back = sum(filtered_durations_0back)  # in ms
+
+        # Now check how many words / min they read on average.
+        # reading_speed_wpm = words_total / (reading_time_total/60000)
+        # print("reading speed in words / min:" + str(reading_speed_wpm))
+
+        # Check average RT / letter
+        RT_per_letter_0back = reading_time_total_0back / letters_total_0back
+        print("\tRT_per_letter_0back:", round(RT_per_letter_0back))
+
+        # save this in the output csv:
+        thisExp.addData('RT_per_letter_0back', round(RT_per_letter_0back))
+
+        # elif curr_block in ["1back_dual_main_no_click"]:
+
+        filtered_durations_1bck = []
+        filtered_words_1bck = []
+        for duration, word in zip(oneback_paced_durations, oneback_paced_words):
+            if 50 <= duration <= 2000:
+                filtered_durations_1bck.append(duration)
+                filtered_words_1bck.append(word)
+        # print("\tfiltered_durations_1bck:", filtered_durations_1bck)
+        # print("\tfiltered_words_1bck:", filtered_words_1bck)
+
+        # Now get number of letters (not words, I want to know how fast they read 1 letter on average!):
+        letters_total_1bck = sum(len(word) for word in filtered_words_1bck)
+        # print("\tletters_total_1bck:", letters_total_1bck)
+        # also get time it took in total to read them all:
+        reading_time_total_1bck = sum(filtered_durations_1bck)  # in ms
+
+        # Now check how many words / min they read on average.
+        # reading_speed_wpm = words_total / (reading_time_total/60000)
+        # print("reading speed in words / min:" + str(reading_speed_wpm))
+
+        # Check average RT / letter
+        RT_per_letter_1bck = reading_time_total_1bck / letters_total_1bck
+        print("\tRT_per_letter_1bck:", round(RT_per_letter_1bck))
+
+        # save this in the output csv:
+        thisExp.addData('RT_per_letter_1bck', round(RT_per_letter_1bck))
+
+        # elif curr_block in ["2back_dual_main_no_click"]:
+
+        filtered_durations_2bck = []
+        filtered_words_2bck = []
+        for duration, word in zip(twoback_paced_durations, twoback_paced_words):
+            if 50 <= duration <= 2500:
+                filtered_durations_2bck.append(duration)
+                filtered_words_2bck.append(word)
+        # print("\tfiltered_durations_2bck:", filtered_durations_2bck)
+        # print("\tfiltered_words_2bck:", filtered_words_2bck)
+
+        # Now get number of letters (not words, I want to know how fast they read 1 letter on average!):
+        letters_total_2bck = sum(len(word) for word in filtered_words_2bck)
+        # print("\tletters_total_2bck:", letters_total_2bck)
+        # also get time it took in total to read them all:
+        reading_time_total_2bck = sum(filtered_durations_2bck)  # in ms
+
+        # Now check how many words / min they read on average.
+        # reading_speed_wpm = words_total / (reading_time_total/60000)
+        # print("reading speed in words / min:" + str(reading_speed_wpm))
+
+        # Check average RT / letter
+        RT_per_letter_2bck = reading_time_total_2bck / letters_total_2bck
+        print("\tRT_per_letter_2bck:", round(RT_per_letter_2bck))
+
+        # save this in the output csv:
+        thisExp.addData('RT_per_letter_2bck', round(RT_per_letter_2bck))
+
+        # if curr_block == "1back_single_main_no_click":
+
+        filtered_durations_oneback_single = []
+        for duration in oneback_single_paced_durations:
+            if 50 <= duration <= 1500:
+                filtered_durations_oneback_single.append(duration)
+        # count n of trials:
+        oneback_single_trials = len(filtered_durations_oneback_single)
+        # get time it took in total:
+        oneback_single_time_total = sum(filtered_durations_oneback_single)  # in ms
+
+        # Check average RT / rectangle
+        RT_per_rectangle_oneback_single = oneback_single_time_total / oneback_single_trials
+        print("\taverage RT per rectangle in ms for single 1back:", round(RT_per_rectangle_oneback_single))
+
+        # save this in the output csv:
+        thisExp.addData('RT_per_rect_1back_single', round(RT_per_rectangle_oneback_single))
+
+        # elif curr_block == "2back_single_main_no_click":
+
+        filtered_durations_twoback_single = []
+        for duration in twoback_single_paced_durations:
+            if 50 <= duration <= 2000:
+                filtered_durations_twoback_single.append(duration)
+        # count n of trials:
+        twoback_single_trials = len(filtered_durations_twoback_single)
+        # get time it took in total:
+        twoback_single_time_total = sum(filtered_durations_twoback_single)  # in ms
+
+        # Check average RT / rectangle
+        RT_per_rectangle_twoback_single = twoback_single_time_total / twoback_single_trials
+        print("\taverage RT per rectangle in ms for single 2back:", round(RT_per_rectangle_twoback_single))
+
+        # save this in the output csv:
+        thisExp.addData('RT_per_rect_2back_single', round(RT_per_rectangle_twoback_single))
 
     # end current routine
     continueRoutine = False

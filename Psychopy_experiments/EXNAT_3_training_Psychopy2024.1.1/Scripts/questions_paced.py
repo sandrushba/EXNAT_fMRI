@@ -240,67 +240,68 @@ elif not skip_questions_paced and not training_Qs_paced:
     # start a new row in the csv
     thisExp.nextEntry()
 
-    # Setup for Q2
-    Q2_text = locals()[curr_text_nr + "_Q2"]
-    Q2_answers = locals()[curr_text_nr + "_Q2_ans"]
-    Q2_correct = locals()[curr_text_nr + "_Q2_corr"]
-
-    question, answers = setup_question(Q2_text, Q2_answers)
-    question_time, chosen_ans, is_correct, button_pressed = display_question_and_get_response(question, answers,
-                                                                                              Q2_correct)
-    print(f"Chosen answer for Q2: {chosen_ans}, Correct: {is_correct}")
-    if curr_block == "0back_dual_main_no_click" and is_correct:
-        zeroback_correct_answers += 1
-    elif curr_block == "1back_dual_main_no_click" and is_correct:
-        oneback_correct_answers += 1
-    elif curr_block == "2back_dual_main_no_click" and is_correct:
-        twoback_correct_answers += 1
-    reset_answers(answers)
-
-    # save data:
-    thisExp.addData('global_onset_time', question_time)
-    thisExp.addData('question', 'Q2')
-    thisExp.addData('button_pressed', button_pressed)
-    thisExp.addData('chosen_ans', chosen_ans)
-    thisExp.addData('ans_correct', chosen_ans == Q2_correct)
-    thisExp.addData('text_nr', curr_text_nr)
-    thisExp.addData('block_nr_exp', exp_block_counter + 1)
-    thisExp.addData('block_name', curr_block)
-    thisExp.addData('n-back_level', curr_nback_cond)
-
-    # start a new row in the csv
-    thisExp.nextEntry()
-
-    # Setup for Q3
-    Q3_text = locals()[curr_text_nr + "_Q3"]
-    Q3_answers = locals()[curr_text_nr + "_Q3_ans"]
-    Q3_correct = locals()[curr_text_nr + "_Q3_corr"]
-
-    question, answers = setup_question(Q3_text, Q3_answers)
-    question_time, chosen_ans, is_correct, button_pressed = display_question_and_get_response(question, answers,
-                                                                                              Q3_correct)
-    print(f"Chosen answer for Q3: {chosen_ans}, Correct: {is_correct}")
-    if curr_block == "0back_dual_main_no_click" and is_correct:
-        zeroback_correct_answers += 1
-    elif curr_block == "1back_dual_main_no_click" and is_correct:
-        oneback_correct_answers += 1
-    elif curr_block == "2back_dual_main_no_click" and is_correct:
-        twoback_correct_answers += 1
-    reset_answers(answers)
-
-    # save data:
-    thisExp.addData('global_onset_time', question_time)
-    thisExp.addData('question', 'Q3')
-    thisExp.addData('button_pressed', button_pressed)
-    thisExp.addData('chosen_ans', chosen_ans)
-    thisExp.addData('ans_correct', chosen_ans == Q3_correct)
-    thisExp.addData('text_nr', curr_text_nr)
-    thisExp.addData('block_nr_exp', exp_block_counter + 1)
-    thisExp.addData('block_name', curr_block)
-    thisExp.addData('n-back_level', curr_nback_cond)
-
-    # start a new row in the csv
-    thisExp.nextEntry()
+    # We are skipping questions 2 and 3 for the paced training due to time issues.
+    # # Setup for Q2
+    # Q2_text = locals()[curr_text_nr + "_Q2"]
+    # Q2_answers = locals()[curr_text_nr + "_Q2_ans"]
+    # Q2_correct = locals()[curr_text_nr + "_Q2_corr"]
+    #
+    # question, answers = setup_question(Q2_text, Q2_answers)
+    # question_time, chosen_ans, is_correct, button_pressed = display_question_and_get_response(question, answers,
+    #                                                                                           Q2_correct)
+    # print(f"Chosen answer for Q2: {chosen_ans}, Correct: {is_correct}")
+    # if curr_block == "0back_dual_main_no_click" and is_correct:
+    #     zeroback_correct_answers += 1
+    # elif curr_block == "1back_dual_main_no_click" and is_correct:
+    #     oneback_correct_answers += 1
+    # elif curr_block == "2back_dual_main_no_click" and is_correct:
+    #     twoback_correct_answers += 1
+    # reset_answers(answers)
+    #
+    # # save data:
+    # thisExp.addData('global_onset_time', question_time)
+    # thisExp.addData('question', 'Q2')
+    # thisExp.addData('button_pressed', button_pressed)
+    # thisExp.addData('chosen_ans', chosen_ans)
+    # thisExp.addData('ans_correct', chosen_ans == Q2_correct)
+    # thisExp.addData('text_nr', curr_text_nr)
+    # thisExp.addData('block_nr_exp', exp_block_counter + 1)
+    # thisExp.addData('block_name', curr_block)
+    # thisExp.addData('n-back_level', curr_nback_cond)
+    #
+    # # start a new row in the csv
+    # thisExp.nextEntry()
+    #
+    # # Setup for Q3
+    # Q3_text = locals()[curr_text_nr + "_Q3"]
+    # Q3_answers = locals()[curr_text_nr + "_Q3_ans"]
+    # Q3_correct = locals()[curr_text_nr + "_Q3_corr"]
+    #
+    # question, answers = setup_question(Q3_text, Q3_answers)
+    # question_time, chosen_ans, is_correct, button_pressed = display_question_and_get_response(question, answers,
+    #                                                                                           Q3_correct)
+    # print(f"Chosen answer for Q3: {chosen_ans}, Correct: {is_correct}")
+    # if curr_block == "0back_dual_main_no_click" and is_correct:
+    #     zeroback_correct_answers += 1
+    # elif curr_block == "1back_dual_main_no_click" and is_correct:
+    #     oneback_correct_answers += 1
+    # elif curr_block == "2back_dual_main_no_click" and is_correct:
+    #     twoback_correct_answers += 1
+    # reset_answers(answers)
+    #
+    # # save data:
+    # thisExp.addData('global_onset_time', question_time)
+    # thisExp.addData('question', 'Q3')
+    # thisExp.addData('button_pressed', button_pressed)
+    # thisExp.addData('chosen_ans', chosen_ans)
+    # thisExp.addData('ans_correct', chosen_ans == Q3_correct)
+    # thisExp.addData('text_nr', curr_text_nr)
+    # thisExp.addData('block_nr_exp', exp_block_counter + 1)
+    # thisExp.addData('block_name', curr_block)
+    # thisExp.addData('n-back_level', curr_nback_cond)
+    #
+    # # start a new row in the csv
+    # thisExp.nextEntry()
 
     # go to next block!
     exp_block_counter += 1

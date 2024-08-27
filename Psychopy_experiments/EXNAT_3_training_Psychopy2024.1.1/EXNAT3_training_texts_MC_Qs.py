@@ -328,17 +328,108 @@ text_04_Q3_ans = ["1) Robbenkolonie von Cape Cross", "2) Robbenkolonie von Cape 
                   "4) Robbenkolonie von Cape Circle"]
 text_04_Q3_corr = "a"
 
+# # Trottellummen
+# # global text_05
+# text_05 = ["Trottellummen", "brüten", "auf", "steilen", "Felsklippen", "ohne", "Nester,", "so", "auch", "auf", "der",
+#            "deutschen", "Insel", "Helgoland.", "Ihre", "Eier", "sind", "einzigartig:", "spitz", "zulaufend,", "bunt",
+#            "und", "gemustert.", "Diese", "Form", "verhindert,", "dass", "sie", "vom", "Felsen", "rollen,", "denn",
+#            "sie", "drehen", "sich", "bei", "Berührung", "im", "engen", "Kreis.", "Forscher", "haben", "außerdem",
+#            "entdeckt,", "dass", "die", "Schale", "der", "Eier", "Nanostrukturen", "besitzt,", "die", "wasserabweisend",
+#            "und", "rau", "sind.", "Dies", "schützt", "die", "Eier", "vor", "Schmutz", "und", "Salzwasser,", "hält",
+#            "die", "Poren", "frei", "und", "erleichtert", "den", "Sauerstoffaustausch.", "Die", "bunten", "Muster",
+#            "helfen", "den", "Eltern,", "ihre", "eigenen", "Eier", "zu", "erkennen.", "So", "überstehen", "die", "Eier",
+#            "die", "gefährliche", "Brutzeit", "besser."]
+#
+# text_05_Q1 = "Wo brüten Trottellummen in Deutschland?"
+# text_05_Q1_ans = ["1) Wangerooge", "2) Hallig Hooge", "3) Borkum", "4) Helgoland"]
+# text_05_Q1_corr = "d"
+#
+# text_05_Q2 = "Was ist besonders an der Form der Eier?"
+# text_05_Q2_ans = ["1) Sie sind spitz zulaufend", "2) Sie sind kugelförmig",
+#                   "3) Sie sind sehr flach", "4) Sie sind halbrund"]
+# text_05_Q2_corr = "a"
+#
+# text_05_Q3 = "Welche weitere besondere Eigenschaft haben die Eier?"
+# text_05_Q3_ans = ["1) Sie sind dunkelblau", "2) Sie sind grün",
+#                   "3) Sie sind wasserabweisend", "4) Sie können Wasser aufnehmen"]
+# text_05_Q3_corr = "c"
+#
+# # life on the island
+# # global text_06
+# text_06 = ["Julia", "Baer", "arbeitet", "allein", "als", "Naturschutzwartin", "im", "Auftrag", "des", "Nabu", "auf",
+#            "der", "Nordseeinsel", "Trischen.", "Ihre", "Aufgabe", "ist", "es,", "Vögel", "wie", "Regenpfeifer,",
+#            "Austernfischer", "und", "Rotschenkel", "zu", "beobachten", "und", "zu", "zählen.", "Die", "studierte",
+#            "Landschafts-", "und", "Meeresökologin", "lebt", "in", "einer", "kleinen", "Holzhütte", "ohne",
+#            "fließendes", "Wasser", "und", "nutzt", "Solarzellen", "für", "Strom.", "Einmal", "pro", "Woche", "bringt",
+#            "der", "pensionierte", "Fischer", "Axel", "Rohwedder", "Vorräte", "und", "ein", "bisschen", "Gesellschaft.",
+#            "Julia", "liebt", "die", "Abgeschiedenheit", "und", "den", "fehlenden", "Großstadtlärm.", "Obwohl", "sie",
+#            "meistens", "allein", "ist,", "fühlt", "sie", "sich", "nie", "einsam.", "Sie", "genießt", "das", "einfache",
+#            "Leben", "und", "plant,", "weiterhin", "auf", "Inseln", "zu", "leben."]
+#
+# text_06_Q1 = "Auf welcher Nordseeinsel lebt Julia Baer?"
+# text_06_Q1_ans = ["1) Pellworm", "2) Trischen", "3) Amrum", "4) Föhr"]
+# text_06_Q1_corr = "b"
+#
+# text_06_Q2 = "Was hat sie studiert?"
+# text_06_Q2_ans = ["1) Meeresökologie", "2) Vogelkunde", "3) Ökonomie", "4) Meeresbiologie"]
+# text_06_Q2_corr = "a"
+#
+# text_06_Q3 = "Was beobachtet Julia Baer auf der Nordseeinsel?"
+# text_06_Q3_ans = ["1) Fische", "2) Krabben", "3) Meeresschnecken", "4) Vögel"]
+# text_06_Q3_corr = "d"
+#
+# # training text_07
+# text_07 = ["Der", "Kölner", "Fotograf", "Tobias", "Zimmer", "taucht", "im", "indonesischen", "Raja", "Ampat,", "einem",
+#            "Ort", "mit", "sehr", "großer", "Artenvielfalt", "unter", "Wasser.", "Hier", "fotografiert", "er", "viele",
+#            "einzigartige", "Meereslebewesen,", "wie", "farbenfrohe", "Fische,", "Haie,", "Rochen", "und",
+#            "Pygmäen-Seepferdchen.", "Beim", "Tauchen", "sieht", "er", "viele", "unterschiedliche", "Korallen.", "Er",
+#            "ist", "beeindruckt", "von", "der", "Schönheit", "und", "Unberührtheit", "der", "Natur.", "Seine",
+#            "Unterkunft", "bemüht", "sich", "um", "Umweltschutz", "und", "bietet", "gute", "Arbeitsbedingungen", "für",
+#            "die", "Einheimischen.", "Die", "Gegend", "ist", "sehr", "schwer", "zu", "erreichen", "und", "wenig",
+#            "touristisch.", "Es", "gibt", "keine", "Spuren", "von", "Fischerei.", "Zimmer", "genießt", "sein",
+#            "Abenteuer", "in", "diesem", "Tauchparadies", "und", "hält", "es", "mit", "der", "Kamera", "fest."]
+#
+# text_07_Q1 = "In welchem Land taucht Tobias Zimmer?"
+# text_07_Q1_ans = ["1) Philippen", "2) Australien", "3) Indonesien", "4) Malaysia"]
+# text_07_Q1_corr = "c"
+#
+# text_07_Q2 = "Wofür ist die Gegend Raja Ampat bekannt?"
+# text_07_Q2_ans = ["1) Ruinen", "2) Artenvielfalt", "3) Fischerei", "4) Vögel"]
+# text_07_Q2_corr = "b"
+#
+# text_07_Q3 = "Worum bemüht sich seine Unterkunft?"
+# text_07_Q3_ans = ["1) Umweltschutz", "2) Tourismus", "3) Tauchunterricht", "4) Digitalisierung"]
+# text_07_Q3_corr = "a"
+#
+# # training text_08
+# text_08 = ["Forscher", "der", "Universität", "Puerto", "Rico", "benutzen", "Mikrofone", "in", "Regenwäldern,", "um",
+#            "Tiere", "zu", "überwachen.", "Sie", "müssen", "so", "nicht", "mehr", "selbst", "in", "den", "Regenwald",
+#            "und", "stören", "die", "Tiere", "nicht.", "Diese", "Mikrofone", "zeichnen", "Tiergeräusche", "auf.",
+#            "Diese", "Technik", "macht", "es", "für", "Forscher", "einfacher", "und", "billiger,", "Daten", "zu",
+#            "sammeln.", "Sie", "werden", "dann", "von", "Computern", "analysiert", "und", "automatisch", "den", "Tieren",
+#            "zugeordnet.", "Die", "Wissenschaftler", "können", "so", "viele", "Tierarten", "gleichzeitig", "und",
+#            "dauerhaft", "beobachten.", "Zum", "Beispiel", "wurden", "Geräusche", "von", "Vögeln", "und", "Affen",
+#            "aufgezeichnet.", "Das", "kann", "helfen,", "die", "Artenvielfalt", "zu", "schützen.", "Die", "Mikrofone",
+#            "werden", "auch", "auf", "Hawaii", "und", "in", "Brasilien", "benutzt."]
+#
+# text_08_Q1 = "Wer analysiert die Geräusche?"
+# text_08_Q1_ans = ["1) Biologen", "2) Ökologen", "3) Handys", "4) Computer"]
+# text_08_Q1_corr = "d"
+#
+# text_08_Q2 = "Welche Tiergeräusche konnten unter anderem aufgezeichnet werden?"
+# text_08_Q2_ans = ["1) Ameisenbären", "2) Affen", "3) Pumas", "4) Fauchschaben"]
+# text_08_Q2_corr = "b"
+#
+# text_08_Q3 = "Wo werden die Mikrofone noch benutzt?"
+# text_08_Q3_ans = ["1) Kolumbien", "2) Panama", "3) Brasilien", "4) Chile"]
+# text_08_Q3_corr = "c"
+
+# These are the shorter versions of four training texts, each one 30 words long. We had to shorten the training due to the long time it took before.
 # Trottellummen
 # global text_05
 text_05 = ["Trottellummen", "brüten", "auf", "steilen", "Felsklippen", "ohne", "Nester,", "so", "auch", "auf", "der",
-           "deutschen", "Insel", "Helgoland.", "Ihre", "Eier", "sind", "einzigartig:", "spitz", "zulaufend,", "bunt",
-           "und", "gemustert.", "Diese", "Form", "verhindert,", "dass", "sie", "vom", "Felsen", "rollen,", "denn",
-           "sie", "drehen", "sich", "bei", "Berührung", "im", "engen", "Kreis.", "Forscher", "haben", "außerdem",
-           "entdeckt,", "dass", "die", "Schale", "der", "Eier", "Nanostrukturen", "besitzt,", "die", "wasserabweisend",
-           "und", "rau", "sind.", "Dies", "schützt", "die", "Eier", "vor", "Schmutz", "und", "Salzwasser,", "hält",
-           "die", "Poren", "frei", "und", "erleichtert", "den", "Sauerstoffaustausch.", "Die", "bunten", "Muster",
-           "helfen", "den", "Eltern,", "ihre", "eigenen", "Eier", "zu", "erkennen.", "So", "überstehen", "die", "Eier",
-           "die", "gefährliche", "Brutzeit", "besser."]
+           "deutschen", "Insel", "Helgoland.", "Ihre", "Eier", "sind", "spitz", "zulaufend,", "bunt",
+           "und", "gemustert.", "Diese", "Form", "verhindert,", "dass", "sie", "vom", "Felsen", "rollen."]
 
 text_05_Q1 = "Wo brüten Trottellummen in Deutschland?"
 text_05_Q1_ans = ["1) Wangerooge", "2) Hallig Hooge", "3) Borkum", "4) Helgoland"]
@@ -357,14 +448,8 @@ text_05_Q3_corr = "c"
 # life on the island
 # global text_06
 text_06 = ["Julia", "Baer", "arbeitet", "allein", "als", "Naturschutzwartin", "im", "Auftrag", "des", "Nabu", "auf",
-           "der", "Nordseeinsel", "Trischen.", "Ihre", "Aufgabe", "ist", "es,", "Vögel", "wie", "Regenpfeifer,",
-           "Austernfischer", "und", "Rotschenkel", "zu", "beobachten", "und", "zu", "zählen.", "Die", "studierte",
-           "Landschafts-", "und", "Meeresökologin", "lebt", "in", "einer", "kleinen", "Holzhütte", "ohne",
-           "fließendes", "Wasser", "und", "nutzt", "Solarzellen", "für", "Strom.", "Einmal", "pro", "Woche", "bringt",
-           "der", "pensionierte", "Fischer", "Axel", "Rohwedder", "Vorräte", "und", "ein", "bisschen", "Gesellschaft.",
-           "Julia", "liebt", "die", "Abgeschiedenheit", "und", "den", "fehlenden", "Großstadtlärm.", "Obwohl", "sie",
-           "meistens", "allein", "ist,", "fühlt", "sie", "sich", "nie", "einsam.", "Sie", "genießt", "das", "einfache",
-           "Leben", "und", "plant,", "weiterhin", "auf", "Inseln", "zu", "leben."]
+           "der", "Nordseeinsel", "Trischen.", "Ihre", "Aufgabe", "ist", "es,", "verschiedene", "Vögel", "wie", "Regenpfeifer,",
+           "Austernfischer", "und", "Rotschenkel", "zu", "beobachten", "und", "zu", "zählen."]
 
 text_06_Q1 = "Auf welcher Nordseeinsel lebt Julia Baer?"
 text_06_Q1_ans = ["1) Pellworm", "2) Trischen", "3) Amrum", "4) Föhr"]
@@ -380,17 +465,12 @@ text_06_Q3_corr = "d"
 
 # training text_07
 text_07 = ["Der", "Kölner", "Fotograf", "Tobias", "Zimmer", "taucht", "im", "indonesischen", "Raja", "Ampat,", "einem",
-           "Ort", "mit", "sehr", "großer", "Artenvielfalt", "unter", "Wasser.", "Hier", "fotografiert", "er", "viele",
+           "Ort", "mit", "großer", "Artenvielfalt", "unter", "Wasser.", "Hier", "fotografiert", "er", "viele",
            "einzigartige", "Meereslebewesen,", "wie", "farbenfrohe", "Fische,", "Haie,", "Rochen", "und",
-           "Pygmäen-Seepferdchen.", "Beim", "Tauchen", "sieht", "er", "viele", "unterschiedliche", "Korallen.", "Er",
-           "ist", "beeindruckt", "von", "der", "Schönheit", "und", "Unberührtheit", "der", "Natur.", "Seine",
-           "Unterkunft", "bemüht", "sich", "um", "Umweltschutz", "und", "bietet", "gute", "Arbeitsbedingungen", "für",
-           "die", "Einheimischen.", "Die", "Gegend", "ist", "sehr", "schwer", "zu", "erreichen", "und", "wenig",
-           "touristisch.", "Es", "gibt", "keine", "Spuren", "von", "Fischerei.", "Zimmer", "genießt", "sein",
-           "Abenteuer", "in", "diesem", "Tauchparadies", "und", "hält", "es", "mit", "der", "Kamera", "fest."]
+           "Pygmäen-Seepferdchen."]
 
 text_07_Q1 = "In welchem Land taucht Tobias Zimmer?"
-text_07_Q1_ans = ["1) Philippen", "2) Australien", "3) Indonesien", "4) Malaysia"]
+text_07_Q1_ans = ["1) Philippinen", "2) Australien", "3) Indonesien", "4) Malaysia"]
 text_07_Q1_corr = "c"
 
 text_07_Q2 = "Wofür ist die Gegend Raja Ampat bekannt?"
@@ -403,17 +483,11 @@ text_07_Q3_corr = "a"
 
 # training text_08
 text_08 = ["Forscher", "der", "Universität", "Puerto", "Rico", "benutzen", "Mikrofone", "in", "Regenwäldern,", "um",
-           "Tiere", "zu", "überwachen.", "Sie", "müssen", "so", "nicht", "mehr", "selbst", "in", "den", "Regenwald",
-           "und", "stören", "die", "Tiere", "nicht.", "Diese", "Mikrofone", "zeichnen", "Tiergeräusche", "auf.",
-           "Diese", "Technik", "macht", "es", "für", "Forscher", "einfacher", "und", "billiger,", "Daten", "zu",
-           "sammeln.", "Sie", "werden", "dann", "von", "Computern", "analysiert", "und", "automatisch", "den", "Tieren",
-           "zugeordnet.", "Die", "Wissenschaftler", "können", "so", "viele", "Tierarten", "gleichzeitig", "und",
-           "dauerhaft", "beobachten.", "Zum", "Beispiel", "wurden", "Geräusche", "von", "Vögeln", "und", "Affen",
-           "aufgezeichnet.", "Das", "kann", "helfen,", "die", "Artenvielfalt", "zu", "schützen.", "Die", "Mikrofone",
-           "werden", "auch", "auf", "Hawaii", "und", "in", "Brasilien", "benutzt."]
+           "Tiere", "zu", "überwachen.", "Sie", "müssen", "so", "nicht", "selbst", "in", "den", "Regenwald",
+           "und", "stören", "keine", "Tiere.", "Diese", "Mikrofone", "zeichnen", "Tiergeräusche", "auf."]
 
-text_08_Q1 = "Wer analysiert die Geräusche?"
-text_08_Q1_ans = ["1) Biologen", "2) Ökologen", "3) Handys", "4) Computer"]
+text_08_Q1 = "Von welcher Universität stammen die Forscher?"
+text_08_Q1_ans = ["1) Brasilia", "2) Venezuela", "3) New York", "4) Puerto Rico"]
 text_08_Q1_corr = "d"
 
 text_08_Q2 = "Welche Tiergeräusche konnten unter anderem aufgezeichnet werden?"
