@@ -1,0 +1,11 @@
+index,itemText,options,layout,type,itemWidth,responseWidth,itemColor,responseColor
+0,Bitte beantworten Sie die folgenden Fragen zu Ihrer Ausbildung:,,,description,,,black,black
+education,Was ist Ihr höchster Bildungsabschluss?,"Hauptschulabschluss, Realschulabschluss, Fachhochschulreife/Abitur, abgeschlossene Ausbildung, abgeschlossenes Studium, Dissertation, Habilitation",vert,radio,1,1,black,black
+edu_intro,Wie viele Jahre verbrachten Sie insgesamt mit:,,,description,,,black,black
+edu_school_years,Schule,,vert,free text,0.3,0.5,black,black
+edu_eveningschool_years,Abendschule,,vert,free text,0.3,0.5,black,black
+edu_training_years,Ausbildung,,vert,free text,0.3,0.5,black,black
+edu_training_GDR_years,Fachschule,,vert,free text,0.3,0.5,black,black
+edu_uni_years,Universität/Hochschule,,vert,free text,0.3,0.5,black,black
+edu_other_years,Sonstiges,,vert,free text,0.3,0.5,black,black
+edu_profession,Was ist Ihr derzeitiger/letzter Beruf?,,vert,free text,0.5,0.5,black,black
