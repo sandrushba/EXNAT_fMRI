@@ -71,6 +71,9 @@ el_tracker.sendCommand("calibration_type = HV9")  # use 9 target dots for calibr
 # Set a gamepad button to accept calibration/drift check target
 # You need a supported gamepad/button box that's connected to the Host PC
 el_tracker.sendCommand("button_function 5 'accept_target_fixation'")  # I think that's enter on our keyboard?
+#Sets automatic calibration pacing.  \c 1000 is a good value for most subjects, \c 1500 for slow
+# subjects and when interocular data is required.
+el_tracker.sendCommand("automatic_calibration_pacing=%d"%(1000))
 
 ### Set screen resolution:
 

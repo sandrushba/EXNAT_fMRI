@@ -238,7 +238,7 @@ if 2 <= exp_block_counter <= 5:
                         core.quit()
 
             ### end trial
-            print("end paced rect trial")
+            # print("end paced rect trial")
 
             # stop display of current word & send trial offset trigger
             win.callOnFlip(send_trigger, "trial_offset")

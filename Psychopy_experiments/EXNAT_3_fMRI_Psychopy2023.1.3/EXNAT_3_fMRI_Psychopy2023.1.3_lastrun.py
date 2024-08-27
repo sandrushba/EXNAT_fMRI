@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2023.1.3),
-    on Wed 31 Jul 2024 03:53:19 PM CEST
+    on Mon 26 Aug 2024 12:37:42 PM CEST
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -69,7 +69,7 @@ filename = _thisDir + os.sep + u'Data/Psychopy/%s_%s_%s' % (expInfo['participant
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
     extraInfo=expInfo, runtimeInfo=None,
-    originPath='/data/hu_martin/Desktop/EXNAT_3_fMRI_Psychopy2023.1.3/EXNAT_3_fMRI_Psychopy2023.1.3_lastrun.py',
+    originPath='/data/tu_martin_cloud/EXNAT/EXNAT_fMRI/Psychopy_experiments/EXNAT_3_fMRI_Psychopy2023.1.3/EXNAT_3_fMRI_Psychopy2023.1.3_lastrun.py',
     savePickle=True, saveWideText=True,
     dataFileName=filename)
 # save a log file for detail verbose info
@@ -83,7 +83,7 @@ frameTolerance = 0.001  # how close to onset before 'same' frame
 
 # --- Setup the Window ---
 win = visual.Window(
-    size=[1920, 1080], fullscr=True, screen=0, 
+    size=[1280, 1024], fullscr=True, screen=0, 
     winType='pyglet', allowStencil=False,
     monitor='testMonitor', color=[0,0,0], colorSpace='rgb',
     backgroundImage='', backgroundFit='none',
@@ -1418,7 +1418,7 @@ for thisLoop_run1_single_reading in loop_run1_single_reading:
                             core.quit()
     
                 ### end trial
-                print("\tend paced trial")
+                # print("\tend paced trial")
                 # stop display of current word & send trial offset trigger
                 win.callOnFlip(send_trigger, "trial_offset")
     
@@ -2092,7 +2092,7 @@ for thisLoop_run2_single_nback in loop_run2_single_nback:
                             core.quit()
     
                 ### end trial
-                print("end paced rect trial")
+                # print("end paced rect trial")
     
                 # stop display of current word & send trial offset trigger
                 win.callOnFlip(send_trigger, "trial_offset")
@@ -2539,7 +2539,7 @@ for thisLoop_dual_task_block in loop_dual_task_blocks:
                         core.quit()
     
             ### end trial
-            print("\tend paced trial")
+            # print("\tend paced trial")
             # stop display of current word & send trial offset trigger
             win.callOnFlip(send_trigger, "trial_offset")
     
