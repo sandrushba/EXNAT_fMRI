@@ -12,7 +12,7 @@
         "SeriesDescription": "t1_mprage_ADNI_32Ch_fc"
       },
       "sidecar_changes": {
-        "ProtocolName": "T2"
+        "ProtocolName": "T1"
       }
     },
     {
@@ -22,7 +22,7 @@
         "SeriesDescription": "t2_spc_sag_p2_iso"
       },
       "sidecar_changes": {
-        "ProtocolName": "T1"
+        "ProtocolName": "T2"
       }
     },
     {
