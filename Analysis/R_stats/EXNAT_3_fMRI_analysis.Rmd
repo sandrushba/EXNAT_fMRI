@@ -576,3 +576,298 @@ save(df_all_data, file = here::here("RData/df_all_data.RData"))
 # save comp question df
 save(df_comprehension_Qs, file = here::here("RData/df_comprehension_questions.RData"))
 ```
+
+# Find & exclude outliers using z-sqrt-POMS-transformation
+```{r find and exclude outlier trials, echo = FALSE}
+# DOESN'T SEEM TO BE A VERY VALID APPROACH WITH PACED DURATIONS SINCE THEY ARE ALREADY VERY MUCH FOCUSED ON THE INDIVIDUAL'S PERFORMANCE. I BELIEVE WE MIGHT NOT HAVE TO EXCLUDE ANY OUTLIERS AT ALL IN THE PACED BLOCKS SINCE TECHNICALLY OUTLIERS ARE NOT A THING ANYMORE.
+
+# only use data from the main blocks from now on:
+df_text_data_clean <- subset(df_all_data, block_name == "Reading_Baseline_main_no_click" | block_name == "Reading_pseudotext_no_click" | block_name == "1back_dual_main_no_click" | block_name == "2back_dual_main_no_click")
+
+message("Nr of trials before exclusion of trials: ", length(df_text_data_clean$participant))
+
+### EXCLUDE BREAKS ####
+# --> Exclude all trials where participants took more than 5 seconds (arbitrary value)
+# It's also a sanity check since this shouldn't be possible in EXNAT-3 due to introduced time-out values on trial basis
+message(paste(length(subset(df_text_data_clean, duration > 5000)$ID), " trials containing breaks were excluded from further analysis", sep = ""))
+
+df_text_data_clean <- subset(df_text_data_clean, duration <= 5000)
+
+
+# Plot distribution of reading times 
+densityplot(df_text_data_clean$duration)
+
+
+### TRANSFORM RT DATA ####
+
+# transf_val = sqrt (  ( x - sample_min ) / ( sample_max - sample_min)  )
+# --> after this, z-transform all values and exclude all values exceeding a value of ± 2 (or ± 3, but they used 2 in the paper)
+
+# This is basically a POMS (Little (2013), read in Moeller (2013)) transformation where you get
+# the square root of the output afterwards and z-transform everything.
+
+# Careful, normally, if you wanted to use the transformed values for group comparisons later, 
+# you'd have to to the transformation across participants & conditions, so everything gets "pulled" into the same range.
+# If you do this for each subject & condition separately, you can't compare means
+# anymore, because every subset of data would have its own scale.
+
+# Here, we only want to use the transformation for identifying & excluding outliers, so we don't really care about this problem. 
+# So we can do this on block level, so we don't exclude more trials from "slower" 2-back blocks than from the BL for example.
+
+# create new column in df_text_data_clean for the transformed RTs:
+df_text_data_clean$tmp_transformed_RTs <- NA 
+
+# get min reading time
+# sample_min <- min(df_text_data$duration)
+sample_min <- 0 # use smallest possible value here (this is described in a book by Little, 2013) - in this case: 0 words / 100 ms
+
+# loop participants:
+message("start excluding trials (block-wise)")
+for (curr_id in unique(df_text_data_clean$participant)){
+  
+  message("current participant: ", curr_id)
+  
+  # create placeholders to count excluded trials / condition
+  trials_excluded_BL    <- 0
+  trials_excluded_1back <- 0
+  trials_excluded_2back <- 0
+  
+  # get data of current participant:
+  curr_df <- subset(df_text_data_clean, participant == curr_id)
+
+  # loop blocks:
+  for (curr_block in unique(curr_df$block_nr_exp)){
+  
+    # get data of current block:
+    curr_block_data <- subset(curr_df, block_nr_exp == curr_block)
+
+    # get max reading time (use sample maximum here)
+    sample_max <- max(curr_block_data$duration)
+
+    # do sqrt(POMS) transform of raw reading time values
+    duration_standardized <- sqrt((curr_block_data$duration - sample_min) / (sample_max - sample_min))
+
+    # z-transform reading data
+    duration_standardized <- as.vector(scale(duration_standardized, center = T, scale = T))
+
+    # put the transformed values into the big df with data of all participants:
+    df_text_data_clean[which(df_text_data_clean$participant == curr_id & 
+                             df_text_data_clean$block_nr_exp == curr_block), ]$tmp_transformed_RTs <- duration_standardized
+    
+    # check how many trials we have that are < -2 or > 2:
+    trials_excluded <- length(which(duration_standardized > 3 | duration_standardized < -3))
+  }# END LOOP BlOCKS
+} # END LOOP PARTICIPANTS
+
+
+# get index of all values < - 2 or > 2 & actually exclude those trials from the dataframe
+excl_row_idx <- which(df_text_data_clean$tmp_transformed_RTs < -3 | df_text_data_clean$tmp_transformed_RTs > 3)
+
+# check how the corresponding untransformed RTs look like so we get a feeling for what's being excluded:
+# densityplot(df_text_data_clean[excl_row_idx, "duration"])
+
+# kick out the outliers:
+df_text_data_clean[excl_row_idx, "excl_trial"] <- TRUE
+# total number of excluded trials
+excl_trials <- sum(df_text_data_clean$excl_trial[df_text_data_clean$excl_trial == TRUE])
+df_text_data_clean <- subset(df_text_data_clean, excl_trial == FALSE)
+
+# drop column with the z-sqrt-POMS-transformed data, we don't need it anymore.  
+df_text_data_clean$tmp_transformed_RTs <- NULL
+```
+
+# log-transform reading times
+```{r log-transform reading times, echo = FALSE}
+# Idea: Ignore that we just transformed our reading times for outlier exclusion. 
+# We now take the raw reading times again and log-transform them.
+
+# use natural logarithm (base e) here:
+df_text_data_clean$reading_times_log <- log(df_text_data_clean$duration)
+# to reverse the log transformation and get the data back to the original scale (for easier interpretation of the results), 
+# use this: exp(log_transformed_data)
+
+# plot the distribution: 
+densityplot(df_text_data_clean$reading_times_log)
+
+# make sure we update the values in the column previous_duration as well:
+df_text_data_clean$previous_reading_times_log <- log(as.numeric(df_text_data_clean$previous_duration))
+
+```
+
+# Some renaming of columns
+```{r}
+# name df differently:
+df_clean <- df_text_data_clean
+
+# rename "block_kind" column 
+names(df_clean)[which(names(df_clean) == "nback_level")] <- "cognitive_load"
+
+# recode values in cognitive_load column
+df_clean <- df_clean %>% 
+  mutate(cognitive_load = case_when(
+    str_detect(cognitive_load, "None") ~ "Reading only",
+    str_detect(cognitive_load, "1") ~ "1-back",
+    str_detect(cognitive_load, "2") ~ "2-back",
+  ))
+
+# turn the values into factors and set their order
+df_clean$cognitive_load <- factor(df_clean$cognitive_load,
+                                  levels = c("Reading only", "1-back", "2-back"))
+
+# save df
+save(df_clean, file = here::here("RData/df_clean_all_subjects.RData"))
+```
+
+# Plots
+## Plot RTs by Task and Condition
+```{r plot rt by task and cond}
+plot_df <- subset(df_clean, reaction == F)
+
+#---- RTs by Task and Condition ----
+plot_RT_task <- ggplot(plot_df, aes(x = cognitive_load, y = duration)) +
+                      #geom_violinhalf(flip = c(1,3,5)) +
+                      geom_boxplot() +
+                      #geom_point2(plot_surprisal_df_summary, mapping = aes(x = Cognitive_Load, y = Reaction_time)) +
+                      #scale_color_manual(values = palet_task_condition_lines) +
+                      #scale_fill_manual(values = palet_task_condition) +
+                      #facet_wrap(~ Surprisal_TS, ncol = 4) +
+                      theme_classic(14)
+                      #theme(legend.position = "none",
+                      #      strip.background.x=element_rect(color = NA))
+# save plot
+cowplot::save_plot(plot_RT_task_cond, file = here::here(paste0("Plots/RT_task_cond_", today, ".pdf")))
+```
+
+## Plot RTs by Surprisal TS, Task & Condition (only dual-task blocks)
+```{r plot RTs by Surprisal TS & Condition, message = FALSE, warning = FALSE}
+plot_surprisal_df <- subset(df_clean, reaction == F) # exclude trials where you had a reaction
+plot_surprisal_df <- pivot_longer(plot_surprisal_df, 
+                                  cols = c("surprisal_1", "surprisal_4",
+                                           "surprisal_12", "surprisal_60"),  
+                                  names_to = "surprisal_ts", 
+                                  values_to = "surprisal") %>% 
+  select(c(surprisal_ts, participant, surprisal, cognitive_load, duration)) 
+
+plot_surprisal_df$surprisal <- round(plot_surprisal_df$surprisal, digits = 0)
+# Now group by participant, cognitive_load & time scale
+plot_surprisal_df <- plot_surprisal_df %>% 
+                    #group_by(participant, cognitive_load, surprisal_ts, surprisal) %>% 
+                    #summarise(mean_rt = mean(duration)) %>% 
+                            rename(Surprisal_TS = surprisal_ts, 
+                                   Subject = participant,
+                                   Surprisal = surprisal,
+                                   Cognitive_Load = cognitive_load,
+                                   Reaction_time = duration)
+
+plot_surprisal_df$Surprisal_TS <- factor(plot_surprisal_df$Surprisal_TS, levels = c("surprisal_1", "surprisal_4", "surprisal_12", "surprisal_60"))
+
+#plot_surprisal_df_summary <- plot_surprisal_df %>% 
+#  group_by(Subject, Cognitive_Load) %>% 
+#  summarise(Reaction_time = mean(Reaction_time))
+
+#---- Plot RTs by Surprisal x Task ----
+plot_RT_surprisal_task <- ggplot(plot_surprisal_df, aes(x = Surprisal, y = Reaction_time)) +
+                      geom_smooth(method = lm, na.rm = T) +
+                      #geom_point2(plot_surprisal_df_summary, mapping = aes(x = Cognitive_Load, y = Reaction_time)) +
+                      #scale_color_manual(values = palet_task_condition) +
+                      #scale_fill_manual(values = palet_task_condition) +
+                      scale_x_continuous(breaks = scales::pretty_breaks(n = 5)) +
+                      facet_wrap(~ Surprisal_TS, ncol = 4) +
+                      theme_classic(14) +
+                      theme(strip.background.x=element_rect(color = NA))
+
+# save plot
+cowplot::save_plot(plot_RT_surprisal_task, file = here::here(paste0("Plots/RT_surprisal_task_", today, ".pdf")))
+
+#---- Plot RTs by Surprisal x Cognitive Load ----
+plot_RT_surprisal_cond <- ggplot(plot_surprisal_df, aes(x = Surprisal, y = Reaction_time, fill = Cognitive_Load, color = Cognitive_Load)) +
+                      geom_smooth(method = lm, aes(fill = Cognitive_Load), na.rm = T) +
+                      #geom_point2(plot_surprisal_df_summary, mapping = aes(x = Cognitive_Load, y = Reaction_time)) +
+                      scale_color_manual(values = palet_load) +
+                      scale_fill_manual(values = palet_load) +
+                      scale_x_continuous(breaks = scales::pretty_breaks(n = 5)) +
+                      facet_wrap(~ Surprisal_TS, ncol = 4) +
+                      theme_classic(14) +
+                      theme(legend.position = "none",
+                            strip.background.x=element_rect(color = NA))
+
+# save plot
+cowplot::save_plot(plot_RT_surprisal_cond, file = here::here(paste0("Plots/RT_surprisal_condition_", today, ".pdf")))
+```
+
+
+## Plot Accuracy data
+d-primes and comprehension questions by Task and Condition
+Hint: We didn't have an n-back task in the baseline condition, so we can only compute & plot them for the 1-back and 2-back dual- and single-task blocks.
+```{r plot d-primes by condition, age and location, echo = TRUE}
+# get data, exclude BL because we didn't have an n-back task there
+plot_df <- subset(df_clean, cognitive_load != "Reading only" )
+plot_df <- droplevels(plot_df)
+
+# get d-prime data:
+# plot_df <- subset(df_text_data, block_kind == "1back_single_main" |
+#                                 block_kind == "2back_single_main" |
+#                                 block_kind == "1back_main" |
+#                                 block_kind == "2back_main")
+
+# aggregate by recording_location, age group, ID and cognitive load condition
+plot_df <- setNames(aggregate(plot_df$dprime,
+                              by = list(plot_df$participant, plot_df$cognitive_load),
+                              FUN = mean),
+                    c("participant", "Task", "Mean_dprime"))
+
+# plot d-primes
+plot_dprimes <- ggplot(plot_df, aes(x = Task, 
+                                    y = Mean_dprime), 
+                            width = 4, height = 7) +
+                      #geom_point(aes(color = Condition, fill = Condition), 
+                      #       position = position_jitter(width = 0.04, height = 0),
+                      #       alpha = 0.3,
+                      #       shape = 19,
+                      #       size = 1) +
+                      #geom_violinhalf(flip = c(1,3)) +
+                      geom_boxplot() +
+                      scale_color_manual(values = palet_dprimes_lines) +
+                      scale_fill_manual(values = palet_dprimes) +
+                      theme_classic(14) +
+                      theme(legend.position=("bottom"))
+                      coord_cartesian(ylim = c(0, 5))
+cowplot::save_plot(plot_dprimes, file = here::here(paste0("Plots/dprimes_", today, ".pdf")))
+
+## plot comprehension question performance
+# Problem here: I excluded all blocks with comprehension questions scores of 0, 
+# so if I plot only the cleaned data, the results will look different.
+# --> To do: Plot raw data from df_comprehension_Qs here
+# which(df_comprehension_Qs$nr_correct == 0)
+
+plot_df <- df_clean
+
+# aggregate by recording_location, age, ID and cognitive load condition
+plot_df <- setNames(aggregate(plot_df$question_acc,
+                              by = list(plot_df$participant, plot_df$cognitive_load),
+                              FUN = mean, na.rm = T),
+                    c("participant", "Task", "Mean_percent_correct"))
+
+# calculate percentage
+plot_df$Mean_percent_correct <- plot_df$Mean_percent_correct * 100
+
+# plot % correct by condition & age
+plot_comprehensionQs <- ggplot(plot_df,
+                               aes(x = Task, 
+                                   y = Mean_percent_correct)) +
+                         geom_violinhalf() +
+                         geom_jitter2(mapping = aes(group = participant), width = 0.2) +
+                         scale_color_manual(values = palet_task_condition_lines) +
+                         scale_fill_manual(values = palet_task_condition) +
+                         # scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+                         theme_classic(14) +
+                         #coord_cartesian(ylim = c(0, 1),
+                        #                xlim = c(18, 85)) +
+                         theme(legend.position = "bottom")
+            
+ggsave(plot_comprehensionQs, 
+       file = here::here(paste0("Plots/compr_Qs_", today, ".pdf")), 
+       device = "pdf", width = 4, height = 4)
+
+```  
+
