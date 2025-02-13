@@ -37,6 +37,7 @@ pkgs <- c("here", # for working with relative paths
           "car", # for basic Anova() function & aGSIFs (= basically weird adjusted VIFs)
           "sjPlot", # for running Anova & showing results in a HTML table in the Viewer
           "colorspace", # for beautiful and balanced color palettes
+          "readxl", # reading in Excel tables
           "interactions") # for simple slopes analysis
 
 
@@ -57,6 +58,12 @@ library(stopwords)
 # Load d-prime function from different R script:
 ```{r source d-prime function, echo = FALSE}
 source(here::here("get_dprime.R")) # get script
+```
+
+# Load R Data
+```{r}
+load(here::here("RData/exp_all_data.RData")) # df with all trials and participants incl demographic information
+load(here::here("RData/exp_df_comprehension_questions.RData")) # df with comprehension question accuracy
 ```
 
 
@@ -110,7 +117,6 @@ palet_effects <- c("#365464")
 
 # Set path to datasets
 ```{r path setup, echo = FALSE}
-# online and lab data should be all in 1 folder:
 path_data_folder <- here::here("Raw_data/fMRI_experiment/")
 ```
 
@@ -151,7 +157,6 @@ for (i in 1:length(file_list)) {
   # rename block_kind column
   subj_df <- subj_df %>% 
     rename(nback_level = n.back_level)
-  
 
   # GET RAW TEXT & N-BACK DATA
 
@@ -161,23 +166,23 @@ for (i in 1:length(file_list)) {
   # remove weird empty rows
   subj_df <- subset(subj_df, !is.na(run_nr))
 
+  
   ### ADD NUMBERED BLOCK NAMES ####
 
   # # We have each main block twice, but I would like to exclude outliers by block and not by condition.
   # # Reason: Reading times in second block might be slightly different than in first block, so don't mix them up.
   # 
-  # change_df <- subj_df %>% 
-  #   filter(!is.na(trial_nr)) %>% 
-  #   group_by(block_name, block_nr) %>% 
-  #   count() %>% 
-  #   ungroup() %>% 
-  #   group_by(block_name) %>% 
-  #   mutate(Index=1:n()) %>% 
-  #   mutate(block_names_numbered = paste(block_name, Index, sep = "_")) %>% 
-  #   select(-c(Index, n))
-  # 
-  # subj_df <- full_join(subj_df, change_df)
+  change_df <- subj_df %>%
+    filter(!is.na(trial_nr)) %>%
+    group_by(run_nr, block_nr_run, block_name) %>%
+    count() %>%
+    ungroup() %>%
+    group_by(block_name) %>%
+    mutate(Index=1:n()) %>%
+    mutate(block_names_numbered = paste(block_name, Index, sep = "_")) %>%
+    select(-c(Index, n))
 
+  subj_df <- full_join(subj_df, change_df)
 
   ### MERGE INFO ON RT PER LETTER INTO ONE COLUMN ####
   subset_df <- subj_df %>% 
@@ -194,7 +199,7 @@ for (i in 1:length(file_list)) {
     distinct()
   
   subj_df <- full_join(subj_df, subset_df)
-  
+
   
   # GET ADDITIONAL INFORMATION ON THE TEXTS:
 
@@ -329,15 +334,13 @@ for (i in 1:length(file_list)) {
 
   # append "empty" word frequency & surprisal score columns to df
   # to do so, create a vector of column names
-  col_names <- c("word_frequency", paste0("surprisal_", c(1, 4, 12, 60)))#,
-                 #paste0("surprisal_", c(1, 2, 8, 16, 32), "_ortho"),
-                 #paste0("similarity_", c(1, 2, 8, 16, 32)))
+  col_names <- c("word_frequency", "surprisal_2", "entropy_2")
   # then add "empty" columns to data frame subj_df
   subj_df[, col_names] <- 0
 
   # get word frequency & surprisal scores for each word
   # load word freq df
-  word_freqs_df = read.csv(here::here("word frequencies/Word_freqs.csv"), sep = ";", header = TRUE)[2:4]
+  word_freqs_df = read.csv(here::here("word_frequencies/Word_freqs.csv"), sep = ";", header = TRUE)[2:4]
   # Explanation: We compute the word frequencies using another
   #              script which is called "calculate_word_frequencies.py".
   #              You can find it in the Analysis folder.
@@ -347,8 +350,7 @@ for (i in 1:length(file_list)) {
 
 
   # Load surprisal scores
-  # load surprisal scores / similarity scores df with TS = context chunk size
-  surprisal_df = read.csv(here::here("surprisal scores/surprisal_scores_masked_context.csv"), sep = ",", header = TRUE)
+  surprisal_df = read.csv(here::here("surprisal_scores/vanilla_2words_surprisal_entropy.csv"), sep = ",", header = TRUE)
 
   # Explanation: I computed the scores in Python using a German GPT-2 model. For each text you can select a context chunk of x words (e.g. 5 words)
   #              and predict the next word. For each possible continuation of your context, you get probabilities.
@@ -382,15 +384,8 @@ for (i in 1:length(file_list)) {
       curr_row <- which(subj_df$text_nr == curr_text_nr & subj_df$question == "")
 
       # add the surprisal scores (untransformed & orthogonalized scores) there
-      subj_df[curr_row, c("surprisal_1", "surprisal_4",
-                          "surprisal_12", "surprisal_60")]  <- curr_surprisals[c("surprisal_1", "surprisal_4",
-                                                                                 "surprisal_12",  "surprisal_60")]
-      #subj_df[curr_row, c("surprisal_1_ortho", "surprisal_2_ortho",
-      #                    "surprisal_8_ortho", "surprisal_16_ortho",
-      #                    "surprisal_32_ortho")]                     <- curr_surprisals[c("surprisal_1_ortho", "surprisal_2_ortho",
-      #                                                                                    "surprisal_8_ortho", "surprisal_16_ortho",
-      #                                                                                    "surprisal_32_ortho")]
-
+      subj_df[curr_row, c("surprisal_2", "entropy_2")]  <- curr_surprisals[c("surprisal_2_words_context", "entropy_2_words_context")]
+      
     }# END if
   }# END loop texts
 
@@ -400,7 +395,7 @@ for (i in 1:length(file_list)) {
 
   # append "empty" word frequency & surprisal score columns to df
   # to do so, create a vector of column names
-  col_names <- c("word_frequency_previous_word", paste0("previous_surprisal_", c(1, 4, 12, 60)))
+  col_names <- c("word_frequency_previous_word", "previous_surprisal_2", "previous_entropy_2")
   # then add "empty" columns to data frame subj_df
   subj_df[, col_names] <- 0
 
@@ -425,33 +420,27 @@ for (i in 1:length(file_list)) {
       subj_df[which(subj_df$text_nr == curr_text_nr & subj_df$question == ""),]$word_frequency_previous_word <- curr_word_freqs
 
       # Do the same for the surprisal scores:
-      curr_surprisals <- subset(surprisal_df, text_nr == curr_text_nr)[ , c("surprisal_1", "surprisal_4",
-                                                                            "surprisal_12", "surprisal_60")]
+      curr_surprisals <- subset(surprisal_df, text_nr == curr_text_nr)[ , c("surprisal_2_words_context", "entropy_2_words_context")]
 
       # add 1 NA to the start of the vectors, remove last value in each
-      curr_surprisals <- rbind(c(NA, NA, NA, NA), curr_surprisals[-nrow(curr_surprisals), ])
+      curr_surprisals <- rbind(c(NA, NA), curr_surprisals[-nrow(curr_surprisals), ])
 
       # find out where in the subj_df text the current text nr is located
       curr_row <- which(subj_df$text_nr == curr_text_nr & subj_df$question == "")
 
       # add the surprisal scores (untransformed & orthogonalized scores) there
-      subj_df[curr_row, c("previous_surprisal_1", "previous_surprisal_4",
-                          "previous_surprisal_12","previous_surprisal_60")] <- curr_surprisals
+      subj_df[curr_row, c("previous_surprisal_2", "previous_entropy_2")] <- curr_surprisals
 
     }# END if
   }# END loop texts
-
+  
   ### CHANGE ORDER OF DATAFRAME ####
   # Move around the columns a bit:
   col_order <- c("participant", "nback_level", "block_nr_exp", "run_nr", "block_nr_run", "block_name",
                  "trial_nr", "text_nr", "word", "duration",
                  "colour", "target", "button_pressed", "nback_response", "nback_RT", "reaction",
                  "word_single", "word_length_single", "word_frequency", "Paced_RT",
-                 "surprisal_1", "surprisal_4", 
-                 "surprisal_12", "surprisal_60",
-                 "previous_surprisal_1", "previous_surprisal_4",
-                 "previous_surprisal_12","previous_surprisal_60",
-                 "word_frequency_previous_word", 
+                 "surprisal_2", "previous_surprisal_2", "word_frequency_previous_word", 
                  "previous_duration", "previous_reaction",
                  "session", "question", "chosen_ans", "ans_correct", "stop_word", "punctuation", "quotes", "date")
 
@@ -460,17 +449,15 @@ for (i in 1:length(file_list)) {
   ### GET PERFORMANCE MEASURES ####
 
   #### COMPREHENSION QUESTION PERFORMANCE ####
-  # Check the performance in the reading comprehension questions in the 2 baseline blocks:
-  # If they don't have 3/3 in at least one of the blocks, exclude their data.
-
+  
   # get question data:
-  Q_df <- subset(subj_df, question != "")[,c("question", "chosen_ans", "ans_correct", "text_nr", "nback_level", "participant")]
+  Q_df <- subset(subj_df, question != "")[,c("question", "chosen_ans", "ans_correct", "text_nr", "block_name", "participant")]
 
   Q_df$ans_correct <- as.logical(Q_df$ans_correct)
   
   # calculate accuracy per text
   Q_df <- Q_df %>% 
-    group_by(text_nr) %>% 
+   group_by(text_nr) %>% 
     mutate(question_acc = sum(ans_correct[ans_correct == TRUE])/3)
   
   Q_subset <- Q_df %>% 
@@ -510,8 +497,8 @@ for (i in 1:length(file_list)) {
     # (= participant reacted by accident)
     curr_block <- subset(curr_block, (nback_RT >= 100 | is.na(nback_RT)))
 
-    # if there are still some trials left (let's say at least 10), compute d-prime
-    if (length(curr_block$participant) > 10){
+    # if there are still some trials left (let's say at least 5), compute d-prime
+    if (length(curr_block$participant) > 5){
         # compute d-prime & add to bigger df
         d_prime <- get_dprime(curr_block$nback_response)
         subj_df$dprime[subj_df$block_nr_exp == nback_block] <- d_prime
@@ -559,25 +546,55 @@ for (i in 1:length(file_list)) {
 }# END READ IN DATASETS
 
 # exclude all trials that we marked for exclusion:
-df_all_data <- subset(df_all_data, excl_trial == FALSE)
+#df_all_data <- subset(df_all_data, excl_trial == FALSE)
+
 
 # clean up!
-rm(list=ls()[! ls() %in% c("df_all_data", "df_comprehension_Qs", 
-                           "apatheme", "palet_load", 
-                           "palet_dprimes", "palet_dprimes_lines", 
-                           "palet_lab_online", "palet9", "today")])
+#rm(list=ls()[! ls() %in% c("df_all_data", "df_comprehension_Qs", 
+#                           "apatheme", "palet_load", 
+#                           "palet_dprimes", "palet_dprimes_lines", 
+#                           "palet_lab_online", "palet9", "today")])
 ```
+
+# Add demographic data to dataframe
+```{r}
+# read in table with demographic data
+df_demographics <- readxl::read_excel(here::here("Raw_data/EXNAT_3_Participants_backup.xlsx"))
+df_demographics <- df_demographics[1:91,c("Subject", 
+                                          "Age", 
+                                          "Sex", 
+                                          "RT_per_letter_baseline", 
+                                          "RT_per_rect_1back_single", 
+                                          "RT_per_rect_2back_single",
+                                          "RT_per_letter_0back_dual",
+                                          "RT_per_letter_1bck_dual",
+                                          "RT_per_letter_2bck_dual",
+                                          "MOCA",
+                                          "DSST",
+                                          "TMT-A",
+                                          "TMT-B",
+                                          "Reading_span")]
+df_demographics <- df_demographics %>% 
+  rename(participant = Subject,
+         age = Age,
+         sex = Sex)
+
+df_all_data <- full_join(df_all_data, df_demographics)
+exp_all_data <- df_all_data
+```
+
 
 # Save raw data in folder "RData"
 ```{r save raw data, echo = FALSE}
 # save df
-save(df_all_data, file = here::here("RData/df_all_data.RData"))
+save(exp_all_data, file = here::here("RData/exp_all_data.RData"))
 
 # save comp question df
-save(df_comprehension_Qs, file = here::here("RData/df_comprehension_questions.RData"))
+save(df_comprehension_Qs, file = here::here("RData/exp_df_comprehension_questions.RData"))
 ```
 
 # Find & exclude outliers using z-sqrt-POMS-transformation
+# do not run until final transformation method is decided upon
 ```{r find and exclude outlier trials, echo = FALSE}
 # DOESN'T SEEM TO BE A VERY VALID APPROACH WITH PACED DURATIONS SINCE THEY ARE ALREADY VERY MUCH FOCUSED ON THE INDIVIDUAL'S PERFORMANCE. I BELIEVE WE MIGHT NOT HAVE TO EXCLUDE ANY OUTLIERS AT ALL IN THE PACED BLOCKS SINCE TECHNICALLY OUTLIERS ARE NOT A THING ANYMORE.
 
@@ -682,28 +699,32 @@ df_text_data_clean$tmp_transformed_RTs <- NULL
 # We now take the raw reading times again and log-transform them.
 
 # use natural logarithm (base e) here:
-df_text_data_clean$reading_times_log <- log(df_text_data_clean$duration)
+exp_all_data$reading_times_log <- log(exp_all_data$duration)
 # to reverse the log transformation and get the data back to the original scale (for easier interpretation of the results), 
 # use this: exp(log_transformed_data)
 
 # plot the distribution: 
-densityplot(df_text_data_clean$reading_times_log)
+ggplot(exp_all_data, aes(x = duration)) +
+  geom_density(fill="#69b3a2", color="#e9ecef", alpha=0.8) +
+  theme_bw()
+  #facet_wrap(~ block_name, nrow = 3)
+
+ggplot(exp_all_data, aes(x = reading_times_log)) +
+  geom_density(fill="#69b3a2", color="#e9ecef", alpha=0.8) +
+  theme_bw()
 
 # make sure we update the values in the column previous_duration as well:
-df_text_data_clean$previous_reading_times_log <- log(as.numeric(df_text_data_clean$previous_duration))
+exp_all_data$previous_reading_times_log <- log(as.numeric(exp_all_data$previous_duration))
 
 ```
 
 # Some renaming of columns
 ```{r}
-# name df differently:
-df_clean <- df_text_data_clean
-
 # rename "block_kind" column 
-names(df_clean)[which(names(df_clean) == "nback_level")] <- "cognitive_load"
+names(exp_all_data)[which(names(exp_all_data) == "nback_level")] <- "cognitive_load"
 
 # recode values in cognitive_load column
-df_clean <- df_clean %>% 
+exp_all_data <- exp_all_data %>% 
   mutate(cognitive_load = case_when(
     str_detect(cognitive_load, "None") ~ "Reading only",
     str_detect(cognitive_load, "1") ~ "1-back",
@@ -711,88 +732,50 @@ df_clean <- df_clean %>%
   ))
 
 # turn the values into factors and set their order
-df_clean$cognitive_load <- factor(df_clean$cognitive_load,
+exp_all_data$cognitive_load <- factor(exp_all_data$cognitive_load,
                                   levels = c("Reading only", "1-back", "2-back"))
 
 # save df
-save(df_clean, file = here::here("RData/df_clean_all_subjects.RData"))
+save(exp_all_data, file = here::here("RData/exp_all_data.RData"))
 ```
 
 # Plots
 ## Plot RTs by Task and Condition
 ```{r plot rt by task and cond}
-plot_df <- subset(df_clean, reaction == F)
+plot_df <- subset(exp_all_data, reaction == F)
 
 #---- RTs by Task and Condition ----
-plot_RT_task <- ggplot(plot_df, aes(x = cognitive_load, y = duration)) +
+(plot_RT_task <- ggplot(plot_df, aes(x = cognitive_load, y = duration)) +
                       #geom_violinhalf(flip = c(1,3,5)) +
                       geom_boxplot() +
                       #geom_point2(plot_surprisal_df_summary, mapping = aes(x = Cognitive_Load, y = Reaction_time)) +
-                      #scale_color_manual(values = palet_task_condition_lines) +
-                      #scale_fill_manual(values = palet_task_condition) +
+                      scale_color_manual(values = palet_task_condition_lines) +
+                      scale_fill_manual(values = palet_task_condition) +
                       #facet_wrap(~ Surprisal_TS, ncol = 4) +
                       theme_classic(14)
                       #theme(legend.position = "none",
                       #      strip.background.x=element_rect(color = NA))
+)
 # save plot
-cowplot::save_plot(plot_RT_task_cond, file = here::here(paste0("Plots/RT_task_cond_", today, ".pdf")))
+cowplot::save_plot(plot_RT_task, file = here::here(paste0("Plots/RT_task_cond", today, ".pdf")))
 ```
 
-## Plot RTs by Surprisal TS, Task & Condition (only dual-task blocks)
+## Plot RTs by Surprisal, Task & Condition (only dual-task blocks)
 ```{r plot RTs by Surprisal TS & Condition, message = FALSE, warning = FALSE}
-plot_surprisal_df <- subset(df_clean, reaction == F) # exclude trials where you had a reaction
-plot_surprisal_df <- pivot_longer(plot_surprisal_df, 
-                                  cols = c("surprisal_1", "surprisal_4",
-                                           "surprisal_12", "surprisal_60"),  
-                                  names_to = "surprisal_ts", 
-                                  values_to = "surprisal") %>% 
-  select(c(surprisal_ts, participant, surprisal, cognitive_load, duration)) 
-
-plot_surprisal_df$surprisal <- round(plot_surprisal_df$surprisal, digits = 0)
-# Now group by participant, cognitive_load & time scale
-plot_surprisal_df <- plot_surprisal_df %>% 
-                    #group_by(participant, cognitive_load, surprisal_ts, surprisal) %>% 
-                    #summarise(mean_rt = mean(duration)) %>% 
-                            rename(Surprisal_TS = surprisal_ts, 
-                                   Subject = participant,
-                                   Surprisal = surprisal,
-                                   Cognitive_Load = cognitive_load,
-                                   Reaction_time = duration)
-
-plot_surprisal_df$Surprisal_TS <- factor(plot_surprisal_df$Surprisal_TS, levels = c("surprisal_1", "surprisal_4", "surprisal_12", "surprisal_60"))
-
-#plot_surprisal_df_summary <- plot_surprisal_df %>% 
-#  group_by(Subject, Cognitive_Load) %>% 
-#  summarise(Reaction_time = mean(Reaction_time))
-
-#---- Plot RTs by Surprisal x Task ----
-plot_RT_surprisal_task <- ggplot(plot_surprisal_df, aes(x = Surprisal, y = Reaction_time)) +
-                      geom_smooth(method = lm, na.rm = T) +
-                      #geom_point2(plot_surprisal_df_summary, mapping = aes(x = Cognitive_Load, y = Reaction_time)) +
-                      #scale_color_manual(values = palet_task_condition) +
-                      #scale_fill_manual(values = palet_task_condition) +
-                      scale_x_continuous(breaks = scales::pretty_breaks(n = 5)) +
-                      facet_wrap(~ Surprisal_TS, ncol = 4) +
-                      theme_classic(14) +
-                      theme(strip.background.x=element_rect(color = NA))
-
-# save plot
-cowplot::save_plot(plot_RT_surprisal_task, file = here::here(paste0("Plots/RT_surprisal_task_", today, ".pdf")))
+plot_surprisal_df <- subset(exp_all_data, reaction == F) # exclude trials where you had a reaction
 
 #---- Plot RTs by Surprisal x Cognitive Load ----
-plot_RT_surprisal_cond <- ggplot(plot_surprisal_df, aes(x = Surprisal, y = Reaction_time, fill = Cognitive_Load, color = Cognitive_Load)) +
-                      geom_smooth(method = lm, aes(fill = Cognitive_Load), na.rm = T) +
+(plot_RT_surprisal_cond <- ggplot(plot_surprisal_df, aes(x = surprisal_2, y = duration, fill = cognitive_load, color = cognitive_load)) +
+                      geom_smooth(method = lm, aes(fill = cognitive_load), na.rm = T) +
                       #geom_point2(plot_surprisal_df_summary, mapping = aes(x = Cognitive_Load, y = Reaction_time)) +
                       scale_color_manual(values = palet_load) +
                       scale_fill_manual(values = palet_load) +
                       scale_x_continuous(breaks = scales::pretty_breaks(n = 5)) +
-                      facet_wrap(~ Surprisal_TS, ncol = 4) +
+                      #facet_wrap(~ Surprisal_TS, ncol = 4) +
                       theme_classic(14) +
-                      theme(legend.position = "none",
+                      theme(legend.position = "bottom",
                             strip.background.x=element_rect(color = NA))
-
-# save plot
-cowplot::save_plot(plot_RT_surprisal_cond, file = here::here(paste0("Plots/RT_surprisal_condition_", today, ".pdf")))
+)
 ```
 
 
@@ -801,7 +784,7 @@ d-primes and comprehension questions by Task and Condition
 Hint: We didn't have an n-back task in the baseline condition, so we can only compute & plot them for the 1-back and 2-back dual- and single-task blocks.
 ```{r plot d-primes by condition, age and location, echo = TRUE}
 # get data, exclude BL because we didn't have an n-back task there
-plot_df <- subset(df_clean, cognitive_load != "Reading only" )
+plot_df <- subset(exp_all_data, cognitive_load != "Reading only" )
 plot_df <- droplevels(plot_df)
 
 # get d-prime data:
@@ -817,7 +800,7 @@ plot_df <- setNames(aggregate(plot_df$dprime,
                     c("participant", "Task", "Mean_dprime"))
 
 # plot d-primes
-plot_dprimes <- ggplot(plot_df, aes(x = Task, 
+(plot_dprimes <- ggplot(plot_df, aes(x = Task, 
                                     y = Mean_dprime), 
                             width = 4, height = 7) +
                       #geom_point(aes(color = Condition, fill = Condition), 
@@ -830,17 +813,13 @@ plot_dprimes <- ggplot(plot_df, aes(x = Task,
                       scale_color_manual(values = palet_dprimes_lines) +
                       scale_fill_manual(values = palet_dprimes) +
                       theme_classic(14) +
-                      theme(legend.position=("bottom"))
+                      theme(legend.position=("bottom"))+
                       coord_cartesian(ylim = c(0, 5))
+)
 cowplot::save_plot(plot_dprimes, file = here::here(paste0("Plots/dprimes_", today, ".pdf")))
 
 ## plot comprehension question performance
-# Problem here: I excluded all blocks with comprehension questions scores of 0, 
-# so if I plot only the cleaned data, the results will look different.
-# --> To do: Plot raw data from df_comprehension_Qs here
-# which(df_comprehension_Qs$nr_correct == 0)
-
-plot_df <- df_clean
+plot_df <- exp_all_data
 
 # aggregate by recording_location, age, ID and cognitive load condition
 plot_df <- setNames(aggregate(plot_df$question_acc,
@@ -852,7 +831,7 @@ plot_df <- setNames(aggregate(plot_df$question_acc,
 plot_df$Mean_percent_correct <- plot_df$Mean_percent_correct * 100
 
 # plot % correct by condition & age
-plot_comprehensionQs <- ggplot(plot_df,
+(plot_comprehensionQs <- ggplot(plot_df,
                                aes(x = Task, 
                                    y = Mean_percent_correct)) +
                          geom_violinhalf() +
@@ -864,10 +843,256 @@ plot_comprehensionQs <- ggplot(plot_df,
                          #coord_cartesian(ylim = c(0, 1),
                         #                xlim = c(18, 85)) +
                          theme(legend.position = "bottom")
-            
-ggsave(plot_comprehensionQs, 
-       file = here::here(paste0("Plots/compr_Qs_", today, ".pdf")), 
-       device = "pdf", width = 4, height = 4)
-
+)
 ```  
 
+# Stats
+## Prepare data for LMMs
+```{r prepare stats, echo = FALSE}
+# shrink the df a bit: exclude rows that don't have surprisal scores on all time scales
+#lmm_df <- subset(exp_all_data, !is.na(surprisal_2))
+
+# only use data from the reading blocks from now on:
+lmm_df <- subset(exp_all_data, str_detect(block_name, "Reading") |
+                               str_detect(block_name, "dual"))
+lmm_df <- droplevels(lmm_df)
+
+# create a Simple Coding scheme for the variable cognitive_load
+c <- contr.treatment(3) # create dummy coding scheme
+my.coding <- matrix(rep(1/3, 6), ncol = 2) # make matrix with only 1/3 values
+my.simple <- c-my.coding
+
+#assign the new coding scheme to lmm_df$cognitive_load
+contrasts(lmm_df$cognitive_load) <- my.simple
+
+# typecast reaction as factor
+lmm_df$reaction <- as.factor(lmm_df$reaction)
+
+# typecast word_length_single, block_nr, trial_nr & age to numeric, and ID & text_nr to factor
+lmm_df$word_length_single <- as.numeric(lmm_df$word_length_single)
+lmm_df$trial_nr <- as.numeric(lmm_df$trial_nr)
+lmm_df$block_nr_exp <- as.numeric(lmm_df$block_nr_exp)
+lmm_df$run_nr <- as.numeric(lmm_df$run_nr)
+lmm_df$age <- as.numeric(lmm_df$age)
+lmm_df$participant <- as.factor(lmm_df$participant)
+lmm_df$MOCA <- as.numeric(lmm_df$MOCA)
+
+# ----------- Fix missing d-prime data in BL block -----------
+# Problem: I can't include a predictor that doesn't have any data in one of the groups. 
+# But I don't have any d-primes for the BL condition because there was no n-back 
+# in those blocks, so I have 2 options: Invent data for the BL block & be careful with interpretation, or exclude the d-primes entirely from my model, which would be sad because I want to control for speed-accuracy tradeoff effects. 
+
+# Idea: If d-prime is high, n-back accuracy is high and reading times should be slower.
+# So in the BL condition with super fast reading, d-primes should be low if there was an imaginary n-back task in those blocks. 
+# Idea: In order not to destroy the direction of the effect, use participant-level mean of all d-primes a constant in all BL blocks.
+# We basically fit a regression line for the effect, which will go through the mean in any way, right? So use the mean as the constant for BL.
+
+# try using participant-level mean of d-primes in 1-back and 2-back blocks as constant
+
+# loop participants in lmm_df, get mean d-prime and assign it as constant: 
+for (curr_id in unique(lmm_df$ID)){
+  
+  # get data of current participant
+  curr_participant <- subset(lmm_df, ID == curr_id)
+  
+  # get mean d-prime from all blocks where we don't have NAs (which are the 1-back and 2-back blocks)
+  mean_dprime <- mean(curr_participant$dprime, na.rm = T)
+  
+  # assign mean d-prime as constant in the BL blocks:
+  lmm_df[which(lmm_df$ID == curr_id & lmm_df$cognitive_load == "BL"), ]$dprime <- mean_dprime
+}
+
+# check if we still have NAs somewhere:
+#which(is.na(subset(lmm_df, cognitive_load == "BL")$dprime))
+
+
+# ----------- prepare columns to check for speed accuracy tradeoff effects -----------
+
+# Further ideas concerning speed accuracy tradeoffs:
+
+# Single participants could perform worse in the n-back than others, so we should have 1 mean d-prime value for each participant.
+# Likewise it is possible that participants perform differently in different blocks, 
+# e.g. they put more effort into doing the n-back in block 1 and then not so much anymore in block 2. So we also need d-primes on block-level.
+# To get rid of the participant-level effect, we need to subtract the mean from each block-wise d-prime though. 
+# So what we're doing now is creating 2 new columns with d-prime values: 
+# 1. a mean d-prime for each participant
+# 2. the deviation of each d-prime from the participant's mean for each block
+
+# 1. calculate mean d-prime for each participant
+#lmm_df$dprime_mean <- ave(lmm_df$dprime, lmm_df$ID, FUN = function(x) mean(x, na.rm = TRUE))
+
+# 2. subtract participant mean from each block's original d-prime
+#lmm_df$dprime_diff <- lmm_df$dprime - lmm_df$dprime_mean
+
+
+# 1. calculate mean %correct score for each participant
+lmm_df$question_acc <- lmm_df$question_acc*100
+
+# calculate mean per participant
+lmm_df <- lmm_df %>% 
+  group_by(participant) %>% 
+  mutate(question_acc_mean = mean(question_acc, na.rm = T)) 
+
+# 2. subtract participant mean from each block's original %correct score
+lmm_df$question_acc_diff <- lmm_df$question_acc - lmm_df$question_acc_mean
+
+
+# ----------- z-transform continuous variables for mixed models -----------
+
+# Define columns you want to z-transform:
+
+# z-transform: now you can compare the estimates in the lmm output
+# only center, not z-transform: units stay the same, makes the interpretation of estimates easier, but you can't compare the estimates anymore.
+#--> you could run the models twice, once with z-transformed values (for comparison of effects), once with centered values (for interpretation of single effects)
+freq_length_cols <- c("word_frequency", "word_length_single", 
+                      "dprime", #"dprime_mean", "dprime_diff", 
+                      "previous_reading_times_log",
+                      "question_acc", "question_acc_mean", 
+                      "question_acc_diff", 
+                      "mean_dprime_singletasks",
+                      "age")
+surprisal_cols   <- c("surprisal_2", "previous_surprisal_2") #  "entropy_2", "previous_entropy_2"
+
+# Apply scale function to each column
+# --> set center to TRUE to subtract the sample mean from each value, set scale to TRUE to divide by standard deviation
+# --> make sure to convert the data to vector format before adding them as a new column
+lmm_df[paste0(freq_length_cols, "_z")] <- lapply(lmm_df[freq_length_cols], 
+                                                 function(x) as.vector(scale(x, 
+                                                                             center = TRUE, 
+                                                                             scale = TRUE)))
+lmm_df[paste0(surprisal_cols, "_z")] <- lapply(lmm_df[surprisal_cols], 
+                                               function(x) as.vector(scale(x, 
+                                                                           center = TRUE, 
+                                                                           scale = TRUE)))
+
+lmm_df[paste0(freq_length_cols, "_centered")] <- lapply(lmm_df[freq_length_cols], 
+                                                        function(x) as.vector(scale(x, 
+                                                                                    center = TRUE, 
+                                                                                    scale = FALSE)))
+lmm_df[paste0(surprisal_cols, "_centered")] <- lapply(lmm_df[surprisal_cols], 
+                                                      function(x) as.vector(scale(x, 
+                                                                                  center = TRUE, 
+                                                                                  scale = FALSE)))
+
+```
+
+
+## save data
+```{r save lmm_df, echo = FALSE}
+
+# save df
+save(lmm_df, file = here::here("RData/lmm_df_all_subjects_02_25.RData"))
+```
+
+## Linear Mixed Model for log-transformed RT
+```{r}
+m_RT_ts2_age_centered_random_slope <- lmer(log(duration) ~ # control carry-over effects from previous trials:
+                                                           previous_reading_times_log_centered +
+                                                           # control diff. response strategies 
+                                                           # on block- and participant-level:
+                                                           dprime_centered + 
+                                                           mean_dprime_singletasks_centered +
+                                                           question_acc_mean_centered +
+                                                           question_acc_diff_centered + 
+                                                           # properties of words: 
+                                                           word_frequency_centered + 
+                                                           word_length_single_centered +
+                                                           # was there an n-back response in the trial?
+                                                           reaction + 
+                                                           # position of trial in experiment for 
+                                                           # controlling training & tiredness effects:
+                                                           block_nr_exp + trial_nr +
+                                                           # cognitive scores
+                                                           #scale(MOCA, scale = FALSE) +
+                                                           #DSST +
+                                                           #Reading_span +
+                                                           # Surprisal on TS 1, age & cognitive load condition:
+                                                           # main effects & their 2-way and 3-way interactions 
+                                                           surprisal_2_centered * age_centered * cognitive_load + 
+                                                           # subject-specific random slope of cognitive load:
+                                                           # cognitive load could have different 
+                                                           # effects on different participants
+                                                           (1 + cognitive_load | participant) + 
+                                                           # random slopes for text, word and colour, 
+                                                           # because we picked them "randomly" from a 
+                                                           # billion of possible other texts, words and colours
+                                                           (1 | text_nr) + 
+                                                           (1 | word) + 
+                                                           (1 | colour), 
+                                                           data = lmm_df, REML = TRUE, 
+                                                           lmerControl(optimizer = "bobyqa"))
+
+#--- model with entropy scores ----
+# performs better and should be our new model
+m_RT_ts2_age_centered_random_slope_entropy <- lmer(log(duration) ~ # control carry-over effects from previous trials:
+                                                           previous_reading_times_log_centered +
+                                                           # control diff. response strategies 
+                                                           # on block- and participant-level:
+                                                           dprime_centered + 
+                                                           mean_dprime_singletasks_centered +
+                                                           compr_Qs_percent_correct_mean_centered +
+                                                           compr_Qs_percent_correct_diff_centered + 
+                                                           # lab vs. online:
+                                                           recording_location + 
+                                                           # properties of words: 
+                                                           word_frequency_centered + 
+                                                           word_length_single_centered +
+                                                           # was there an n-back response in the trial?
+                                                           reaction + 
+                                                           # position of trial in experiment for 
+                                                           # controlling training & tiredness effects:
+                                                           block_nr + trial_nr +
+                                                           # entropy
+                                                           entropy_2_centered + 
+                                                           # Surprisal on TS 1, age & cognitive load condition:
+                                                           # main effects & their 2-way and 3-way interactions 
+                                                           surprisal_2_centered * age_centered * cognitive_load + 
+                                                           # subject-specific random slope of cognitive load:
+                                                           # cognitive load could have different 
+                                                           # effects on different participants
+                                                           (1 + cognitive_load | ID) + 
+                                                           # random slopes for text, word and colour, 
+                                                           # because we picked them "randomly" from a 
+                                                           # billion of possible other texts, words and colours
+                                                           (1 | text_nr) + 
+                                                           (1 | word) + 
+                                                           (1 | colour), 
+                                                           data = lmm_df, REML = TRUE, 
+                                                           # choose bobyqa optimizer 
+                                                           # (= Bound Optimization BY Quadratic Approximation) 
+                                                           # for estimating model parameters. 
+                                                           # It's efficient (= good for large datasets & 
+                                                           # complex models) and relatively conservative.
+                                                           lmerControl(optimizer = "bobyqa"))
+
+# save model output:
+saveRDS(m_RT_ts2_age_centered_random_slope_entropy, 
+        file = "Analysis/RData/Mixed_models/m_RT_ts2_age_centered_random_slope_entropy.rds")
+
+# Compare models
+anova(m_RT_ts2_age_centered_random_slope, m_RT_ts2_age_centered_random_slope_entropy) # The model with entropy is better than the one without
+
+## also run a version without mean-centering age for Johnson Neyman plots
+m_RT_ts2_No_centering_age <- lmer(log(duration) ~ previous_reading_times_log_centered + 
+                                                  dprime_centered + 
+                                                  mean_dprime_singletasks_centered + 
+                                                  compr_Qs_percent_correct_mean_centered +
+                                                  compr_Qs_percent_correct_diff_centered + 
+                                                  recording_location + word_frequency_centered +
+                                                  word_length_single_centered + reaction + 
+                                                  block_nr + trial_nr + 
+                                                  entropy_2_centered +
+                                                  surprisal_2_centered * age * cognitive_load + 
+                                                  (1 + cognitive_load | ID) + (1 | text_nr) + 
+                                                  (1 | word) + (1 | colour), 
+                                                  data = lmm_df, REML = TRUE, lmerControl(optimizer = "bobyqa"))
+saveRDS(m_RT_ts2_No_centering_age, 
+        file = "Analysis/RData/Mixed_models/m_RT_ts2_No_centering_age_random_slope_entropy.rds")
+
+#---- Comparing 1-back to 2-back and not only to reading baseline via post-hoc test ----
+test_predictions(m_RT_ts2_age_centered_random_slope_entropy, terms = "cognitive_load [1back, 2back]")
+
+# plotting the difference
+pred <- predict_response(m_RT_ts2_age_centered_random_slope_entropy, terms = "cognitive_load [1back, 2back]")
+plot(pred)
+```
