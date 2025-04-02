@@ -1,0 +1,172 @@
+{
+  "extractors": {
+    "EchoNumber": [
+      "[0-9]"
+    ]
+  },
+  "descriptions": [
+    {
+      "datatype": "anat",
+      "suffix": "T1w",
+      "criteria": {
+        "SeriesDescription": "t1_mprage_ADNI_32Ch_fc"
+      },
+      "sidecar_changes": {
+        "ProtocolName": "T1"
+      }
+    },
+    {
+      "datatype": "anat",
+      "suffix": "T2w",
+      "criteria": {
+        "SeriesDescription": "t2_spc_sag_p2_iso"
+      },
+      "sidecar_changes": {
+        "ProtocolName": "T2"
+      }
+    },
+    {
+      "id": "task_single_reading",
+      "datatype": "func",
+      "suffix": "sbref",
+      "custom_entities": [
+        "echo",
+        "task-singleReading"
+      ],
+      "criteria": {
+        "SeriesDescription": "cmrr_mbep2d_2.5iso_3ech_single_reading_SBRef"
+      }
+    },
+    {
+      "id": "task_single_reading",
+      "datatype": "func",
+      "suffix": "bold",
+      "custom_entities": [
+        "echo",
+        "task-singleReading"
+      ],
+      "criteria": {
+        "SeriesDescription": "cmrr_mbep2d_2.5iso_3ech_single_reading"
+      },
+      "sidecar_changes": {
+        "TaskName": "singleReading"
+      }
+    },
+    {
+      "id": "task_single_nback",
+      "datatype": "func",
+      "suffix": "sbref",
+      "custom_entities": [
+        "echo",
+        "task-singleNback"
+      ],
+      "criteria": {
+        "SeriesDescription": "cmrr_mbep2d_2.5iso_3ech_single_nback_SBRef"
+      }
+    },
+    {
+      "id": "task_single_nback",
+      "datatype": "func",
+      "suffix": "bold",
+      "custom_entities": [
+        "echo",
+        "task-singleNback"
+      ],
+      "criteria": {
+        "SeriesDescription": "cmrr_mbep2d_2.5iso_3ech_single_nback"
+      },
+      "sidecar_changes": {
+        "TaskName": "singleNback"
+      }
+    },
+    {
+      "id": "task_dual_task",
+      "datatype": "func",
+      "suffix": "sbref",
+      "custom_entities": [
+        "echo",
+        "task-dualTask"
+      ],
+      "criteria": {
+        "SeriesDescription": "cmrr_mbep2d_2.5iso_3ech_dual_task_SBRef"
+      }
+    },
+    {
+      "id": "task_dual_task",
+      "datatype": "func",
+      "suffix": "bold",
+      "custom_entities": [
+        "echo",
+        "task-dualTask"
+      ],
+      "criteria": {
+        "SeriesDescription": "cmrr_mbep2d_2.5iso_3ech_dual_task"
+      },
+      "sidecar_changes": {
+        "TaskName": "dualTask"
+      }
+    },
+    {
+      "datatype": "fmap",
+      "suffix": "epi",
+      "criteria": {
+        "SeriesDescription": "cmrr_mbep2d_se_2.5iso_norm",
+        "SeriesNumber": {
+          "lt": "10"
+        }
+      },
+      "sidecar_changes": {
+        "IntendedFor": [
+          "task_single_reading",
+          "task_single_nback"
+        ]
+      }
+    },
+    {
+      "datatype": "fmap",
+      "suffix": "epi",
+      "criteria": {
+        "SeriesDescription": "cmrr_mbep2d_se_2.5iso_invPol",
+        "SeriesNumber": {
+          "lt": "10"
+        }
+      },
+      "sidecar_changes": {
+        "IntendedFor": [
+          "task_single_reading",
+          "task_single_nback"
+        ]
+      }
+    },
+    {
+      "datatype": "fmap",
+      "suffix": "epi",
+      "criteria": {
+        "SeriesDescription": "cmrr_mbep2d_se_2.5iso_norm",
+        "SeriesNumber": {
+          "gt": "10"
+        }
+      },
+      "sidecar_changes": {
+        "IntendedFor": [
+          "task_dual_task"
+        ]
+      }
+    },
+    {
+      "datatype": "fmap",
+      "suffix": "epi",
+      "criteria": {
+        "SeriesDescription": "cmrr_mbep2d_se_2.5iso_invPol",
+        "SeriesNumber": {
+          "gt": "10"
+        }
+      },
+      "sidecar_changes": {
+        "IntendedFor": [
+          "task_dual_task"
+        ]
+      }
+    }
+  ]
+}
