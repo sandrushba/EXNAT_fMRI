@@ -2,7 +2,7 @@ import os
 import glob
 import pandas as pd
 from nilearn import plotting, datasets, surface
-from nilearn.glm.second_level import SecondLevelModel
+from nilearn.glm.second_level import SecondLevelModel, non_parametric_inference
 from nilearn.glm import threshold_stats_img
 
 def list_subject_folders(stats_dir):
@@ -13,7 +13,7 @@ def list_subject_folders(stats_dir):
             if os.path.isdir(os.path.join(stats_dir, name)) and name.startswith('sub-YA')]
 
 def find_con_img(stats_dir, sub_ID, run):
-    first_level_path = os.path.join(stats_dir, "subjects", sub_ID, "1st_level_SingleBlocks", sub_ID)
+    first_level_path = os.path.join(stats_dir, "subjects", sub_ID, "1st_level_SingleBlocks_noIntercept", sub_ID)
 
     img = glob.glob(os.path.join(first_level_path, "*" + run + "*stat-effect*.nii.gz"))
 
@@ -74,7 +74,11 @@ def main():
                 two_sided=False,
                 cluster_threshold=10)
 
-            output_path = os.path.join(stats_dir, "group_statistics", "SingleBlocks")
+            output_path = os.path.join(stats_dir, "group_statistics", "SingleBlocks_noIntercept")
+            if not os.path.exists(output_path):
+                # Create the directory
+                os.makedirs(output_path)
+
             # Save thresholded image
             thresholded_img.to_filename(f"{output_path}/{df_name}_thresholded.nii.gz")
             # Also save non-thresholded image
@@ -89,18 +93,18 @@ def main():
             view.save_as_html(os.path.join(output_path, df_name + "_thresholded_volume.html"))
 
             # Plot on surface
-            view = plotting.view_img_on_surf(
-                stat_map_img=thresholded_img,
-                surf_mesh="fsaverage",
-                darkness=1,
-                bg_on_data=True,
-                threshold=threshold,
-                cmap="spring",
-                vmin=threshold,
-                symmetric_cmap=False,
-                title=df_name)
+            # view = plotting.view_img_on_surf(
+            #     stat_map_img=thresholded_img,
+            #     surf_mesh="fsaverage",
+            #     darkness=1,
+            #     bg_on_data=True,
+            #     threshold=threshold,
+            #     cmap="spring",
+            #     vmin=threshold,
+            #     symmetric_cmap=False,
+            #     title=df_name)
             #view.open_in_browser()
-            view.save_as_html(os.path.join(output_path, df_name + "_thresholded_surface.html"))
+            #view.save_as_html(os.path.join(output_path, df_name + "_thresholded_surface.html"))
 
             # fsaverage = datasets.fetch_surf_fsaverage()
             # mesh = surface.load_surf_mesh(fsaverage.pial_left)

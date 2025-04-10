@@ -392,6 +392,8 @@ def make_contrasts(design_matrix, run):
             "Text vs Pseudotext": basic_contrasts["Reading_Baseline"] - basic_contrasts["Reading_pseudotext"],
             "Pseudotext vs Text": -basic_contrasts["Reading_Baseline"]
                               + basic_contrasts["Reading_pseudotext"],
+            "Text vs Rest": basic_contrasts["Reading_Baseline"],
+            "Pseudotext vs Rest": basic_contrasts["Reading_pseudotext"],
             "effects_of_interest": np.vstack(
                 (basic_contrasts["Reading_Baseline"], basic_contrasts["Reading_pseudotext"])
             )
@@ -401,6 +403,10 @@ def make_contrasts(design_matrix, run):
             "1back vs 2back": basic_contrasts["1back_single"] - basic_contrasts["2back_single"],
             "2back vs 1back": -basic_contrasts["1back_single"]
                               + basic_contrasts["2back_single"],
+            "1back vs Instructions": basic_contrasts["1back_single"] - basic_contrasts["instructions"],
+            "2back vs Instructions": basic_contrasts["2back_single"] - basic_contrasts["instructions"],
+            "1back vs Rest": basic_contrasts["1back_single"],
+            "2back vs Rest": basic_contrasts["2back_single"],
             "effects_of_interest": np.vstack(
                 (basic_contrasts["1back_single"], basic_contrasts["2back_single"])
             ),
@@ -492,6 +498,10 @@ def main():
                 oversampling=50
             )
 
+            #MODEL WITHOUT INTERCEPT
+            # Remove the last column of the design matrix to run a model without intercept for main effect
+            design_matrix = design_matrix.drop(design_matrix.columns[-1], axis=1)
+
             # put the design matrices in a list
             design_matrices.append(design_matrix)
 
@@ -519,7 +529,8 @@ def main():
                                        # time correction to account for this
                                        smoothing_fwhm=5,
                                        subject_label=sub_ID,
-                                       drift_model=None,  # no additional drift because we're already using cosine
+                                       drift_model=drift_model,  # no additional drift because we're already using cosine
+                                       high_pass=high_pass,
                                        # regressors from fmriprep
                                        hrf_model=hrf_model,
                                        mask_img=gm_mask_binary,
@@ -530,9 +541,11 @@ def main():
                                     sample_masks=sample_mask_corrected)
 
             # Save model output together with contrast images in stats directory
-            output_dir = os.path.join(stats_dir, sub_ID, "1st_level_SingleBlocks")
+            output_dir = os.path.join(stats_dir, sub_ID, "1st_level_SingleBlocks_noIntercept")
             save_glm_to_bids(model=fmri_glm,
                              contrasts=contrast_dict,
+                             contrast_types={"1back vs Rest": "F",
+                                             "2back vs Rest": "F"},
                              out_dir=output_dir,
                              prefix=sub_ID+"_"+run,
                              plot_type="glass")
